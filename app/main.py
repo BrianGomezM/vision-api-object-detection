@@ -1,47 +1,31 @@
+# app/main.py
 from fastapi import FastAPI
-from app.routes import batch
 from app.routes.detect import router as detect_router
 
-# --------------------------------------------------
-# CONFIGURACIÓN DE LA APLICACIÓN
-# --------------------------------------------------
+# Intentar importar batch si existe
+try:
+    from app.routes import batch
+    BATCH_AVAILABLE = True
+except ImportError:
+    BATCH_AVAILABLE = False
 
-# Se inicializa la aplicación FastAPI con información general
 app = FastAPI(
-    title="API Detección de Objetos",
-    description="Pruebas con modelos YOLO, Faster R-CNN y SSD",
-    version="1.0"
+    title="API de Detección de Objetos para Accesibilidad",
+    description="Genera descripciones narrativas egocéntricas para personas con ceguera total",
+    version="2.0.0"
 )
-
-
-# --------------------------------------------------
-# RUTA PRINCIPAL
-# --------------------------------------------------
 
 @app.get("/")
 def home():
-    """
-    Endpoint base para verificar que la API está activa.
+    return {
+        "message": "API funcionando correctamente 🚀",
+        "endpoints": {
+            "detect": "POST /api/detect",
+            "docs": "/docs"
+        }
+    }
 
-    Retorna:
-    -------
-    dict
-        Mensaje simple indicando que el servicio está funcionando.
-    """
-    return {"message": "API funcionando correctamente 🚀"}
-
-
-# --------------------------------------------------
-# REGISTRO DE RUTAS
-# --------------------------------------------------
-
-# Rutas de detección (YOLO, Faster R-CNN, SSD)
-# Incluyen endpoints como:
-# - /api/detect
-# - /api/detect-all
 app.include_router(detect_router, prefix="/api")
 
-# Rutas de ejecución batch (evaluación completa)
-# Incluye:
-# - /api/run-batch
-app.include_router(batch.router, prefix="/api", tags=["Batch"])
+if BATCH_AVAILABLE:
+    app.include_router(batch.router, prefix="/api", tags=["Batch"])
