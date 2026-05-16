@@ -1,11 +1,11 @@
 """
 app/routes/detect.py
 
-Pipeline completo: imagen → YOLO → espacial → free_space → decisión → LLM → narrativa
-
-Endpoints:
-  POST /detect       → respuesta normal para producción
-  POST /debug-detect → diagnóstico completo paso a paso (solo desarrollo)
+Endpoints disponibles:
+  POST /detect          → producción: narrativa egocéntrica completa
+  POST /debug-detect    → diagnóstico paso a paso (desarrollo)
+  POST /detect-all      → ejecuta los 3 modelos sobre la misma imagen (para A10)
+  GET  /health          → estado del servicio
 """
 
 import time
@@ -50,7 +50,6 @@ def build_final_narrative(description: str, instruction: str) -> str:
     """
     Descripción del entorno SIEMPRE primero.
     Instrucción de movimiento SIEMPRE al final.
-    Nunca se suprime ninguna de las dos partes.
     """
     desc = description.strip()
     inst = instruction.strip()
@@ -60,12 +59,41 @@ def build_final_narrative(description: str, instruction: str) -> str:
     return desc or inst or "No se detectaron objetos. Avanza con precaución."
 
 
-def _ms(t_start: float) -> float:
-    return round((time.time() - t_start) * 1000, 2)
+def _ms(t: float) -> float:
+    return round((time.time() - t) * 1000, 2)
+
+
+def _run_model(model_name: str, image_bytes: bytes, threshold: float) -> dict:
+    """Ejecuta el modelo indicado y retorna su resultado."""
+    runners = {"yolo": run_yolo, "fasterrcnn": run_fasterrcnn, "ssd": run_ssd}
+    return runners[model_name](image_bytes, threshold)
+
+
+def _metricas_deteccion(detections: list) -> dict:
+    """Calcula métricas de detección a partir de la lista de objetos."""
+    if not detections:
+        return {
+            "num_detections": 0,
+            "avg_confidence": 0.0,
+            "max_confidence": 0.0,
+            "min_confidence": 0.0,
+            "unique_labels":  0,
+            "labels":         [],
+        }
+    confs  = [d["confidence"] for d in detections]
+    labels = [d["label"]      for d in detections]
+    return {
+        "num_detections": len(detections),
+        "avg_confidence": round(sum(confs) / len(confs), 3),
+        "max_confidence": round(max(confs), 3),
+        "min_confidence": round(min(confs), 3),
+        "unique_labels":  len(set(labels)),
+        "labels":         list(set(labels)),
+    }
 
 
 # ──────────────────────────────────────────────────────────────
-# ENDPOINT PRODUCCIÓN
+# ENDPOINT PRODUCCIÓN — narrativa egocéntrica completa
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/detect")
@@ -91,6 +119,7 @@ async def detect(
         image_bytes = await file.read()
         image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
         tiempos["lectura_imagen"] = _ms(t0)
+
         if debug:
             debug_info["imagen"] = {
                 "original":         f"{w_orig}x{h_orig}",
@@ -102,8 +131,7 @@ async def detect(
 
         # 2. Detección
         t1 = time.time()
-        runners = {"yolo": run_yolo, "fasterrcnn": run_fasterrcnn, "ssd": run_ssd}
-        result     = runners[model](image_bytes, threshold)
+        result     = _run_model(model, image_bytes, threshold)
         detections = result.get("detections", [])
         tiempos["deteccion"] = _ms(t1)
 
@@ -128,9 +156,8 @@ async def detect(
         description = desc_result.get("text", "")
         tiempos["llm_descripcion"] = _ms(t5)
 
-        # 7. Narrativa final — descripción SIEMPRE primero
+        # 7. Narrativa final
         final_narrative = build_final_narrative(description, decision["instruction"])
-
         tiempos["total"] = _ms(start_total)
 
         if debug:
@@ -176,7 +203,79 @@ async def detect(
 
 
 # ──────────────────────────────────────────────────────────────
-# ENDPOINT DIAGNÓSTICO — muestra cada paso del pipeline
+# ENDPOINT EVALUACIÓN — compara los 3 modelos sobre una imagen
+# Usado para A10: evaluar desempeño de modelos según criterios
+# ──────────────────────────────────────────────────────────────
+
+@router.post("/detect-all")
+async def detect_all(
+    file: UploadFile            = File(...),
+    confidence_threshold: float = Form(0.35),
+):
+    """
+    Ejecuta YOLO, Faster R-CNN y SSD sobre la misma imagen.
+    Retorna métricas comparativas: tiempo, objetos detectados,
+    confianza promedio/máxima/mínima y clases detectadas.
+
+    Usar con Postman para la actividad A10.
+    """
+    image_bytes_raw = await file.read()
+    threshold = normalize_threshold(confidence_threshold)
+
+    # Redimensionar una sola vez
+    image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes_raw)
+
+    resultados = {}
+
+    for model_name in ["yolo", "fasterrcnn", "ssd"]:
+        t_start = time.time()
+        try:
+            result     = _run_model(model_name, image_bytes, threshold)
+            detections = result.get("detections", [])
+            t_ms       = _ms(t_start)
+
+            resultados[model_name] = {
+                "status":             "success",
+                "tiempo_inferencia_ms": t_ms,
+                "metricas":           _metricas_deteccion(detections),
+                "detections":         detections[:15],  # primeras 15 para no saturar
+            }
+        except Exception as e:
+            resultados[model_name] = {
+                "status": "error",
+                "error":  str(e),
+                "tiempo_inferencia_ms": _ms(t_start),
+            }
+
+    # Resumen comparativo
+    resumen = []
+    for mn, r in resultados.items():
+        if r["status"] == "success":
+            m = r["metricas"]
+            resumen.append({
+                "modelo":               mn,
+                "tiempo_ms":            r["tiempo_inferencia_ms"],
+                "objetos_detectados":   m["num_detections"],
+                "confianza_promedio":   m["avg_confidence"],
+                "confianza_max":        m["max_confidence"],
+                "clases_unicas":        m["unique_labels"],
+                "clases":               m["labels"],
+            })
+
+    return {
+        "imagen": {
+            "archivo":  file.filename,
+            "original": f"{w_orig}x{h_orig}",
+            "procesada": f"{width}x{height}",
+        },
+        "umbral_confianza": threshold,
+        "resumen_comparativo": resumen,
+        "resultados_detallados": resultados,
+    }
+
+
+# ──────────────────────────────────────────────────────────────
+# ENDPOINT DIAGNÓSTICO — pipeline paso a paso
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/debug-detect")
@@ -185,44 +284,32 @@ async def debug_detect(
     file: UploadFile            = File(...),
     confidence_threshold: float = Form(default=0.35),
 ):
-    """
-    Endpoint de diagnóstico completo.
-
-    Muestra:
-      - Todas las detecciones RAW de YOLO (sin filtros de navegación)
-      - Detecciones después de filtros
-      - Análisis espacial objeto por objeto
-      - Cobertura real de cada zona
-      - Qué envía al LLM
-      - Narrativa final con cada parte separada
-
-    Úsalo cuando la narrativa no sea coherente con la imagen.
-    Llámalo desde /docs con debug=True para ver todo.
-    """
+    """Diagnóstico completo del pipeline. Ver cada paso por separado."""
     report: dict = {"pasos": {}}
 
     try:
-        # ── Imagen ────────────────────────────────────────────
         image_bytes = await file.read()
         image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
         threshold = normalize_threshold(confidence_threshold)
 
         report["imagen"] = {
-            "original":  f"{w_orig}x{h_orig}",
-            "procesada": f"{width}x{height}",
+            "original":       f"{w_orig}x{h_orig}",
+            "procesada":      f"{width}x{height}",
             "threshold_usado": threshold,
         }
 
-        # ── PASO 1: YOLO raw (umbral muy bajo para ver todo) ──
-        from app.services.yolo_service import _get_model, _INTERNAL_CONF, _NAV_CLASSES, _CRITICAL, _CRITICAL_MIN_CONF
+        # Paso 1: YOLO raw con umbral mínimo
+        from app.services.yolo_service import (
+            _get_model, _INTERNAL_CONF, _NAV_CLASSES, _CRITICAL, _CRITICAL_MIN_CONF
+        )
         from PIL import Image as PILImage
 
-        yolo_model  = _get_model()
-        pil_image   = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
+        yolo_model = _get_model()
+        pil_image  = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
 
         raw_results = yolo_model.predict(
             source=pil_image,
-            conf=0.15,          # umbral mínimo para ver TODO lo que YOLO detecta
+            conf=0.15,
             iou=0.50,
             imgsz=int(os.getenv("YOLO_IMGSZ", "1280")),
             verbose=False,
@@ -233,194 +320,120 @@ async def debug_detect(
             if r.boxes is None:
                 continue
             for box in r.boxes:
-                conf   = float(box.conf[0])
-                cls_id = int(box.cls[0])
-                label  = yolo_model.names[cls_id]
+                conf  = float(box.conf[0])
+                label = yolo_model.names[int(box.cls[0])]
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
                 raw_detections.append({
-                    "label":      label,
-                    "confidence": round(conf, 3),
+                    "label":          label,
+                    "confidence":     round(conf, 3),
                     "en_nav_classes": label in _NAV_CLASSES,
                     "es_critico":     label in _CRITICAL,
-                    "pasa_filtro":    (
+                    "pasa_filtro": (
                         label in _NAV_CLASSES and
                         conf >= (_CRITICAL_MIN_CONF if label in _CRITICAL else threshold)
                     ),
-                    "bbox": {
-                        "x1": round(x1, 1), "y1": round(y1, 1),
-                        "x2": round(x2, 1), "y2": round(y2, 1),
-                    },
+                    "bbox": {"x1": round(x1,1), "y1": round(y1,1),
+                             "x2": round(x2,1), "y2": round(y2,1)},
                 })
 
         raw_detections.sort(key=lambda d: d["confidence"], reverse=True)
-
         report["pasos"]["1_yolo_raw"] = {
-            "descripcion":      "Todo lo que YOLO detecta con conf>=0.15, antes de filtros",
-            "total_detectado":  len(raw_detections),
-            "clases_unicas":    list({d["label"] for d in raw_detections}),
-            "detecciones":      raw_detections,
+            "descripcion":     "Todo lo que YOLO detecta con conf>=0.15, antes de filtros",
+            "total_detectado": len(raw_detections),
+            "clases_unicas":   list({d["label"] for d in raw_detections}),
+            "detecciones":     raw_detections,
         }
 
-        # ── PASO 2: Detecciones después de filtros ────────────
+        # Paso 2: detecciones filtradas
         result     = run_yolo(image_bytes, threshold)
         detections = result.get("detections", [])
-
         report["pasos"]["2_detecciones_filtradas"] = {
-            "descripcion":   "Detecciones que pasaron los filtros de navegación",
-            "total":         len(detections),
-            "clases":        [d["label"] for d in detections],
-            "detecciones":   detections,
+            "descripcion": "Detecciones que pasaron los filtros de navegación",
+            "total":       len(detections),
+            "clases":      [d["label"] for d in detections],
+            "detecciones": detections,
         }
 
-        # ── PASO 3: Análisis espacial ─────────────────────────
+        # Paso 3: análisis espacial
         analyzed = analyze_spatial(detections, width, height)
-
         report["pasos"]["3_analisis_espacial"] = {
-            "descripcion":  "Objetos con posición egocéntrica asignada",
-            "total":        len(analyzed),
+            "descripcion": "Objetos con posición egocéntrica asignada",
+            "total":       len(analyzed),
             "objetos": [
                 {
-                    "label":      obj["label_es"],
-                    "posicion":   obj["position"],
-                    "zona":       f"{obj['depth_key']}_{obj['lateral_key']}",
-                    "prioridad":  obj["priority"],
-                    "tamano":     obj["relative_size"],
-                    "cantidad":   obj.get("count", 1),
-                    "confianza":  f"{obj['confidence']:.1%}",
+                    "label":     obj["label_es"],
+                    "posicion":  obj["position"],
+                    "zona":      f"{obj['depth_key']}_{obj['lateral_key']}",
+                    "prioridad": obj["priority"],
+                    "tamano":    obj["relative_size"],
+                    "cantidad":  obj.get("count", 1),
+                    "confianza": f"{obj['confidence']:.1%}",
                 }
                 for obj in analyzed
             ],
         }
 
-        # ── PASO 4: Espacio libre ─────────────────────────────
+        # Paso 4: espacio libre
         free_space = calculate_free_space(analyzed, width)
-
         report["pasos"]["4_espacio_libre"] = {
-            "descripcion":      "Cobertura de obstáculos por zona (0=libre, 1=bloqueado)",
-            "zonas":            free_space["zones"],
-            "mejor_direccion":  free_space["best_direction"],
-            "situacion":        free_space["situation"],
+            "descripcion":     "Cobertura de obstáculos por zona",
+            "zonas":           free_space["zones"],
+            "mejor_direccion": free_space["best_direction"],
+            "situacion":       free_space["situation"],
             "interpretacion": {
-                "left":   _interpretar_zona(free_space["zones"]["left"]),
-                "center": _interpretar_zona(free_space["zones"]["center"]),
-                "right":  _interpretar_zona(free_space["zones"]["right"]),
+                k: ("libre" if v < 0.10 else "parcialmente ocupado" if v < 0.35 else "bloqueado")
+                for k, v in free_space["zones"].items()
             },
         }
 
-        # ── PASO 5: Decisión de movimiento ────────────────────
+        # Paso 5: decisión
         decision = decide_movement(analyzed, free_space)
-
         report["pasos"]["5_decision"] = {
-            "descripcion": "Instrucción de movimiento generada por risk_engine",
+            "descripcion": "Instrucción de movimiento",
             "instruccion": decision["instruction"],
         }
 
-        # ── PASO 6: Descripción LLM ───────────────────────────
+        # Paso 6: descripción LLM
         desc_result = generate_description(analyzed, debug=True)
         description = desc_result.get("text", "")
-
         report["pasos"]["6_descripcion_llm"] = {
-            "descripcion":    "Texto descriptivo generado (solo describe, no instruye)",
+            "descripcion":    "Texto descriptivo del entorno",
             "texto":          description,
             "prompt_enviado": desc_result.get("prompt", "fallback_manual_usado"),
             "error_llm":      desc_result.get("llm_error"),
         }
 
-        # ── PASO 7: Narrativa final ───────────────────────────
+        # Paso 7: narrativa final
         final = build_final_narrative(description, decision["instruction"])
-
         report["pasos"]["7_narrativa_final"] = {
-            "descripcion":             "Combinación final para la persona ciega",
-            "descripcion_entorno":     description,
-            "instruccion_movimiento":  decision["instruction"],
-            "narrativa_completa":      final,
+            "descripcion_entorno":    description,
+            "instruccion_movimiento": decision["instruction"],
+            "narrativa_completa":     final,
         }
 
         report["narrativa_final"] = final
-        report["diagnostico"]     = _generar_diagnostico(report)
+
+        # Diagnóstico automático
+        avisos = []
+        perdidas = [d for d in raw_detections if not d["pasa_filtro"] and d["confidence"] > 0.25]
+        if perdidas:
+            perdidas_str = ", ".join(
+                f"{d['label']} ({d['confidence']:.0%})" for d in perdidas[:5]
+            )
+            avisos.append(f"WARN: {len(perdidas)} objeto(s) descartados por filtros: {perdidas_str}")
+        if len(detections) == 0:
+            avisos.append("ERROR: ningún objeto pasó los filtros. Bajar confidence_threshold.")
+        elif len(detections) < 3:
+            avisos.append(f"WARN: solo {len(detections)} objeto(s) detectados.")
+        if not avisos:
+            avisos.append("OK: pipeline sin anomalias detectadas.")
+        report["diagnostico"] = avisos
 
         return report
 
     except Exception as e:
         report["error"] = str(e)
         return report
-
-
-# ──────────────────────────────────────────────────────────────
-# HELPERS DE DIAGNÓSTICO
-# ──────────────────────────────────────────────────────────────
-
-def _interpretar_zona(valor: float) -> str:
-    if valor < 0.10:
-        return "libre"
-    if valor < 0.35:
-        return "parcialmente ocupado"
-    return "bloqueado"
-
-
-def _generar_diagnostico(report: dict) -> list[str]:
-    """
-    Genera advertencias automáticas para ayudar a identificar
-    por qué la narrativa puede no ser coherente con la imagen.
-    """
-    avisos = []
-    pasos  = report.get("pasos", {})
-
-    raw       = pasos.get("1_yolo_raw", {})
-    filtered  = pasos.get("2_detecciones_filtradas", {})
-    spatial   = pasos.get("3_analisis_espacial", {})
-    espacio   = pasos.get("4_espacio_libre", {})
-
-    raw_total      = raw.get("total_detectado", 0)
-    filtered_total = filtered.get("total", 0)
-
-    # ¿Se perdieron detecciones en el filtro?
-    perdidas = [
-        d for d in raw.get("detecciones", [])
-        if not d["pasa_filtro"] and d["confidence"] > 0.25
-    ]
-    if perdidas:
-        labels_perdidos = [(d["label"], f"{d['confidence']:.0%}") for d in perdidas[:5]]
-        avisos.append(
-            f"⚠️  {len(perdidas)} objeto(s) detectados por YOLO pero descartados por filtros: "
-            f"{labels_perdidos}. Considera bajar confidence_threshold."
-        )
-
-    # ¿Muy pocos objetos llegan al análisis?
-    if filtered_total == 0:
-        avisos.append(
-            "❌ YOLO no retornó ningún objeto relevante. "
-            "Prueba bajar confidence_threshold a 0.25 o verificar que el modelo yolov8x.pt esté descargado."
-        )
-    elif filtered_total < 3:
-        avisos.append(
-            f"⚠️  Solo {filtered_total} objeto(s) detectados. "
-            "La imagen puede tener más objetos navegables. Prueba threshold=0.25."
-        )
-
-    # ¿El centro tiene cobertura alta pero no hay obstáculos al frente en spatial?
-    center_cov = espacio.get("zonas", {}).get("center", 0)
-    objs_frente = [o for o in spatial.get("objetos", []) if "center" in o.get("zona", "")]
-    if center_cov > 0.35 and not objs_frente:
-        avisos.append(
-            "⚠️  El centro aparece bloqueado en free_space pero no hay objetos "
-            "clasificados como 'center' en el análisis espacial. "
-            "Puede haber un objeto que cubre múltiples zonas."
-        )
-
-    # ¿La dirección sugerida tiene cobertura mayor a 0?
-    mejor = espacio.get("mejor_direccion", "")
-    cob_mejor = espacio.get("zonas", {}).get(mejor, 0)
-    if cob_mejor > 0.20:
-        avisos.append(
-            f"⚠️  La dirección sugerida '{mejor}' tiene cobertura {cob_mejor:.0%}. "
-            "Puede haber obstáculos en esa dirección que el sistema no detectó correctamente."
-        )
-
-    if not avisos:
-        avisos.append("✅ Pipeline sin anomalías detectadas.")
-
-    return avisos
 
 
 # ──────────────────────────────────────────────────────────────

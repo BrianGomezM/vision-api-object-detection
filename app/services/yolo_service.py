@@ -26,9 +26,9 @@ import io
 import os
 
 # ── Configuración general ──────────────────────────────────────
-YOLO_WEIGHTS   = os.getenv("YOLO_WEIGHTS", "yolov8x.pt")
-YOLO_IMGSZ     = int(os.getenv("YOLO_IMGSZ",  "1280"))
-YOLO_IOU       = float(os.getenv("YOLO_IOU",  "0.50"))
+YOLO_WEIGHTS   = os.getenv("YOLO_WEIGHTS", "yolo26s.pt") # modelo grande para mejorar detección de objetos pequeños;
+YOLO_IMGSZ     = int(os.getenv("YOLO_IMGSZ",  "1280"))# tamaño de imagen para inferencia; 1280 mejora detección de objetos pequeños sin ser tan lento como 640
+YOLO_IOU       = float(os.getenv("YOLO_IOU",  "0.50")) # IOU para NMS, no afecta a la confianza de detección
 _INTERNAL_CONF = 0.15   # YOLO ve todo desde aquí; filtramos después por clase
 
 # ──────────────────────────────────────────────────────────────
