@@ -31,7 +31,7 @@ OUTPUT_JSON    = "test_results_json"
 OUTPUT_EXCEL   = "test_results_summary.xlsx"
 OUTPUT_CHARTS  = "charts"
 
-MODELS     = ["yolo", "fasterrcnn", "ssd"]
+MODELS = ["yolo", "fasterrcnn", "maskrcnn", "ssd"]
 THRESHOLDS = [0.3, 0.5, 0.7]
 
 process = psutil.Process()

@@ -5,13 +5,14 @@ numpy
 torch
 torchvision
 ultralytics
+opencv-python
 requests
 pandas
 matplotlib
 psutil
 openpyxl
 python-multipart
+python-dotenv
 deep-translator==1.11.4
-# LLM opcionales (elige uno o ambos)
-openai==1.30.0           # Para GPT-4o-mini
-google-generativeai==0.7.0  # Para Gemini (gratuito)
+openai==1.30.0
+google-generativeai==0.7.0

@@ -1,11 +1,22 @@
 """
 app/routes/detect.py
 
-Endpoints disponibles:
-  POST /detect          → producción: narrativa egocéntrica completa
-  POST /debug-detect    → diagnóstico paso a paso (desarrollo)
-  POST /detect-all      → ejecuta los 3 modelos sobre la misma imagen (para A10)
+Endpoints:
+  POST /detect          → narrativa egocéntrica completa (producción)
+  POST /detect-all      → compara los 4 modelos sobre la misma imagen (evaluación A10)
+  POST /debug-detect    → pipeline paso a paso (diagnóstico)
   GET  /health          → estado del servicio
+
+MODELOS DISPONIBLES:
+  yolo       → YOLO26 (Ultralytics, 2026)
+  fasterrcnn → Faster R-CNN ResNet-101-FPN (Detectron2, 2026)
+  maskrcnn   → Mask R-CNN ResNet-101-FPN (Detectron2, 2026)
+  ssd        → SSD-MobileNet V2 (TF Hub / TF Object Detection API, 2026)
+
+FUNCIONALIDADES:
+  - Estimación de pasos: distancia aproximada en pasos hasta cada objeto.
+  - Clasificación de escenario: tipo de espacio detectado (sala, cocina, etc.).
+  - Narrativa egocéntrica: descripción en lenguaje de primera persona para ciegos.
 """
 
 import time
@@ -16,14 +27,18 @@ import io
 
 from app.services.yolo_service        import run_yolo
 from app.services.fasterrcnn_service  import run_fasterrcnn
+from app.services.maskrcnn_service    import run_maskrcnn
 from app.services.ssd_service         import run_ssd
 from app.services.spatial_analyzer    import analyze_spatial
 from app.services.free_space_analyzer import calculate_free_space
 from app.services.risk_engine         import decide_movement
 from app.services.llm_enhancer        import generate_description
+from app.services.step_estimator      import estimate_steps
+from app.services.scene_classifier    import classify_scene
 
 router = APIRouter()
 
+_VALID_MODELS = {"yolo", "fasterrcnn", "maskrcnn", "ssd"}
 
 # ──────────────────────────────────────────────────────────────
 # UTILIDADES
@@ -46,17 +61,22 @@ def resize_image(image_bytes: bytes, max_dim: int = 800):
     return image_bytes, ow, oh, ow, oh
 
 
-def build_final_narrative(description: str, instruction: str) -> str:
+def build_final_narrative(scene_intro: str, description: str, instruction: str) -> str:
     """
-    Descripción del entorno SIEMPRE primero.
-    Instrucción de movimiento SIEMPRE al final.
+    Narrativa final:
+      1. Contexto de escenario (si confianza media o alta)
+      2. Descripción de objetos con posición y pasos
+      3. Instrucción de movimiento
     """
-    desc = description.strip()
-    inst = instruction.strip()
-    if desc and inst:
-        sep = " " if desc.endswith(".") else ". "
-        return f"{desc}{sep}{inst}"
-    return desc or inst or "No se detectaron objetos. Avanza con precaución."
+    parts = [p.strip() for p in [scene_intro, description, instruction] if p and p.strip()]
+    if not parts:
+        return "No se detectaron objetos. Avanza con precaución."
+    result = ""
+    for part in parts:
+        if result:
+            result += " " if result.endswith(".") else ". "
+        result += part
+    return result
 
 
 def _ms(t: float) -> float:
@@ -64,13 +84,16 @@ def _ms(t: float) -> float:
 
 
 def _run_model(model_name: str, image_bytes: bytes, threshold: float) -> dict:
-    """Ejecuta el modelo indicado y retorna su resultado."""
-    runners = {"yolo": run_yolo, "fasterrcnn": run_fasterrcnn, "ssd": run_ssd}
+    runners = {
+        "yolo":       run_yolo,
+        "fasterrcnn": run_fasterrcnn,
+        "maskrcnn":   run_maskrcnn,
+        "ssd":        run_ssd,
+    }
     return runners[model_name](image_bytes, threshold)
 
 
 def _metricas_deteccion(detections: list) -> dict:
-    """Calcula métricas de detección a partir de la lista de objetos."""
     if not detections:
         return {
             "num_detections": 0,
@@ -93,7 +116,7 @@ def _metricas_deteccion(detections: list) -> dict:
 
 
 # ──────────────────────────────────────────────────────────────
-# ENDPOINT PRODUCCIÓN — narrativa egocéntrica completa
+# ENDPOINT PRODUCCIÓN
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/detect")
@@ -110,9 +133,9 @@ async def detect(
         start_total = time.time()
 
         if not file:
-            return {"error": "No se envió archivo"}
-        if model not in ["yolo", "fasterrcnn", "ssd"]:
-            return {"error": f"Modelo no válido: {model}"}
+            return {"status": "error", "message": "No se envió archivo"}
+        if model not in _VALID_MODELS:
+            return {"status": "error", "message": f"Modelo no válido: {model}. Usa: {sorted(_VALID_MODELS)}"}
 
         # 1. Imagen
         t0 = time.time()
@@ -140,24 +163,39 @@ async def detect(
         analyzed_objects = analyze_spatial(detections, width, height)
         tiempos["analisis_espacial"] = _ms(t2)
 
-        # 4. Espacio libre
+        # 4. Estimación de pasos
         t3 = time.time()
-        free_space = calculate_free_space(analyzed_objects, width)
-        tiempos["free_space"] = _ms(t3)
+        analyzed_objects = estimate_steps(analyzed_objects, width, height)
+        tiempos["estimacion_pasos"] = _ms(t3)
 
-        # 5. Decisión de movimiento
+        # 5. Espacio libre
         t4 = time.time()
-        decision = decide_movement(analyzed_objects, free_space)
-        tiempos["decision"] = _ms(t4)
+        free_space = calculate_free_space(analyzed_objects, width)
+        tiempos["free_space"] = _ms(t4)
 
-        # 6. Descripción LLM
+        # 6. Decisión de movimiento
         t5 = time.time()
+        decision = decide_movement(analyzed_objects, free_space)
+        tiempos["decision"] = _ms(t5)
+
+        # 7. Clasificación de escenario
+        t6 = time.time()
+        scene_info  = classify_scene(analyzed_objects)
+        tiempos["clasificacion_escenario"] = _ms(t6)
+        scene_intro = (
+            scene_info.get("scene_intro", "")
+            if scene_info.get("confidence") in ("media", "alta")
+            else ""
+        )
+
+        # 8. Descripción LLM
+        t7 = time.time()
         desc_result = generate_description(analyzed_objects, debug)
         description = desc_result.get("text", "")
-        tiempos["llm_descripcion"] = _ms(t5)
+        tiempos["llm_descripcion"] = _ms(t7)
 
-        # 7. Narrativa final
-        final_narrative = build_final_narrative(description, decision["instruction"])
+        # 9. Narrativa final
+        final_narrative = build_final_narrative(scene_intro, description, decision["instruction"])
         tiempos["total"] = _ms(start_total)
 
         if debug:
@@ -171,26 +209,34 @@ async def detect(
                     "confianza": f"{obj['confidence']:.1%}",
                     "tamano":    obj.get("relative_size"),
                     "cantidad":  obj.get("count", 1),
+                    "pasos":     obj.get("steps_estimate"),
                 }
                 for obj in analyzed_objects[:10]
             ]
             debug_info["free_space"]      = free_space
             debug_info["decision"]        = decision
+            debug_info["escenario"]       = scene_info
             debug_info["descripcion_llm"] = description
 
         response = {
             "status":          "success",
-            "model":           model,
+            "model":           result.get("model", model),
             "narrativa_final": final_narrative,
+            "escenario": {
+                "tipo":      scene_info.get("scene_type", "desconocido"),
+                "confianza": scene_info.get("confidence", "baja"),
+            },
             "metricas": {
-                "tiempo_total_ms":    tiempos["total"],
-                "deteccion_ms":       tiempos["deteccion"],
-                "espacial_ms":        tiempos["analisis_espacial"],
-                "free_space_ms":      tiempos["free_space"],
-                "decision_ms":        tiempos["decision"],
-                "llm_ms":             tiempos["llm_descripcion"],
-                "objetos_detectados": len(detections),
-                "umbral_confianza":   threshold,
+                "tiempo_total_ms":         tiempos["total"],
+                "deteccion_ms":            tiempos["deteccion"],
+                "espacial_ms":             tiempos["analisis_espacial"],
+                "estimacion_pasos_ms":     tiempos["estimacion_pasos"],
+                "free_space_ms":           tiempos["free_space"],
+                "decision_ms":             tiempos["decision"],
+                "escenario_ms":            tiempos["clasificacion_escenario"],
+                "llm_ms":                  tiempos["llm_descripcion"],
+                "objetos_detectados":      len(detections),
+                "umbral_confianza":        threshold,
             },
         }
         if debug:
@@ -203,8 +249,7 @@ async def detect(
 
 
 # ──────────────────────────────────────────────────────────────
-# ENDPOINT EVALUACIÓN — compara los 3 modelos sobre una imagen
-# Usado para A10: evaluar desempeño de modelos según criterios
+# ENDPOINT EVALUACIÓN — compara los 4 modelos
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/detect-all")
@@ -213,69 +258,73 @@ async def detect_all(
     confidence_threshold: float = Form(0.35),
 ):
     """
-    Ejecuta YOLO, Faster R-CNN y SSD sobre la misma imagen.
-    Retorna métricas comparativas: tiempo, objetos detectados,
-    confianza promedio/máxima/mínima y clases detectadas.
-
-    Usar con Postman para la actividad A10.
+    Ejecuta YOLO26, Faster R-CNN (Detectron2), Mask R-CNN (Detectron2)
+    y SSD-MobileNet V2 (TF Hub) sobre la misma imagen.
+    Retorna métricas comparativas para la evaluación A10.
     """
     image_bytes_raw = await file.read()
     threshold = normalize_threshold(confidence_threshold)
-
-    # Redimensionar una sola vez
     image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes_raw)
 
-    resultados = {}
+    model_versions = {
+        "yolo":       "YOLO26 (Ultralytics 2026)",
+        "fasterrcnn": "Faster R-CNN ResNet-101-FPN (Detectron2 2026)",
+        "maskrcnn":   "Mask R-CNN ResNet-101-FPN (Detectron2 2026)",
+        "ssd":        "SSD-MobileNet V2 (TF Hub 2026)",
+    }
 
-    for model_name in ["yolo", "fasterrcnn", "ssd"]:
+    resultados = {}
+    for model_name in ["yolo", "fasterrcnn", "maskrcnn", "ssd"]:
         t_start = time.time()
         try:
             result     = _run_model(model_name, image_bytes, threshold)
             detections = result.get("detections", [])
             t_ms       = _ms(t_start)
-
             resultados[model_name] = {
-                "status":             "success",
+                "status":               "success",
+                "model_version":        model_versions[model_name],
+                "model_id":             result.get("model", model_name),
                 "tiempo_inferencia_ms": t_ms,
-                "metricas":           _metricas_deteccion(detections),
-                "detections":         detections[:15],  # primeras 15 para no saturar
+                "metricas":             _metricas_deteccion(detections),
+                "detections":           detections[:15],
             }
         except Exception as e:
             resultados[model_name] = {
-                "status": "error",
-                "error":  str(e),
+                "status":               "error",
+                "model_version":        model_versions[model_name],
+                "error":                str(e),
                 "tiempo_inferencia_ms": _ms(t_start),
             }
 
-    # Resumen comparativo
     resumen = []
     for mn, r in resultados.items():
         if r["status"] == "success":
             m = r["metricas"]
             resumen.append({
-                "modelo":               mn,
-                "tiempo_ms":            r["tiempo_inferencia_ms"],
-                "objetos_detectados":   m["num_detections"],
-                "confianza_promedio":   m["avg_confidence"],
-                "confianza_max":        m["max_confidence"],
-                "clases_unicas":        m["unique_labels"],
-                "clases":               m["labels"],
+                "modelo":             mn,
+                "version":            r.get("model_version"),
+                "tiempo_ms":          r["tiempo_inferencia_ms"],
+                "objetos_detectados": m["num_detections"],
+                "confianza_promedio": m["avg_confidence"],
+                "confianza_max":      m["max_confidence"],
+                "clases_unicas":      m["unique_labels"],
+                "clases":             m["labels"],
             })
 
     return {
         "imagen": {
-            "archivo":  file.filename,
-            "original": f"{w_orig}x{h_orig}",
+            "archivo":   file.filename,
+            "original":  f"{w_orig}x{h_orig}",
             "procesada": f"{width}x{height}",
         },
-        "umbral_confianza": threshold,
-        "resumen_comparativo": resumen,
+        "umbral_confianza":      threshold,
+        "resumen_comparativo":   resumen,
         "resultados_detallados": resultados,
     }
 
 
 # ──────────────────────────────────────────────────────────────
-# ENDPOINT DIAGNÓSTICO — pipeline paso a paso
+# ENDPOINT DIAGNÓSTICO
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/debug-detect")
@@ -284,7 +333,7 @@ async def debug_detect(
     file: UploadFile            = File(...),
     confidence_threshold: float = Form(default=0.35),
 ):
-    """Diagnóstico completo del pipeline. Ver cada paso por separado."""
+    """Diagnóstico completo del pipeline, paso a paso."""
     report: dict = {"pasos": {}}
 
     try:
@@ -293,71 +342,28 @@ async def debug_detect(
         threshold = normalize_threshold(confidence_threshold)
 
         report["imagen"] = {
-            "original":       f"{w_orig}x{h_orig}",
-            "procesada":      f"{width}x{height}",
+            "original":        f"{w_orig}x{h_orig}",
+            "procesada":       f"{width}x{height}",
+            "modelo":          model,
             "threshold_usado": threshold,
         }
 
-        # Paso 1: YOLO raw con umbral mínimo
-        from app.services.yolo_service import (
-            _get_model, _INTERNAL_CONF, _NAV_CLASSES, _CRITICAL, _CRITICAL_MIN_CONF
-        )
-        from PIL import Image as PILImage
-
-        yolo_model = _get_model()
-        pil_image  = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
-
-        raw_results = yolo_model.predict(
-            source=pil_image,
-            conf=0.15,
-            iou=0.50,
-            imgsz=int(os.getenv("YOLO_IMGSZ", "1280")),
-            verbose=False,
-        )
-
-        raw_detections = []
-        for r in raw_results:
-            if r.boxes is None:
-                continue
-            for box in r.boxes:
-                conf  = float(box.conf[0])
-                label = yolo_model.names[int(box.cls[0])]
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                raw_detections.append({
-                    "label":          label,
-                    "confidence":     round(conf, 3),
-                    "en_nav_classes": label in _NAV_CLASSES,
-                    "es_critico":     label in _CRITICAL,
-                    "pasa_filtro": (
-                        label in _NAV_CLASSES and
-                        conf >= (_CRITICAL_MIN_CONF if label in _CRITICAL else threshold)
-                    ),
-                    "bbox": {"x1": round(x1,1), "y1": round(y1,1),
-                             "x2": round(x2,1), "y2": round(y2,1)},
-                })
-
-        raw_detections.sort(key=lambda d: d["confidence"], reverse=True)
-        report["pasos"]["1_yolo_raw"] = {
-            "descripcion":     "Todo lo que YOLO detecta con conf>=0.15, antes de filtros",
-            "total_detectado": len(raw_detections),
-            "clases_unicas":   list({d["label"] for d in raw_detections}),
-            "detecciones":     raw_detections,
-        }
-
-        # Paso 2: detecciones filtradas
-        result     = run_yolo(image_bytes, threshold)
+        # Paso 1: detecciones filtradas
+        result     = _run_model(model, image_bytes, threshold)
         detections = result.get("detections", [])
-        report["pasos"]["2_detecciones_filtradas"] = {
-            "descripcion": "Detecciones que pasaron los filtros de navegación",
-            "total":       len(detections),
-            "clases":      [d["label"] for d in detections],
-            "detecciones": detections,
+        report["pasos"]["1_detecciones_filtradas"] = {
+            "descripcion":   "Detecciones tras filtros de navegación",
+            "model_version": result.get("model", model),
+            "backbone":      result.get("backbone", "N/A"),
+            "total":         len(detections),
+            "clases":        list({d["label"] for d in detections}),
+            "detecciones":   detections,
         }
 
-        # Paso 3: análisis espacial
+        # Paso 2: análisis espacial
         analyzed = analyze_spatial(detections, width, height)
-        report["pasos"]["3_analisis_espacial"] = {
-            "descripcion": "Objetos con posición egocéntrica asignada",
+        report["pasos"]["2_analisis_espacial"] = {
+            "descripcion": "Objetos con posición egocéntrica 3×3",
             "total":       len(analyzed),
             "objetos": [
                 {
@@ -366,67 +372,85 @@ async def debug_detect(
                     "zona":      f"{obj['depth_key']}_{obj['lateral_key']}",
                     "prioridad": obj["priority"],
                     "tamano":    obj["relative_size"],
-                    "cantidad":  obj.get("count", 1),
                     "confianza": f"{obj['confidence']:.1%}",
                 }
                 for obj in analyzed
             ],
         }
 
+        # Paso 3: estimación de pasos
+        analyzed = estimate_steps(analyzed, width, height)
+        report["pasos"]["3_estimacion_pasos"] = {
+            "descripcion": "Pasos aproximados hasta cada objeto (estimación heurística)",
+            "advertencia": "Valores aproximados basados en tamaño y posición en imagen, no distancia real",
+            "objetos": [
+                {
+                    "label":    o["label_es"],
+                    "pasos":    o.get("steps_estimate"),
+                    "posicion": o.get("position"),
+                    "tamano":   o.get("relative_size"),
+                }
+                for o in analyzed if o.get("steps_estimate") is not None
+            ],
+        }
+
         # Paso 4: espacio libre
         free_space = calculate_free_space(analyzed, width)
         report["pasos"]["4_espacio_libre"] = {
-            "descripcion":     "Cobertura de obstáculos por zona",
+            "descripcion":     "Cobertura de obstáculos por columna",
             "zonas":           free_space["zones"],
             "mejor_direccion": free_space["best_direction"],
             "situacion":       free_space["situation"],
-            "interpretacion": {
-                k: ("libre" if v < 0.10 else "parcialmente ocupado" if v < 0.35 else "bloqueado")
-                for k, v in free_space["zones"].items()
-            },
         }
 
-        # Paso 5: decisión
+        # Paso 5: decisión de movimiento
         decision = decide_movement(analyzed, free_space)
         report["pasos"]["5_decision"] = {
-            "descripcion": "Instrucción de movimiento",
+            "descripcion": "Instrucción de movimiento generada por risk_engine",
             "instruccion": decision["instruction"],
         }
 
-        # Paso 6: descripción LLM
+        # Paso 6: clasificación de escenario
+        scene_info = classify_scene(analyzed)
+        report["pasos"]["6_escenario"] = {
+            "descripcion":  "Tipo de escenario inferido a partir de los objetos detectados",
+            "tipo":         scene_info.get("scene_type"),
+            "confianza":    scene_info.get("confidence"),
+            "frase_intro":  scene_info.get("scene_intro"),
+        }
+
+        # Paso 7: descripción LLM
         desc_result = generate_description(analyzed, debug=True)
         description = desc_result.get("text", "")
-        report["pasos"]["6_descripcion_llm"] = {
-            "descripcion":    "Texto descriptivo del entorno",
+        report["pasos"]["7_descripcion_llm"] = {
+            "descripcion":    "Descripción egocéntrica con pasos generada por LLM",
             "texto":          description,
-            "prompt_enviado": desc_result.get("prompt", "fallback_manual_usado"),
+            "prompt_enviado": desc_result.get("prompt", "fallback_manual"),
             "error_llm":      desc_result.get("llm_error"),
         }
 
-        # Paso 7: narrativa final
-        final = build_final_narrative(description, decision["instruction"])
-        report["pasos"]["7_narrativa_final"] = {
+        # Paso 8: narrativa final
+        scene_intro = (
+            scene_info.get("scene_intro", "")
+            if scene_info.get("confidence") in ("media", "alta") else ""
+        )
+        final = build_final_narrative(scene_intro, description, decision["instruction"])
+        report["pasos"]["8_narrativa_final"] = {
+            "escenario":              scene_intro,
             "descripcion_entorno":    description,
             "instruccion_movimiento": decision["instruction"],
             "narrativa_completa":     final,
         }
-
         report["narrativa_final"] = final
 
         # Diagnóstico automático
         avisos = []
-        perdidas = [d for d in raw_detections if not d["pasa_filtro"] and d["confidence"] > 0.25]
-        if perdidas:
-            perdidas_str = ", ".join(
-                f"{d['label']} ({d['confidence']:.0%})" for d in perdidas[:5]
-            )
-            avisos.append(f"WARN: {len(perdidas)} objeto(s) descartados por filtros: {perdidas_str}")
         if len(detections) == 0:
-            avisos.append("ERROR: ningún objeto pasó los filtros. Bajar confidence_threshold.")
+            avisos.append("ERROR: ningún objeto detectado. Bajar confidence_threshold.")
         elif len(detections) < 3:
-            avisos.append(f"WARN: solo {len(detections)} objeto(s) detectados.")
+            avisos.append(f"WARN: solo {len(detections)} objeto(s) detectado(s).")
         if not avisos:
-            avisos.append("OK: pipeline sin anomalias detectadas.")
+            avisos.append("OK: pipeline sin anomalías detectadas.")
         report["diagnostico"] = avisos
 
         return report
@@ -445,5 +469,10 @@ async def health_check():
     return {
         "status": "healthy",
         "groq":   bool(os.environ.get("GROQ_API_KEY")),
-        "models": ["yolo", "fasterrcnn", "ssd"],
+        "models": {
+            "yolo":       "YOLO26 (Ultralytics 2026)",
+            "fasterrcnn": "Faster R-CNN ResNet-101-FPN (Detectron2 2026)",
+            "maskrcnn":   "Mask R-CNN ResNet-101-FPN (Detectron2 2026)",
+            "ssd":        "SSD-MobileNet V2 (TF Hub / TF Object Detection API 2026)",
+        },
     }

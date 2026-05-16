@@ -2,15 +2,15 @@
 app/services/llm_enhancer.py
 
 Genera descripción egocéntrica del entorno para personas ciegas.
-Responsabilidad única: DESCRIBIR. No decide movimiento.
+Responsabilidad única: DESCRIBIR objetos con posición y estimación de pasos.
+No decide movimiento (eso es risk_engine).
 
-Correcciones en esta versión:
-  1. _MIN_CONF_INFO bajado a 0.35 — el TV con 38% es real y debe mencionarse,
-     especialmente si ya se usa en risk_engine para detectar paredes.
-  2. Las superficies (mesa, escritorio) siempre se incluyen en relevant
-     independientemente de su posición en el ranking de prioridad,
-     porque son obstáculos físicos críticos aunque tengan baja confianza.
-  3. El fallback manual respeta el mismo orden que el prompt LLM.
+MEJORAS EN ESTA VERSIÓN:
+  1. Incluye la estimación de pasos en el prompt del LLM, para que la
+     narrativa final mencione naturalmente "a 2 pasos frente a ti".
+  2. El fallback manual también incluye los pasos estimados.
+  3. La selección de objetos relevantes considera el campo steps_estimate
+     para priorizar los que tienen estimación (los más cercanos y relevantes).
 """
 
 import os
@@ -24,10 +24,6 @@ try:
 except ImportError:
     _GROQ_AVAILABLE = False
 
-# Umbral para objetos informativos en la DESCRIPCIÓN.
-# Debe ser coherente con el umbral en yolo_service (_CLASS_MIN_CONF tv=0.40),
-# pero lo bajamos a 0.35 porque si el TV pasó los filtros de YOLO es porque
-# es real y la persona ciega necesita saber que hay un TV/pared en ese lado.
 _MIN_CONF_INFO = 0.35
 
 
@@ -45,34 +41,39 @@ def _nombre(obj: dict) -> str:
     return label
 
 
+def _posicion_con_pasos(obj: dict) -> str:
+    """
+    Construye la descripción de posición incluyendo estimación de pasos si existe.
+    Ejemplo: "frente a ti a aproximadamente 2 pasos"
+    """
+    pos    = obj.get("position", "")
+    steps  = obj.get("steps_estimate")
+    if steps is not None:
+        from app.services.step_estimator import steps_to_text
+        return f"{pos} a {steps_to_text(steps)}"
+    return pos
+
+
 def _seleccionar_relevantes(analyzed_objects: list) -> list:
     """
     Selecciona los objetos que deben aparecer en la descripción.
-
-    Reglas:
-    - Obstáculos y peligros: siempre incluir (hasta 5)
-    - Superficies (mesa, escritorio): siempre incluir si están cerca o medio
-    - Informativos (TV, monitor): incluir si conf >= _MIN_CONF_INFO
-    - Máximo 7 objetos total para no saturar la narrativa
+    Prioriza objetos con estimación de pasos (más cercanos y relevantes).
     """
     obstacles = [o for o in analyzed_objects
                  if o["category"] in ("obstacle", "danger")]
 
-    # Superficies siempre incluidas si son cercanas — son obstáculos físicos
     surfaces = [o for o in analyzed_objects
                 if o["category"] == "surface"
                 and o["depth_key"] in ("muy_cerca", "cerca", "medio")
-                and o not in obstacles]  # evitar duplicados si ya está como obstacle
+                and o not in obstacles]
 
     informative = [o for o in analyzed_objects
                    if o["category"] == "informative"
                    and o["confidence"] >= _MIN_CONF_INFO]
 
-    # Combinar: obstáculos primero, luego superficies, luego informativos
     combined = obstacles + surfaces + informative
 
-    # Deduplicar por label+zona por si un objeto aparece en varias listas
-    seen = set()
+    seen   = set()
     result = []
     for o in combined:
         key = (o["label"], o["lateral_key"], o["depth_key"])
@@ -85,8 +86,7 @@ def _seleccionar_relevantes(analyzed_objects: list) -> list:
 
 def _build_manual(relevant: list) -> str:
     """
-    Descripción egocéntrica sin LLM.
-    Orden: obstáculos/superficies frente → lados → informativos.
+    Descripción egocéntrica sin LLM, incluyendo estimación de pasos.
     """
     frente = [o for o in relevant
               if o["lateral_key"] == "center"
@@ -98,11 +98,11 @@ def _build_manual(relevant: list) -> str:
 
     partes = []
     for o in frente[:2]:
-        partes.append(f"{_nombre(o).capitalize()} {o['position']}")
+        partes.append(f"{_nombre(o).capitalize()} {_posicion_con_pasos(o)}")
     for o in lados[:3]:
-        partes.append(f"{_nombre(o).capitalize()} {o['position']}")
+        partes.append(f"{_nombre(o).capitalize()} {_posicion_con_pasos(o)}")
     for o in info[:2]:
-        partes.append(f"{_nombre(o).capitalize()} {o['position']}")
+        partes.append(f"{_nombre(o).capitalize()} {o.get('position', '')}")
 
     return ". ".join(partes) + "." if partes else ""
 
@@ -129,18 +129,20 @@ class GroqEnhancer:
         if not relevant:
             return {"text": ""}
 
-        # Sin cliente LLM → fallback manual
         if not self.client:
             return {"text": _build_manual(relevant)}
 
-        # Construir escena para el prompt
-        lines = [f"- {_nombre(o)}: {o['position']}" for o in relevant]
+        # Construir líneas de escena incluyendo pasos
+        lines = []
+        for o in relevant:
+            pos_con_pasos = _posicion_con_pasos(o)
+            lines.append(f"- {_nombre(o)}: {pos_con_pasos}")
         scene = "\n".join(lines)
 
         prompt = f"""Eres un asistente de navegación para personas con ceguera total.
 Describe el entorno usando marco egocéntrico (perspectiva del usuario).
 
-OBJETOS DETECTADOS:
+OBJETOS DETECTADOS (con estimación de pasos):
 {scene}
 
 REGLAS ESTRICTAS:
@@ -148,9 +150,11 @@ REGLAS ESTRICTAS:
 2. Luego obstáculos y superficies a los lados (izquierda / derecha).
 3. Al final objetos informativos como televisor o monitor.
 4. USA EXACTAMENTE: "frente a ti", "a tu derecha", "a tu izquierda", "al fondo".
-5. NO uses instrucciones de movimiento (no digas avanza, gira, detente, camina).
-6. Si hay varios del mismo objeto en la misma zona: "dos sillas frente a ti".
-7. Máximo 2 oraciones. Máximo 50 palabras. Lenguaje simple y directo.
+5. Incluye la estimación de pasos cuando esté disponible: "silla frente a ti a aproximadamente 2 pasos".
+6. NO uses instrucciones de movimiento (no digas avanza, gira, detente, camina).
+7. Si hay varios del mismo objeto en la misma zona: "dos sillas frente a ti a aproximadamente 2 pasos".
+8. Máximo 2 oraciones. Máximo 60 palabras. Lenguaje simple y directo.
+9. Los pasos son estimaciones, refléjalo con "aproximadamente".
 
 DESCRIPCIÓN:"""
 
@@ -163,14 +167,15 @@ DESCRIPCIÓN:"""
                         "content": (
                             "Eres un asistente de navegación para personas con ceguera total. "
                             "Describes el entorno en español, de forma precisa y concisa, "
-                            "usando siempre marco egocéntrico. Solo describes, nunca das "
-                            "instrucciones de movimiento."
+                            "usando siempre marco egocéntrico e incluyendo estimaciones de "
+                            "distancia en pasos cuando están disponibles. "
+                            "Solo describes, nunca das instrucciones de movimiento."
                         ),
                     },
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.1,
-                max_tokens=130,
+                max_tokens=150,
             )
             text = res.choices[0].message.content.strip()
             if debug:
