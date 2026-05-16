@@ -1,13 +1,16 @@
 """
 app/routes/batch.py
 
-Ejecuta pruebas masivas sobre todas las imágenes en test_images/
-con los tres modelos y tres thresholds.
+Pruebas masivas sobre todas las imágenes en test_images/
+con los cuatro modelos y tres thresholds.
 
-Corrección respecto a versión anterior:
-  El endpoint /detect ya no retorna una lista 'detections' directamente.
-  Ahora retorna 'metricas.objetos_detectados' (conteo) y los objetos
-  están en 'debug.objetos'. Este archivo lee la estructura correcta.
+CORRECCIONES EN ESTA VERSIÓN:
+  1. MODELS actualizado a 4 modelos: yolo, fasterrcnn, maskrcnn, ssd.
+  2. extraer_metricas ahora lee todos los campos de metricas del endpoint
+     actualizado: estimacion_pasos_ms, escenario_ms, decision_ms, free_space_ms.
+  3. col_order actualizado con los nuevos campos de métricas.
+  4. generar_grafica_barras con paleta de 4 colores para los 4 modelos.
+  5. El campo "escenario" del response se guarda en el Excel.
 """
 
 from fastapi import APIRouter
@@ -22,24 +25,20 @@ import matplotlib.pyplot as plt
 
 router = APIRouter()
 
-# ──────────────────────────────────────────────────────────────
-# CONFIGURACIÓN
-# ──────────────────────────────────────────────────────────────
-API_URL        = "http://127.0.0.1:8000/api/detect"
-IMAGE_DIR      = "test_images"
-OUTPUT_JSON    = "test_results_json"
-OUTPUT_EXCEL   = "test_results_summary.xlsx"
-OUTPUT_CHARTS  = "charts"
+API_URL       = "http://127.0.0.1:8000/api/detect"
+IMAGE_DIR     = "test_images"
+OUTPUT_JSON   = "test_results_json"
+OUTPUT_EXCEL  = "test_results_summary.xlsx"
+OUTPUT_CHARTS = "charts"
 
-MODELS = ["yolo", "fasterrcnn", "maskrcnn", "ssd"]
+MODELS     = ["yolo", "fasterrcnn", "maskrcnn", "ssd"]
 THRESHOLDS = [0.3, 0.5, 0.7]
+
+# Paleta de 4 colores — uno por modelo
+_COLORS = ["#4C72B0", "#55A868", "#C44E52", "#DD8452"]
 
 process = psutil.Process()
 
-
-# ──────────────────────────────────────────────────────────────
-# HELPERS DE RECURSOS
-# ──────────────────────────────────────────────────────────────
 
 def get_mem_mb():
     return process.memory_info().rss / (1024 * 1024)
@@ -56,43 +55,20 @@ def get_mime_type(filename):
     return "image/png" if filename.lower().endswith(".png") else "image/jpeg"
 
 
-# ──────────────────────────────────────────────────────────────
-# HELPER — EXTRAE MÉTRICAS DE LA RESPUESTA NUEVA
-# ──────────────────────────────────────────────────────────────
-
 def extraer_metricas(result: dict) -> dict:
     """
-    Extrae métricas de detección de la respuesta del endpoint /detect.
-
-    La respuesta nueva tiene esta estructura:
-      {
-        "status": "success",
-        "model": "yolo",
-        "narrativa_final": "...",
-        "metricas": {
-          "objetos_detectados": 5,
-          "tiempo_total_ms": 1234,
-          "deteccion_ms": 800,
-          ...
-        },
-        "debug": {
-          "objetos": [
-            {"objeto": "silla", "confianza": "92.1%", ...},
-            ...
-          ]
-        }
-      }
-
-    Retorna un dict con los campos que necesita batch para el Excel.
+    Extrae métricas del endpoint /detect.
+    Estructura actual:
+      result.metricas  → tiempos y conteo
+      result.debug.objetos → lista con confianza, pasos, etc.
+      result.escenario → tipo y confianza del escenario
     """
     metricas = result.get("metricas", {})
-    debug    = result.get("debug",    {})
-    objetos  = debug.get("objetos",   [])
+    debug    = result.get("debug", {})
+    objetos  = debug.get("objetos", [])
+    escenario = result.get("escenario", {})
 
-    # Extraer confianzas de los objetos del debug
-    # El campo "confianza" viene como "92.1%" → convertir a float
-    confianzas = []
-    labels     = []
+    confianzas, labels = [], []
     for obj in objetos:
         try:
             conf_str = obj.get("confianza", "0%").replace("%", "")
@@ -106,28 +82,29 @@ def extraer_metricas(result: dict) -> dict:
     num = metricas.get("objetos_detectados", len(objetos))
 
     return {
-        "num_detections":  num,
-        "unique_labels":   len(set(labels)),
-        "avg_confidence":  round(sum(confianzas) / len(confianzas), 3) if confianzas else 0,
-        "min_confidence":  round(min(confianzas), 3) if confianzas else 0,
-        "max_confidence":  round(max(confianzas), 3) if confianzas else 0,
-        "labels":          ", ".join(labels),
-        # Tiempos del pipeline
-        "deteccion_ms":    metricas.get("deteccion_ms", 0),
-        "espacial_ms":     metricas.get("espacial_ms",  0),
-        "llm_ms":          metricas.get("llm_ms",       0),
-        "narrativa_final": result.get("narrativa_final", ""),
+        "num_detections":       num,
+        "unique_labels":        len(set(labels)),
+        "avg_confidence":       round(sum(confianzas) / len(confianzas), 3) if confianzas else 0,
+        "min_confidence":       round(min(confianzas), 3) if confianzas else 0,
+        "max_confidence":       round(max(confianzas), 3) if confianzas else 0,
+        "labels":               ", ".join(labels),
+        "narrativa_final":      result.get("narrativa_final", ""),
+        "escenario_tipo":       escenario.get("tipo", ""),
+        "escenario_confianza":  escenario.get("confianza", ""),
+        # Tiempos desglosados del pipeline
+        "deteccion_ms":         metricas.get("deteccion_ms", 0),
+        "espacial_ms":          metricas.get("espacial_ms", 0),
+        "estimacion_pasos_ms":  metricas.get("estimacion_pasos_ms", 0),
+        "free_space_ms":        metricas.get("free_space_ms", 0),
+        "decision_ms":          metricas.get("decision_ms", 0),
+        "escenario_ms":         metricas.get("escenario_ms", 0),
+        "llm_ms":               metricas.get("llm_ms", 0),
     }
 
 
-# ──────────────────────────────────────────────────────────────
-# GRÁFICAS
-# ──────────────────────────────────────────────────────────────
-
 def generar_grafica_barras(x, y, titulo, xlabel, ylabel, nombre_archivo):
-    plt.figure(figsize=(8, 5))
-    colores = ["#4C72B0", "#55A868", "#C44E52"]
-    bars = plt.bar(x, y, color=colores[:len(x)], edgecolor="black")
+    plt.figure(figsize=(9, 5))
+    bars = plt.bar(x, y, color=_COLORS[:len(x)], edgecolor="black")
     plt.title(titulo, fontsize=12, fontweight="bold")
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -140,10 +117,6 @@ def generar_grafica_barras(x, y, titulo, xlabel, ylabel, nombre_archivo):
     plt.savefig(f"{OUTPUT_CHARTS}/{nombre_archivo}")
     plt.close()
 
-
-# ──────────────────────────────────────────────────────────────
-# ENDPOINT PRINCIPAL
-# ──────────────────────────────────────────────────────────────
 
 @router.post("/run-batch")
 def run_batch():
@@ -161,13 +134,11 @@ def run_batch():
 
         for threshold in THRESHOLDS:
             for model in MODELS:
-
                 samples    = []
                 stop_event = threading.Event()
                 monitor_thread = threading.Thread(
                     target=monitor_resources, args=(stop_event, samples)
                 )
-
                 mem_before = get_mem_mb()
 
                 with open(image_path, "rb") as f:
@@ -175,20 +146,18 @@ def run_batch():
                     data  = {
                         "model":                model,
                         "confidence_threshold": str(threshold),
-                        "debug":                "true",   # necesario para obtener objetos
+                        "debug":                "true",
                     }
-
                     monitor_thread.start()
-                    t_start = time.perf_counter()
+                    t_start  = time.perf_counter()
                     response = requests.post(API_URL, files=files, data=data)
-                    t_end = time.perf_counter()
+                    t_end    = time.perf_counter()
                     stop_event.set()
                     monitor_thread.join()
 
                 mem_after     = get_mem_mb()
                 response_time = round((t_end - t_start) * 1000, 2)
 
-                # Métricas de sistema
                 if samples:
                     cpu_vals = [s[0] for s in samples]
                     mem_vals = [s[1] for s in samples]
@@ -199,83 +168,38 @@ def run_batch():
                 else:
                     avg_cpu = max_cpu = avg_mem = peak_mem = 0
 
-                # Error HTTP
+                base_row = {
+                    "image": filename, "model": model, "threshold": threshold,
+                    "response_time_ms": response_time,
+                    "cpu_avg_percent": avg_cpu, "cpu_max_percent": max_cpu,
+                    "mem_avg_mb": avg_mem, "mem_peak_mb": peak_mem,
+                    "mem_before_mb": round(mem_before, 2),
+                    "mem_after_mb":  round(mem_after,  2),
+                    "status_code": response.status_code,
+                }
+
                 if response.status_code != 200:
-                    rows.append({
-                        "image": filename, "model": model, "threshold": threshold,
-                        "num_detections": None, "unique_labels": None,
-                        "avg_confidence": None, "min_confidence": None, "max_confidence": None,
-                        "labels": None, "narrativa_final": None,
-                        "response_time_ms": response_time,
-                        "deteccion_ms": None, "espacial_ms": None, "llm_ms": None,
-                        "cpu_avg_percent": avg_cpu, "cpu_max_percent": max_cpu,
-                        "mem_avg_mb": avg_mem, "mem_peak_mb": peak_mem,
-                        "mem_before_mb": round(mem_before, 2),
-                        "mem_after_mb":  round(mem_after,  2),
-                        "status_code": response.status_code,
-                        "status": "error", "error": response.text[:200],
-                    })
+                    rows.append({**base_row, "status": "error",
+                                 "error": response.text[:200]})
                     continue
 
                 result = response.json()
 
-                # Verificar que no sea un error de aplicación
                 if result.get("status") == "error":
-                    rows.append({
-                        "image": filename, "model": model, "threshold": threshold,
-                        "num_detections": 0, "unique_labels": 0,
-                        "avg_confidence": 0, "min_confidence": 0, "max_confidence": 0,
-                        "labels": "", "narrativa_final": "",
-                        "response_time_ms": response_time,
-                        "deteccion_ms": 0, "espacial_ms": 0, "llm_ms": 0,
-                        "cpu_avg_percent": avg_cpu, "cpu_max_percent": max_cpu,
-                        "mem_avg_mb": avg_mem, "mem_peak_mb": peak_mem,
-                        "mem_before_mb": round(mem_before, 2),
-                        "mem_after_mb":  round(mem_after,  2),
-                        "status_code": 200,
-                        "status": "error",
-                        "error": result.get("message", "error desconocido")[:200],
-                    })
+                    rows.append({**base_row, "status": "error",
+                                 "error": result.get("message", "error desconocido")[:200]})
                     continue
 
-                # Guardar JSON individual
                 json_name = f"{os.path.splitext(filename)[0]}_{model}_thr_{threshold}.json"
                 with open(os.path.join(OUTPUT_JSON, json_name), "w", encoding="utf-8") as jf:
                     json.dump(result, jf, ensure_ascii=False, indent=2)
 
-                # Extraer métricas de la respuesta nueva
                 m = extraer_metricas(result)
-
-                rows.append({
-                    "image":            filename,
-                    "model":            model,
-                    "threshold":        threshold,
-                    "num_detections":   m["num_detections"],
-                    "unique_labels":    m["unique_labels"],
-                    "avg_confidence":   m["avg_confidence"],
-                    "min_confidence":   m["min_confidence"],
-                    "max_confidence":   m["max_confidence"],
-                    "labels":           m["labels"],
-                    "narrativa_final":  m["narrativa_final"],
-                    "response_time_ms": response_time,
-                    "deteccion_ms":     m["deteccion_ms"],
-                    "espacial_ms":      m["espacial_ms"],
-                    "llm_ms":           m["llm_ms"],
-                    "cpu_avg_percent":  avg_cpu,
-                    "cpu_max_percent":  max_cpu,
-                    "mem_avg_mb":       avg_mem,
-                    "mem_peak_mb":      peak_mem,
-                    "mem_before_mb":    round(mem_before, 2),
-                    "mem_after_mb":     round(mem_after,  2),
-                    "status_code":      response.status_code,
-                    "status":           "ok",
-                    "error":            "",
-                })
+                rows.append({**base_row, **m, "status": "ok", "error": ""})
 
                 print(f"  [{model}] thr={threshold} → {m['num_detections']} obj "
-                      f"| {response_time:.0f}ms")
+                      f"| {response_time:.0f}ms total | {m['deteccion_ms']:.0f}ms detec")
 
-    # ── DataFrame y Excel ──────────────────────────────────────
     if not rows:
         return {"message": "No se procesaron imágenes", "rows": 0}
 
@@ -286,9 +210,12 @@ def run_batch():
         "image", "model", "threshold",
         "num_detections", "unique_labels",
         "avg_confidence", "min_confidence", "max_confidence",
-        "response_time_ms", "deteccion_ms", "espacial_ms", "llm_ms",
+        "response_time_ms",
+        "deteccion_ms", "espacial_ms", "estimacion_pasos_ms",
+        "free_space_ms", "decision_ms", "escenario_ms", "llm_ms",
         "cpu_avg_percent", "cpu_max_percent",
         "mem_avg_mb", "mem_peak_mb", "mem_before_mb", "mem_after_mb",
+        "escenario_tipo", "escenario_confianza",
         "labels", "narrativa_final",
         "status_code", "status", "error",
     ]
@@ -298,28 +225,25 @@ def run_batch():
     summary_by_threshold = df_ok.groupby(["threshold", "model"]).mean(numeric_only=True).reset_index()
 
     with pd.ExcelWriter(OUTPUT_EXCEL, engine="openpyxl") as writer:
-        df.to_excel(writer,                 sheet_name="Resultados",         index=False)
-        summary_by_model.to_excel(writer,   sheet_name="Resumen_Modelo",     index=False)
-        summary_by_threshold.to_excel(writer, sheet_name="Resumen_Threshold", index=False)
+        df.to_excel(writer,                   sheet_name="Resultados",         index=False)
+        summary_by_model.to_excel(writer,     sheet_name="Resumen_Modelo",     index=False)
+        summary_by_threshold.to_excel(writer, sheet_name="Resumen_Threshold",  index=False)
 
-    # ── Gráficas ───────────────────────────────────────────────
     if not summary_by_model.empty:
-        generar_grafica_barras(
-            summary_by_model["model"], summary_by_model["response_time_ms"],
-            "Tiempo promedio de inferencia por modelo", "Modelo", "Tiempo (ms)", "tiempo.png"
-        )
-        generar_grafica_barras(
-            summary_by_model["model"], summary_by_model["cpu_avg_percent"],
-            "Uso promedio de CPU por modelo", "Modelo", "CPU (%)", "cpu.png"
-        )
-        generar_grafica_barras(
-            summary_by_model["model"], summary_by_model["mem_avg_mb"],
-            "Uso promedio de memoria RAM por modelo", "Modelo", "Memoria (MB)", "ram.png"
-        )
-        generar_grafica_barras(
-            summary_by_model["model"], summary_by_model["avg_confidence"],
-            "Confianza promedio por modelo", "Modelo", "Confianza", "confianza.png"
-        )
+        models_ok = summary_by_model["model"].tolist()
+        for col, titulo, ylabel, fname in [
+            ("response_time_ms", "Tiempo total promedio por modelo",    "Tiempo (ms)", "tiempo.png"),
+            ("deteccion_ms",     "Tiempo de detección promedio",        "Tiempo (ms)", "deteccion.png"),
+            ("cpu_avg_percent",  "Uso promedio de CPU por modelo",      "CPU (%)",     "cpu.png"),
+            ("mem_avg_mb",       "Uso promedio de memoria por modelo",  "Memoria (MB)","ram.png"),
+            ("avg_confidence",   "Confianza promedio por modelo",       "Confianza",   "confianza.png"),
+            ("num_detections",   "Objetos detectados promedio",         "Objetos",     "objetos.png"),
+        ]:
+            if col in summary_by_model.columns:
+                generar_grafica_barras(
+                    models_ok, summary_by_model[col].tolist(),
+                    titulo, "Modelo", ylabel, fname
+                )
 
     return {
         "message": "Batch ejecutado correctamente",
@@ -327,4 +251,7 @@ def run_batch():
         "rows":    len(rows),
         "ok":      len(df_ok),
         "errors":  len(df[df["status"] == "error"]),
+        "modelos": MODELS,
+        "graficas": ["tiempo.png", "deteccion.png", "cpu.png",
+                     "ram.png", "confianza.png", "objetos.png"],
     }

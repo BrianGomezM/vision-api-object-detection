@@ -1,18 +1,38 @@
+# ── API Framework ─────────────────────────────────────────────
 fastapi
 uvicorn
+python-multipart
+python-dotenv
+
+# ── Imagen / Visión ───────────────────────────────────────────
 pillow
 numpy
+opencv-python
+
+# ── PyTorch (YOLO26 y Detectron2) ────────────────────────────
 torch
 torchvision
+
+# ── YOLO26 (Ultralytics) ──────────────────────────────────────
 ultralytics
-opencv-python
+
+# ── Faster R-CNN y Mask R-CNN (Detectron2 - Meta AI) ─────────
+# Instalación especial - no disponible en PyPI estándar:
+# pip install 'git+https://github.com/facebookresearch/detectron2.git'
+
+# ── SSD-MobileNet V2 (TensorFlow Object Detection API) ────────
+tensorflow
+tensorflow-hub
+
+# ── LLM (descripción egocéntrica y clasificación de escenario) ─
+groq
+
+# ── Traducción dinámica EN→ES ─────────────────────────────────
+deep-translator==1.11.4
+
+# ── Batch / Análisis ──────────────────────────────────────────
 requests
 pandas
 matplotlib
 psutil
 openpyxl
-python-multipart
-python-dotenv
-deep-translator==1.11.4
-openai==1.30.0
-google-generativeai==0.7.0

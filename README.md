@@ -1,168 +1,151 @@
-# API de Evaluación de Modelos de Detección de Objetos
+# API de Generación de Descripciones Narrativas Egocéntricas
 
-## Descripción
+Sistema backend que procesa imágenes y genera descripciones auditivas
+accesibles para personas con ceguera total, orientadas a la navegación
+en entornos Web 3D.
 
-Este proyecto implementa una API para la evaluación de modelos de detección de objetos utilizando modelos preentrenados de visión por computadora.
+---
 
-Los modelos evaluados son:
+## Modelos de detección disponibles
 
-* YOLO
-* Faster R-CNN 
-* SSD
+| Modelo | Versión | Framework | mAP COCO |
+|--------|---------|-----------|----------|
+| `yolo` | YOLO26-X (Ultralytics 2026) | PyTorch | Estado del arte |
+| `fasterrcnn` | ResNet-101-FPN 3x (Detectron2) | PyTorch | 42.0 |
+| `maskrcnn` | ResNet-101-FPN 3x + segmentación (Detectron2) | PyTorch | 42.9 |
+| `ssd` | SSD-MobileNet V2 (TF Hub / TF OD API) | TensorFlow | 21.3 |
 
-El objetivo principal es analizar el comportamiento de estos modelos en un entorno controlado, evaluando sus salidas y su rendimiento para determinar cuál es más adecuado para su integración en el proyecto de grado.
-
-
-## Contexto (Actividad A6)
-
-Este desarrollo corresponde a la actividad A6 del proyecto de grado:
-
-**"Analizar salidas del modelo de detección de objetos"**
-
-Se busca:
-
-* ejecutar modelos con imágenes de prueba
-* analizar su salida en formato JSON
-* estudiar bounding boxes, clases y niveles de confianza
-* comparar modelos en términos de rendimiento y comportamiento
-
-
-
-## Objetivo
-
-Evaluar modelos de detección de objetos considerando:
-
-* precisión de detección
-* confianza de las predicciones
-* tiempo de respuesta
-* consumo de recursos del sistema (CPU y memoria)
-
+---
 
 ## Estructura del proyecto
 
+```
 app/
+├── main.py                       # FastAPI app + registro de routers
 ├── routes/
-│   ├── detect.py        # Endpoints de detección
-│   └── batch.py         # Ejecución de pruebas masivas
-│
+│   ├── detect.py                 # Endpoints: /detect, /detect-all, /debug-detect, /health
+│   └── batch.py                  # Endpoint: /run-batch (pruebas masivas)
 ├── services/
-│   ├── yolo_service.py
-│   ├── fasterrcnn_service.py
-│   └── ssd_service.py
-│
-├── main.py                # Registro de rutas
-├── run.py                 # Punto de entrada
+│   ├── yolo_service.py           # YOLO26 — detección principal
+│   ├── fasterrcnn_service.py     # Faster R-CNN — Detectron2
+│   ├── maskrcnn_service.py       # Mask R-CNN — Detectron2 + máscaras
+│   ├── ssd_service.py            # SSD-MobileNet V2 — TF Hub
+│   ├── spatial_analyzer.py       # Cuadrícula 3×3 + categorías + prioridad
+│   ├── step_estimator.py         # Estimación de pasos hasta cada objeto
+│   ├── free_space_analyzer.py    # Zonas navegables libres
+│   ├── risk_engine.py            # Decisión de movimiento con pasos libres
+│   ├── llm_enhancer.py           # Descripción egocéntrica vía Groq/Llama
+│   └── scene_classifier.py       # Clasificación de escenario vía LLM
+└── utils/
+    └── translator.py             # Traducción EN→ES dinámica con caché
 
-test_images/               # Imágenes de prueba
-test_results_json/         # Resultados JSON por prueba
-charts/                    # Gráficas generadas
-test_results_summary.xlsx  # Resultados en Excel
+run.py                            # Punto de entrada
+diagnostico_yolo.py               # Script de diagnóstico de detección
+test_images/                      # Imágenes de prueba
+test_results_json/                 # JSON por combinación imagen/modelo/threshold
+charts/                           # Gráficas generadas por batch
+test_results_summary.xlsx         # Resultados consolidados
 
+ELIMINADO (no usar):
+  app/services/narrative_service.py   — reemplazado por llm_enhancer
+  app/routes/detect_old.py            — versión obsoleta
+```
+
+---
 
 ## Instalación
 
-1. Crear entorno virtual (opcional pero recomendado):
-    python -m venv venv
-2. Activar entorno:
-    Windows:
-    venv\Scripts\activate
-3. Instalar dependencias:
-    pip install -r requirements.txt
+```bash
+python -m venv venv
+venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+
+# Detectron2 (Faster R-CNN y Mask R-CNN) — instalación especial:
+pip install 'git+https://github.com/facebookresearch/detectron2.git'
+```
+
+Variables de entorno (`.env`):
+```
+GROQ_API_KEY=gsk_...
+YOLO_WEIGHTS=yolo26x.pt
+YOLO_IMGSZ=1280
+```
+
+---
 
 ## Ejecución
 
-Iniciar la API:
+```bash
 python run.py
+```
 
+API disponible en `http://127.0.0.1:8000`
+Documentación automática en `http://127.0.0.1:8000/docs`
 
-La API estará disponible en:
-http://127.0.0.1:8000
+---
 
-Documentación automática:
-http://127.0.0.1:8000/docs
+## Endpoints
 
-## Endpoints disponibles
+### POST `/api/detect`
+Detección individual + narrativa completa.
 
-### 1. Detección individual
+Parámetros form-data:
+- `model`: `yolo` | `fasterrcnn` | `maskrcnn` | `ssd`
+- `file`: imagen
+- `confidence_threshold`: 0.0 – 1.0 (default 0.35)
+- `debug`: true | false
 
-POST `/api/detect`
+Respuesta incluye:
+- `narrativa_final`: escenario + objetos con pasos + instrucción
+- `escenario`: tipo y confianza del escenario detectado
+- `metricas`: tiempos desglosados de cada etapa del pipeline
 
-Permite ejecutar un modelo específico.
+### POST `/api/detect-all`
+Ejecuta los 4 modelos sobre la misma imagen. Usado para comparativa A10.
 
-Parámetros:
+### POST `/api/run-batch`
+Procesa todas las imágenes en `test_images/` con todos los modelos
+y thresholds (0.3, 0.5, 0.7). Genera Excel y 6 gráficas comparativas.
 
-* model: yolo | fasterrcnn | ssd
-* file: imagen
-* confidence_threshold: valor entre 0 y 1
+### GET `/api/health`
+Estado del servicio y versiones de modelos cargados.
 
-### 2. Detección con todos los modelos
+---
 
-POST `/api/detect-all`
+## Pipeline de procesamiento
 
-Ejecuta los tres modelos sobre la misma imagen.
+```
+Imagen → Modelo (YOLO26 / FasterRCNN / MaskRCNN / SSD)
+       → Análisis espacial 3×3 (lateral + profundidad + categoría)
+       → Estimación de pasos (heurística por tamaño + posición vertical)
+       → Análisis de espacio libre (3 columnas, sin small_objects)
+       → Decisión de movimiento (pasos libres al frente o desvío)
+       → Clasificación de escenario (LLM → sala, cocina, pasillo...)
+       → Descripción LLM egocéntrica (objetos + pasos)
+       → Narrativa final = escenario + descripción + instrucción
+```
 
-### 3. Ejecución batch (pruebas completas)
+---
 
-POST `/api/run-batch`
+## Ejemplo de narrativa de salida
 
-Este endpoint:
+```
+Parece que estás en una sala de estar.
+Sofá a tu derecha a aproximadamente 2 pasos.
+3 sillas frente a ti a aproximadamente 5 pasos.
+2 sillas a tu izquierda a aproximadamente 5 pasos.
+Televisor al fondo a tu izquierda.
+Puedes avanzar hacia el frente.
+Tienes aproximadamente 4 pasos libres antes del primer obstáculo.
+```
 
-* procesa todas las imágenes en la carpeta `test_images`
-* ejecuta los tres modelos
-* evalúa múltiples thresholds (0.3, 0.5, 0.7)
-* genera resultados automáticos
+---
 
-## Métricas evaluadas
+## Diagnóstico de detección
 
-### Métricas de detección
+```bash
+python diagnostico_yolo.py test_images/prueba.jpg 0.35
+```
 
-* num_detections: número de objetos detectados
-* avg_confidence: confianza promedio
-* max_confidence: confianza máxima
-* min_confidence: confianza mínima
-* unique_labels: número de clases distintas
-* labels: clases detectadas
-
-### Métricas de rendimiento
-
-* response_time_ms: tiempo de respuesta
-* cpu_avg_percent: uso promedio de CPU
-* cpu_max_percent: uso máximo de CPU
-* mem_avg_mb: memoria promedio utilizada
-* mem_peak_mb: memoria máxima utilizada
-* mem_before_mb / mem_after_mb: memoria antes y después
-
-## Resultados generados
-
-Después de ejecutar `/api/run-batch` se generan:
-
-* Archivo Excel:
-  * `test_results_summary.xlsx`
-* Resultados JSON:
-  * carpeta `test_results_json`
-* Gráficas:
-  * carpeta `charts`
-
-## Gráficas generadas
-
-Se generan automáticamente:
-
-* tiempo promedio por modelo
-* uso de CPU por modelo
-* uso de memoria por modelo
-* confianza promedio por modelo
-
-## Metodología
-
-El análisis se realiza bajo condiciones controladas:
-
-* mismo conjunto de imágenes
-* mismos niveles de confianza
-* evaluación individual por modelo
-* medición de recursos por ejecución
-
-## Notas
-
-* Los modelos utilizados son preentrenados (COCO dataset)
-* Los resultados dependen de la calidad de las imágenes de prueba
-* El análisis incluye tanto métricas cuantitativas como observación manual
+Muestra qué detecta YOLO26, qué pasa/no pasa los filtros, y la
+distribución en la cuadrícula 3×3.

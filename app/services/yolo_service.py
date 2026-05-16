@@ -1,19 +1,16 @@
 """
 app/services/yolo_service.py
 
-YOLO actualizado a YOLO26 — la versión más reciente de Ultralytics (2026).
+YOLO26 — versión más reciente de Ultralytics (2026).
 
-Cambios respecto a versiones anteriores:
-  - Pesos: yolo26x.pt (YOLO26-Extra Large) — máxima precisión.
-    Alternativas por velocidad: yolo26n, yolo26s, yolo26m, yolo26l, yolo26x.
-  - YOLO26 mantiene la misma interfaz de Ultralytics (predict/YOLO class),
-    por lo que el código de inferencia no cambia entre versiones.
-  - La variable YOLO_WEIGHTS en .env permite cambiar de variante sin tocar código.
+CORRECCIONES EN ESTA VERSIÓN:
+  - "door" bajado de 0.25 a 0.15: puertas interiores blancas tienen baja
+    confianza en YOLO-COCO (entrenad principalmente con puertas exteriores).
+  - Comentario interno corregido: hace referencia a YOLO26, no YOLOv11.
 
 Referencias:
   - Ultralytics YOLO26: https://docs.ultralytics.com/models/yolo26/
   - Jocher, G. et al. (2026). Ultralytics YOLO26. Ultralytics.
-  - Wang, C. et al. (2024). YOLOv10: Real-Time End-to-End Object Detection.
 """
 
 from ultralytics import YOLO
@@ -21,25 +18,13 @@ from PIL import Image
 import io
 import os
 
-# ── Configuración general ──────────────────────────────────────
-# yolo11x.pt: la variante más precisa de YOLOv11 (publicado oct-2024).
-# Alternativas en orden de velocidad/precisión: yolo11n, yolo11s, yolo11m, yolo11l, yolo11x
 YOLO_WEIGHTS   = os.getenv("YOLO_WEIGHTS", "yolo26x.pt")
-YOLO_IMGSZ     = int(os.getenv("YOLO_IMGSZ", "1280"))   # 1280 mejora objetos pequeños
-YOLO_IOU       = float(os.getenv("YOLO_IOU", "0.50"))   # NMS IoU threshold
-_INTERNAL_CONF = 0.15   # YOLO ve todo desde aquí; filtramos después por clase
+YOLO_IMGSZ     = int(os.getenv("YOLO_IMGSZ", "1280"))
+YOLO_IOU       = float(os.getenv("YOLO_IOU", "0.50"))
+_INTERNAL_CONF = 0.15
 
-# ──────────────────────────────────────────────────────────────
-# UMBRAL MÍNIMO POR CLASE
-# ──────────────────────────────────────────────────────────────
-# Criterio para valores bajos (0.15-0.20):
-#   Solo objetos que son obstáculos físicos críticos y que YOLO-COCO detecta
-#   con baja confianza por limitaciones del dataset (ej: mesas redondas).
-# Criterio estándar (0.30+):
-#   Objetos grandes y bien representados en COCO.
-#
 _CLASS_MIN_CONF: dict[str, float] = {
-    # Superficies / mesas — difíciles en perspectiva frontal
+    # Superficies — perspectiva frontal difícil para YOLO-COCO
     "dining table": 0.15,
     "table":        0.15,
     "desk":         0.20,
@@ -54,9 +39,9 @@ _CLASS_MIN_CONF: dict[str, float] = {
     "person":       0.30,
     "dog":          0.30,
     "cat":          0.30,
-    # Arquitectura
-    "stairs":       0.25,
-    "door":         0.25,
+    # Arquitectura — CORREGIDO: door baja a 0.15 (puertas interiores blancas)
+    "stairs":       0.20,
+    "door":         0.15,
     # Objetos de suelo
     "backpack":     0.30,
     "suitcase":     0.30,
@@ -69,12 +54,12 @@ _CLASS_MIN_CONF: dict[str, float] = {
     "tv":           0.40,
     "monitor":      0.35,
     "laptop":       0.35,
-    "clock":        0.35,
+    "clock":        0.30,
     "cell phone":   0.35,
     "refrigerator": 0.30,
     "sink":         0.30,
     "toilet":       0.30,
-    # Peligrosos — umbral bajo para no perderlos nunca
+    # Peligrosos
     "knife":        0.20,
     "scissors":     0.20,
 }
@@ -91,7 +76,6 @@ _CRITICAL: set[str] = {
 }
 _CRITICAL_MIN_CONF = 0.15
 
-# ── Modelo singleton ───────────────────────────────────────────
 _model: YOLO | None = None
 
 
@@ -105,11 +89,9 @@ def _get_model() -> YOLO:
 
 def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
     """
-    Ejecuta YOLOv11 con umbral diferenciado por clase.
-
-    confidence_threshold: threshold general del endpoint.
-    Cada clase puede tener su mínimo en _CLASS_MIN_CONF; se usa
-    el MENOR de los dos para no perder objetos críticos.
+    Ejecuta YOLO26 con umbral diferenciado por clase.
+    Se usa el MENOR entre el threshold del endpoint y el mínimo de la clase
+    para no perder obstáculos críticos de baja confianza.
     """
     model = _get_model()
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -125,7 +107,6 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
     )
 
     detections = []
-
     for r in results:
         if r.boxes is None:
             continue
@@ -139,7 +120,6 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
 
             class_min = _CLASS_MIN_CONF.get(label, confidence_threshold)
             effective  = min(class_min, confidence_threshold)
-
             if conf < effective:
                 continue
 
