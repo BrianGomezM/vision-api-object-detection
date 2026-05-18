@@ -3,20 +3,15 @@ app/routes/detect.py
 
 Endpoints:
   POST /detect          → narrativa egocéntrica completa (producción)
-  POST /detect-all      → compara los 4 modelos sobre la misma imagen (evaluación A10)
+  POST /detect-all      → compara los 4 modelos sobre la misma imagen
   POST /debug-detect    → pipeline paso a paso (diagnóstico)
   GET  /health          → estado del servicio
 
 MODELOS DISPONIBLES:
-  yolo       → YOLO26 (Ultralytics, 2026)
-  fasterrcnn → Faster R-CNN ResNet-101-FPN (Detectron2, 2026)
-  maskrcnn   → Mask R-CNN ResNet-101-FPN (Detectron2, 2026)
-  ssd        → SSD-MobileNet V2 (TF Hub / TF Object Detection API, 2026)
-
-FUNCIONALIDADES:
-  - Estimación de pasos: distancia aproximada en pasos hasta cada objeto.
-  - Clasificación de escenario: tipo de espacio detectado (sala, cocina, etc.).
-  - Narrativa egocéntrica: descripción en lenguaje de primera persona para ciegos.
+  yolo       → YOLO26s (Ultralytics, 2026)
+  fasterrcnn → Faster R-CNN ResNet-50-FPN V2 (torchvision)
+  maskrcnn   → Mask R-CNN ResNet-50-FPN V2 (torchvision) + máscaras
+  ssd        → SSD-MobileNet V2 (TF Hub / TF Object Detection API)
 """
 
 import time
@@ -40,6 +35,13 @@ router = APIRouter()
 
 _VALID_MODELS = {"yolo", "fasterrcnn", "maskrcnn", "ssd"}
 
+_MODEL_VERSIONS = {
+    "yolo":       "YOLO26s (Ultralytics 2026)",
+    "fasterrcnn": "Faster R-CNN ResNet-50-FPN V2 (torchvision)",
+    "maskrcnn":   "Mask R-CNN ResNet-50-FPN V2 (torchvision)",
+    "ssd":        "SSD-MobileNet V2 (TF Hub)",
+}
+
 # ──────────────────────────────────────────────────────────────
 # UTILIDADES
 # ──────────────────────────────────────────────────────────────
@@ -62,12 +64,6 @@ def resize_image(image_bytes: bytes, max_dim: int = 800):
 
 
 def build_final_narrative(scene_intro: str, description: str, instruction: str) -> str:
-    """
-    Narrativa final:
-      1. Contexto de escenario (si confianza media o alta)
-      2. Descripción de objetos con posición y pasos
-      3. Instrucción de movimiento
-    """
     parts = [p.strip() for p in [scene_intro, description, instruction] if p and p.strip()]
     if not parts:
         return "No se detectaron objetos. Avanza con precaución."
@@ -137,7 +133,6 @@ async def detect(
         if model not in _VALID_MODELS:
             return {"status": "error", "message": f"Modelo no válido: {model}. Usa: {sorted(_VALID_MODELS)}"}
 
-        # 1. Imagen
         t0 = time.time()
         image_bytes = await file.read()
         image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
@@ -152,33 +147,27 @@ async def detect(
 
         threshold = normalize_threshold(confidence_threshold)
 
-        # 2. Detección
         t1 = time.time()
         result     = _run_model(model, image_bytes, threshold)
         detections = result.get("detections", [])
         tiempos["deteccion"] = _ms(t1)
 
-        # 3. Análisis espacial
         t2 = time.time()
         analyzed_objects = analyze_spatial(detections, width, height)
         tiempos["analisis_espacial"] = _ms(t2)
 
-        # 4. Estimación de pasos
         t3 = time.time()
         analyzed_objects = estimate_steps(analyzed_objects, width, height)
         tiempos["estimacion_pasos"] = _ms(t3)
 
-        # 5. Espacio libre
         t4 = time.time()
         free_space = calculate_free_space(analyzed_objects, width)
         tiempos["free_space"] = _ms(t4)
 
-        # 6. Decisión de movimiento
         t5 = time.time()
         decision = decide_movement(analyzed_objects, free_space)
         tiempos["decision"] = _ms(t5)
 
-        # 7. Clasificación de escenario
         t6 = time.time()
         scene_info  = classify_scene(analyzed_objects)
         tiempos["clasificacion_escenario"] = _ms(t6)
@@ -188,13 +177,11 @@ async def detect(
             else ""
         )
 
-        # 8. Descripción LLM
         t7 = time.time()
         desc_result = generate_description(analyzed_objects, debug)
         description = desc_result.get("text", "")
         tiempos["llm_descripcion"] = _ms(t7)
 
-        # 9. Narrativa final
         final_narrative = build_final_narrative(scene_intro, description, decision["instruction"])
         tiempos["total"] = _ms(start_total)
 
@@ -221,6 +208,7 @@ async def detect(
         response = {
             "status":          "success",
             "model":           result.get("model", model),
+            "model_version":   _MODEL_VERSIONS.get(model, model),
             "narrativa_final": final_narrative,
             "escenario": {
                 "tipo":      scene_info.get("scene_type", "desconocido"),
@@ -258,20 +246,12 @@ async def detect_all(
     confidence_threshold: float = Form(0.35),
 ):
     """
-    Ejecuta YOLO26, Faster R-CNN (Detectron2), Mask R-CNN (Detectron2)
-    y SSD-MobileNet V2 (TF Hub) sobre la misma imagen.
-    Retorna métricas comparativas para la evaluación A10.
+    Ejecuta los 4 modelos sobre la misma imagen.
+    Retorna métricas comparativas para la evaluación del TG.
     """
     image_bytes_raw = await file.read()
     threshold = normalize_threshold(confidence_threshold)
     image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes_raw)
-
-    model_versions = {
-        "yolo":       "YOLO26 (Ultralytics 2026)",
-        "fasterrcnn": "Faster R-CNN ResNet-101-FPN (Detectron2 2026)",
-        "maskrcnn":   "Mask R-CNN ResNet-101-FPN (Detectron2 2026)",
-        "ssd":        "SSD-MobileNet V2 (TF Hub 2026)",
-    }
 
     resultados = {}
     for model_name in ["yolo", "fasterrcnn", "maskrcnn", "ssd"]:
@@ -282,7 +262,7 @@ async def detect_all(
             t_ms       = _ms(t_start)
             resultados[model_name] = {
                 "status":               "success",
-                "model_version":        model_versions[model_name],
+                "model_version":        _MODEL_VERSIONS[model_name],
                 "model_id":             result.get("model", model_name),
                 "tiempo_inferencia_ms": t_ms,
                 "metricas":             _metricas_deteccion(detections),
@@ -291,7 +271,7 @@ async def detect_all(
         except Exception as e:
             resultados[model_name] = {
                 "status":               "error",
-                "model_version":        model_versions[model_name],
+                "model_version":        _MODEL_VERSIONS[model_name],
                 "error":                str(e),
                 "tiempo_inferencia_ms": _ms(t_start),
             }
@@ -345,10 +325,10 @@ async def debug_detect(
             "original":        f"{w_orig}x{h_orig}",
             "procesada":       f"{width}x{height}",
             "modelo":          model,
+            "model_version":   _MODEL_VERSIONS.get(model, model),
             "threshold_usado": threshold,
         }
 
-        # Paso 1: detecciones filtradas
         result     = _run_model(model, image_bytes, threshold)
         detections = result.get("detections", [])
         report["pasos"]["1_detecciones_filtradas"] = {
@@ -360,7 +340,6 @@ async def debug_detect(
             "detecciones":   detections,
         }
 
-        # Paso 2: análisis espacial
         analyzed = analyze_spatial(detections, width, height)
         report["pasos"]["2_analisis_espacial"] = {
             "descripcion": "Objetos con posición egocéntrica 3×3",
@@ -378,11 +357,10 @@ async def debug_detect(
             ],
         }
 
-        # Paso 3: estimación de pasos
         analyzed = estimate_steps(analyzed, width, height)
         report["pasos"]["3_estimacion_pasos"] = {
-            "descripcion": "Pasos aproximados hasta cada objeto (estimación heurística)",
-            "advertencia": "Valores aproximados basados en tamaño y posición en imagen, no distancia real",
+            "descripcion": "Pasos aproximados hasta cada objeto (heurística)",
+            "advertencia": "Valores aproximados basados en tamaño y posición, no distancia real",
             "objetos": [
                 {
                     "label":    o["label_es"],
@@ -394,7 +372,6 @@ async def debug_detect(
             ],
         }
 
-        # Paso 4: espacio libre
         free_space = calculate_free_space(analyzed, width)
         report["pasos"]["4_espacio_libre"] = {
             "descripcion":     "Cobertura de obstáculos por columna",
@@ -403,14 +380,12 @@ async def debug_detect(
             "situacion":       free_space["situation"],
         }
 
-        # Paso 5: decisión de movimiento
         decision = decide_movement(analyzed, free_space)
         report["pasos"]["5_decision"] = {
             "descripcion": "Instrucción de movimiento generada por risk_engine",
             "instruccion": decision["instruction"],
         }
 
-        # Paso 6: clasificación de escenario
         scene_info = classify_scene(analyzed)
         report["pasos"]["6_escenario"] = {
             "descripcion":  "Tipo de escenario inferido a partir de los objetos detectados",
@@ -419,7 +394,6 @@ async def debug_detect(
             "frase_intro":  scene_info.get("scene_intro"),
         }
 
-        # Paso 7: descripción LLM
         desc_result = generate_description(analyzed, debug=True)
         description = desc_result.get("text", "")
         report["pasos"]["7_descripcion_llm"] = {
@@ -429,7 +403,6 @@ async def debug_detect(
             "error_llm":      desc_result.get("llm_error"),
         }
 
-        # Paso 8: narrativa final
         scene_intro = (
             scene_info.get("scene_intro", "")
             if scene_info.get("confidence") in ("media", "alta") else ""
@@ -443,7 +416,6 @@ async def debug_detect(
         }
         report["narrativa_final"] = final
 
-        # Diagnóstico automático
         avisos = []
         if len(detections) == 0:
             avisos.append("ERROR: ningún objeto detectado. Bajar confidence_threshold.")
@@ -469,10 +441,5 @@ async def health_check():
     return {
         "status": "healthy",
         "groq":   bool(os.environ.get("GROQ_API_KEY")),
-        "models": {
-            "yolo":       "YOLO26 (Ultralytics 2026)",
-            "fasterrcnn": "Faster R-CNN ResNet-101-FPN (Detectron2 2026)",
-            "maskrcnn":   "Mask R-CNN ResNet-101-FPN (Detectron2 2026)",
-            "ssd":        "SSD-MobileNet V2 (TF Hub / TF Object Detection API 2026)",
-        },
+        "models": _MODEL_VERSIONS,
     }

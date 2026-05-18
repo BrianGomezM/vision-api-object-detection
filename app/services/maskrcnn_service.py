@@ -1,103 +1,107 @@
 """
 app/services/maskrcnn_service.py
 
-Mask R-CNN con Detectron2 — implementación moderna recomendada (2026).
+Mask R-CNN con torchvision — sin Detectron2, compatible con Windows.
 
-SOBRE EL MODELO:
-  Mask R-CNN extiende Faster R-CNN añadiendo una rama de segmentación de
-  instancias (máscara pixel a pixel por objeto detectado). Introducido por
-  He et al. (2017), sigue siendo el estándar de referencia para segmentación
-  de instancias. La implementación moderna recomendada es Detectron2.
+JUSTIFICACIÓN DEL CAMBIO:
+  Detectron2 requiere compilación C++ y no funciona en Windows.
+  torchvision incluye Mask R-CNN preentrenado en COCO con ResNet-50-FPN V2,
+  compatible con Python 3.10+ sin compilación adicional.
+
+MODELO:
+  maskrcnn_resnet50_fpn_v2 — ResNet-50 + FPN V2, preentrenado COCO 2017.
+  Es la versión más reciente disponible en torchvision (v0.25, 2025).
+  box AP: 47.4 | mask AP: 41.8 en COCO val2017.
 
 VENTAJA PARA ESTE PROYECTO:
-  Las máscaras de segmentación permiten calcular la forma real del objeto
-  (no solo su bounding box), lo que mejora la estimación de pasos porque
-  se puede medir el área real ocupada por el objeto en lugar del área del
-  rectángulo que lo contiene. Esto es especialmente útil para objetos
-  irregulares como sofás, sillas y plantas.
+  Las máscaras de segmentación permiten calcular el área real del objeto
+  (no solo su bounding box), lo que mejora la estimación de pasos para
+  objetos irregulares como sofás, sillas y plantas.
 
-CONFIGURACIONES DISPONIBLES (MASKRCNN_CONFIG en .env):
-  "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"   — R50, más rápido
-  "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"  — R101 (default)
-
-INSTALACIÓN REQUERIDA:
-  pip install 'git+https://github.com/facebookresearch/detectron2.git'
+INSTALACIÓN:
+  pip install torch torchvision
 
 Referencias:
   - He, K. et al. (2017). Mask R-CNN. ICCV 2017.
-  - Wu, Y. et al. (2019). Detectron2. GitHub: facebookresearch/detectron2.
+  - torchvision: https://pytorch.org/vision/stable/models/mask_rcnn.html
 """
 
-import os
 import io
 import numpy as np
 from PIL import Image
 
-# ── Detectron2 ────────────────────────────────────────────────
 try:
     import torch
-    from detectron2 import model_zoo
-    from detectron2.engine import DefaultPredictor
-    from detectron2.config import get_cfg
-    from detectron2.data import MetadataCatalog
-    _DETECTRON2_AVAILABLE = True
+    from torchvision.models.detection import (
+        maskrcnn_resnet50_fpn_v2,
+        MaskRCNN_ResNet50_FPN_V2_Weights,
+    )
+    _TORCHVISION_AVAILABLE = True
 except ImportError:
-    _DETECTRON2_AVAILABLE = False
+    _TORCHVISION_AVAILABLE = False
 
-# ── Configuración ──────────────────────────────────────────────
-_MODEL_CONFIG = os.getenv(
-    "MASKRCNN_CONFIG",
-    "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
-)
-_DEVICE = "cuda" if (
-    _DETECTRON2_AVAILABLE and
-    __import__("torch").cuda.is_available()
-) else "cpu"
+# ── Etiquetas COCO (91 clases, índice 0 = background) ─────────
+_COCO_LABELS = [
+    "__background__", "person", "bicycle", "car", "motorcycle", "airplane",
+    "bus", "train", "truck", "boat", "traffic light", "fire hydrant",
+    "N/A", "stop sign", "parking meter", "bench", "bird", "cat", "dog",
+    "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe",
+    "N/A", "backpack", "umbrella", "N/A", "N/A", "handbag", "tie",
+    "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite",
+    "baseball bat", "baseball glove", "skateboard", "surfboard",
+    "tennis racket", "bottle", "N/A", "wine glass", "cup", "fork",
+    "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange",
+    "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
+    "couch", "potted plant", "bed", "N/A", "dining table", "N/A", "N/A",
+    "toilet", "N/A", "tv", "laptop", "mouse", "remote", "keyboard",
+    "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator",
+    "N/A", "book", "clock", "vase", "scissors", "teddy bear",
+    "hair drier", "toothbrush",
+]
 
-_MASK_SCORE_THRESHOLD = float(os.getenv("MASKRCNN_SCORE_THRESH", "0.0"))
+_DEVICE = "cuda" if (_TORCHVISION_AVAILABLE and torch.cuda.is_available()) else "cpu"
 
 # ── Singleton ──────────────────────────────────────────────────
-_predictor    = None
-_thing_classes = None
+_model      = None
+_transforms = None
 
 
-def _get_predictor():
-    global _predictor, _thing_classes
-    if _predictor is None:
-        if not _DETECTRON2_AVAILABLE:
+def _get_model():
+    global _model, _transforms
+    if _model is None:
+        if not _TORCHVISION_AVAILABLE:
             raise RuntimeError(
-                "Detectron2 no está instalado. "
-                "Ejecutar: pip install 'git+https://github.com/facebookresearch/detectron2.git'"
+                "torchvision no está instalado. "
+                "Ejecutar: pip install torch torchvision"
             )
-        print(f"[Mask R-CNN] Cargando Detectron2: {_MODEL_CONFIG} en {_DEVICE}")
-        cfg = get_cfg()
-        cfg.merge_from_file(model_zoo.get_config_file(_MODEL_CONFIG))
-        cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(_MODEL_CONFIG)
-        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = _MASK_SCORE_THRESHOLD
-        cfg.MODEL.DEVICE = _DEVICE
-        _predictor    = DefaultPredictor(cfg)
-        _thing_classes = MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes
-    return _predictor, _thing_classes
+        print(f"[Mask R-CNN] Cargando maskrcnn_resnet50_fpn_v2 en {_DEVICE}")
+        weights     = MaskRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+        _model      = maskrcnn_resnet50_fpn_v2(weights=weights)
+        _model.to(_DEVICE)
+        _model.eval()
+        _transforms = weights.transforms()
+    return _model, _transforms
 
 
 def _mask_area_ratio(mask: np.ndarray, image_area: int) -> float:
     """
     Calcula la fracción del área de la imagen cubierta por la máscara real
-    del objeto (más preciso que el área del bounding box).
+    del objeto. Más preciso que el área del bounding box para objetos
+    irregulares como sofás, sillas y plantas.
     """
     if mask is None or image_area == 0:
         return 0.0
+    # mask es un array booleano [H, W] — suma de píxeles True
     return float(mask.sum()) / image_area
 
 
 def run_maskrcnn(image_bytes: bytes, confidence_threshold: float = 0.5) -> dict:
     """
-    Ejecuta Mask R-CNN vía Detectron2 (ResNet-101-FPN por defecto).
+    Ejecuta Mask R-CNN (torchvision ResNet-50-FPN V2).
 
-    Además de bounding boxes y etiquetas, retorna:
-      - mask_area_ratio: fracción del área de imagen cubierta por la máscara real.
-        Esto permite al step_estimator usar el área real del objeto (no del bbox)
-        para una estimación de pasos más precisa en objetos con formas irregulares.
+    Retorna bounding boxes, etiquetas, confianzas y mask_area_ratio
+    para cada detección. El step_estimator usa mask_area_ratio cuando
+    está disponible para una estimación de pasos más precisa.
 
     Parámetros:
         image_bytes: imagen en binario.
@@ -106,20 +110,22 @@ def run_maskrcnn(image_bytes: bytes, confidence_threshold: float = 0.5) -> dict:
     Retorna:
         dict con model, confidence_threshold y lista de detections.
     """
-    predictor, thing_classes = _get_predictor()
+    model, transforms = _get_model()
 
     image_pil  = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    image_bgr  = np.array(image_pil)[:, :, ::-1]
-    img_h, img_w = image_bgr.shape[:2]
-    image_area   = img_h * img_w
+    img_w, img_h = image_pil.size
+    image_area   = img_w * img_h
 
-    outputs   = predictor(image_bgr)
-    instances = outputs["instances"].to("cpu")
+    img_tensor = transforms(image_pil).unsqueeze(0).to(_DEVICE)
 
-    boxes   = instances.pred_boxes.tensor.numpy() if instances.has("pred_boxes")    else []
-    scores  = instances.scores.numpy()            if instances.has("scores")        else []
-    labels  = instances.pred_classes.numpy()      if instances.has("pred_classes")  else []
-    masks   = instances.pred_masks.numpy()        if instances.has("pred_masks")    else [None] * len(scores)
+    with torch.no_grad():
+        outputs = model(img_tensor)[0]
+
+    boxes  = outputs["boxes"].cpu().numpy()
+    scores = outputs["scores"].cpu().numpy()
+    labels = outputs["labels"].cpu().numpy()
+    # masks: tensor [N, 1, H, W] con valores 0-1 (probabilidad por pixel)
+    masks  = outputs["masks"].cpu().numpy() if "masks" in outputs else None
 
     detections = []
     for i in range(len(scores)):
@@ -127,16 +133,27 @@ def run_maskrcnn(image_bytes: bytes, confidence_threshold: float = 0.5) -> dict:
         if score < confidence_threshold:
             continue
 
-        label_idx  = int(labels[i])
-        label      = thing_classes[label_idx] if label_idx < len(thing_classes) else "unknown"
+        label_idx = int(labels[i])
+        label = (
+            _COCO_LABELS[label_idx]
+            if label_idx < len(_COCO_LABELS)
+            else f"class_{label_idx}"
+        )
+        if label in ("N/A", "__background__"):
+            continue
+
         x1, y1, x2, y2 = [float(v) for v in boxes[i]]
-        mask       = masks[i] if i < len(masks) else None
-        area_ratio = _mask_area_ratio(mask, image_area)
+
+        # Binarizar máscara con umbral 0.5
+        area_ratio = 0.0
+        if masks is not None and i < len(masks):
+            mask_bin = masks[i, 0] > 0.5   # [H, W] booleano
+            area_ratio = _mask_area_ratio(mask_bin, image_area)
 
         detections.append({
             "label":           label,
             "confidence":      round(score, 3),
-            "mask_area_ratio": round(area_ratio, 5),  # área real del objeto / área imagen
+            "mask_area_ratio": round(area_ratio, 5),
             "bbox": {
                 "x1": round(x1, 2),
                 "y1": round(y1, 2),
@@ -146,8 +163,8 @@ def run_maskrcnn(image_bytes: bytes, confidence_threshold: float = 0.5) -> dict:
         })
 
     return {
-        "model":                "mask_rcnn_detectron2",
-        "backbone":             _MODEL_CONFIG,
+        "model":                "mask_rcnn_resnet50_fpn_v2",
+        "backbone":             "ResNet-50-FPN-V2 (torchvision)",
         "confidence_threshold": confidence_threshold,
         "detections":           detections,
     }

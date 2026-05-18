@@ -36,11 +36,11 @@ OUTPUT_JSON   = "test_results_json"
 OUTPUT_EXCEL  = "test_results_summary.xlsx"
 OUTPUT_CHARTS = "charts"
 
-MODELS     = ["yolo", "fasterrcnn", "ssd"]   # maskrcnn opcional — muy lento
+MODELS     = ["yolo", "fasterrcnn", "maskrcnn", "ssd"]
 THRESHOLDS = [0.3, 0.5, 0.7]
 
-_COLORS  = ["#4C72B0", "#55A868", "#DD8452"]
-_MARKERS = ["o", "s", "^"]
+_COLORS  = ["#4C72B0", "#55A868", "#C44E52", "#DD8452"]
+_MARKERS = ["o", "s", "^", "D"]
 
 process = psutil.Process()
 
@@ -266,36 +266,126 @@ def _line_chart(df_ok, col, titulo, ylabel, fname):
 
 
 def _generar_graficas(df_ok: pd.DataFrame) -> list:
+    """
+    Genera 3 figuras compuestas académicas en lugar de 9 imágenes sueltas.
+
+    Figura 1 — Rendimiento de detección (2×2):
+        (a) Objetos detectados promedio por modelo
+        (b) Confianza promedio por modelo
+        (c) Detecciones vs threshold por modelo (línea)
+        (d) Confianza vs threshold por modelo (línea)
+
+    Figura 2 — Tiempos del pipeline (1×3):
+        (a) Tiempo de detección promedio por modelo
+        (b) Tiempo total del pipeline por modelo
+        (c) Tiempo de detección vs threshold (línea)
+
+    Figura 3 — Recursos del sistema (1×2):
+        (a) Uso de CPU promedio por modelo
+        (b) Uso de RAM promedio por modelo
+    """
     if df_ok.empty:
         return []
 
     summary = df_ok.groupby("model").mean(numeric_only=True).reset_index()
     models  = summary["model"].tolist()
+    n       = len(models)
     graficas = []
 
-    # ── Gráficas de barras (promedio por modelo) ───────────────
-    specs_bar = [
-        ("num_detections",  "Objetos detectados (promedio)",        "Objetos",  "g1_objetos.png"),
-        ("avg_confidence",  "Confianza promedio por modelo",         "Confianza","g2_confianza.png"),
-        ("deteccion_ms",    "Tiempo de detección promedio (ms)",     "ms",       "g3_deteccion.png"),
-        ("tiempo_total_ms", "Tiempo total del pipeline (ms)",        "ms",       "g4_total_ms.png"),
-        ("cpu_avg_percent", "Uso de CPU promedio (%)",               "CPU %",    "g5_cpu.png"),
-        ("mem_avg_mb",      "Uso de RAM promedio (MB)",              "RAM (MB)", "g6_ram.png"),
-    ]
-    for col, titulo, ylabel, fname in specs_bar:
-        if col in summary.columns:
-            _bar_chart(models, summary[col].tolist(), titulo, ylabel, fname)
-            graficas.append(fname)
+    FONT_TITLE  = {"fontsize": 11, "fontweight": "bold"}
+    FONT_LABEL  = {"fontsize": 9}
+    FONT_TICK   = {"fontsize": 8}
+    FONT_SUPTITLE = {"fontsize": 13, "fontweight": "bold", "y": 1.01}
 
-    # ── Gráficas de línea (métrica vs threshold) ───────────────
-    specs_line = [
-        ("num_detections", "Detecciones vs Threshold",         "Objetos",   "g7_det_vs_thr.png"),
-        ("avg_confidence", "Confianza vs Threshold",           "Confianza", "g8_conf_vs_thr.png"),
-        ("deteccion_ms",   "Tiempo detección vs Threshold",    "ms",        "g9_ms_vs_thr.png"),
-    ]
-    for col, titulo, ylabel, fname in specs_line:
-        _line_chart(df_ok, col, titulo, ylabel, fname)
-        graficas.append(fname)
+    # ── Helpers internos ──────────────────────────────────────
+
+    def _ax_bar(ax, col, titulo, ylabel):
+        if col not in summary.columns:
+            ax.set_visible(False)
+            return
+        vals = summary[col].tolist()
+        bars = ax.bar(models, vals, color=_COLORS[:n], edgecolor="black",
+                      width=0.5, zorder=3)
+        ax.set_title(titulo, **FONT_TITLE, pad=8)
+        ax.set_ylabel(ylabel, **FONT_LABEL)
+        ax.tick_params(labelsize=8)
+        ax.grid(axis="y", linestyle="--", alpha=0.5, zorder=0)
+        for bar, v in zip(bars, vals):
+            ax.text(bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() * 1.01,
+                    f"{v:,.1f}",
+                    ha="center", va="bottom", fontsize=8, fontweight="bold")
+
+    def _ax_line(ax, col, titulo, ylabel):
+        for i, model in enumerate(MODELS):
+            sub = (df_ok[df_ok["model"] == model]
+                   .groupby("threshold")[col].mean().reset_index())
+            if sub.empty:
+                continue
+            ax.plot(sub["threshold"], sub[col],
+                    marker=_MARKERS[i], color=_COLORS[i],
+                    label=model, linewidth=2, markersize=7, zorder=3)
+        ax.set_title(titulo, **FONT_TITLE, pad=8)
+        ax.set_xlabel("Threshold", **FONT_LABEL)
+        ax.set_ylabel(ylabel, **FONT_LABEL)
+        ax.set_xticks(THRESHOLDS)
+        ax.tick_params(labelsize=8)
+        ax.legend(fontsize=8, framealpha=0.7)
+        ax.grid(linestyle="--", alpha=0.5, zorder=0)
+
+    # ── FIGURA 1: Rendimiento de detección (2×2) ──────────────
+    fig1, axes1 = plt.subplots(2, 2, figsize=(14, 10))
+    fig1.suptitle("Figura 1. Rendimiento de Detección por Modelo",
+                  **FONT_SUPTITLE)
+
+    _ax_bar(axes1[0, 0], "num_detections",
+            "(a) Objetos detectados (promedio)", "Objetos")
+    _ax_bar(axes1[0, 1], "avg_confidence",
+            "(b) Confianza promedio", "Confianza")
+    _ax_line(axes1[1, 0], "num_detections",
+             "(c) Detecciones vs Threshold", "Objetos")
+    _ax_line(axes1[1, 1], "avg_confidence",
+             "(d) Confianza vs Threshold", "Confianza")
+
+    fig1.tight_layout()
+    fname1 = "fig1_rendimiento_deteccion.png"
+    fig1.savefig(os.path.join(OUTPUT_CHARTS, fname1), dpi=150, bbox_inches="tight")
+    plt.close(fig1)
+    graficas.append(fname1)
+
+    # ── FIGURA 2: Tiempos del pipeline (1×3) ──────────────────
+    fig2, axes2 = plt.subplots(1, 3, figsize=(18, 5))
+    fig2.suptitle("Figura 2. Tiempos del Pipeline de Detección",
+                  **FONT_SUPTITLE)
+
+    _ax_bar(axes2[0], "deteccion_ms",
+            "(a) Tiempo de detección (ms)", "ms")
+    _ax_bar(axes2[1], "tiempo_total_ms",
+            "(b) Tiempo total del pipeline (ms)", "ms")
+    _ax_line(axes2[2], "deteccion_ms",
+             "(c) Tiempo detección vs Threshold", "ms")
+
+    fig2.tight_layout()
+    fname2 = "fig2_tiempos_pipeline.png"
+    fig2.savefig(os.path.join(OUTPUT_CHARTS, fname2), dpi=150, bbox_inches="tight")
+    plt.close(fig2)
+    graficas.append(fname2)
+
+    # ── FIGURA 3: Recursos del sistema (1×2) ──────────────────
+    fig3, axes3 = plt.subplots(1, 2, figsize=(12, 5))
+    fig3.suptitle("Figura 3. Uso de Recursos del Sistema por Modelo",
+                  **FONT_SUPTITLE)
+
+    _ax_bar(axes3[0], "cpu_avg_percent",
+            "(a) Uso de CPU promedio (%)", "CPU %")
+    _ax_bar(axes3[1], "mem_avg_mb",
+            "(b) Uso de RAM promedio (MB)", "RAM (MB)")
+
+    fig3.tight_layout()
+    fname3 = "fig3_recursos_sistema.png"
+    fig3.savefig(os.path.join(OUTPUT_CHARTS, fname3), dpi=150, bbox_inches="tight")
+    plt.close(fig3)
+    graficas.append(fname3)
 
     return graficas
 
