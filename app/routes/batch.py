@@ -11,6 +11,9 @@ CORRECCIONES EN ESTA VERSIÓN:
   3. col_order actualizado con los nuevos campos de métricas.
   4. generar_grafica_barras con paleta de 4 colores para los 4 modelos.
   5. El campo "escenario" del response se guarda en el Excel.
+  6. NUEVO: manejo de ConnectionError, Timeout y finally para stop_event/thread.
+  7. NUEVO: timeout=120 en requests.post para evitar cuelgues indefinidos.
+  8. NUEVO: bloque finally garantiza que monitor_thread siempre termina.
 """
 
 from fastapi import APIRouter
@@ -63,9 +66,9 @@ def extraer_metricas(result: dict) -> dict:
       result.debug.objetos → lista con confianza, pasos, etc.
       result.escenario → tipo y confianza del escenario
     """
-    metricas = result.get("metricas", {})
-    debug    = result.get("debug", {})
-    objetos  = debug.get("objetos", [])
+    metricas  = result.get("metricas", {})
+    debug     = result.get("debug", {})
+    objetos   = debug.get("objetos", [])
     escenario = result.get("escenario", {})
 
     confianzas, labels = [], []
@@ -141,19 +144,65 @@ def run_batch():
                 )
                 mem_before = get_mem_mb()
 
-                with open(image_path, "rb") as f:
-                    files = {"file": (filename, f, get_mime_type(filename))}
-                    data  = {
-                        "model":                model,
-                        "confidence_threshold": str(threshold),
-                        "debug":                "true",
-                    }
-                    monitor_thread.start()
-                    t_start  = time.perf_counter()
-                    response = requests.post(API_URL, files=files, data=data)
-                    t_end    = time.perf_counter()
+                base_row = {
+                    "image":     filename,
+                    "model":     model,
+                    "threshold": threshold,
+                }
+
+                try:
+                    with open(image_path, "rb") as f:
+                        files = {"file": (filename, f, get_mime_type(filename))}
+                        data  = {
+                            "model":                model,
+                            "confidence_threshold": str(threshold),
+                            "debug":                "true",
+                        }
+                        monitor_thread.start()
+                        t_start  = time.perf_counter()
+                        response = requests.post(
+                            API_URL, files=files, data=data, timeout=120
+                        )
+                        t_end = time.perf_counter()
+
+                except requests.exceptions.ConnectionError as e:
+                    rows.append({
+                        **base_row,
+                        "response_time_ms": 0,
+                        "status_code": 0,
+                        "status": "error",
+                        "error": f"Servidor no disponible en {API_URL}: {str(e)[:120]}",
+                    })
+                    print(f"  [{model}] thr={threshold} → ERROR conexión: {API_URL}")
+                    continue
+
+                except requests.exceptions.Timeout:
+                    rows.append({
+                        **base_row,
+                        "response_time_ms": 120_000,
+                        "status_code": 0,
+                        "status": "error",
+                        "error": "Timeout después de 120s",
+                    })
+                    print(f"  [{model}] thr={threshold} → ERROR timeout")
+                    continue
+
+                except Exception as e:
+                    rows.append({
+                        **base_row,
+                        "response_time_ms": 0,
+                        "status_code": 0,
+                        "status": "error",
+                        "error": f"Error inesperado: {str(e)[:120]}",
+                    })
+                    print(f"  [{model}] thr={threshold} → ERROR: {e}")
+                    continue
+
+                finally:
+                    # Garantiza que el hilo de monitoreo siempre termina
                     stop_event.set()
-                    monitor_thread.join()
+                    if monitor_thread.is_alive():
+                        monitor_thread.join()
 
                 mem_after     = get_mem_mb()
                 response_time = round((t_end - t_start) * 1000, 2)
@@ -168,29 +217,38 @@ def run_batch():
                 else:
                     avg_cpu = max_cpu = avg_mem = peak_mem = 0
 
-                base_row = {
-                    "image": filename, "model": model, "threshold": threshold,
+                base_row.update({
                     "response_time_ms": response_time,
-                    "cpu_avg_percent": avg_cpu, "cpu_max_percent": max_cpu,
-                    "mem_avg_mb": avg_mem, "mem_peak_mb": peak_mem,
-                    "mem_before_mb": round(mem_before, 2),
-                    "mem_after_mb":  round(mem_after,  2),
-                    "status_code": response.status_code,
-                }
+                    "cpu_avg_percent":  avg_cpu,
+                    "cpu_max_percent":  max_cpu,
+                    "mem_avg_mb":       avg_mem,
+                    "mem_peak_mb":      peak_mem,
+                    "mem_before_mb":    round(mem_before, 2),
+                    "mem_after_mb":     round(mem_after,  2),
+                    "status_code":      response.status_code,
+                })
 
                 if response.status_code != 200:
-                    rows.append({**base_row, "status": "error",
-                                 "error": response.text[:200]})
+                    rows.append({
+                        **base_row,
+                        "status": "error",
+                        "error":  response.text[:200],
+                    })
                     continue
 
                 result = response.json()
 
                 if result.get("status") == "error":
-                    rows.append({**base_row, "status": "error",
-                                 "error": result.get("message", "error desconocido")[:200]})
+                    rows.append({
+                        **base_row,
+                        "status": "error",
+                        "error":  result.get("message", "error desconocido")[:200],
+                    })
                     continue
 
-                json_name = f"{os.path.splitext(filename)[0]}_{model}_thr_{threshold}.json"
+                json_name = (
+                    f"{os.path.splitext(filename)[0]}_{model}_thr_{threshold}.json"
+                )
                 with open(os.path.join(OUTPUT_JSON, json_name), "w", encoding="utf-8") as jf:
                     json.dump(result, jf, ensure_ascii=False, indent=2)
 
@@ -222,22 +280,24 @@ def run_batch():
     df = df[[c for c in col_order if c in df.columns]]
 
     summary_by_model     = df_ok.groupby("model").mean(numeric_only=True).reset_index()
-    summary_by_threshold = df_ok.groupby(["threshold", "model"]).mean(numeric_only=True).reset_index()
+    summary_by_threshold = (
+        df_ok.groupby(["threshold", "model"]).mean(numeric_only=True).reset_index()
+    )
 
     with pd.ExcelWriter(OUTPUT_EXCEL, engine="openpyxl") as writer:
-        df.to_excel(writer,                   sheet_name="Resultados",         index=False)
-        summary_by_model.to_excel(writer,     sheet_name="Resumen_Modelo",     index=False)
-        summary_by_threshold.to_excel(writer, sheet_name="Resumen_Threshold",  index=False)
+        df.to_excel(writer,                   sheet_name="Resultados",        index=False)
+        summary_by_model.to_excel(writer,     sheet_name="Resumen_Modelo",    index=False)
+        summary_by_threshold.to_excel(writer, sheet_name="Resumen_Threshold", index=False)
 
     if not summary_by_model.empty:
         models_ok = summary_by_model["model"].tolist()
         for col, titulo, ylabel, fname in [
-            ("response_time_ms", "Tiempo total promedio por modelo",    "Tiempo (ms)", "tiempo.png"),
-            ("deteccion_ms",     "Tiempo de detección promedio",        "Tiempo (ms)", "deteccion.png"),
-            ("cpu_avg_percent",  "Uso promedio de CPU por modelo",      "CPU (%)",     "cpu.png"),
-            ("mem_avg_mb",       "Uso promedio de memoria por modelo",  "Memoria (MB)","ram.png"),
-            ("avg_confidence",   "Confianza promedio por modelo",       "Confianza",   "confianza.png"),
-            ("num_detections",   "Objetos detectados promedio",         "Objetos",     "objetos.png"),
+            ("response_time_ms", "Tiempo total promedio por modelo",   "Tiempo (ms)", "tiempo.png"),
+            ("deteccion_ms",     "Tiempo de detección promedio",       "Tiempo (ms)", "deteccion.png"),
+            ("cpu_avg_percent",  "Uso promedio de CPU por modelo",     "CPU (%)",     "cpu.png"),
+            ("mem_avg_mb",       "Uso promedio de memoria por modelo", "Memoria (MB)","ram.png"),
+            ("avg_confidence",   "Confianza promedio por modelo",      "Confianza",   "confianza.png"),
+            ("num_detections",   "Objetos detectados promedio",        "Objetos",     "objetos.png"),
         ]:
             if col in summary_by_model.columns:
                 generar_grafica_barras(
@@ -246,12 +306,14 @@ def run_batch():
                 )
 
     return {
-        "message": "Batch ejecutado correctamente",
-        "excel":   OUTPUT_EXCEL,
-        "rows":    len(rows),
-        "ok":      len(df_ok),
-        "errors":  len(df[df["status"] == "error"]),
-        "modelos": MODELS,
-        "graficas": ["tiempo.png", "deteccion.png", "cpu.png",
-                     "ram.png", "confianza.png", "objetos.png"],
+        "message":  "Batch ejecutado correctamente",
+        "excel":    OUTPUT_EXCEL,
+        "rows":     len(rows),
+        "ok":       len(df_ok),
+        "errors":   len(df[df["status"] == "error"]),
+        "modelos":  MODELS,
+        "graficas": [
+            "tiempo.png", "deteccion.png", "cpu.png",
+            "ram.png", "confianza.png", "objetos.png",
+        ],
     }
