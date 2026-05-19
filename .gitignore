@@ -1,56 +1,36 @@
-# -----------------------------
-# 🐍 Python
-# -----------------------------
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.log
 
-# -----------------------------
-# 🧪 Entorno virtual
-# -----------------------------
+# Entorno virtual
 venv/
 env/
 ENV/
 
-# -----------------------------
-# 🔐 Variables de entorno
-# -----------------------------
+# Variables de entorno
 .env
 .env.*
 
-# -----------------------------
-# 📊 Archivos generados (TU PROYECTO)
-# -----------------------------
+# Modelos (archivos grandes)
+*.pt
+*.pth
+
+# Archivos generados
 test_results_json/
 charts/
 *.xlsx
 
-# -----------------------------
-# 🖼️ Opcional (si no quieres subir imágenes de prueba)
-# -----------------------------
-# test_images/
-
-# -----------------------------
-# 📦 Archivos grandes (modelos)
-# -----------------------------
-*.pt
-*.pth
-
-# -----------------------------
-# 🧰 IDEs
-# -----------------------------
+# IDEs
 .vscode/
 .idea/
 
-# -----------------------------
-# 🖥️ Sistema operativo
-# -----------------------------
+# Sistema operativo
 .DS_Store
 Thumbs.db
 
-# -----------------------------
-# 🧾 Cache de librerías
-# -----------------------------
+# Cache de librerías
 *.cache
+/tmp/translation_cache.json
