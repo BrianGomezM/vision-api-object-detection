@@ -58,7 +58,8 @@ _CLASS_MIN_CONF: dict[str, float] = {
     "box":          0.25,
     "bottle":       0.25,
     "potted plant": 0.25,
-    "vase":         0.25,
+    "vase":         0.20,
+    "wine glass":   0.15,
     # Informativos
     "tv":           0.40,
     "monitor":      0.35,
@@ -70,6 +71,7 @@ _CLASS_MIN_CONF: dict[str, float] = {
     "toilet":       0.30,
     # Peligrosos
     "knife":        0.20,
+    "dining table": 0.10,
     "scissors":     0.20,
 }
 

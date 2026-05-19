@@ -8,7 +8,7 @@ Endpoints:
   GET  /health          → estado del servicio
 
 MODELOS DISPONIBLES:
-  yolo       → YOLO26s (Ultralytics, 2026)
+  yolo       → YOLO (Ultralytics, 2026)
   fasterrcnn → Faster R-CNN ResNet-50-FPN V2 (torchvision)
   maskrcnn   → Mask R-CNN ResNet-50-FPN V2 (torchvision) + máscaras
   ssd        → SSD-MobileNet V2 (TF Hub / TF Object Detection API)
@@ -36,7 +36,7 @@ router = APIRouter()
 _VALID_MODELS = {"yolo", "fasterrcnn", "maskrcnn", "ssd"}
 
 _MODEL_VERSIONS = {
-    "yolo":       "YOLO26s (Ultralytics 2026)",
+    "yolo":       "YOLO (Ultralytics 2026)",
     "fasterrcnn": "Faster R-CNN ResNet-50-FPN V2 (torchvision)",
     "maskrcnn":   "Mask R-CNN ResNet-50-FPN V2 (torchvision)",
     "ssd":        "SSD-MobileNet V2 (TF Hub)",

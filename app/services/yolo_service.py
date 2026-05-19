@@ -61,6 +61,7 @@ _CLASS_MIN_CONF: dict[str, float] = {
     "toilet":       0.30,
     # Peligrosos
     "knife":        0.20,
+    "dining table": 0.10, 
     "scissors":     0.20,
 }
 
