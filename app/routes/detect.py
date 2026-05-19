@@ -21,9 +21,9 @@ from PIL import Image
 import io
 
 from app.services.yolo_service        import run_yolo
-from app.services.fasterrcnn_service  import run_fasterrcnn
-from app.services.maskrcnn_service    import run_maskrcnn
-from app.services.ssd_service         import run_ssd
+from app.experimental.fasterrcnn_service  import run_fasterrcnn
+from app.experimental.maskrcnn_service    import run_maskrcnn
+from app.experimental.ssd_service         import run_ssd
 from app.services.spatial_analyzer    import analyze_spatial
 from app.services.free_space_analyzer import calculate_free_space
 from app.services.risk_engine         import decide_movement

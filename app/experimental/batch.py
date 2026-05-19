@@ -79,13 +79,13 @@ def _run_model(model_name: str, image_bytes: bytes, threshold: float) -> dict:
         from app.services.yolo_service import run_yolo
         return run_yolo(image_bytes, threshold)
     elif model_name == "fasterrcnn":
-        from app.services.fasterrcnn_service import run_fasterrcnn
+        from app.experimental.fasterrcnn_service import run_fasterrcnn
         return run_fasterrcnn(image_bytes, threshold)
     elif model_name == "maskrcnn":
-        from app.services.maskrcnn_service import run_maskrcnn
+        from app.experimental.maskrcnn_service import run_maskrcnn
         return run_maskrcnn(image_bytes, threshold)
     elif model_name == "ssd":
-        from app.services.ssd_service import run_ssd
+        from app.experimental.ssd_service import run_ssd
         return run_ssd(image_bytes, threshold)
     else:
         raise ValueError(f"Modelo no reconocido: {model_name}")

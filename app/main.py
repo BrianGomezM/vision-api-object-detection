@@ -27,5 +27,5 @@ app.include_router(detect_router, prefix="/api")
 # CORREGIDO: antes usaba try/except que silenciaba el ImportError
 # real y dejaba /api/run-batch sin registrar → 404.
 # Ahora importamos directamente; si falla, el error es visible.
-from app.routes.batch import router as batch_router
+from app.experimental.batch import router as batch_router
 app.include_router(batch_router, prefix="/api", tags=["Batch"])
