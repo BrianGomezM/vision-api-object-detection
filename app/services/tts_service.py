@@ -60,6 +60,8 @@ REFERENCIA:
 import os
 import io
 import logging
+from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 # ──────────────────────────────────────────────────────────────
@@ -127,7 +129,7 @@ _ENCODING_MAP: dict[str, int] = {
 # SINGLETON DEL CLIENTE
 # ──────────────────────────────────────────────────────────────
 # El cliente de Google Cloud TTS se inicializa una sola vez para
-# reutilizar la conexión gRPC subyacente entre solicitudes, reduciendo
+# reutilizar la sesión HTTP subyacente entre solicitudes, reduciendo
 # la latencia de establecimiento de conexión (~100 ms por solicitud).
 
 _client: Optional[object] = None
@@ -167,11 +169,15 @@ def _get_client() -> Optional[object]:
         return None
 
     try:
+        # transport="rest" es obligatorio cuando se autentifica con API Key.
+        # El transporte gRPC (por defecto) requiere OAuth2/Service Account
+        # y rechaza API Keys con un error de autenticación silencioso.
         _client = texttospeech.TextToSpeechClient(
-            client_options=ClientOptions(api_key=_API_KEY)
+            client_options=ClientOptions(api_key=_API_KEY),
+            transport="rest",
         )
         logger.info(
-            "[TTS] Cliente Google Cloud TTS inicializado con API Key. "
+            "[TTS] Cliente Google Cloud TTS inicializado (REST + API Key). "
             "Voz: %s | Velocidad: %.2f | Tono: %.1f",
             _VOICE_NAME, _SPEAKING_RATE, _PITCH,
         )
@@ -241,13 +247,12 @@ def synthesize_speech(text: str) -> Optional[bytes]:
         synthesis_input = texttospeech.SynthesisInput(text=text)
 
         # ── Selección de voz ──────────────────────────────────
-        # ssml_gender=NEUTRAL garantiza la asignación de la voz más
-        # andrógina disponible, alineándose con el requisito de tono
-        # neutro y andrógino definido en el alcance del anteproyecto.
+        # Las voces Neural2 no admiten ssml_gender=NEUTRAL (error 400).
+        # Al especificar el nombre exacto de la voz, el género queda
+        # implícito en la voz elegida y no es necesario declararlo.
         voice_params = texttospeech.VoiceSelectionParams(
             language_code=_LANGUAGE_CODE,
             name=_VOICE_NAME,
-            ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
         )
 
         # ── Configuración de audio ────────────────────────────
@@ -275,8 +280,51 @@ def synthesize_speech(text: str) -> Optional[bytes]:
     except Exception as exc:
         # El fallo de TTS no interrumpe la respuesta del sistema.
         # El endpoint manejará el None retornado degradando a JSON.
-        logger.error("[TTS] Error durante la síntesis: %s", exc)
+        logger.error("[TTS] Error durante la síntesis: %s", exc, exc_info=True)
         return None
+
+
+# ──────────────────────────────────────────────────────────────
+# DIRECTORIO DE SALIDA DE AUDIO
+# ──────────────────────────────────────────────────────────────
+
+# Ruta absoluta a la carpeta donde se guardan los archivos de audio generados.
+# Se crea automáticamente si no existe al llamar synthesize_and_save().
+AUDIO_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "audio_output"
+
+
+def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
+    """
+    Convierte texto en audio MP3 y lo guarda en audio_output/.
+
+    Parámetros:
+        text     : narrativa egocéntrica en español.
+        filename : nombre del archivo de salida. Si es None, genera uno
+                   automático con timestamp: narrativa_YYYYMMDD_HHMMSS.mp3
+
+    Retorna:
+        str  : ruta relativa al archivo guardado (ej. "audio_output/narrativa_20260521_143022.mp3")
+        None : si la síntesis falla o el cliente TTS no está disponible.
+    """
+    audio_bytes = synthesize_speech(text)
+    if audio_bytes is None:
+        return None
+
+    AUDIO_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    if filename is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"narrativa_{timestamp}.mp3"
+
+    file_path = AUDIO_OUTPUT_DIR / filename
+    file_path.write_bytes(audio_bytes)
+
+    relative_path = f"audio_output/{filename}"
+    logger.info(
+        "[TTS] Audio guardado: %s (%d bytes)",
+        relative_path, len(audio_bytes),
+    )
+    return relative_path
 
 
 # ──────────────────────────────────────────────────────────────
