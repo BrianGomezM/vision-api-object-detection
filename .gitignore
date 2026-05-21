@@ -34,3 +34,8 @@ Thumbs.db
 # Cache de librerías
 *.cache
 /tmp/translation_cache.json
+
+
+# Credenciales Google Cloud
+google_credentials.json
+*.json

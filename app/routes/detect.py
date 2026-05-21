@@ -4,7 +4,7 @@ app/routes/detect.py
 Endpoints de producción de la API de navegación egocéntrica.
 
 ENDPOINTS:
-  POST /api/detect        → narrativa completa para producción
+  POST /api/detect        → narrativa completa para producción (JSON o audio MP3)
   POST /api/debug-detect  → pipeline paso a paso para diagnóstico
   GET  /api/health        → estado del servicio y configuración activa
 
@@ -13,15 +13,16 @@ CONFIGURACIÓN (variables de entorno en .env):
   API_DEFAULT_CONF    → umbral de confianza por defecto del endpoint   (default: 0.35)
 
 PIPELINE COMPLETO (ejecutado en _run_full_pipeline):
-  1. resize_image()       — escalar imagen si excede MAX_IMAGE_DIM
-  2. run_yolo()           — detectar objetos con YOLO26
-  3. analyze_spatial()    — enriquecer con posición + categoría + prioridad
-  4. estimate_steps()     — agregar estimación de pasos por objeto
+  1. resize_image()        — escalar imagen si excede MAX_IMAGE_DIM
+  2. run_yolo()            — detectar objetos con YOLO26
+  3. analyze_spatial()     — enriquecer con posición + categoría + prioridad
+  4. estimate_steps()      — agregar estimación de pasos por objeto
   5. calculate_free_space()— calcular fracción bloqueada por columna
-  6. decide_movement()    — generar instrucción de movimiento
-  7. classify_scene()     — identificar tipo de escenario (LLM)
+  6. decide_movement()     — generar instrucción de movimiento
+  7. classify_scene()      — identificar tipo de escenario (LLM)
   8. generate_description()— descripción egocéntrica (LLM)
-  9. build_narrative()    — ensamblar narrativa final
+  9. build_narrative()     — ensamblar narrativa final
+ 10. synthesize_speech()   — convertir narrativa a audio MP3 (opcional, audio=true)
 """
 
 import time
@@ -29,6 +30,7 @@ import os
 import io
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import StreamingResponse
 from PIL import Image
 
 from app.services.yolo_service        import run_yolo, YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
@@ -38,6 +40,7 @@ from app.services.free_space_analyzer import calculate_free_space
 from app.services.risk_engine         import decide_movement
 from app.services.scene_classifier    import classify_scene
 from app.services.llm_enhancer        import generate_description
+from app.services.tts_service         import synthesize_speech, is_tts_active
 from app.utils.groq_client            import GROQ_MODEL, is_llm_active
 
 router = APIRouter()
@@ -228,14 +231,28 @@ async def detect(
         False,
         description="Si true, incluye detalles de cada objeto y el prompt del LLM"
     ),
+    audio: bool = Form(
+        False,
+        description=(
+            "Si true, retorna StreamingResponse con audio MP3 de la narrativa "
+            "en lugar del JSON estándar. Requiere GOOGLE_API_KEY en .env."
+        )
+    ),
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
 
-    Respuesta mínima (debug=false):
-      - narrativa_final : texto listo para síntesis de voz
-      - escenario       : tipo y confianza del escenario detectado
-      - metricas        : tiempos por etapa, objetos detectados, umbral usado
+    Modos de respuesta:
+      - audio=false (default) → JSON con narrativa_final, escenario y métricas.
+      - audio=true            → StreamingResponse audio/mpeg con el audio MP3
+                                de la narrativa. El texto se incluye en los
+                                headers X-Narrativa, X-Escenario y
+                                X-Objetos-Detectados para diagnóstico sin
+                                necesidad de una segunda solicitud.
+
+    Degradación si TTS no está disponible (audio=true pero sin API Key):
+      → Retorna JSON con status='success_no_audio' y aviso descriptivo,
+        sin interrumpir el servicio.
     """
     try:
         image_bytes = await file.read()
@@ -245,6 +262,44 @@ async def detect(
         threshold = normalize_threshold(confidence_threshold)
         result    = _run_full_pipeline(image_bytes, threshold, debug)
 
+        # ── Modo audio: StreamingResponse MP3 ─────────────────
+        if audio:
+            audio_bytes = synthesize_speech(result["narrativa_final"])
+
+            if audio_bytes:
+                # El texto de la narrativa se incluye en los headers para
+                # que el cliente Web 3D pueda acceder a él sin un segundo
+                # request, útil para logging y diagnóstico en A20.
+                headers = {
+                    "X-Narrativa":          result["narrativa_final"][:500],
+                    "X-Escenario":          result["escenario"].get("scene_type", ""),
+                    "X-Objetos-Detectados": str(len(result["detections"])),
+                }
+                return StreamingResponse(
+                    io.BytesIO(audio_bytes),
+                    media_type="audio/mpeg",
+                    headers=headers,
+                )
+
+            # TTS no disponible → degradar a JSON con aviso explícito.
+            # El cliente debe manejar este caso implementando TTS propio
+            # o solicitando al usuario configurar la API Key.
+            return {
+                "status":          "success_no_audio",
+                "narrativa_final": result["narrativa_final"],
+                "aviso": (
+                    "El servicio TTS no está disponible. "
+                    "Verificar GOOGLE_API_KEY en .env."
+                ),
+                "metricas": {
+                    **result["tiempos"],
+                    "objetos_detectados": len(result["detections"]),
+                    "umbral_confianza":   threshold,
+                    "imagen":             result["imagen"],
+                },
+            }
+
+        # ── Modo JSON: respuesta estándar (sin cambios respecto a v3.0) ──
         response = {
             "status":          "success",
             "narrativa_final": result["narrativa_final"],
@@ -409,10 +464,12 @@ async def health_check():
     """
     Retorna el estado del servicio y la configuración activa.
     Útil para monitoreo y verificación post-despliegue.
+    Incluye el estado del TTS para verificar que las credenciales
+    de Google Cloud están correctamente configuradas.
     """
     return {
         "status":  "healthy",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "modelo": {
             "nombre":  "YOLO26",
             "weights": YOLO_WEIGHTS,
@@ -423,6 +480,11 @@ async def health_check():
             "proveedor": "Groq",
             "modelo":    GROQ_MODEL,
             "activo":    is_llm_active(),
+        },
+        "tts": {
+            "proveedor": "Google Cloud Text-to-Speech",
+            "voz":       os.getenv("TTS_VOICE_NAME", "es-ES-Neural2-A"),
+            "activo":    is_tts_active(),
         },
         "configuracion": {
             "umbral_default": _DEFAULT_CONF,

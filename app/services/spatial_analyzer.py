@@ -196,16 +196,27 @@ def _depth(bbox: dict, height: int, size: float) -> tuple[str, str, int]:
 
 def _pos_text(dep_text: str, lat_text: str, lat_key: str) -> str:
     """
-    Combina profundidad y lateral en una frase natural.
+    Combina profundidad y lateral en una frase natural optimizada
+    para síntesis de voz (TTS).
 
-    Ejemplos:
-      muy_cerca + frente a ti → "justo frente a ti"
-      cerca     + a tu derecha → "cerca a tu derecha"
-      medio     + a tu izquierda → "un poco más adelante, a tu izquierda"
+    Regla especial para el centro:
+      - muy_cerca + centro → "justo frente a ti"
+      - cerca + centro     → "frente a ti"
+        (omite "cerca" porque suena redundante al sintetizarse:
+         "cerca frente a ti" es ambiguo; "frente a ti" es claro)
+      - medio + centro     → "un poco más adelante, frente a ti"
+      - lejos + centro     → "al fondo, frente a ti"
+
+    Para laterales el texto de profundidad se antepone normalmente:
+      - cerca + derecha    → "cerca a tu derecha"
+      - muy_cerca + izq    → "justo a tu izquierda"
     """
     if lat_key == "center":
-        # "justo frente a ti" — sin coma intermedia
-        return f"{dep_text.rstrip(',').strip()} {lat_text}"
+        dep_clean = dep_text.rstrip(",").strip()
+        # "cerca" sola al frente es redundante en voz → usar solo el lateral
+        if dep_clean == "cerca":
+            return lat_text   # → "frente a ti"
+        return f"{dep_clean} {lat_text}"
     return f"{dep_text} {lat_text}".strip()
 
 
