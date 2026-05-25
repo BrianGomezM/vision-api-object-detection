@@ -18,10 +18,25 @@ ENV/
 *.pt
 *.pth
 
-# Archivos generados
+# Archivos generados por el sistema de evaluación
 test_results_json/
 charts/
 *.xlsx
+
+# Dataset acumulado para fine-tuning
+# (las imágenes y etiquetas son generadas en producción — no versionar)
+dataset/images/
+dataset/labels/
+dataset/finetune/
+# Los metadatos JSON SÍ se pueden versionar si se desea trazabilidad
+# dataset/metadata/   ← descomenta esta línea para excluirlos también
+
+# Métricas de producción (JSONL, crece con el uso)
+metrics/
+test_results/
+
+# Audio generado por TTS
+audio_output/
 
 # IDEs
 .vscode/
@@ -35,7 +50,11 @@ Thumbs.db
 *.cache
 /tmp/translation_cache.json
 
-
 # Credenciales Google Cloud
 google_credentials.json
 *.json
+# NOTA: excluir *.json excluye también los metadatos del dataset.
+# Si quieres versionar dataset/metadata/*.json, reemplaza la línea
+# anterior por entradas específicas:
+# google_credentials.json
+# test_results_json/

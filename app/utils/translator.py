@@ -42,7 +42,10 @@ from typing import Optional
 # ──────────────────────────────────────────────────────────────
 
 _CACHE_FILE: Path = Path(
-    os.getenv("TRANSLATION_CACHE_PATH", "/tmp/translation_cache.json")
+    os.getenv(
+        "TRANSLATION_CACHE_PATH",
+        str(Path.home() / ".cache" / "vision-api" / "translation_cache.json"),
+    )
 )
 
 # Timeout para la llamada a Google Translate (evita que cuelgue la API)
@@ -162,8 +165,16 @@ _STATIC_DICT: dict[str, str] = {
     "fire hydrant":   "boca de incendios",
     "stop sign":      "señal de stop",
     "parking meter":  "parquímetro",
-    # ── Animales adicionales ──────────────────────────────────
-    "bench":          "banco",
+    # ── Clases arquitectónicas personalizadas (dataset 3D) ────
+    "stairs":         "escaleras",
+    "wall":           "pared",
+    "floor":          "suelo",
+    "door_frame":     "marco de puerta",
+    "ramp":           "rampa",
+    "handrail":       "pasamanos",
+    "elevator":       "ascensor",
+    "column":         "columna",
+    "window":         "ventana",
 }
 
 

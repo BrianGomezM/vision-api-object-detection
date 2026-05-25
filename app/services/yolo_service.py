@@ -171,16 +171,17 @@ def _get_model() -> YOLO:
     print(f"[YOLO] Cargando: {YOLO_WEIGHTS}  imgsz={YOLO_IMGSZ}  iou={YOLO_IOU}  augment={YOLO_AUGMENT}")
     _model = YOLO(YOLO_WEIGHTS)
 
-    # Warm-up: imagen negra pequeña con conf alta para que no genere
-    # detecciones reales pero sí resuelva el overhead de compilación.
+    # Warm-up: imagen negra con conf alta para resolver el overhead de
+    # compilación JIT/GPU antes de la primera petición real.
+    # Usa YOLO_IMGSZ del entorno para que el warm-up sea idéntico a producción.
     print("[YOLO] Warm-up en curso...")
-    _warmup = Image.fromarray(np.zeros((640, 640, 3), dtype=np.uint8))
+    _warmup = Image.fromarray(np.zeros((YOLO_IMGSZ, YOLO_IMGSZ, 3), dtype=np.uint8))
     _model.predict(
         source=_warmup,
         conf=0.99,
-        imgsz=640,
+        imgsz=YOLO_IMGSZ,
         verbose=False,
-        augment=False,   # augment=False siempre en warm-up para que sea rápido
+        augment=False,
     )
     print("[YOLO] Modelo listo para inferencia.")
 

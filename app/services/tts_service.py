@@ -58,7 +58,6 @@ REFERENCIA:
 """
 
 import os
-import io
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -292,6 +291,10 @@ def synthesize_speech(text: str) -> Optional[bytes]:
 # Se crea automáticamente si no existe al llamar synthesize_and_save().
 AUDIO_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "audio_output"
 
+# Número máximo de archivos de audio a conservar en disco.
+# Cuando se supera, se elimina el más antiguo para liberar espacio.
+_MAX_AUDIO_FILES: int = int(os.getenv("TTS_MAX_SAVED_FILES", "5"))
+
 
 def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
     """
@@ -324,6 +327,19 @@ def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
         "[TTS] Audio guardado: %s (%d bytes)",
         relative_path, len(audio_bytes),
     )
+
+    # Rotación: eliminar los más antiguos si se supera el límite configurado.
+    existing = sorted(
+        AUDIO_OUTPUT_DIR.glob("narrativa_*.mp3"),
+        key=lambda f: f.stat().st_mtime,
+    )
+    for old_file in existing[:-_MAX_AUDIO_FILES]:
+        try:
+            old_file.unlink()
+            logger.info("[TTS] Archivo antiguo eliminado: %s", old_file.name)
+        except OSError as e:
+            logger.warning("[TTS] No se pudo eliminar %s: %s", old_file.name, e)
+
     return relative_path
 
 

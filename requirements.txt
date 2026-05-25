@@ -9,18 +9,18 @@ pillow
 numpy
 opencv-python
 
-# ── PyTorch (YOLO26 y Detectron2) ────────────────────────────
+# ── PyTorch (YOLO26s y modelos comparativos) ─────────────────
 torch
 torchvision
 
-# ── YOLO26 (Ultralytics) ──────────────────────────────────────
+# ── YOLO26s (Ultralytics) ──────────────────────────────────────
 ultralytics
 
-# ── Faster R-CNN y Mask R-CNN (Detectron2 - Meta AI) ─────────
+# ── Faster R-CNN y Mask R-CNN (experimental) ─────────────────
 # Instalación especial - no disponible en PyPI estándar:
 # pip install 'git+https://github.com/facebookresearch/detectron2.git'
 
-# ── SSD-MobileNet V2 (TensorFlow Object Detection API) ────────
+# ── SSD-MobileNet V2 (experimental) ──────────────────────────
 tensorflow
 tensorflow-hub
 
@@ -30,12 +30,15 @@ groq
 # ── Traducción dinámica EN→ES ─────────────────────────────────
 deep-translator==1.11.4
 
-# ── Batch / Análisis ──────────────────────────────────────────
+# ── Batch / Análisis / Evaluación ────────────────────────────
 requests
 pandas
 matplotlib
 psutil
 openpyxl
 
-# ── Text-to-Speech API (Google Cloud) ───────────────────────
+# ── Text-to-Speech API (Google Cloud) ─────────────────────────
 google-cloud-texttospeech
+
+# ── Pruebas de carga y funcionales (nuevos endpoints) ─────────
+httpx

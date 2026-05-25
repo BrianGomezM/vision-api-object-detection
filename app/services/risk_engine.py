@@ -147,10 +147,16 @@ def decide_movement(objects: List[Dict], free_space: Dict) -> Dict:
     )
 
     if truly_blocked:
+        # Nunca dejar al usuario sin dirección: siempre indicar la salida menos bloqueada.
+        _DIR_TEXT = {"left": "la izquierda", "center": "el frente", "right": "la derecha"}
+        min_zone  = min(zones, key=zones.get)
+        pasos     = _pasos_libres(objects, min_zone)
+        base      = _texto_avance(pasos, _DIR_TEXT[min_zone])
         return {
             "instruction": (
-                "Detente. Hay obstáculos cerca en todas las direcciones. "
-                "No avances hasta recibir ayuda o información adicional."
+                f"Hay obstáculos en todas las direcciones. "
+                f"La salida menos bloqueada es hacia {_DIR_TEXT[min_zone]}. "
+                f"{base}"
             )
         }
 
@@ -198,11 +204,16 @@ def decide_movement(objects: List[Dict], free_space: Dict) -> Dict:
                 f"{_texto_avance(_pasos_libres(objects, 'right'), 'la derecha')}"
             )}
 
-        # Frente bloqueado y ningún lateral libre
+        # Frente bloqueado y ningún lateral plenamente libre:
+        # dar la dirección lateral con menor cobertura para que el usuario no se quede quieto.
+        _DIR_TEXT = {"left": "la izquierda", "right": "la derecha"}
+        min_lateral = "left" if zones["left"] <= zones["right"] else "right"
+        pasos_lat   = _pasos_libres(objects, min_lateral)
         return {
             "instruction": (
-                "Detente. El paso al frente está bloqueado "
-                "y los lados no tienen salida clara."
+                f"El paso al frente está bloqueado. "
+                f"Gira con cuidado hacia {_DIR_TEXT[min_lateral]} y avanza despacio. "
+                f"{_texto_avance(pasos_lat, _DIR_TEXT[min_lateral])}"
             )
         }
 

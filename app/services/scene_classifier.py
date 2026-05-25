@@ -27,7 +27,8 @@ CONFIGURACIÓN (.env):
 import os
 import re
 import json
-from typing import Dict, List
+import time
+from typing import Dict, List, Optional
 from app.utils.groq_client import get_groq_client, GROQ_MODEL
 
 # ──────────────────────────────────────────────────────────────
@@ -37,6 +38,23 @@ from app.utils.groq_client import get_groq_client, GROQ_MODEL
 _MAX_TOKENS: int    = int(float(os.getenv("LLM_SCENE_TOKENS",      "150")))
 _TEMPERATURE: float = float(os.getenv("LLM_SCENE_TEMP",            "0.1"))
 _MAX_OBJECTS: int   = int(os.getenv("LLM_SCENE_MAX_OBJECTS",       "15"))
+# TTL en segundos para reutilizar el último escenario clasificado.
+# Si dos peticiones llegan dentro de este intervalo con los mismos objetos
+# dominantes, se evita una llamada al LLM. Default: 10 s.
+_SCENE_CACHE_TTL: float = float(os.getenv("LLM_SCENE_CACHE_TTL", "10"))
+
+# ──────────────────────────────────────────────────────────────
+# CACHÉ DE ESCENARIO (entre peticiones consecutivas)
+# ──────────────────────────────────────────────────────────────
+
+_scene_cache: Optional[Dict] = None
+_scene_cache_ts: float       = 0.0
+_scene_cache_key: str        = ""
+
+
+def _make_cache_key(object_names: List[str]) -> str:
+    """Clave determinista a partir de los primeros N objetos ordenados."""
+    return "|".join(sorted(set(object_names[:_MAX_OBJECTS])))
 
 
 # ──────────────────────────────────────────────────────────────
@@ -114,8 +132,8 @@ Identifica el tipo de escenario. Responde SOLO con JSON válido, sin texto extra
   "scene_intro": "<frase exacta: 'Parece que estás en una <scene_type>.' o 'Parece que estás en un <scene_type>.'>"
 }}
 
-REGLAS:
-- sofá + TV                    → scene_type: "sala de estar"
+REGLAS (los objetos ya están en español):
+- sofá + televisor             → scene_type: "sala de estar"
 - cama                         → scene_type: "dormitorio"
 - refrigerador + horno         → scene_type: "cocina"
 - escritorio + silla + monitor → scene_type: "oficina"
@@ -178,16 +196,16 @@ CRÍTICO:
 # Keywords característicos de cada escenario.
 # Puntuación = cantidad de keywords presentes en los objetos detectados.
 _CONTEXT_GROUPS: Dict[str, List[str]] = {
-    "sala de estar":     ["couch", "sofa", "tv", "potted plant", "remote", "vase"],
-    "dormitorio":        ["bed", "pillow", "lamp", "clock", "wardrobe"],
-    "cocina":            ["refrigerator", "microwave", "oven", "sink", "toaster", "bowl"],
-    "comedor":           ["dining table", "chair", "cup", "bowl", "fork", "knife"],
-    "oficina":           ["chair", "desk", "laptop", "monitor", "keyboard", "mouse", "book"],
-    "sala de cine":      ["tv", "chair", "couch", "remote"],
-    "baño":              ["toilet", "sink", "toothbrush"],
-    "entrada o pasillo": ["door", "potted plant", "vase", "bench"],
-    "exterior":          ["car", "bus", "bicycle", "person", "motorcycle", "truck"],
-    "tienda":            ["person", "bottle", "book", "backpack", "suitcase"],
+    "sala de estar":     ["sofá", "televisor", "planta en maceta", "control remoto", "jarrón"],
+    "dormitorio":        ["cama", "almohada", "lámpara", "reloj", "armario"],
+    "cocina":            ["refrigerador", "microondas", "horno", "lavabo", "tostadora", "cuenco"],
+    "comedor":           ["mesa de comedor", "silla", "taza", "cuenco", "tenedor", "cuchillo"],
+    "oficina":           ["silla", "escritorio", "portátil", "monitor", "teclado", "ratón", "libro"],
+    "sala de cine":      ["televisor", "silla", "sofá", "control remoto"],
+    "baño":              ["inodoro", "lavabo", "cepillo de dientes"],
+    "entrada o pasillo": ["puerta", "planta en maceta", "jarrón", "banco"],
+    "exterior":          ["coche", "autobús", "bicicleta", "persona", "motocicleta", "camión"],
+    "tienda":            ["persona", "botella", "libro", "mochila", "maleta"],
 }
 
 
@@ -257,9 +275,27 @@ def classify_scene(analyzed_objects: List[Dict]) -> Dict:
             "scene_intro": "",
         }
 
+    # Preferir label_es (español) para que el LLM reciba los mismos nombres
+    # que se usan en los ejemplos del prompt; caer a label en inglés si falta.
     object_names = [
-        obj.get("label", "")
+        obj.get("label_es") or obj.get("label", "")
         for obj in analyzed_objects
-        if obj.get("label")
+        if obj.get("label_es") or obj.get("label")
     ]
-    return _classify_with_llm(object_names)
+
+    global _scene_cache, _scene_cache_ts, _scene_cache_key
+    cache_key = _make_cache_key(object_names)
+    now       = time.monotonic()
+
+    if (
+        _scene_cache is not None
+        and cache_key == _scene_cache_key
+        and (now - _scene_cache_ts) < _SCENE_CACHE_TTL
+    ):
+        return {**_scene_cache, "cached": True}
+
+    result           = _classify_with_llm(object_names)
+    _scene_cache     = result
+    _scene_cache_ts  = now
+    _scene_cache_key = cache_key
+    return result

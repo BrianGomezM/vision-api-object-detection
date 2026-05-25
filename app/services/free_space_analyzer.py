@@ -180,24 +180,16 @@ def calculate_free_space(objects: List[Dict], width: int) -> Dict:
     l_blocked = zones["left"]   > _BLOCK_THRESHOLD
     r_blocked = zones["right"]  > _BLOCK_THRESHOLD
 
-    if c_blocked and l_blocked and r_blocked:
-        # Antes de declarar "blocked" total, verificar falso-blocked:
-        # Un único objeto grande puede ocupar toda una columna lateral
-        # (sofá = right:1.0) sin que el centro esté realmente bloqueado.
-        # En ese caso la situación no es "blocked" sino "front_blocked".
-        left_solo_grande  = (large_obj_count["left"]  == 1 and raw["left"]  > 0.8)
-        right_solo_grande = (large_obj_count["right"] == 1 and raw["right"] > 0.8)
+    # Falso-blocked: un único objeto grande (sofá, cama) puede ocupar
+    # >80% de una columna lateral sin ser un obstáculo real de paso.
+    # En ese caso no contamos ese lateral como verdaderamente bloqueado.
+    left_solo_grande  = (large_obj_count["left"]  == 1 and raw["left"]  > 0.8)
+    right_solo_grande = (large_obj_count["right"] == 1 and raw["right"] > 0.8)
+    l_blocked_real = l_blocked and not left_solo_grande
+    r_blocked_real = r_blocked and not right_solo_grande
 
-        if (left_solo_grande or right_solo_grande) and not c_blocked:
-            # El centro está libre → se puede avanzar
-            situation = "clear"
-        elif (left_solo_grande or right_solo_grande) and c_blocked:
-            # Centro bloqueado pero lateral por objeto grande → un lateral libre
-            situation = "front_blocked"
-        else:
-            # Bloqueo real en todas las direcciones
-            situation = "blocked"
-
+    if c_blocked and l_blocked_real and r_blocked_real:
+        situation = "blocked"
     elif c_blocked:
         situation = "front_blocked"
     else:

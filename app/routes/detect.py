@@ -8,21 +8,28 @@ ENDPOINTS:
   POST /api/debug-detect  → pipeline paso a paso para diagnóstico
   GET  /api/health        → estado del servicio y configuración activa
 
+CAMBIOS RESPECTO A LA VERSIÓN ANTERIOR:
+  - Se añade llamada a log_metric() al final de /detect para registrar
+    métricas de producción consumibles desde /api/metrics/summary.
+  - Se agrega campo "confianza_prom" en las métricas de respuesta.
+  - Versión bumped a 3.2.0.
+
 CONFIGURACIÓN (variables de entorno en .env):
   API_MAX_IMAGE_DIM   → dimensión máxima de imagen antes de inferencia (default: 800)
   API_DEFAULT_CONF    → umbral de confianza por defecto del endpoint   (default: 0.35)
 
-PIPELINE COMPLETO (ejecutado en _run_full_pipeline):
-  1. resize_image()        — escalar imagen si excede MAX_IMAGE_DIM
-  2. run_yolo()            — detectar objetos con YOLO26
-  3. analyze_spatial()     — enriquecer con posición + categoría + prioridad
-  4. estimate_steps()      — agregar estimación de pasos por objeto
-  5. calculate_free_space()— calcular fracción bloqueada por columna
-  6. decide_movement()     — generar instrucción de movimiento
-  7. classify_scene()      — identificar tipo de escenario (LLM)
-  8. generate_description()— descripción egocéntrica (LLM)
-  9. build_narrative()     — ensamblar narrativa final
- 10. synthesize_speech()   — convertir narrativa a audio MP3 (opcional, audio=true)
+PIPELINE COMPLETO (_run_full_pipeline):
+  1. resize_image()         — escalar imagen si excede MAX_IMAGE_DIM
+  2. run_yolo()             — detectar objetos con YOLO26s
+  3. analyze_spatial()      — enriquecer con posición + categoría + prioridad
+  4. estimate_steps()       — agregar estimación de pasos por objeto
+  5. calculate_free_space() — calcular fracción bloqueada por columna
+  6. decide_movement()      — generar instrucción de movimiento
+  7. classify_scene()       — identificar tipo de escenario (LLM)
+  8. generate_description() — descripción egocéntrica (LLM)
+  9. build_narrative()      — ensamblar narrativa final
+ 10. synthesize_speech()    — convertir narrativa a audio MP3 (opcional, audio=true)
+ 11. log_metric()           — registrar métricas de producción (NUEVO)
 """
 
 import time
@@ -51,13 +58,8 @@ router = APIRouter()
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
 # ──────────────────────────────────────────────────────────────
 
-# Dimensión máxima (px) de la imagen antes de pasarla a YOLO.
-# Imágenes más grandes se redimensionan preservando la relación de aspecto.
-# Valores mayores = más precisión + más tiempo de inferencia.
-_MAX_IMAGE_DIM: int = int(os.getenv("API_MAX_IMAGE_DIM", "800"))
-
-# Umbral de confianza por defecto cuando el cliente no envía el parámetro
-_DEFAULT_CONF: float = float(os.getenv("API_DEFAULT_CONF", "0.35"))
+_MAX_IMAGE_DIM: int   = int(os.getenv("API_MAX_IMAGE_DIM", "800"))
+_DEFAULT_CONF: float  = float(os.getenv("API_DEFAULT_CONF", "0.35"))
 
 
 # ──────────────────────────────────────────────────────────────
@@ -65,12 +67,10 @@ _DEFAULT_CONF: float = float(os.getenv("API_DEFAULT_CONF", "0.35"))
 # ──────────────────────────────────────────────────────────────
 
 def _ms(t: float) -> float:
-    """Milisegundos transcurridos desde t."""
     return round((time.time() - t) * 1000, 2)
 
 
 def normalize_threshold(value: float) -> float:
-    """Asegura que el umbral esté en [0.0, 1.0]."""
     return max(0.0, min(1.0, float(value)))
 
 
@@ -78,25 +78,17 @@ def resize_image(image_bytes: bytes, max_dim: int = None) -> tuple:
     """
     Redimensiona la imagen si alguna dimensión supera max_dim,
     preservando la relación de aspecto con filtro LANCZOS.
-
-    Si la imagen ya es pequeña, la retorna sin modificar.
-
-    Parámetros:
-        image_bytes : imagen en binario
-        max_dim     : dimensión máxima permitida (None → usa _MAX_IMAGE_DIM)
-
-    Retorna:
-        (bytes, new_width, new_height, orig_width, orig_height)
+    Retorna (bytes, new_w, new_h, orig_w, orig_h).
     """
     max_dim = max_dim or _MAX_IMAGE_DIM
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    ow, oh = img.size
+    img     = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    ow, oh  = img.size
 
     if max(ow, oh) > max_dim:
-        ratio = max_dim / max(ow, oh)
+        ratio  = max_dim / max(ow, oh)
         nw, nh = int(ow * ratio), int(oh * ratio)
-        img = img.resize((nw, nh), Image.Resampling.LANCZOS)
-        buf = io.BytesIO()
+        img    = img.resize((nw, nh), Image.Resampling.LANCZOS)
+        buf    = io.BytesIO()
         img.save(buf, format="JPEG", quality=90)
         return buf.getvalue(), nw, nh, ow, oh
 
@@ -105,13 +97,9 @@ def resize_image(image_bytes: bytes, max_dim: int = None) -> tuple:
 
 def build_narrative(scene_intro: str, description: str, instruction: str) -> str:
     """
-    Ensambla la narrativa final concatenando los tres fragmentos:
-      1. Intro del escenario  ("Parece que estás en una sala de estar.")
-      2. Descripción del entorno ("Sofá a tu derecha a aproximadamente 2 pasos.")
-      3. Instrucción de movimiento ("Puedes avanzar al frente.")
-
-    Maneja puntuación automáticamente para que la unión sea fluida.
-    Si no hay ningún fragmento, retorna un mensaje seguro por defecto.
+    Ensambla la narrativa final concatenando intro de escenario,
+    descripción del entorno e instrucción de movimiento.
+    Maneja puntuación automáticamente.
     """
     parts = [p.strip() for p in [scene_intro, description, instruction] if p and p.strip()]
     if not parts:
@@ -120,7 +108,6 @@ def build_narrative(scene_intro: str, description: str, instruction: str) -> str
     result = ""
     for part in parts:
         if result:
-            # Si el fragmento anterior ya termina en punto, solo espacio
             sep = " " if result.rstrip().endswith(".") else ". "
             result += sep
         result += part
@@ -131,6 +118,10 @@ def build_narrative(scene_intro: str, description: str, instruction: str) -> str
     return result
 
 
+# Alias para compatibilidad con batch.py que importa build_final_narrative
+build_final_narrative = build_narrative
+
+
 # ──────────────────────────────────────────────────────────────
 # PIPELINE COMPLETO
 # ──────────────────────────────────────────────────────────────
@@ -138,67 +129,56 @@ def build_narrative(scene_intro: str, description: str, instruction: str) -> str
 def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False) -> dict:
     """
     Ejecuta el pipeline completo de detección → narrativa.
-
-    Cada etapa mide su tiempo de ejecución para las métricas del endpoint.
-
-    Parámetros:
-        image_bytes : imagen en binario (JPEG o PNG)
-        threshold   : umbral de confianza normalizado [0.0, 1.0]
-        debug       : si True, incluye prompt del LLM en la respuesta
-
-    Retorna dict con todos los resultados intermedios y tiempos.
+    Cada etapa mide su tiempo para las métricas del endpoint.
     """
     tiempos: dict = {}
     t_total = time.time()
 
-    # ── 0. Redimensionamiento previo a inferencia ──────────────
     image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
 
-    # ── 1. Detección YOLO26 ────────────────────────────────────
-    t1 = time.time()
+    # 1. Detección YOLO26s
+    t1         = time.time()
     det_result = run_yolo(image_bytes, threshold)
     detections = det_result.get("detections", [])
     tiempos["deteccion_ms"] = _ms(t1)
 
-    # ── 2. Análisis espacial egocéntrico ───────────────────────
-    t2 = time.time()
+    # 2. Análisis espacial egocéntrico
+    t2       = time.time()
     analyzed = analyze_spatial(detections, width, height)
     tiempos["espacial_ms"] = _ms(t2)
 
-    # ── 3. Estimación de pasos ─────────────────────────────────
-    t3 = time.time()
+    # 3. Estimación de pasos
+    t3       = time.time()
     analyzed = estimate_steps(analyzed, width, height)
     tiempos["pasos_ms"] = _ms(t3)
 
-    # ── 4. Análisis de espacio libre ───────────────────────────
-    t4 = time.time()
+    # 4. Análisis de espacio libre
+    t4         = time.time()
     free_space = calculate_free_space(analyzed, width)
     tiempos["espacio_ms"] = _ms(t4)
 
-    # ── 5. Decisión de movimiento ──────────────────────────────
-    t5 = time.time()
+    # 5. Decisión de movimiento
+    t5       = time.time()
     decision = decide_movement(analyzed, free_space)
     tiempos["decision_ms"] = _ms(t5)
 
-    # ── 6. Clasificación de escenario (LLM) ────────────────────
-    t6 = time.time()
+    # 6. Clasificación de escenario (LLM)
+    t6         = time.time()
     scene_info = classify_scene(analyzed)
     tiempos["escenario_ms"] = _ms(t6)
-
-    # Solo usar la intro si la confianza es suficiente
     scene_intro = (
         scene_info.get("scene_intro", "")
         if scene_info.get("confidence") in ("media", "alta")
         else ""
     )
 
-    # ── 7. Descripción egocéntrica (LLM) ──────────────────────
-    t7 = time.time()
+    # 7. Descripción egocéntrica (LLM)
+    t7          = time.time()
     desc_result = generate_description(analyzed, debug=debug)
     description = desc_result.get("text", "")
     tiempos["llm_ms"] = _ms(t7)
 
-    # ── 8. Narrativa final ─────────────────────────────────────
+    # 8. Narrativa final
     narrativa = build_narrative(scene_intro, description, decision["instruction"])
     tiempos["total_ms"] = _ms(t_total)
 
@@ -219,42 +199,39 @@ def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False
 
 
 # ──────────────────────────────────────────────────────────────
-# POST /detect — endpoint de producción
+# POST /detect
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/detect", tags=["Detección"])
 async def detect(
-    file: UploadFile            = File(..., description="Imagen JPEG o PNG del entorno"),
+    file: UploadFile = File(..., description="Imagen JPEG o PNG del entorno"),
     confidence_threshold: float = Form(
         _DEFAULT_CONF, ge=0.0, le=1.0,
-        description="Umbral de confianza YOLO (0.0–1.0)"
+        description="Umbral de confianza YOLO (0.0–1.0)",
     ),
     debug: bool = Form(
         False,
-        description="Si true, incluye detalles de cada objeto y el prompt del LLM"
+        description="Si true, incluye detalles de cada objeto y el prompt del LLM",
     ),
     audio: bool = Form(
         False,
         description=(
-            "Si true, retorna StreamingResponse con audio MP3 de la narrativa "
-            "en lugar del JSON estándar. Requiere GOOGLE_API_KEY en .env."
-        )
+            "Si true, retorna StreamingResponse audio/mpeg. "
+            "Requiere GOOGLE_API_KEY en .env."
+        ),
     ),
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
 
     Modos de respuesta:
-      - audio=false (default) → JSON con narrativa_final, escenario y métricas.
-      - audio=true            → StreamingResponse audio/mpeg con el audio MP3
-                                de la narrativa. El texto se incluye en los
-                                headers X-Narrativa, X-Escenario y
-                                X-Objetos-Detectados para diagnóstico sin
-                                necesidad de una segunda solicitud.
+      - audio=false (default) → JSON con narrativa_final, escenario, audio (base64) y métricas.
+      - audio=true            → StreamingResponse audio/mpeg con el MP3 de la narrativa.
+                                El texto se incluye en headers X-Narrativa, X-Escenario
+                                y X-Objetos-Detectados.
 
-    Degradación si TTS no está disponible (audio=true pero sin API Key):
-      → Retorna JSON con status='success_no_audio' y aviso descriptivo,
-        sin interrumpir el servicio.
+    Las métricas de cada solicitud exitosa se registran automáticamente en
+    metrics/production_metrics.jsonl para consumo desde GET /api/metrics/summary.
     """
     try:
         image_bytes = await file.read()
@@ -264,17 +241,15 @@ async def detect(
         threshold = normalize_threshold(confidence_threshold)
         result    = _run_full_pipeline(image_bytes, threshold, debug)
 
-        # ── TTS: genera, guarda en disco y codifica en base64 ────────────
+        # TTS: genera, guarda en disco y codifica en base64
         t_tts      = time.time()
         audio_path = synthesize_and_save(result["narrativa_final"])
         tts_ms     = _ms(t_tts)
 
-        # Construir objeto audio completo para la respuesta JSON.
-        # Si TTS no está disponible, todos los campos quedan en None.
         if audio_path:
-            raw_bytes   = Path(audio_path).read_bytes()
-            b64_str     = base64.b64encode(raw_bytes).decode("utf-8")
-            audio_info  = {
+            raw_bytes  = Path(audio_path).read_bytes()
+            b64_str    = base64.b64encode(raw_bytes).decode("utf-8")
+            audio_info = {
                 "disponible":   True,
                 "archivo":      audio_path,
                 "content_type": "audio/mpeg",
@@ -285,23 +260,41 @@ async def detect(
         else:
             raw_bytes  = None
             audio_info = {
-                "disponible":  False,
-                "archivo":     None,
+                "disponible":   False,
+                "archivo":      None,
                 "content_type": None,
                 "data_base64":  None,
                 "data_uri":     None,
                 "tamano_bytes": None,
             }
 
+        # Calcular confianza promedio para métricas
+        confs    = [d["confidence"] for d in result["detections"]]
+        avg_conf = round(sum(confs) / len(confs), 3) if confs else 0.0
+
         metricas = {
             **result["tiempos"],
             "tts_ms":             tts_ms,
             "objetos_detectados": len(result["detections"]),
+            "confianza_prom":     avg_conf,
             "umbral_confianza":   threshold,
             "imagen":             result["imagen"],
         }
 
-        # ── Modo stream: devuelve MP3 binario (útil para clientes de audio) ─
+        # ── Registrar métricas de producción (NUEVO) ──────────
+        try:
+            from app.routes.evaluation import log_metric
+            log_metric({
+                "objetos":        len(result["detections"]),
+                "confianza_prom": avg_conf,
+                "deteccion_ms":   result["tiempos"].get("deteccion_ms", 0),
+                "total_ms":       result["tiempos"].get("total_ms", 0),
+                "escenario":      result["escenario"].get("scene_type", "desconocido"),
+            })
+        except Exception:
+            pass  # El registro de métricas nunca debe romper la respuesta principal
+
+        # ── Modo stream: devuelve MP3 binario ─────────────────
         if audio:
             if raw_bytes:
                 headers = {
@@ -322,7 +315,7 @@ async def detect(
                 "metricas":        metricas,
             }
 
-        # ── Modo JSON completo: narrativa + audio (base64 + ruta) + escenario + métricas ─
+        # ── Modo JSON completo ─────────────────────────────────
         response = {
             "status":          "success",
             "narrativa_final": result["narrativa_final"],
@@ -366,17 +359,18 @@ async def detect(
 
 
 # ──────────────────────────────────────────────────────────────
-# POST /debug-detect — diagnóstico paso a paso
+# POST /debug-detect
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/debug-detect", tags=["Diagnóstico"])
 async def debug_detect(
-    file: UploadFile            = File(...),
+    file: UploadFile = File(...),
     confidence_threshold: float = Form(_DEFAULT_CONF, ge=0.0, le=1.0),
 ):
     """
     Ejecuta el pipeline completo y expone cada etapa con detalle.
     Útil para calibración, validación y diagnóstico académico.
+    No registra métricas de producción (endpoint de diagnóstico).
     """
     try:
         image_bytes = await file.read()
@@ -390,8 +384,8 @@ async def debug_detect(
         decision    = result["decision"]
         scene_info  = result["escenario"]
         desc_result = result["desc_result"]
+        n_det       = len(result["detections"])
 
-        n_det = len(result["detections"])
         if n_det == 0:
             aviso = "⚠️  NINGÚN objeto detectado. Prueba bajar confidence_threshold."
         elif n_det < 3:
@@ -475,22 +469,30 @@ async def debug_detect(
 
 
 # ──────────────────────────────────────────────────────────────
-# GET /health — estado del servicio
+# GET /health
 # ──────────────────────────────────────────────────────────────
 
 @router.get("/health", tags=["Info"])
 async def health_check():
     """
     Retorna el estado del servicio y la configuración activa.
-    Útil para monitoreo y verificación post-despliegue.
-    Incluye el estado del TTS para verificar que las credenciales
-    de Google Cloud están correctamente configuradas.
+    Incluye estado del LLM, TTS y los nuevos módulos de evaluación.
     """
+    # Contar imágenes en dataset si existe
+    from pathlib import Path as _Path
+    dataset_path = _Path("dataset/metadata")
+    dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
+
+    metrics_path = _Path("metrics/production_metrics.jsonl")
+    metrics_count = 0
+    if metrics_path.exists():
+        metrics_count = sum(1 for l in metrics_path.read_text().strip().split("\n") if l.strip())
+
     return {
         "status":  "healthy",
-        "version": "3.1.0",
+        "version": "3.2.0",
         "modelo": {
-            "nombre":  "YOLO26",
+            "nombre":  "YOLO26s",
             "weights": YOLO_WEIGHTS,
             "imgsz":   YOLO_IMGSZ,
             "iou":     YOLO_IOU,
@@ -504,6 +506,21 @@ async def health_check():
             "proveedor": "Google Cloud Text-to-Speech",
             "voz":       os.getenv("TTS_VOICE_NAME", "es-ES-Neural2-A"),
             "activo":    is_tts_active(),
+        },
+        "evaluacion": {
+            "dataset_imagenes":    dataset_count,
+            "metricas_registradas": metrics_count,
+            "endpoints": [
+                "POST /api/dataset/upload",
+                "GET  /api/dataset/stats",
+                "GET  /api/metrics/summary",
+                "GET  /api/metrics/latency",
+                "POST /api/test/functional",
+                "POST /api/test/load",
+                "GET  /api/test/results",
+                "POST /api/finetune/prepare",
+                "GET  /api/finetune/status",
+            ],
         },
         "configuracion": {
             "umbral_default": _DEFAULT_CONF,

@@ -77,9 +77,14 @@ OBJECT_TAXONOMY: dict[str, list[str]] = {
         "knife",
         "scissors",
         "fire",
+        # ── Clases arquitectónicas de alto riesgo ─────────────
+        "stairs",       # escaleras — caída
+        "ramp",         # rampa — desnivel
     ],
     "exit": [
         "door",
+        "door_frame",   # marco de puerta personalizado
+        "elevator",     # ascensor — punto de referencia de salida
     ],
     "obstacle": [
         "person", "chair", "couch", "sofa", "bed", "bench", "stool",
@@ -89,6 +94,16 @@ OBJECT_TAXONOMY: dict[str, list[str]] = {
         "car", "bus", "truck",
         "potted plant", "vase",
         "dog", "cat",
+        # ── Clases arquitectónicas de bloqueo físico ──────────
+        "wall",         # pared — no atravesable
+        "column",       # columna — obstáculo fijo
+        "handrail",     # pasamanos — límite lateral
+    ],
+    "surface": [
+        # Las superficies son también obstáculos, pero se tratan de forma
+        # especial para detectar objetos que están encima de ellas.
+        "dining table", "table", "desk", "counter", "shelf",
+        "floor",        # suelo — referencia de navegación
     ],
     "surface": [
         # Las superficies son también obstáculos, pero se tratan de forma
@@ -126,13 +141,15 @@ _CAT_ORDER: list[str] = [
 
 def classify_object(label: str) -> str:
     """
-    Clasifica un label COCO en una categoría semántica.
+    Clasifica un label en una categoría semántica.
+    Usa matching exacto para evitar falsos positivos con clases custom
+    (ej. "wall" no debe matchear en "firewall").
     Recorre _CAT_ORDER y retorna la primera coincidencia.
     Si no hay coincidencia retorna "other".
     """
     key = label.strip().lower()
     for cat in _CAT_ORDER:
-        if any(item in key for item in OBJECT_TAXONOMY[cat]):
+        if key in OBJECT_TAXONOMY[cat]:
             return cat
     return "other"
 

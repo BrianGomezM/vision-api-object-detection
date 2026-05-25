@@ -1,0 +1,58 @@
+# data/custom_dataset.yaml
+#
+# Dataset personalizado para navegación egocéntrica en entornos 3D.
+# Extiende COCO-80 con clases arquitectónicas críticas para personas ciegas.
+#
+# FLUJO:
+#   1. Coloca imágenes en data/images/train/ y data/images/val/
+#   2. Coloca anotaciones YOLO en data/labels/train/ y data/labels/val/
+#   3. Ejecuta: python scripts/train_custom.py
+#
+# HERRAMIENTAS DE ANOTACIÓN RECOMENDADAS:
+#   - Roboflow (roboflow.com) — exporta directo en formato YOLO
+#   - Label Studio           — open source, instalable local
+#   - CVAT                   — open source, más completo
+
+# Rutas relativas al directorio raíz del proyecto
+path:  data
+train: images/train
+val:   images/val
+
+# ──────────────────────────────────────────────────────────────
+# CLASES PERSONALIZADAS
+# ──────────────────────────────────────────────────────────────
+# Estas son las clases que NO están en COCO-80 y son críticas
+# para navegación de personas ciegas en entornos arquitectónicos.
+#
+# Prioridad de recolección de imágenes:
+#   🔴 Crítico  : stairs, wall, floor (bloqueo físico directo)
+#   🟠 Alto     : door_frame, ramp, handrail
+#   🟡 Medio    : elevator, column, window
+
+nc: 9  # número de clases
+
+names:
+  0: stairs        # escaleras — peligro de caída
+  1: wall          # pared — límite no atravesable
+  2: floor         # suelo — referencia de navegación
+  3: door_frame    # marco de puerta — salida / entrada
+  4: ramp          # rampa — accesibilidad
+  5: handrail      # pasamanos — apoyo en escaleras
+  6: elevator      # ascensor — punto de referencia
+  7: column        # columna — obstáculo fijo
+  8: window        # ventana — referencia espacial
+
+# ──────────────────────────────────────────────────────────────
+# NOTA SOBRE ANOTACIONES
+# ──────────────────────────────────────────────────────────────
+# Formato YOLO: cada imagen tiene un .txt con una línea por objeto:
+#   <class_id> <x_center> <y_center> <width> <height>
+# Todos los valores normalizados entre 0 y 1.
+#
+# Ejemplo: una escalera que ocupa el centro-inferior de la imagen:
+#   0 0.50 0.75 0.60 0.40
+#
+# CANTIDAD MÍNIMA RECOMENDADA POR CLASE:
+#   - Para fine-tuning: 100–300 imágenes por clase
+#   - Para resultados sólidos: 500+ imágenes por clase
+#   - Split recomendado: 80% train / 20% val

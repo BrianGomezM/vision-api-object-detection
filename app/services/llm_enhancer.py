@@ -52,13 +52,16 @@ def _nombre(obj: dict) -> str:
     """
     Nombre del objeto para la narrativa.
     Usa siempre el nombre completo — nunca pronombres.
-    Si hay más de uno en la misma zona, pluraliza.
+    Si hay más de uno en la misma zona, pluraliza correctamente.
     """
     label = obj.get("label_es") or obj["label"]
     count = obj.get("count", 1)
     if count > 1:
-        sufijo = "s" if label[-1] in "aeiouáéíóú" else "es"
-        return f"{count} {label}{sufijo}"
+        # No pluralizar si la palabra ya termina en "s" (ya es plural en español)
+        if not label.endswith("s"):
+            sufijo = "s" if label[-1] in "aeiouáéíóú" else "es"
+            label  = f"{label}{sufijo}"
+        return f"{count} {label}"
     return label
 
 
