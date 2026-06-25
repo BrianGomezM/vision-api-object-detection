@@ -38,6 +38,9 @@ test_results/
 # Audio generado por TTS
 audio_output/
 
+# Imágenes anotadas generadas por el visualizador de detecciones
+detections_output/
+
 # IDEs
 .vscode/
 .idea/

@@ -1,61 +1,34 @@
-# API de Generación de Descripciones Narrativas Egocéntricas
+# Vision API — Navegación Egocéntrica para Personas con Ceguera Total
 
-Sistema backend que procesa imágenes de entornos Web 3D y genera
-descripciones auditivas accesibles para personas con ceguera total.
+API backend que convierte imágenes de entornos Web 3D en descripciones
+auditivas, pensada como apoyo de navegación para personas con ceguera
+total. Detecta objetos con un modelo YOLO, los ubica en el espacio relativo
+al usuario, estima la distancia en pasos y genera una narrativa hablada en
+español — todo en una sola petición HTTP.
 
-**Modelo de detección:** YOLO26s (Ultralytics 2026) — seleccionado tras
+Este proyecto es el backend de un trabajo de grado orientado a
+accesibilidad digital.
+
+**Modelo de detección:** YOLO26s (Ultralytics 2026) — seleccionado tras una
 evaluación comparativa contra Faster R-CNN, Mask R-CNN y SSD (ver rama
 `comparativa/multi-modelo`).
 
-## Estructura del proyecto
+---
 
-```
-vision-api-project/
-├── app/
-│   ├── main.py                      # FastAPI app + registro de routers
-│   ├── routes/
-│   │   ├── detect.py                # /detect, /debug-detect, /health
-│   │   └── evaluation.py            # /dataset/*, /metrics/*, /test/*, /finetune/*
-│   ├── services/
-│   │   ├── yolo_service.py          # Detección YOLO26s
-│   │   ├── spatial_analyzer.py      # Cuadrícula 3×3 + categorías + prioridad
-│   │   ├── step_estimator.py        # Estimación de pasos (heurística monocular)
-│   │   ├── free_space_analyzer.py   # Zonas navegables libres
-│   │   ├── risk_engine.py           # Decisión de movimiento
-│   │   ├── llm_enhancer.py          # Descripción egocéntrica (Groq/Llama)
-│   │   ├── scene_classifier.py      # Clasificación de escenario (Groq/Llama)
-│   │   └── tts_service.py           # Síntesis de voz (Google Cloud TTS)
-│   └── utils/
-│       ├── translator.py            # Traducción EN→ES dinámica con caché
-│       └── groq_client.py           # Singleton cliente Groq
-├── app/experimental/                # Modelos comparativos (no se cargan en prod)
-│   ├── fasterrcnn_service.py
-│   ├── maskrcnn_service.py
-│   ├── ssd_service.py
-│   ├── batch.py
-│   └── diagnostico_yolo.py
-├── dataset/                         # Generado en producción — excluido de Git
-│   ├── images/                      # Imágenes subidas con /api/dataset/upload
-│   ├── labels/                      # Etiquetas YOLO auto-generadas (class cx cy bw bh)
-│   ├── metadata/                    # JSON de metadatos por imagen
-│   └── finetune/                    # Dataset preparado para yolo train
-│       ├── images/train/
-│       ├── images/val/
-│       ├── labels/train/
-│       ├── labels/val/
-│       └── data.yaml
-├── metrics/                         # Generado en producción — excluido de Git
-│   └── production_metrics.jsonl     # Métricas de cada solicitud a /api/detect
-├── test_results/                    # Resultados de pruebas — excluido de Git
-│   └── test_history.jsonl
-├── audio_output/                    # Archivos MP3 generados por TTS
-├── test_images/                     # Imágenes de prueba
-├── run.py                           # Punto de entrada
-├── requirements.txt
-└── .env                             # Variables de entorno (excluido de Git)
-```
+## Tabla de contenidos
 
-## Pipeline de procesamiento
+- [Cómo funciona](#cómo-funciona)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Instalación](#instalación)
+- [Ejecución](#ejecución)
+- [Endpoints](#endpoints)
+- [Flujo de fine-tuning](#flujo-de-fine-tuning)
+- [Despliegue](#despliegue)
+- [Ramas del repositorio](#ramas-del-repositorio)
+
+---
+
+## Cómo funciona
 
 ```
 Imagen (JPEG/PNG)
@@ -67,6 +40,8 @@ Imagen (JPEG/PNG)
   ├─ analyze_spatial()        Cuadrícula 3×3 — posición egocéntrica + categoría
   │
   ├─ estimate_steps()         Heurística monocular — pasos por objeto
+  │
+  ├─ save_annotated_image()   Imagen con bounding boxes (debug/visualización)
   │
   ├─ calculate_free_space()   Fracción bloqueada por columna (izq/centro/der)
   │
@@ -81,6 +56,67 @@ Imagen (JPEG/PNG)
   └─ log_metric()             Registra métricas en production_metrics.jsonl
 ```
 
+**Narrativa de ejemplo:**
+
+```
+Parece que estás en una sala de estar.
+Sofá a tu derecha a aproximadamente 2 pasos.
+3 sillas frente a ti a aproximadamente 5 pasos.
+Televisor al fondo a tu izquierda.
+Puedes avanzar hacia el frente.
+Tienes aproximadamente 4 pasos libres antes del primer obstáculo.
+```
+
+---
+
+## Estructura del proyecto
+
+```
+vision-api-project/
+├── app/
+│   ├── main.py                        # FastAPI app, CORS, routers, eventos de ciclo de vida
+│   ├── routes/
+│   │   ├── detect.py                  # /detect, /debug-detect, /health
+│   │   ├── evaluation.py              # /dataset/*, /metrics/*, /test/*, /finetune/*
+│   │   └── metrics.py                 # /metrics, /feedback
+│   ├── services/
+│   │   ├── yolo_service.py            # Detección YOLO26s
+│   │   ├── spatial_analyzer.py        # Cuadrícula 3×3 + categorías + prioridad
+│   │   ├── step_estimator.py          # Estimación de pasos (heurística monocular)
+│   │   ├── free_space_analyzer.py     # Zonas navegables libres
+│   │   ├── risk_engine.py             # Decisión de movimiento
+│   │   ├── llm_enhancer.py            # Descripción egocéntrica (Groq/Llama)
+│   │   ├── scene_classifier.py        # Clasificación de escenario (Groq/Llama)
+│   │   ├── detection_visualizer.py    # Imagen anotada con bounding boxes
+│   │   └── tts_service.py             # Síntesis de voz (Google Cloud TTS)
+│   └── utils/
+│       ├── translator.py              # Traducción EN→ES dinámica con caché
+│       └── groq_client.py             # Singleton cliente Groq
+├── app/experimental/                  # Modelos comparativos (no se cargan en prod)
+│   ├── fasterrcnn_service.py
+│   ├── maskrcnn_service.py
+│   ├── ssd_service.py
+│   ├── batch.py
+│   └── diagnostico_yolo.py
+├── dataset/                           # Generado en producción — excluido de Git
+│   ├── images/                        # Imágenes subidas con /api/dataset/upload
+│   ├── labels/                        # Etiquetas YOLO auto-generadas (class cx cy bw bh)
+│   ├── metadata/                      # JSON de metadatos por imagen
+│   └── finetune/                      # Dataset preparado para yolo train
+├── metrics/                           # Generado en producción — excluido de Git
+├── test_results/                      # Resultados de pruebas — excluido de Git
+├── audio_output/                      # MP3 generados por TTS — excluido de Git
+├── detections_output/                 # Imágenes anotadas — excluido de Git
+├── test_images/                       # Imágenes de prueba
+├── run.py                             # Punto de entrada local
+├── startup.sh                         # Comando de arranque para Azure App Service
+├── requirements.txt                   # Dependencias de producción (lo que despliega Azure)
+├── requirements-dev.txt               # + modelos comparativos y herramientas de análisis
+└── .env                                # Variables de entorno (excluido de Git)
+```
+
+---
+
 ## Instalación
 
 ```bash
@@ -91,8 +127,11 @@ python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # Linux/Mac
 
-# 2. Instalar dependencias
+# 2. Instalar dependencias de producción
 pip install -r requirements.txt
+
+# Si además vas a entrenar o comparar contra Faster R-CNN / Mask R-CNN / SSD:
+pip install -r requirements-dev.txt
 
 # 3. Configurar variables de entorno
 cp .env.example .env
@@ -109,7 +148,13 @@ YOLO_IMGSZ=1280
 YOLO_IOU=0.45
 TTS_VOICE_NAME=es-ES-Neural2-A
 TTS_SPEAKING_RATE=0.95
+CORS_ORIGINS=https://tu-cliente.vercel.app
 ```
+
+`CORS_ORIGINS` acepta varios orígenes separados por coma. En desarrollo,
+`localhost:3000`/`3001` ya están permitidos por defecto.
+
+---
 
 ## Ejecución
 
@@ -144,6 +189,7 @@ Respuesta JSON:
   "narrativa_final": "Parece que estás en una sala de estar. Sofá a tu derecha...",
   "escenario": { "tipo": "sala de estar", "confianza": "alta" },
   "audio": { "disponible": true, "data_uri": "data:audio/mpeg;base64,..." },
+  "imagen_anotada": { "disponible": true, "url": "/detections/detection_xxx.jpg" },
   "metricas": {
     "total_ms": 2317,
     "deteccion_ms": 1.2,
@@ -193,13 +239,16 @@ Estado del dataset preparado y comando de entrenamiento.
 
 ---
 
-### Métricas
+### Métricas y evaluación de usuarios
 
 #### `GET /api/metrics/summary?limit=500`
 Promedio, p50, p90, p95, p99 de tiempos de respuesta en producción.
 
 #### `GET /api/metrics/latency?limit=100`
 Historial de latencias para graficar en frontend.
+
+#### `POST /api/feedback` / `GET /api/feedback`
+Registro y consulta de evaluación de usuarios (escala Likert).
 
 ---
 
@@ -241,16 +290,30 @@ Historial de ejecuciones de pruebas (funcionales y carga), más recientes primer
 6. Reemplazar yolo26s.pt con los nuevos pesos (runs/detect/train/weights/best.pt)
 ```
 
-## Narrativa de ejemplo
+---
 
-```
-Parece que estás en una sala de estar.
-Sofá a tu derecha a aproximadamente 2 pasos.
-3 sillas frente a ti a aproximadamente 5 pasos.
-Televisor al fondo a tu izquierda.
-Puedes avanzar hacia el frente.
-Tienes aproximadamente 4 pasos libres antes del primer obstáculo.
-```
+## Despliegue
+
+El backend está listo para Azure App Service (Linux, Python). Resumen del
+proceso:
+
+1. **Plan de App Service:** se recomienda **B1** (1.75 GB RAM) — el modelo
+   YOLO26s sobre `torch` necesita más memoria de la que ofrece el plan
+   gratuito F1.
+2. **Build:** Azure instala automáticamente `requirements.txt` (solo
+   dependencias de producción; los modelos comparativos quedan fuera).
+3. **Comando de inicio:** configurar `bash startup.sh` en
+   *Configuración → General → Comando de inicio*. Internamente usa
+   `gunicorn` con worker de `uvicorn` para servir la app ASGI de FastAPI.
+4. **Variables de entorno:** configurar en *Configuración → Variables de
+   entorno* las mismas claves del `.env` local (`GROQ_API_KEY`,
+   `GOOGLE_API_KEY`/credenciales de Google Cloud, `CORS_ORIGINS` con el
+   dominio del cliente desplegado en Vercel, etc.).
+5. Los pesos de YOLO26s no se versionan en Git; si no están presentes en el
+   contenedor, Ultralytics los descarga automáticamente en el primer
+   arranque.
+
+---
 
 ## Ramas del repositorio
 

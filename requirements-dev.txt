@@ -1,0 +1,21 @@
+# Dependencias adicionales SOLO para desarrollo/investigación local.
+# No se instalan en producción (no las usa app/main.py).
+# Instalar con: pip install -r requirements.txt -r requirements-dev.txt
+-r requirements.txt
+
+# ── Modelos comparativos (rama comparativa/multi-modelo) ──────
+# app/experimental/ssd_service.py
+tensorflow
+tensorflow-hub
+
+# Faster R-CNN y Mask R-CNN (experimental) — instalación especial,
+# no disponible en PyPI estándar:
+# pip install 'git+https://github.com/facebookresearch/detectron2.git'
+
+# ── Batch / Análisis / Evaluación comparativa ─────────────────
+opencv-python
+pandas
+matplotlib
+psutil
+openpyxl
+requests

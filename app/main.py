@@ -8,6 +8,11 @@ EVENTOS:
            → inicializa cliente Google Cloud TTS y verifica credenciales
   shutdown → guarda caché de traducciones en disco
 
+CORS:
+  Permite peticiones desde el cliente Next.js (localhost:3000 / 127.0.0.1:3000)
+  y cualquier origen configurado en la variable CORS_ORIGINS del entorno.
+  En desarrollo se aceptan todos los orígenes de localhost.
+
 ENDPOINTS registrados:
   /api/detect        POST — narrativa completa (JSON o audio MP3)
   /api/debug-detect  POST — pipeline paso a paso
@@ -22,11 +27,18 @@ ENDPOINTS registrados:
   /api/test/results      GET  — historial de resultados de pruebas
   /api/finetune/prepare  POST — prepara dataset en formato YOLO (data.yaml)
   /api/finetune/status   GET  — estado del dataset preparado
+  /api/feedback          POST/GET — evaluación de usuarios (escala Likert)
+  /api/metrics           GET  — métricas de sesión en memoria
 """
 
+import os
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.routes.detect     import router as detect_router
 from app.routes.evaluation import router as eval_router
+from app.routes.metrics    import router as metrics_router
 
 app = FastAPI(
     title="API de Detección de Objetos para Accesibilidad",
@@ -35,6 +47,38 @@ app = FastAPI(
         "en entornos Web 3D. Incluye endpoints de evaluación, dataset y fine-tuning."
     ),
     version="3.2.0",
+)
+
+
+# ──────────────────────────────────────────────────────────────
+# CORS — permite que el cliente Next.js consuma la API
+# ──────────────────────────────────────────────────────────────
+
+# Orígenes permitidos base (cliente Next.js en desarrollo y producción local)
+_DEFAULT_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+]
+
+# Orígenes adicionales desde variable de entorno (separados por coma)
+# Ejemplo: CORS_ORIGINS=https://mi-dominio.vercel.app,https://otro.com
+_env_origins = os.getenv("CORS_ORIGINS", "")
+_extra_origins = [o.strip() for o in _env_origins.split(",") if o.strip()]
+
+ALLOWED_ORIGINS: list[str] = _DEFAULT_ORIGINS + _extra_origins
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    # Métodos necesarios para los endpoints del sistema
+    allow_methods=["GET", "POST", "OPTIONS"],
+    # Headers que el cliente Next.js envía en peticiones multipart y JSON
+    allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With"],
+    # Exponer headers personalizados que /api/detect devuelve en modo audio=true
+    expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File"],
 )
 
 
@@ -98,8 +142,24 @@ def home():
 
 
 # ──────────────────────────────────────────────────────────────
+# ARCHIVOS ESTÁTICOS — imágenes anotadas con bounding boxes
+# Accesibles en: GET /detections/<nombre_archivo>.jpg
+# ──────────────────────────────────────────────────────────────
+
+_DETECTIONS_DIR = Path("detections_output")
+_DETECTIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+app.mount(
+    "/detections",
+    StaticFiles(directory=str(_DETECTIONS_DIR)),
+    name="detections",
+)
+
+
+# ──────────────────────────────────────────────────────────────
 # REGISTRO DE ROUTERS
 # ──────────────────────────────────────────────────────────────
 
-app.include_router(detect_router, prefix="/api")
-app.include_router(eval_router,   prefix="/api")
+app.include_router(detect_router,  prefix="/api")
+app.include_router(eval_router,    prefix="/api")
+app.include_router(metrics_router, prefix="/api")  # GET /api/metrics, POST /api/feedback, GET /api/feedback

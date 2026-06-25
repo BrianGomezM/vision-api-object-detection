@@ -42,15 +42,16 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from PIL import Image
 
-from app.services.yolo_service        import run_yolo, YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
-from app.services.spatial_analyzer    import analyze_spatial
-from app.services.step_estimator      import estimate_steps
-from app.services.free_space_analyzer import calculate_free_space
-from app.services.risk_engine         import decide_movement
-from app.services.scene_classifier    import classify_scene
-from app.services.llm_enhancer        import generate_description
-from app.services.tts_service         import synthesize_speech, synthesize_and_save, is_tts_active
-from app.utils.groq_client            import GROQ_MODEL, is_llm_active
+from app.services.yolo_service          import run_yolo, YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
+from app.services.spatial_analyzer     import analyze_spatial
+from app.services.step_estimator       import estimate_steps
+from app.services.free_space_analyzer  import calculate_free_space
+from app.services.risk_engine          import decide_movement
+from app.services.scene_classifier     import classify_scene
+from app.services.llm_enhancer         import generate_description
+from app.services.tts_service          import synthesize_speech, synthesize_and_save, is_tts_active
+from app.services.detection_visualizer import save_annotated_image
+from app.utils.groq_client             import GROQ_MODEL, is_llm_active
 
 router = APIRouter()
 
@@ -152,6 +153,12 @@ def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False
     analyzed = estimate_steps(analyzed, width, height)
     tiempos["pasos_ms"] = _ms(t3)
 
+    # 3.5 Visualización: guardar imagen con bounding boxes anotados
+    # Se ejecuta aquí porque analyzed ya contiene bbox + label_es + categoría + pasos.
+    t_vis             = time.time()
+    annotated_path    = save_annotated_image(image_bytes, analyzed)
+    tiempos["visualizer_ms"] = _ms(t_vis)
+
     # 4. Análisis de espacio libre
     t4         = time.time()
     free_space = calculate_free_space(analyzed, width)
@@ -191,6 +198,8 @@ def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False
         "detections":      detections,
         "desc_result":     desc_result,
         "tiempos":         tiempos,
+        "annotated_path":  annotated_path,   # ruta relativa o None si no hay objetos
+        "image_bytes":     image_bytes,      # bytes procesados (para base64 en endpoint)
         "imagen": {
             "original":  f"{w_orig}x{h_orig}",
             "procesada": f"{width}x{height}",
@@ -240,6 +249,28 @@ async def detect(
 
         threshold = normalize_threshold(confidence_threshold)
         result    = _run_full_pipeline(image_bytes, threshold, debug)
+
+        # ── Imagen anotada: leer del disco y codificar en base64 ─────
+        annotated_info = {
+            "disponible":  False,
+            "archivo":     None,
+            "url":         None,
+            "data_base64": None,
+            "data_uri":    None,
+        }
+        if result.get("annotated_path"):
+            try:
+                ann_bytes = Path(result["annotated_path"]).read_bytes()
+                ann_b64   = base64.b64encode(ann_bytes).decode("utf-8")
+                annotated_info = {
+                    "disponible":  True,
+                    "archivo":     result["annotated_path"],
+                    "url":         f"/detections/{Path(result['annotated_path']).name}",
+                    "data_base64": ann_b64,
+                    "data_uri":    f"data:image/jpeg;base64,{ann_b64}",
+                }
+            except Exception:
+                pass  # No debe romper la respuesta si el visualizador falla
 
         # TTS: genera, guarda en disco y codifica en base64
         t_tts      = time.time()
@@ -317,9 +348,10 @@ async def detect(
 
         # ── Modo JSON completo ─────────────────────────────────
         response = {
-            "status":          "success",
-            "narrativa_final": result["narrativa_final"],
-            "audio":           audio_info,
+            "status":           "success",
+            "narrativa_final":  result["narrativa_final"],
+            "audio":            audio_info,
+            "imagen_anotada":   annotated_info,   # ← imagen con bounding boxes
             "escenario": {
                 "tipo":      result["escenario"].get("scene_type", "desconocido"),
                 "confianza": result["escenario"].get("confidence", "baja"),
