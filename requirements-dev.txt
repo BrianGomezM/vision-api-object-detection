@@ -13,7 +13,8 @@ tensorflow-hub
 # pip install 'git+https://github.com/facebookresearch/detectron2.git'
 
 # ── Batch / Análisis / Evaluación comparativa ─────────────────
-opencv-python
+# (opencv-python-headless ya viene de requirements.txt y cubre cv2;
+# no instalar opencv-python aquí para evitar conflictos de binarios)
 pandas
 matplotlib
 psutil

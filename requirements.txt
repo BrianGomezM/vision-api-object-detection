@@ -14,6 +14,12 @@ python-dotenv
 pillow
 numpy
 
+# opencv-python-headless fijado a propósito: ultralytics depende de
+# cv2 internamente y, si no se fija, pip instala opencv-python (con
+# soporte de GUI) que requiere libGL.so.1 — ausente en el contenedor
+# de Azure App Service y provoca ImportError al arrancar el worker.
+opencv-python-headless
+
 # ── PyTorch + YOLO26s (Ultralytics) ───────────────────────────
 torch
 torchvision
