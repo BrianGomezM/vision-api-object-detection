@@ -19,8 +19,10 @@ evaluación comparativa contra Faster R-CNN, Mask R-CNN y SSD (ver rama
 
 - [Cómo funciona](#cómo-funciona)
 - [Estructura del proyecto](#estructura-del-proyecto)
-- [Instalación](#instalación)
-- [Ejecución](#ejecución)
+- [Qué se necesita antes de empezar](#qué-se-necesita-antes-de-empezar)
+- [Cómo instalar el proyecto](#cómo-instalar-el-proyecto)
+- [Cómo poner en marcha el proyecto](#cómo-poner-en-marcha-el-proyecto)
+- [Cómo comprobar que funciona](#cómo-comprobar-que-funciona)
 - [Endpoints](#endpoints)
 - [Flujo de fine-tuning](#flujo-de-fine-tuning)
 - [Despliegue](#despliegue)
@@ -88,7 +90,7 @@ vision-api-project/
 │   │   ├── llm_enhancer.py            # Descripción egocéntrica (Groq/Llama)
 │   │   ├── scene_classifier.py        # Clasificación de escenario (Groq/Llama)
 │   │   ├── detection_visualizer.py    # Imagen anotada con bounding boxes
-│   │   └── tts_service.py             # Síntesis de voz (Google Cloud TTS)
+│   │   └── tts_service.py             # Síntesis de voz (edge-tts, sin costo)
 │   └── utils/
 │       ├── translator.py              # Traducción EN→ES dinámica con caché
 │       └── groq_client.py             # Singleton cliente Groq
@@ -117,53 +119,124 @@ vision-api-project/
 
 ---
 
-## Instalación
+## Qué se necesita antes de empezar
 
-```bash
-# 1. Clonar y crear entorno virtual
-git clone <repo>
-cd vision-api-project
-python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Linux/Mac
+Para usar este proyecto en una computadora hacen falta tres cosas:
 
-# 2. Instalar dependencias de producción
-pip install -r requirements.txt
+1. **Python** (versión 3.11), que es el programa que ejecuta el código.
+2. Una **clave de Groq**, gratuita, que se obtiene creando una cuenta en
+   [console.groq.com](https://console.groq.com). Esta clave permite generar
+   las descripciones en español; sin ella el proyecto no puede iniciar.
+3. Opcionalmente, **Docker Desktop**, si se prefiere ejecutar el proyecto
+   de la misma forma en que corre en el servidor de producción, en vez de
+   instalar cada programa por separado.
 
-# Si además vas a entrenar o comparar contra Faster R-CNN / Mask R-CNN / SSD:
-pip install -r requirements-dev.txt
-
-# 3. Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus claves
-```
-
-### Variables de entorno (`.env`)
-
-```
-GROQ_API_KEY=gsk_...
-GOOGLE_API_KEY=AIza...
-YOLO_WEIGHTS=yolo26s.pt
-YOLO_IMGSZ=1280
-YOLO_IOU=0.45
-TTS_VOICE_NAME=es-ES-Neural2-A
-TTS_SPEAKING_RATE=0.95
-CORS_ORIGINS=https://tu-cliente.vercel.app
-```
-
-`CORS_ORIGINS` acepta varios orígenes separados por coma. En desarrollo,
-`localhost:3000`/`3001` ya están permitidos por defecto.
+No hace falta tarjeta de crédito ni pagar nada para obtener la clave de
+Groq ni para ejecutar el proyecto.
 
 ---
 
-## Ejecución
+## Cómo instalar el proyecto
+
+1. Descargar el proyecto a la computadora (clonar el repositorio o
+   descargarlo como archivo comprimido y extraerlo).
+2. Abrir una terminal dentro de la carpeta del proyecto.
+3. Crear un espacio separado para instalar los programas que necesita el
+   proyecto, sin mezclarlos con el resto de la computadora:
+
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate          # en Windows
+   source venv/bin/activate       # en Mac o Linux
+   ```
+
+4. Instalar todo lo que el proyecto necesita para funcionar:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   Este paso puede tardar varios minutos la primera vez, porque descarga
+   el modelo de inteligencia artificial y sus componentes.
+
+5. Crear un archivo de configuración llamado `.env` en la carpeta principal
+   del proyecto, con este contenido:
+
+   ```
+   GROQ_API_KEY=la_clave_obtenida_en_groq
+   YOLO_WEIGHTS=yolo26s.pt
+   YOLO_IMGSZ=1280
+   YOLO_IOU=0.45
+   TTS_VOICE_NAME=es-ES-AlvaroNeural
+   TTS_SPEAKING_RATE=0.95
+   CORS_ORIGINS=https://direccion-del-sitio-web-que-lo-va-a-usar.com
+   ```
+
+   Solo `GROQ_API_KEY` es obligatoria. Las demás ya tienen un valor por
+   defecto y pueden dejarse como están. `CORS_ORIGINS` solo es necesaria
+   si otra página web (por ejemplo, la interfaz visual del proyecto) va a
+   consumir este servicio; puede tener varias direcciones separadas por
+   coma.
+
+---
+
+## Cómo poner en marcha el proyecto
+
+Hay dos formas de hacerlo. Cualquiera de las dos deja el proyecto
+funcionando en la misma dirección.
+
+### Opción 1: directamente con Python
 
 ```bash
 python run.py
 ```
 
-API disponible en: `http://127.0.0.1:8000`
-Documentación Swagger: `http://127.0.0.1:8000/docs`
+### Opción 2: con Docker
+
+Esta opción usa exactamente la misma configuración con la que el proyecto
+corre en el servidor de producción.
+
+```bash
+docker build -t vision-api .
+docker run -p 8000:8000 --env-file .env vision-api
+```
+
+En ambos casos, después de unos segundos el proyecto queda disponible en
+la propia computadora, en esta dirección:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## Cómo comprobar que funciona
+
+1. Abrir en el navegador la dirección `http://127.0.0.1:8000/docs`.
+   Se muestra una página con la lista de todas las funciones disponibles
+   del proyecto, y permite probarlas sin necesidad de escribir código.
+
+2. Comprobar el estado general: abrir
+   `http://127.0.0.1:8000/api/health`. Si el proyecto está funcionando,
+   se muestra un mensaje indicando que el servicio está activo, junto con
+   el estado de cada componente (detección de objetos, generación de
+   texto y de voz).
+
+3. Probar la función principal: en la página `/docs`, buscar
+   `POST /api/detect`, presionar "Try it out", y subir una de las
+   imágenes de ejemplo incluidas en la carpeta `test_images`. El
+   resultado incluye una descripción en español de lo que aparece en la
+   imagen.
+
+4. Probar automáticamente que todo funciona correctamente: en la misma
+   página `/docs`, buscar `POST /api/test/functional` y ejecutarlo. Este
+   paso revisa por sí solo varias funciones del proyecto y devuelve un
+   resumen de cuáles pasaron y cuáles no.
+
+5. Probar que el proyecto soporta varias solicitudes al mismo tiempo: en
+   `/docs`, buscar `POST /api/test/load` y ejecutarlo. Simula varias
+   personas usando el servicio a la vez y muestra cuánto tiempo tarda en
+   responder.
 
 ---
 
@@ -319,9 +392,10 @@ eso queda horneado en la imagen en build time.
    GitHub) para que Azure pueda descargarlo sin credenciales.
 4. **Variables de entorno:** configurar en *Configuración → Variables de
    entorno* las mismas claves del `.env` local (`GROQ_API_KEY`,
-   `GOOGLE_API_KEY`/credenciales de Google Cloud, `CORS_ORIGINS` con el
-   dominio del cliente desplegado en Vercel, etc.) — estas nunca van
-   dentro de la imagen.
+   `CORS_ORIGINS` con el dominio del cliente desplegado en Vercel, etc.)
+   — estas nunca van dentro de la imagen. No se requiere ninguna clave de
+   pago: `GROQ_API_KEY` es gratuita y el audio se genera con `edge-tts`,
+   que no necesita clave ni tarjeta.
 5. Los pesos de YOLO26s no se versionan en Git; si no están presentes en el
    contenedor, Ultralytics los descarga automáticamente en el primer
    arranque.
