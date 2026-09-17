@@ -1,4 +1,9 @@
 #!/bin/bash
+# OBSOLETO: el despliegue en Azure ahora es por contenedor Docker (ver
+# Dockerfile, cuyo CMD reemplaza este script). Se conserva solo como
+# referencia histórica del comando de arranque para el despliegue anterior
+# por código (Oryx), por si algún día se vuelve a ese modelo.
+#
 # Comando de arranque para Azure App Service (Linux, Python).
 # Configurar en: Portal Azure → App Service → Configuración → General →
 # Comando de inicio  →  bash startup.sh
