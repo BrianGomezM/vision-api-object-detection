@@ -375,7 +375,7 @@ _FUNCTIONAL_CASES = [
     {
         "id":          "FUN-01",
         "descripcion": "Imagen de sala de estar debe detectar ≥1 objeto y retornar narrativa",
-        "image_path":  "test_images/sala.jpg",
+        "image_path":  "test_images/05_sala_muebles.jpg",
         "tipo":        "imagen_real",
         "espera": {
             "status":      "success",
@@ -404,7 +404,7 @@ _FUNCTIONAL_CASES = [
     {
         "id":          "FUN-04",
         "descripcion": "threshold=0.0 debe retornar ≥ objetos que threshold=0.9",
-        "image_path":  "test_images/sala.jpg",
+        "image_path":  "test_images/05_sala_muebles.jpg",
         "tipo":        "threshold_comparison",
         "espera": {},
     },
@@ -420,7 +420,7 @@ _FUNCTIONAL_CASES = [
     {
         "id":          "FUN-06",
         "descripcion": "POST /api/dataset/upload con imagen válida debe guardar y etiquetar",
-        "image_path":  "test_images/sala.jpg",
+        "image_path":  "test_images/05_sala_muebles.jpg",
         "tipo":        "dataset_upload",
         "espera": {
             "status": "stored",
@@ -629,7 +629,7 @@ async def run_load_test(
     n_requests:  int  = Form(10,                      description="Total de solicitudes a enviar"),
     concurrency: int  = Form(3,                       description="Solicitudes paralelas simultáneas"),
     base_url:    str  = Form("http://127.0.0.1:8000", description="URL base del servidor"),
-    image_path:  str  = Form("test_images/sala.jpg",  description="Imagen de prueba (ruta relativa)"),
+    image_path:  str  = Form("test_images/05_sala_muebles.jpg",  description="Imagen de prueba (ruta relativa)"),
 ):
     """
     Ejecuta una prueba de carga enviando N solicitudes a /api/detect con hasta
