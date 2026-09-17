@@ -294,21 +294,34 @@ Historial de ejecuciones de pruebas (funcionales y carga), más recientes primer
 
 ## Despliegue
 
-El backend está listo para Azure App Service (Linux, Python). Resumen del
-proceso:
+El backend se despliega en Azure App Service (Linux) como **contenedor
+Docker** — ver [Dockerfile](Dockerfile). Se eligió este enfoque en vez del
+despliegue por código (Oryx) porque Oryx reinstalaba `torch`/`ultralytics`
+y las libs de sistema (`libxcb1`, etc. — requeridas por
+`opencv-python-headless`) en **cada arranque del contenedor**, no solo en
+cada deploy, haciendo cualquier reinicio lento y dependiente de la
+disponibilidad de los mirrors de Debian en ese momento. Con Docker, todo
+eso queda horneado en la imagen en build time.
 
 1. **Plan de App Service:** se recomienda **B1** (1.75 GB RAM) — el modelo
    YOLO26s sobre `torch` necesita más memoria de la que ofrece el plan
    gratuito F1.
-2. **Build:** Azure instala automáticamente `requirements.txt` (solo
-   dependencias de producción; los modelos comparativos quedan fuera).
-3. **Comando de inicio:** configurar `bash startup.sh` en
-   *Configuración → General → Comando de inicio*. Internamente usa
-   `gunicorn` con worker de `uvicorn` para servir la app ASGI de FastAPI.
+2. **CI/CD:** `.github/workflows/main_visionnav-api.yml` construye la
+   imagen en cada push a `main`, la publica en GitHub Container Registry
+   (`ghcr.io/<owner>/vision-api-object-detection`) y actualiza el App
+   Service para que la use.
+3. **Configuración de la pila (una sola vez, manual en el Portal):**
+   *Configuración → Configuración general → Pila* → cambiar a **Contenedor
+   Docker** → Imagen única → Origen: *Otros registros de contenedores* →
+   URL del registro `https://ghcr.io` → Imagen y etiqueta
+   `ghcr.io/<owner>/vision-api-object-detection:latest`. El paquete en
+   GitHub debe estar en visibilidad **pública** (Settings del paquete en
+   GitHub) para que Azure pueda descargarlo sin credenciales.
 4. **Variables de entorno:** configurar en *Configuración → Variables de
    entorno* las mismas claves del `.env` local (`GROQ_API_KEY`,
    `GOOGLE_API_KEY`/credenciales de Google Cloud, `CORS_ORIGINS` con el
-   dominio del cliente desplegado en Vercel, etc.).
+   dominio del cliente desplegado en Vercel, etc.) — estas nunca van
+   dentro de la imagen.
 5. Los pesos de YOLO26s no se versionan en Git; si no están presentes en el
    contenedor, Ultralytics los descarga automáticamente en el primer
    arranque.

@@ -1,0 +1,31 @@
+# Secretos y config local — nunca deben entrar a la imagen
+.env
+.env.*
+google_credentials.json
+
+# Entornos virtuales y cachés de Python
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+
+# Git y CI
+.git/
+.github/
+
+# Datos/artefactos generados en runtime (se regeneran, no hace falta hornearlos)
+audio_output/
+detections_output/
+test_results/
+test_results_json/
+metrics/
+charts/
+data/
+dataset/
+
+# Documentación e IDE
+README.md
+.vscode/
+.idea/
