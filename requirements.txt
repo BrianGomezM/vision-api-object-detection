@@ -31,8 +31,11 @@ groq
 # ── Traducción dinámica EN→ES ─────────────────────────────────
 deep-translator==1.11.4
 
-# ── Text-to-Speech API (Google Cloud) ─────────────────────────
-google-cloud-texttospeech
+# ── Text-to-Speech ──────────────────────────────────────────────
+# edge-tts: voces neuronales de Microsoft Edge, gratis, sin API key ni
+# tarjeta (a diferencia de Google Cloud TTS, que exige facturación
+# activada en el proyecto incluso dentro de la capa gratuita).
+edge-tts
 
 # ── Cliente HTTP (usado por /api/test/* para pruebas de carga) ─
 httpx

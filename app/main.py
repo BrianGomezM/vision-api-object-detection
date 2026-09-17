@@ -69,9 +69,20 @@ _extra_origins = [o.strip() for o in _env_origins.split(",") if o.strip()]
 
 ALLOWED_ORIGINS: list[str] = _DEFAULT_ORIGINS + _extra_origins
 
+# Vercel genera una URL de preview distinta (con hash aleatorio) en cada
+# deploy — p. ej. https://visionnav-client-h0mj35bwa-<team>.vercel.app —
+# así que se permite cualquier subdominio *.vercel.app del proyecto
+# mediante regex, en vez de tener que actualizar CORS_ORIGINS cada vez.
+# Override con CORS_ORIGIN_REGEX si el proyecto/equipo de Vercel cambia.
+_CORS_ORIGIN_REGEX = os.getenv(
+    "CORS_ORIGIN_REGEX",
+    r"^https://visionnav-client(-[a-zA-Z0-9]+)*\.vercel\.app$",
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=_CORS_ORIGIN_REGEX,
     allow_credentials=True,
     # Métodos necesarios para los endpoints del sistema
     allow_methods=["GET", "POST", "OPTIONS"],
@@ -89,16 +100,12 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """
-    Al arrancar:
-      1. Carga YOLO26s con warm-up para eliminar overhead en la primera petición.
-      2. Inicializa el cliente Google Cloud TTS y verifica credenciales.
-         Si no están configuradas el sistema opera en modo solo-texto.
+    Al arrancar: carga YOLO26s con warm-up para eliminar overhead en la
+    primera petición. edge-tts no requiere inicialización (no usa cliente
+    persistente ni credenciales).
     """
     from app.services.yolo_service import _get_model
     _get_model()
-
-    from app.services.tts_service import _get_client
-    _get_client()
 
 
 @app.on_event("shutdown")

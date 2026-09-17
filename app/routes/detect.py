@@ -226,7 +226,7 @@ async def detect(
         False,
         description=(
             "Si true, retorna StreamingResponse audio/mpeg. "
-            "Requiere GOOGLE_API_KEY en .env."
+            "Requiere edge-tts instalado (ver requirements.txt)."
         ),
     ),
 ):
@@ -342,7 +342,7 @@ async def detect(
             return {
                 "status":          "success_no_audio",
                 "narrativa_final": result["narrativa_final"],
-                "aviso":           "TTS no disponible. Verificar GOOGLE_API_KEY en .env.",
+                "aviso":           "TTS no disponible. Verificar que edge-tts esté instalado.",
                 "metricas":        metricas,
             }
 
@@ -535,8 +535,8 @@ async def health_check():
             "activo":    is_llm_active(),
         },
         "tts": {
-            "proveedor": "Google Cloud Text-to-Speech",
-            "voz":       os.getenv("TTS_VOICE_NAME", "es-ES-Neural2-A"),
+            "proveedor": "edge-tts",
+            "voz":       os.getenv("TTS_VOICE_NAME", "es-ES-AlvaroNeural"),
             "activo":    is_tts_active(),
         },
         "evaluacion": {

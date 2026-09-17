@@ -1,64 +1,51 @@
 """
 app/services/tts_service.py
 
-Síntesis de voz (Text-to-Speech) mediante Google Cloud TTS.
+Síntesis de voz (Text-to-Speech) mediante edge-tts.
 
 RESPONSABILIDAD ÚNICA:
   Convertir la narrativa egocéntrica generada por llm_enhancer.py
   en un stream de audio MP3 listo para ser reproducido por el cliente
   Web 3D, sin lógica de negocio ni dependencia de otros servicios.
 
-MOTOR SELECCIONADO — Google Cloud Text-to-Speech:
-  Se seleccionó sobre edge-tts, pyttsx3 y Coqui TTS por los siguientes
-  criterios relevantes para el proyecto:
-    - Voces Neural2 en español con tono neutro y andrógino (es-ES-Neural2-A)
-    - Capa gratuita de 1 millón de caracteres/mes (suficiente para fase beta)
-    - Sin dependencia de GPU ni de librerías nativas del sistema operativo
-    - Latencia baja (~200–400 ms por solicitud) compatible con tiempo real
-    - API estable con cliente oficial de Google para Python
-
-AUTENTICACIÓN:
-  Se utiliza API Key (variable de entorno GOOGLE_API_KEY) en lugar de
-  archivo JSON de cuenta de servicio (Application Default Credentials).
-  La API Key se pasa directamente al constructor del cliente mediante
-  ClientOptions, sin requerir archivos adicionales en disco.
+MOTOR SELECCIONADO — edge-tts:
+  Se migró desde Google Cloud TTS porque esa API exige una cuenta de
+  facturación (tarjeta) vinculada al proyecto de Google Cloud incluso
+  para permanecer dentro de la capa gratuita mensual — inviable para
+  un despliegue académico sin método de pago. edge-tts usa las mismas
+  voces neuronales de Microsoft Edge Read Aloud, es gratis, no requiere
+  API key ni tarjeta, y ofrece calidad de voz comparable.
 
 FLUJO DE PROCESAMIENTO:
-  1. Verificar que el cliente Google Cloud TTS esté disponible (singleton).
-  2. Construir la solicitud con los parámetros de voz configurados en .env.
-  3. Ejecutar la síntesis y retornar los bytes del audio MP3.
+  1. Construir la solicitud con voz/velocidad/tono configurados en .env.
+  2. edge-tts es async-only; se ejecuta en un hilo con su propio event
+     loop porque este servicio se llama de forma síncrona desde una ruta
+     ya async (no se puede anidar asyncio.run dentro de un loop corriendo).
+  3. Retornar los bytes del audio MP3.
   4. En caso de fallo: retornar None para que el endpoint degrade a JSON.
 
 CONFIGURACIÓN (variables de entorno en .env):
-  GOOGLE_API_KEY    → clave de API de Google Cloud (tipo AIza...)
-  TTS_LANGUAGE_CODE → código de idioma BCP-47  (default: es-ES)
-  TTS_VOICE_NAME    → nombre de la voz Neural2  (default: es-ES-Neural2-A)
-  TTS_AUDIO_ENCODING→ formato de salida          (default: MP3)
-  TTS_SPEAKING_RATE → velocidad [0.25–4.0]       (default: 0.95)
-  TTS_PITCH         → tono [-20.0–20.0]          (default: 0.0)
+  TTS_VOICE_NAME    → voz de Edge                (default: es-ES-AlvaroNeural)
+  TTS_SPEAKING_RATE → velocidad relativa a 1.0    (default: 0.95)
+  TTS_PITCH_HZ      → ajuste de tono en Hz        (default: 0)
   TTS_MAX_CHARS     → límite de caracteres/solicitud (default: 4500)
 
-VOCES RECOMENDADAS EN ESPAÑOL (tono neutro):
-  es-ES-Neural2-A  → español de España, neural, más andrógino (recomendado)
-  es-ES-Neural2-B  → español de España, neural, más grave
-  es-US-Neural2-A  → español latinoamericano, neural
-  es-US-Neural2-C  → español latinoamericano, neural, femenino suave
-
-LÍMITES DE LA CAPA GRATUITA (Google Cloud TTS, 2024):
-  - Voces Neural2:   1.000.000 bytes de texto/mes
-  - Voces Standard:  4.000.000 caracteres/mes
-  Referencia: https://cloud.google.com/text-to-speech/pricing
+VOCES RECOMENDADAS EN ESPAÑOL:
+  es-ES-AlvaroNeural   → español de España, masculino (recomendado)
+  es-ES-ElviraNeural   → español de España, femenino
+  es-MX-JorgeNeural    → español latinoamericano, masculino
+  es-US-AlonsoNeural   → español EE.UU., masculino
+  Lista completa: `edge-tts --list-voices` o
+  https://github.com/rany2/edge-tts
 
 INSTALACIÓN:
-  pip install google-cloud-texttospeech
-
-REFERENCIA:
-  Google Cloud. (2024). Text-to-Speech documentation.
-  https://cloud.google.com/text-to-speech/docs
+  pip install edge-tts
 """
 
 import os
+import asyncio
 import logging
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -76,120 +63,79 @@ logger = logging.getLogger(__name__)
 # ──────────────────────────────────────────────────────────────
 
 try:
-    from google.cloud import texttospeech
-    from google.api_core.client_options import ClientOptions
-    _GOOGLE_TTS_AVAILABLE: bool = True
+    import edge_tts
+    _EDGE_TTS_AVAILABLE: bool = True
 except ImportError:
-    _GOOGLE_TTS_AVAILABLE: bool = False
+    _EDGE_TTS_AVAILABLE: bool = False
     logger.warning(
-        "[TTS] google-cloud-texttospeech no está instalado. "
-        "Ejecutar: pip install google-cloud-texttospeech"
+        "[TTS] edge-tts no está instalado. Ejecutar: pip install edge-tts"
     )
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
 # ──────────────────────────────────────────────────────────────
 
-# Clave de API de Google Cloud (tipo AIza...).
-# Se obtiene desde Google Cloud Console → APIs & Services → Credentials.
-_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
-
-# Código de idioma BCP-47 para la síntesis.
-_LANGUAGE_CODE: str = os.getenv("TTS_LANGUAGE_CODE", "es-ES")
-
-# Nombre de la voz Neural2. Debe ser compatible con _LANGUAGE_CODE.
-# Voces Neural2 tienen mayor naturalidad pero consumen cuota más rápido.
-_VOICE_NAME: str = os.getenv("TTS_VOICE_NAME", "es-ES-Neural2-A")
-
-# Formato de audio de salida. MP3 es el más compatible con navegadores web.
-_AUDIO_ENCODING_STR: str = os.getenv("TTS_AUDIO_ENCODING", "MP3")
+# Voz neuronal de Edge. Debe existir en el catálogo de edge-tts.
+_VOICE_NAME: str = os.getenv("TTS_VOICE_NAME", "es-ES-AlvaroNeural")
 
 # Velocidad de habla: 1.0 = natural, <1 = más lento, >1 = más rápido.
 # 0.95 es ligeramente más lento para facilitar la comprensión en accesibilidad.
 _SPEAKING_RATE: float = float(os.getenv("TTS_SPEAKING_RATE", "0.95"))
 
-# Tono: 0.0 = natural de la voz. Valores negativos = más grave.
-_PITCH: float = float(os.getenv("TTS_PITCH", "0.0"))
+# Ajuste de tono en Hz. 0 = natural de la voz.
+_PITCH_HZ: int = int(os.getenv("TTS_PITCH_HZ", "0"))
 
-# Límite de caracteres por solicitud para proteger la cuota mensual.
-# Una narrativa típica tiene entre 100 y 300 caracteres.
+# Límite de caracteres por solicitud. Una narrativa típica tiene
+# entre 100 y 300 caracteres.
 _MAX_CHARS: int = int(os.getenv("TTS_MAX_CHARS", "4500"))
 
-# Mapa de strings a valores enteros del enum AudioEncoding de Google.
-# Se resuelve en tiempo de ejecución para no depender de la librería
-# en el nivel de importación del módulo.
-_ENCODING_MAP: dict[str, int] = {
-    "MP3":      1,  # AudioEncoding.MP3
-    "LINEAR16": 2,  # AudioEncoding.LINEAR16 (WAV sin comprimir)
-    "OGG_OPUS": 3,  # AudioEncoding.OGG_OPUS
-}
 
-# ──────────────────────────────────────────────────────────────
-# SINGLETON DEL CLIENTE
-# ──────────────────────────────────────────────────────────────
-# El cliente de Google Cloud TTS se inicializa una sola vez para
-# reutilizar la sesión HTTP subyacente entre solicitudes, reduciendo
-# la latencia de establecimiento de conexión (~100 ms por solicitud).
-
-_client: Optional[object] = None
+def _rate_to_edge_percent(rate: float) -> str:
+    """Convierte el factor de velocidad (1.0 = natural) al formato de
+    porcentaje que espera edge-tts (p. ej. 0.95 → '-5%')."""
+    return f"{round((rate - 1.0) * 100):+d}%"
 
 
-def _get_client() -> Optional[object]:
+def _run_async(coro):
+    """Ejecuta una corrutina en un hilo aparte con su propio event loop.
+
+    edge-tts es async-only, pero este servicio se llama de forma síncrona
+    desde app/routes/detect.py dentro de una ruta ya async — anidar
+    asyncio.run() ahí lanzaría "cannot be called from a running event
+    loop". Un hilo nuevo con su propio loop evita el conflicto.
     """
-    Retorna el cliente singleton de Google Cloud TTS autenticado
-    mediante API Key (variable de entorno GOOGLE_API_KEY).
+    result: dict = {}
 
-    A diferencia de la autenticación por archivo JSON (Service Account),
-    la API Key se pasa directamente al constructor del cliente mediante
-    ClientOptions, sin requerir archivos adicionales en disco.
+    def _runner() -> None:
+        loop = asyncio.new_event_loop()
+        try:
+            result["value"] = loop.run_until_complete(coro)
+        except Exception as exc:  # noqa: BLE001 — se re-lanza en el hilo llamante
+            result["error"] = exc
+        finally:
+            loop.close()
 
-    Retorna None cuando:
-      - La librería google-cloud-texttospeech no está instalada.
-      - GOOGLE_API_KEY no está definida en .env.
-      - La inicialización del cliente falla (clave inválida, API no activada).
+    thread = threading.Thread(target=_runner)
+    thread.start()
+    thread.join()
 
-    En todos los casos el endpoint degrada a respuesta JSON sin audio,
-    sin interrumpir el servicio.
-    """
-    global _client
+    if "error" in result:
+        raise result["error"]
+    return result.get("value")
 
-    # Reutilizar instancia existente si ya fue inicializado correctamente
-    if _client is not None:
-        return _client
 
-    if not _GOOGLE_TTS_AVAILABLE:
-        return None
-
-    if not _API_KEY:
-        logger.warning(
-            "[TTS] GOOGLE_API_KEY no definida en .env. "
-            "TTS desactivado — el endpoint retornará solo texto."
-        )
-        return None
-
-    try:
-        # transport="rest" es obligatorio cuando se autentifica con API Key.
-        # El transporte gRPC (por defecto) requiere OAuth2/Service Account
-        # y rechaza API Keys con un error de autenticación silencioso.
-        _client = texttospeech.TextToSpeechClient(
-            client_options=ClientOptions(api_key=_API_KEY),
-            transport="rest",
-        )
-        logger.info(
-            "[TTS] Cliente Google Cloud TTS inicializado (REST + API Key). "
-            "Voz: %s | Velocidad: %.2f | Tono: %.1f",
-            _VOICE_NAME, _SPEAKING_RATE, _PITCH,
-        )
-        return _client
-
-    except Exception as exc:
-        logger.error(
-            "[TTS] Error al inicializar cliente con API Key: %s. "
-            "Verificar que GOOGLE_API_KEY sea válida y que "
-            "Cloud Text-to-Speech API esté habilitada en Google Cloud Console.",
-            exc,
-        )
-        return None
+async def _synthesize_edge_tts(text: str) -> bytes:
+    communicate = edge_tts.Communicate(
+        text,
+        voice=_VOICE_NAME,
+        rate=_rate_to_edge_percent(_SPEAKING_RATE),
+        pitch=f"{_PITCH_HZ:+d}Hz",
+    )
+    audio_chunks = bytearray()
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio_chunks.extend(chunk["data"])
+    return bytes(audio_chunks)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -198,12 +144,12 @@ def _get_client() -> Optional[object]:
 
 def synthesize_speech(text: str) -> Optional[bytes]:
     """
-    Convierte un texto en español en audio MP3 mediante Google Cloud TTS.
+    Convierte un texto en español en audio MP3 mediante edge-tts.
 
-    La función es síncrona para mantener compatibilidad con el pipeline
-    actual de detect.py, que orquesta las etapas de forma secuencial.
-    Google Cloud TTS usa gRPC internamente, lo que mantiene la latencia
-    baja (~200–400 ms) sin necesidad de asyncio explícito.
+    La función expone una firma síncrona para mantener compatibilidad con
+    el pipeline actual de detect.py (orquesta las etapas de forma
+    secuencial); internamente delega la corrutina de edge-tts a un hilo
+    con su propio event loop (ver _run_async).
 
     Parámetros:
         text : narrativa egocéntrica generada por llm_enhancer.py.
@@ -211,7 +157,7 @@ def synthesize_speech(text: str) -> Optional[bytes]:
 
     Retorna:
         bytes : audio en formato MP3 listo para StreamingResponse.
-        None  : si el cliente no está disponible o la síntesis falla.
+        None  : si edge-tts no está disponible o la síntesis falla.
                 El endpoint debe degradar a respuesta JSON en este caso.
 
     Ejemplo de uso en detect.py:
@@ -219,62 +165,36 @@ def synthesize_speech(text: str) -> Optional[bytes]:
         if audio:
             return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
     """
-    client = _get_client()
-    if client is None:
-        logger.warning("[TTS] Cliente no disponible. Retornando None.")
+    if not _EDGE_TTS_AVAILABLE:
+        logger.warning("[TTS] edge-tts no disponible. Retornando None.")
         return None
 
     if not text or not text.strip():
         logger.warning("[TTS] Texto vacío recibido. No se genera audio.")
         return None
 
-    # Truncar si supera el límite configurado para proteger la cuota mensual.
-    # Una narrativa típica tiene 100–300 caracteres; el truncado solo actúa
-    # en casos anómalos de narrativas excepcionalmente largas.
+    # Truncar si supera el límite configurado. Una narrativa típica tiene
+    # 100–300 caracteres; el truncado solo actúa en casos anómalos.
     if len(text) > _MAX_CHARS:
         logger.warning(
-            "[TTS] Texto truncado de %d a %d caracteres para proteger la cuota.",
+            "[TTS] Texto truncado de %d a %d caracteres.",
             len(text), _MAX_CHARS,
         )
         text = text[:_MAX_CHARS]
 
     try:
-        # ── Entrada de texto ──────────────────────────────────
-        # SynthesisInput acepta texto plano o SSML. Se usa texto plano
-        # para mantener la simplicidad; SSML puede incorporarse en versiones
-        # futuras para controlar pausas y énfasis en la narrativa.
-        synthesis_input = texttospeech.SynthesisInput(text=text)
+        audio_bytes = _run_async(_synthesize_edge_tts(text))
 
-        # ── Selección de voz ──────────────────────────────────
-        # Las voces Neural2 no admiten ssml_gender=NEUTRAL (error 400).
-        # Al especificar el nombre exacto de la voz, el género queda
-        # implícito en la voz elegida y no es necesario declararlo.
-        voice_params = texttospeech.VoiceSelectionParams(
-            language_code=_LANGUAGE_CODE,
-            name=_VOICE_NAME,
-        )
-
-        # ── Configuración de audio ────────────────────────────
-        encoding_value = _ENCODING_MAP.get(_AUDIO_ENCODING_STR.upper(), 1)
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=encoding_value,
-            speaking_rate=_SPEAKING_RATE,
-            pitch=_PITCH,
-        )
-
-        # ── Llamada a la API ──────────────────────────────────
-        response = client.synthesize_speech(
-            input=synthesis_input,
-            voice=voice_params,
-            audio_config=audio_config,
-        )
+        if not audio_bytes:
+            logger.warning("[TTS] edge-tts no devolvió audio.")
+            return None
 
         logger.info(
-            "[TTS] Audio sintetizado correctamente. "
+            "[TTS] Audio sintetizado correctamente (edge-tts). "
             "Tamaño: %d bytes | Caracteres: %d",
-            len(response.audio_content), len(text),
+            len(audio_bytes), len(text),
         )
-        return response.audio_content
+        return audio_bytes
 
     except Exception as exc:
         # El fallo de TTS no interrumpe la respuesta del sistema.
@@ -349,7 +269,7 @@ def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
 
 def is_tts_active() -> bool:
     """
-    Retorna True si el cliente Google Cloud TTS está disponible y configurado.
+    Retorna True si edge-tts está instalado y disponible.
     Utilizado por el endpoint /api/health para reportar el estado del servicio.
     """
-    return _get_client() is not None
+    return _EDGE_TTS_AVAILABLE
