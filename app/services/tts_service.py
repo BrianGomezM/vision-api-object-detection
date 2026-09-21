@@ -1,60 +1,71 @@
 """
 app/services/tts_service.py
 
-Síntesis de voz (Text-to-Speech) mediante edge-tts.
+Síntesis de voz (Text-to-Speech) mediante Gemini TTS (Google).
 
 RESPONSABILIDAD ÚNICA:
   Convertir la narrativa egocéntrica generada por llm_enhancer.py
   en un stream de audio MP3 listo para ser reproducido por el cliente
   Web 3D, sin lógica de negocio ni dependencia de otros servicios.
 
-MOTOR SELECCIONADO — edge-tts:
-  Se migró desde Google Cloud TTS porque esa API exige una cuenta de
-  facturación (tarjeta) vinculada al proyecto de Google Cloud incluso
-  para permanecer dentro de la capa gratuita mensual — inviable para
-  un despliegue académico sin método de pago. edge-tts usa las mismas
-  voces neuronales de Microsoft Edge Read Aloud, es gratis, no requiere
-  API key ni tarjeta, y ofrece calidad de voz comparable.
+MOTOR SELECCIONADO — Gemini TTS:
+  Proveedor oficial y predeterminado del proyecto. Usa la API de Gemini
+  (paquete `google-genai`) con GOOGLE_API_KEY definida en .env. No existe
+  fallback a otro proveedor: si Gemini TTS no está disponible o falla,
+  el sistema degrada a modo solo-texto (igual que en cualquier otro fallo).
 
-FLUJO DE PROCESAMIENTO:
-  1. Construir la solicitud con voz/velocidad/tono configurados en .env.
-  2. edge-tts es async-only; se ejecuta en un hilo con su propio event
-     loop porque este servicio se llama de forma síncrona desde una ruta
-     ya async (no se puede anidar asyncio.run dentro de un loop corriendo).
-  3. Retornar los bytes del audio MP3.
-  4. En caso de fallo: retornar None para que el endpoint degrade a JSON.
+FORMATO DE AUDIO DEVUELTO POR GEMINI:
+  PCM lineal sin comprimir (16 bits, 24000 Hz, mono) — mime_type
+  "audio/l16; rate=24000; channels=1". El resto del sistema
+  (detect.py, el cliente Web3D) espera MP3, por lo que este módulo
+  codifica el PCM a MP3 con `lameenc` (encoder puro, sin depender de
+  un binario externo como ffmpeg) antes de devolverlo.
 
-CONFIGURACIÓN (variables de entorno en .env):
-  TTS_VOICE_NAME    → voz de Edge                (default: es-ES-AlvaroNeural)
-  TTS_SPEAKING_RATE → velocidad relativa a 1.0    (default: 0.95)
-  TTS_PITCH_HZ      → ajuste de tono en Hz        (default: 0)
-  TTS_MAX_CHARS     → límite de caracteres/solicitud (default: 4500)
+CONTROL DE ESTILO DE VOZ:
+  Gemini TTS no expone parámetros numéricos de velocidad/tono (no hay
+  equivalente a "rate" o "pitch" en la API). El estilo se controla
+  mediante una instrucción en lenguaje natural antepuesta al texto a
+  sintetizar (patrón documentado por Google: "Di en tono cálido: <texto>").
+  El modelo interpreta esa instrucción como una directiva de actuación
+  y no la pronuncia; esto se verificó de forma aislada comparando la
+  duración del audio con y sin la instrucción de estilo (diferencia de
+  ~0.1 s sobre un texto de referencia, incompatible con que la
+  instrucción completa se esté narrando).
 
-VOCES RECOMENDADAS EN ESPAÑOL:
-  es-ES-AlvaroNeural   → español de España, masculino (recomendado)
-  es-ES-ElviraNeural   → español de España, femenino
-  es-MX-JorgeNeural    → español latinoamericano, masculino
-  es-US-AlonsoNeural   → español EE.UU., masculino
-  Lista completa: `edge-tts --list-voices` o
-  https://github.com/rany2/edge-tts
+CONFIGURACIÓN CENTRALIZADA (variables de entorno en .env):
+  TTS_MODEL              → modelo Gemini TTS   (default: models/gemini-3.1-flash-tts-preview)
+  TTS_VOICE              → voz predefinida     (default: Sulafat — ver justificación abajo)
+  TTS_STYLE_INSTRUCTIONS → instrucción de estilo en español, antepuesta al texto
+  TTS_MAX_CHARS          → límite de caracteres/solicitud (default: 4500)
+  TTS_MAX_SAVED_FILES    → archivos de audio a conservar en disco (default: 5)
+
+VOZ SELECCIONADA — Sulafat ("Warm"):
+  Gemini TTS ofrece 30 voces predefinidas, cada una documentada por
+  Google con un único adjetivo de personalidad (p. ej. Kore="Firm",
+  Puck="Upbeat", Iapetus="Clear"). Google no publica ninguna dimensión
+  de neutralidad de género; por lo tanto no existe una voz "andrógina"
+  oficial y no se debe afirmar que Sulafat lo sea. Sulafat se eligió
+  por ser la única etiquetada como "Warm" (cálida), cumpliendo el
+  requisito de calidez/cercanía sin una personalidad marcada o extrema
+  (a diferencia de, p. ej., "Excitable" o "Gravelly"). Alternativas
+  igualmente razonables y documentadas: Achird ("Friendly"),
+  Iapetus ("Clear"), Schedar ("Even"). Cambiar de voz solo requiere
+  editar TTS_VOICE en .env — ningún código depende del nombre elegido.
 
 INSTALACIÓN:
-  pip install edge-tts
+  pip install google-genai lameenc
 """
 
 import os
-import asyncio
+import io
 import logging
-import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-# ──────────────────────────────────────────────────────────────
-# LOGGING
-# ──────────────────────────────────────────────────────────────
-# Se usa el módulo logging estándar (no print) para permitir
-# configuración centralizada en producción sin modificar código.
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -63,101 +74,181 @@ logger = logging.getLogger(__name__)
 # ──────────────────────────────────────────────────────────────
 
 try:
-    import edge_tts
-    _EDGE_TTS_AVAILABLE: bool = True
+    from google import genai
+    from google.genai import types as genai_types
+    from google.genai import errors as genai_errors
+    _GENAI_AVAILABLE: bool = True
 except ImportError:
-    _EDGE_TTS_AVAILABLE: bool = False
+    _GENAI_AVAILABLE: bool = False
     logger.warning(
-        "[TTS] edge-tts no está instalado. Ejecutar: pip install edge-tts"
+        "[TTS] Paquete 'google-genai' no está instalado. Ejecutar: "
+        "pip install google-genai"
+    )
+
+try:
+    import lameenc
+    _LAMEENC_AVAILABLE: bool = True
+except ImportError:
+    _LAMEENC_AVAILABLE: bool = False
+    logger.warning(
+        "[TTS] Paquete 'lameenc' no está instalado. Ejecutar: pip install lameenc"
     )
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
 # ──────────────────────────────────────────────────────────────
 
-# Voz neuronal de Edge. Debe existir en el catálogo de edge-tts.
-_VOICE_NAME: str = os.getenv("TTS_VOICE_NAME", "es-ES-AlvaroNeural")
+TTS_MODEL: str = os.getenv("TTS_MODEL", "models/gemini-3.1-flash-tts-preview")
+TTS_VOICE: str = os.getenv("TTS_VOICE", "Sulafat")
 
-# Velocidad de habla: 1.0 = natural, <1 = más lento, >1 = más rápido.
-# 0.95 es ligeramente más lento para facilitar la comprensión en accesibilidad.
-_SPEAKING_RATE: float = float(os.getenv("TTS_SPEAKING_RATE", "0.95"))
+# ──────────────────────────────────────────────────────────────
+# MODELOS TTS DISPONIBLES (para el selector del cliente)
+# ──────────────────────────────────────────────────────────────
+# Cada modelo de Gemini TTS tiene su PROPIA cuota de RPM en el nivel
+# gratuito (son recursos/quotas separados en Google AI Studio). El nivel
+# gratuito de gemini-3.1-flash-tts-preview solo permite 3 solicitudes/min,
+# así que exponer alternativas deja seguir haciendo pruebas con cuota
+# fresca en vez de esperar a que se libere la del modelo por defecto.
+# IDs verificados contra client.models.list() de la API de Gemini.
+AVAILABLE_TTS_MODELS: list[dict] = [
+    {
+        "id": "models/gemini-3.1-flash-tts-preview",
+        "label": "Gemini 3.1 Flash TTS (por defecto)",
+        "descripcion": "El configurado en .env. $1.00 / $20.00 por 1M tokens (texto/audio).",
+    },
+    {
+        "id": "models/gemini-2.5-flash-preview-tts",
+        "label": "Gemini 2.5 Flash TTS (alterna)",
+        "descripcion": "Cuota de RPM independiente. Más económico: $0.50 / $10.00 por 1M tokens.",
+    },
+    {
+        "id": "models/gemini-2.5-pro-preview-tts",
+        "label": "Gemini 2.5 Pro TTS (alterna)",
+        "descripcion": "Cuota de RPM independiente. Mayor calidad, mismo precio que el 3.1: $1.00 / $20.00 por 1M tokens.",
+    },
+]
+_ALLOWED_TTS_MODEL_IDS: set[str] = {m["id"] for m in AVAILABLE_TTS_MODELS}
 
-# Ajuste de tono en Hz. 0 = natural de la voz.
-_PITCH_HZ: int = int(os.getenv("TTS_PITCH_HZ", "0"))
+
+def get_available_tts_models() -> list[dict]:
+    """Lista de modelos TTS habilitados para seleccionar desde el cliente."""
+    return AVAILABLE_TTS_MODELS
+TTS_STYLE_INSTRUCTIONS: str = os.getenv(
+    "TTS_STYLE_INSTRUCTIONS",
+    "Narra con un tono cálido, natural, claro y neutral, ritmo moderado, "
+    "apto para narración educativa, evitando dramatización excesiva:",
+)
 
 # Límite de caracteres por solicitud. Una narrativa típica tiene
 # entre 100 y 300 caracteres.
 _MAX_CHARS: int = int(os.getenv("TTS_MAX_CHARS", "4500"))
 
+# Parámetros fijos del audio devuelto por Gemini TTS (documentados por
+# Google; no configurables por la API).
+_SAMPLE_RATE_HZ: int = 24000
+_SAMPLE_WIDTH_BYTES: int = 2  # 16 bits
+_CHANNELS: int = 1
 
-def _rate_to_edge_percent(rate: float) -> str:
-    """Convierte el factor de velocidad (1.0 = natural) al formato de
-    porcentaje que espera edge-tts (p. ej. 0.95 → '-5%')."""
-    return f"{round((rate - 1.0) * 100):+d}%"
+# ──────────────────────────────────────────────────────────────
+# CLIENTE GEMINI — SINGLETON PEREZOSO
+# ──────────────────────────────────────────────────────────────
+# Mismo patrón que app/utils/groq_client.py: se construye una sola vez
+# y se reutiliza; retorna None (sin lanzar excepción) si no hay clave
+# o si el paquete no está instalado, para que el resto del sistema
+# degrade a modo solo-texto sin romper la respuesta.
+
+_client = None
+
+# Detalle del último error de síntesis (code/status/message de la API de
+# Gemini cuando aplica). Permite a detect.py distinguir, por ejemplo, un
+# 429 RESOURCE_EXHAUSTED (cuota agotada) de un fallo genérico, en vez de
+# mostrar siempre el mismo aviso "TTS no disponible" sin contexto.
+_last_error: Optional[dict] = None
 
 
-def _run_async(coro):
-    """Ejecuta una corrutina en un hilo aparte con su propio event loop.
+def get_last_tts_error() -> Optional[dict]:
+    """Retorna {'code', 'status', 'message'} del último fallo de síntesis, o None."""
+    return _last_error
 
-    edge-tts es async-only, pero este servicio se llama de forma síncrona
-    desde app/routes/detect.py dentro de una ruta ya async — anidar
-    asyncio.run() ahí lanzaría "cannot be called from a running event
-    loop". Un hilo nuevo con su propio loop evita el conflicto.
+
+def _get_gemini_client():
+    global _client
+
+    if _client is not None:
+        return _client
+
+    if not _GENAI_AVAILABLE:
+        return None
+
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        logger.warning("[TTS] GOOGLE_API_KEY no definida en .env. TTS desactivado.")
+        return None
+
+    _client = genai.Client(api_key=api_key)
+    logger.info("[TTS] Cliente Gemini inicializado. Modelo: %s  Voz: %s", TTS_MODEL, TTS_VOICE)
+    return _client
+
+
+def _pcm_to_mp3(pcm_bytes: bytes) -> bytes:
+    """Codifica PCM lineal (24 kHz, 16 bits, mono) a MP3 con lameenc.
+
+    Necesario porque Gemini TTS devuelve PCM sin comprimir, mientras que
+    el resto del sistema (detect.py, el cliente Web3D) espera MP3.
     """
-    result: dict = {}
-
-    def _runner() -> None:
-        loop = asyncio.new_event_loop()
-        try:
-            result["value"] = loop.run_until_complete(coro)
-        except Exception as exc:  # noqa: BLE001 — se re-lanza en el hilo llamante
-            result["error"] = exc
-        finally:
-            loop.close()
-
-    thread = threading.Thread(target=_runner)
-    thread.start()
-    thread.join()
-
-    if "error" in result:
-        raise result["error"]
-    return result.get("value")
+    encoder = lameenc.Encoder()
+    encoder.set_bit_rate(64)
+    encoder.set_in_sample_rate(_SAMPLE_RATE_HZ)
+    encoder.set_channels(_CHANNELS)
+    encoder.set_quality(2)  # 2 = alta calidad (0=mejor/más lento, 9=peor/más rápido)
+    mp3_bytes = encoder.encode(pcm_bytes)
+    mp3_bytes += encoder.flush()
+    return mp3_bytes
 
 
-async def _synthesize_edge_tts(text: str) -> bytes:
-    communicate = edge_tts.Communicate(
-        text,
-        voice=_VOICE_NAME,
-        rate=_rate_to_edge_percent(_SPEAKING_RATE),
-        pitch=f"{_PITCH_HZ:+d}Hz",
+def _synthesize_gemini_tts(text: str, model: str = None) -> bytes:
+    """Genera audio con Gemini TTS y lo retorna ya codificado en MP3."""
+    client = _get_gemini_client()
+    if client is None:
+        raise RuntimeError("Cliente Gemini no disponible (sin API key o sin paquete instalado).")
+
+    contents = f"{TTS_STYLE_INSTRUCTIONS} {text}"
+    response = client.models.generate_content(
+        model=model or TTS_MODEL,
+        contents=contents,
+        config=genai_types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=genai_types.SpeechConfig(
+                voice_config=genai_types.VoiceConfig(
+                    prebuilt_voice_config=genai_types.PrebuiltVoiceConfig(voice_name=TTS_VOICE)
+                )
+            ),
+        ),
     )
-    audio_chunks = bytearray()
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_chunks.extend(chunk["data"])
-    return bytes(audio_chunks)
+    part = response.candidates[0].content.parts[0]
+    pcm_bytes = part.inline_data.data
+    return _pcm_to_mp3(pcm_bytes)
 
 
 # ──────────────────────────────────────────────────────────────
 # FUNCIÓN PÚBLICA DE SÍNTESIS
 # ──────────────────────────────────────────────────────────────
 
-def synthesize_speech(text: str) -> Optional[bytes]:
+def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
     """
-    Convierte un texto en español en audio MP3 mediante edge-tts.
-
-    La función expone una firma síncrona para mantener compatibilidad con
-    el pipeline actual de detect.py (orquesta las etapas de forma
-    secuencial); internamente delega la corrutina de edge-tts a un hilo
-    con su propio event loop (ver _run_async).
+    Convierte un texto en español en audio MP3 mediante Gemini TTS.
 
     Parámetros:
-        text : narrativa egocéntrica generada por llm_enhancer.py.
-               Debe estar en español con marco de referencia egocéntrico.
+        text  : narrativa egocéntrica generada por llm_enhancer.py.
+                Debe estar en español con marco de referencia egocéntrico.
+        model : ID de modelo Gemini TTS a usar (p. ej. "models/gemini-2.5-flash-preview-tts").
+                Si es None o no está en AVAILABLE_TTS_MODELS, se usa TTS_MODEL (.env).
+                Permite al cliente cambiar de modelo cuando agota la cuota RPM
+                del modelo por defecto — cada modelo tiene su propia cuota.
 
     Retorna:
         bytes : audio en formato MP3 listo para StreamingResponse.
-        None  : si edge-tts no está disponible o la síntesis falla.
+        None  : si Gemini TTS no está disponible o la síntesis falla.
                 El endpoint debe degradar a respuesta JSON en este caso.
 
     Ejemplo de uso en detect.py:
@@ -165,16 +256,14 @@ def synthesize_speech(text: str) -> Optional[bytes]:
         if audio:
             return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
     """
-    if not _EDGE_TTS_AVAILABLE:
-        logger.warning("[TTS] edge-tts no disponible. Retornando None.")
+    if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
+        logger.warning("[TTS] Dependencias de Gemini TTS no disponibles. Retornando None.")
         return None
 
     if not text or not text.strip():
         logger.warning("[TTS] Texto vacío recibido. No se genera audio.")
         return None
 
-    # Truncar si supera el límite configurado. Una narrativa típica tiene
-    # 100–300 caracteres; el truncado solo actúa en casos anómalos.
     if len(text) > _MAX_CHARS:
         logger.warning(
             "[TTS] Texto truncado de %d a %d caracteres.",
@@ -182,24 +271,45 @@ def synthesize_speech(text: str) -> Optional[bytes]:
         )
         text = text[:_MAX_CHARS]
 
+    # Validar contra la lista blanca: un id desconocido cae al modelo por
+    # defecto en vez de dejarlo pasar sin más a la API de Gemini.
+    effective_model = model if model in _ALLOWED_TTS_MODEL_IDS else None
+
+    global _last_error
+    _last_error = None
+
     try:
-        audio_bytes = _run_async(_synthesize_edge_tts(text))
+        audio_bytes = _synthesize_gemini_tts(text, model=effective_model)
 
         if not audio_bytes:
-            logger.warning("[TTS] edge-tts no devolvió audio.")
+            logger.warning("[TTS] Gemini TTS no devolvió audio.")
+            _last_error = {"code": None, "status": "SIN_AUDIO", "message": "La API no devolvió datos de audio."}
             return None
 
         logger.info(
-            "[TTS] Audio sintetizado correctamente (edge-tts). "
+            "[TTS] Audio sintetizado correctamente (modelo=%s, voz=%s). "
             "Tamaño: %d bytes | Caracteres: %d",
-            len(audio_bytes), len(text),
+            effective_model or TTS_MODEL, TTS_VOICE, len(audio_bytes), len(text),
         )
         return audio_bytes
 
     except Exception as exc:
         # El fallo de TTS no interrumpe la respuesta del sistema.
-        # El endpoint manejará el None retornado degradando a JSON.
-        logger.error("[TTS] Error durante la síntesis: %s", exc, exc_info=True)
+        # El endpoint manejará el None retornado degradando a texto/browser-TTS.
+        # El mensaje de error de la API de Gemini (code/status/message) es una
+        # descripción del lado del servidor (p.ej. "Resource exhausted") y no
+        # incluye la API key (el SDK la envía por header, no en la URL/cuerpo),
+        # así que es seguro registrarlo — a diferencia del texto de la excepción
+        # completa, que sí podría incluir detalles de transporte no deseados.
+        if isinstance(exc, genai_errors.APIError):
+            _last_error = {"code": exc.code, "status": exc.status, "message": exc.message}
+            logger.error(
+                "[TTS] Error durante la síntesis: %s %s — %s",
+                exc.code, exc.status, exc.message,
+            )
+        else:
+            _last_error = {"code": None, "status": type(exc).__name__, "message": str(exc)}
+            logger.error("[TTS] Error durante la síntesis (%s): %s", type(exc).__name__, exc)
         return None
 
 
@@ -207,16 +317,12 @@ def synthesize_speech(text: str) -> Optional[bytes]:
 # DIRECTORIO DE SALIDA DE AUDIO
 # ──────────────────────────────────────────────────────────────
 
-# Ruta absoluta a la carpeta donde se guardan los archivos de audio generados.
-# Se crea automáticamente si no existe al llamar synthesize_and_save().
 AUDIO_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "audio_output"
 
-# Número máximo de archivos de audio a conservar en disco.
-# Cuando se supera, se elimina el más antiguo para liberar espacio.
 _MAX_AUDIO_FILES: int = int(os.getenv("TTS_MAX_SAVED_FILES", "5"))
 
 
-def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
+def synthesize_and_save(text: str, filename: str = None, model: str = None) -> Optional[str]:
     """
     Convierte texto en audio MP3 y lo guarda en audio_output/.
 
@@ -224,12 +330,13 @@ def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
         text     : narrativa egocéntrica en español.
         filename : nombre del archivo de salida. Si es None, genera uno
                    automático con timestamp: narrativa_YYYYMMDD_HHMMSS.mp3
+        model    : ID de modelo Gemini TTS a usar (ver synthesize_speech).
 
     Retorna:
         str  : ruta relativa al archivo guardado (ej. "audio_output/narrativa_20260521_143022.mp3")
         None : si la síntesis falla o el cliente TTS no está disponible.
     """
-    audio_bytes = synthesize_speech(text)
+    audio_bytes = synthesize_speech(text, model=model)
     if audio_bytes is None:
         return None
 
@@ -248,7 +355,6 @@ def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
         relative_path, len(audio_bytes),
     )
 
-    # Rotación: eliminar los más antiguos si se supera el límite configurado.
     existing = sorted(
         AUDIO_OUTPUT_DIR.glob("narrativa_*.mp3"),
         key=lambda f: f.stat().st_mtime,
@@ -269,7 +375,8 @@ def synthesize_and_save(text: str, filename: str = None) -> Optional[str]:
 
 def is_tts_active() -> bool:
     """
-    Retorna True si edge-tts está instalado y disponible.
+    Retorna True si Gemini TTS está disponible y configurado
+    (paquetes instalados y GOOGLE_API_KEY presente en .env).
     Utilizado por el endpoint /api/health para reportar el estado del servicio.
     """
-    return _EDGE_TTS_AVAILABLE
+    return _get_gemini_client() is not None

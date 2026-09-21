@@ -1,0 +1,8 @@
+﻿fuente,tipo,url,licencia/estado,nota
+Generación sintética,Imágenes generadas para evaluación,No aplica,Generación propia para el conjunto de evaluación,No atribuirlas a una fuente externa. Conservar el prompt/metadatos de generación si se necesita documentar reproducibilidad.
+Sketchfab,Biblioteca de modelos 3D,https://sketchfab.com/,La licencia depende del modelo específico; no asumir CC0,Para tesis registrar URL exacta del modelo/render y licencia individual antes de citarlo como recurso externo.
+Poly Haven,Biblioteca de assets 3D,https://polyhaven.com/es,CC0 para sus assets,"Poly Haven declara que sus assets son CC0. La página web, logos y otros contenidos no necesariamente tienen la misma licencia."
+JustCreate3D,Low Poly Megapolis Pack,https://justcreate3d.itch.io/low-poly-megapolis-pack,Licencia del pack; no CC0,"La página indica uso en desarrollo de juegos/apps y creación de contenido multimedia, con restricciones sobre redistribución de los assets originales."
+KayKit / Kay Lousberg,Restaurant Bits,https://kaylousberg.itch.io/restaurant-bits,CC0,La página específica de Restaurant Bits indica CC0 y uso personal/comercial sin atribución obligatoria.
+Hyper3D,Plataforma de generación 3D,https://hyper3d.ai/es,No corresponde a una imagen del ZIP salvo que se haya usado en su generación,Conservar solo como referencia de herramienta si alguna imagen fue realmente generada allí.
+Tripo3D,Plataforma de generación 3D,https://www.tripo3d.ai/es,No corresponde a una imagen del ZIP salvo que se haya usado en su generación,Conservar solo como referencia de herramienta si alguna imagen fue realmente generada allí.

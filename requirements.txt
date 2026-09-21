@@ -32,10 +32,12 @@ groq
 deep-translator==1.11.4
 
 # ── Text-to-Speech ──────────────────────────────────────────────
-# edge-tts: voces neuronales de Microsoft Edge, gratis, sin API key ni
-# tarjeta (a diferencia de Google Cloud TTS, que exige facturación
-# activada en el proyecto incluso dentro de la capa gratuita).
-edge-tts
+# Gemini TTS (Google): requiere GOOGLE_API_KEY (nivel gratuito de
+# Google AI Studio, sin facturación). google-genai es el SDK oficial;
+# lameenc codifica el PCM devuelto por Gemini a MP3 (sin depender de
+# un binario externo como ffmpeg).
+google-genai
+lameenc
 
 # ── Cliente HTTP (usado por /api/test/* para pruebas de carga) ─
 httpx

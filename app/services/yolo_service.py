@@ -17,10 +17,13 @@ CONFIGURACIÓN (variables de entorno en .env):
                        del filtro por clase          (default: 0.15)
 
 ESTRATEGIA DE UMBRAL:
-  Cada clase tiene un umbral mínimo propio (_CLASS_MIN_CONF).
-  El umbral efectivo = min(class_min, confidence_threshold_del_endpoint).
-  Esto evita perder obstáculos críticos que YOLO detecta con baja
-  confianza (p.ej. mesas en perspectiva frontal, puertas blancas).
+  Cada clase tiene un umbral mínimo propio (_CLASS_MIN_CONF), usado como
+  PISO de seguridad — nunca se baja de ahí aunque el endpoint pida un
+  umbral más permisivo, evitando perder obstáculos críticos que YOLO
+  detecta con baja confianza (p.ej. mesas en perspectiva frontal,
+  puertas blancas). El umbral efectivo = max(class_min, confidence_threshold
+  _del_endpoint), así que el umbral del endpoint SÍ puede exigir más
+  confianza que el mínimo de la clase cuando el usuario pide algo estricto.
 
 WARM-UP:
   Al cargar el modelo se ejecuta una inferencia con imagen negra para
@@ -200,7 +203,7 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
       1. YOLO recibe conf=_INTERNAL_CONF (bajo) para capturar todos los
          candidatos sin descartar prematuramente.
       2. Para cada detección se calcula:
-         effective = min(_CLASS_MIN_CONF.get(label, threshold), threshold)
+         effective = max(_CLASS_MIN_CONF.get(label, threshold), threshold)
       3. Solo pasan clases en _NAV_CLASSES con conf >= effective.
       4. Resultado ordenado por confianza descendente.
 
@@ -257,11 +260,17 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
                 continue
 
             # Filtro 2: umbral efectivo por clase
-            # El mínimo entre el umbral de la clase y el del endpoint
-            # garantiza que no se pierdan obstáculos críticos aunque
-            # el usuario envíe un threshold alto.
+            # class_min es un PISO de seguridad, no un techo: el máximo entre
+            # el mínimo de la clase y el umbral del endpoint garantiza que
+            # nunca se baje de ese mínimo (no se pierden obstáculos críticos
+            # aunque el usuario pida un umbral muy bajo), pero el umbral del
+            # endpoint SÍ puede subir la exigencia por encima del mínimo si
+            # el usuario pide algo más estricto.
+            # (Antes se usaba min(), que hacía lo opuesto: class_min actuaba
+            # como techo que el umbral del usuario nunca podía superar —
+            # subir el slider no filtraba estas ~30 clases con mínimo propio.)
             class_min = _CLASS_MIN_CONF.get(label, confidence_threshold)
-            effective = min(class_min, confidence_threshold)
+            effective = max(class_min, confidence_threshold)
 
             if conf < effective:
                 continue

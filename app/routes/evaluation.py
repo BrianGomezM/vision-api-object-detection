@@ -435,6 +435,15 @@ _FUNCTIONAL_CASES = [
             "min_total": 1,
         },
     },
+    {
+        "id":          "FUN-08",
+        "descripcion": "Archivo corrupto (no es una imagen válida) debe retornar HTTP 422, no 200",
+        "image_path":  None,
+        "tipo":        "archivo_corrupto",
+        "espera": {
+            "http_status": 422,
+        },
+    },
 ]
 
 
@@ -479,6 +488,16 @@ async def run_functional_tests(
                         "/api/detect",
                         data={"confidence_threshold": "0.35"},
                         files={"file": ("empty.jpg", b"", "image/jpeg")},
+                    )
+                    passed = r.status_code == espera["http_status"]
+                    detail = {"http_status_recibido": r.status_code}
+
+                # ── FUN-08: Archivo corrupto (H42) ─────────────
+                elif tipo == "archivo_corrupto":
+                    r = await client.post(
+                        "/api/detect",
+                        data={"confidence_threshold": "0.35"},
+                        files={"file": ("corrupto.png", os.urandom(2000), "image/png")},
                     )
                     passed = r.status_code == espera["http_status"]
                     detail = {"http_status_recibido": r.status_code}

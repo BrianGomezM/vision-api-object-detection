@@ -37,6 +37,7 @@ import os
 import io
 import base64
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import StreamingResponse
@@ -49,7 +50,10 @@ from app.services.free_space_analyzer  import calculate_free_space
 from app.services.risk_engine          import decide_movement
 from app.services.scene_classifier     import classify_scene
 from app.services.llm_enhancer         import generate_description
-from app.services.tts_service          import synthesize_speech, synthesize_and_save, is_tts_active
+from app.services.tts_service          import (
+    synthesize_speech, synthesize_and_save, is_tts_active,
+    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_VOICE,
+)
 from app.services.detection_visualizer import save_annotated_image
 from app.utils.groq_client             import GROQ_MODEL, is_llm_active
 
@@ -123,6 +127,55 @@ def build_narrative(scene_intro: str, description: str, instruction: str) -> str
 build_final_narrative = build_narrative
 
 
+def _build_annotated_info(annotated_path: str | None) -> dict:
+    """
+    Lee del disco la imagen con bounding boxes (dibujada por
+    save_annotated_image) y la codifica en base64 para incluirla en la
+    respuesta JSON. Usado tanto por /detect como por /debug-detect —
+    ambos ejecutan el mismo pipeline y ya generan esta imagen.
+    """
+    info = {
+        "disponible":  False,
+        "archivo":     None,
+        "url":         None,
+        "data_base64": None,
+        "data_uri":    None,
+    }
+    if not annotated_path:
+        return info
+
+    try:
+        ann_bytes = Path(annotated_path).read_bytes()
+        ann_b64   = base64.b64encode(ann_bytes).decode("utf-8")
+        info = {
+            "disponible":  True,
+            "archivo":     annotated_path,
+            "url":         f"/detections/{Path(annotated_path).name}",
+            "data_base64": ann_b64,
+            "data_uri":    f"data:image/jpeg;base64,{ann_b64}",
+        }
+    except Exception:
+        pass  # No debe romper la respuesta si la lectura del archivo falla
+
+    return info
+
+
+def _tts_unavailable_reason() -> str:
+    """
+    Clasifica por qué no hay audio disponible, para que el cliente pueda
+    mostrar un mensaje útil en vez de un genérico "TTS no disponible":
+      - "cuota_excedida"  : Gemini devolvió 429 / RESOURCE_EXHAUSTED.
+      - "error_sintesis"  : falló por otra razón (ver logs del servidor).
+      - "tts_desactivado" : falta GOOGLE_API_KEY o dependencias no instaladas.
+    """
+    err = get_last_tts_error()
+    if err is None:
+        return "tts_desactivado"
+    if err.get("code") == 429 or err.get("status") == "RESOURCE_EXHAUSTED":
+        return "cuota_excedida"
+    return "error_sintesis"
+
+
 # ──────────────────────────────────────────────────────────────
 # PIPELINE COMPLETO
 # ──────────────────────────────────────────────────────────────
@@ -169,21 +222,25 @@ def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False
     decision = decide_movement(analyzed, free_space)
     tiempos["decision_ms"] = _ms(t5)
 
-    # 6. Clasificación de escenario (LLM)
-    t6         = time.time()
-    scene_info = classify_scene(analyzed)
-    tiempos["escenario_ms"] = _ms(t6)
+    # 6-7. Clasificación de escenario + descripción egocéntrica (ambas LLM/Groq).
+    # Son independientes entre sí (solo dependen de `analyzed`), así que se
+    # ejecutan en paralelo en vez de secuencial: recorta esta parte del
+    # pipeline a ~max(t6, t7) en vez de t6 + t7. Antes de este cambio ambas
+    # llamadas de red se esperaban una tras otra sin necesidad.
+    t67 = time.time()
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        future_scene = executor.submit(classify_scene, analyzed)
+        future_desc  = executor.submit(generate_description, analyzed, debug)
+        scene_info   = future_scene.result()
+        desc_result  = future_desc.result()
+    tiempos["escenario_ms"] = tiempos["llm_ms"] = _ms(t67)
+
     scene_intro = (
         scene_info.get("scene_intro", "")
         if scene_info.get("confidence") in ("media", "alta")
         else ""
     )
-
-    # 7. Descripción egocéntrica (LLM)
-    t7          = time.time()
-    desc_result = generate_description(analyzed, debug=debug)
     description = desc_result.get("text", "")
-    tiempos["llm_ms"] = _ms(t7)
 
     # 8. Narrativa final
     narrativa = build_narrative(scene_intro, description, decision["instruction"])
@@ -226,7 +283,17 @@ async def detect(
         False,
         description=(
             "Si true, retorna StreamingResponse audio/mpeg. "
-            "Requiere edge-tts instalado (ver requirements.txt)."
+            "Requiere GOOGLE_API_KEY configurada (ver requirements.txt)."
+        ),
+    ),
+    tts_model: str = Form(
+        None,
+        description=(
+            "ID de modelo Gemini TTS a usar en esta llamada (opcional). "
+            "Cada modelo tiene su propia cuota de RPM en el nivel gratuito, "
+            "así que permite seguir generando audio cuando el modelo por "
+            "defecto agota su cuota. Ver GET /api/tts/models para las opciones. "
+            "Un id no reconocido cae al TTS_MODEL configurado en .env."
         ),
     ),
 ):
@@ -247,34 +314,25 @@ async def detect(
         if not image_bytes:
             raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
 
+        try:
+            Image.open(io.BytesIO(image_bytes)).verify()
+        except Exception:
+            raise HTTPException(
+                status_code=422,
+                detail="El archivo enviado no es una imagen válida o está corrupto.",
+            )
+
         threshold = normalize_threshold(confidence_threshold)
         result    = _run_full_pipeline(image_bytes, threshold, debug)
 
         # ── Imagen anotada: leer del disco y codificar en base64 ─────
-        annotated_info = {
-            "disponible":  False,
-            "archivo":     None,
-            "url":         None,
-            "data_base64": None,
-            "data_uri":    None,
-        }
-        if result.get("annotated_path"):
-            try:
-                ann_bytes = Path(result["annotated_path"]).read_bytes()
-                ann_b64   = base64.b64encode(ann_bytes).decode("utf-8")
-                annotated_info = {
-                    "disponible":  True,
-                    "archivo":     result["annotated_path"],
-                    "url":         f"/detections/{Path(result['annotated_path']).name}",
-                    "data_base64": ann_b64,
-                    "data_uri":    f"data:image/jpeg;base64,{ann_b64}",
-                }
-            except Exception:
-                pass  # No debe romper la respuesta si el visualizador falla
+        annotated_info = _build_annotated_info(result.get("annotated_path"))
 
-        # TTS: genera, guarda en disco y codifica en base64
+        # TTS: se genera en toda petición junto con la detección (flujo original).
+        # tts_model permite al cliente elegir un modelo alterno con cuota
+        # propia cuando el modelo por defecto agota su RPM gratuito.
         t_tts      = time.time()
-        audio_path = synthesize_and_save(result["narrativa_final"])
+        audio_path = synthesize_and_save(result["narrativa_final"], model=tts_model)
         tts_ms     = _ms(t_tts)
 
         if audio_path:
@@ -282,6 +340,7 @@ async def detect(
             b64_str    = base64.b64encode(raw_bytes).decode("utf-8")
             audio_info = {
                 "disponible":   True,
+                "razon":        None,
                 "archivo":      audio_path,
                 "content_type": "audio/mpeg",
                 "data_base64":  b64_str,
@@ -292,6 +351,7 @@ async def detect(
             raw_bytes  = None
             audio_info = {
                 "disponible":   False,
+                "razon":        _tts_unavailable_reason(),
                 "archivo":      None,
                 "content_type": None,
                 "data_base64":  None,
@@ -339,10 +399,16 @@ async def detect(
                     media_type="audio/mpeg",
                     headers=headers,
                 )
+            razon = audio_info["razon"]
+            aviso = {
+                "cuota_excedida":  "TTS no disponible: se alcanzó el límite de cuota de Gemini TTS. Intenta de nuevo en un momento.",
+                "tts_desactivado": "TTS no disponible. Verificar que GOOGLE_API_KEY esté configurada.",
+                "error_sintesis":  "TTS no disponible: la síntesis falló. Ver logs del servidor para más detalle.",
+            }.get(razon, "TTS no disponible.")
             return {
                 "status":          "success_no_audio",
                 "narrativa_final": result["narrativa_final"],
-                "aviso":           "TTS no disponible. Verificar que edge-tts esté instalado.",
+                "aviso":           aviso,
                 "metricas":        metricas,
             }
 
@@ -409,6 +475,14 @@ async def debug_detect(
         if not image_bytes:
             raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
 
+        try:
+            Image.open(io.BytesIO(image_bytes)).verify()
+        except Exception:
+            raise HTTPException(
+                status_code=422,
+                detail="El archivo enviado no es una imagen válida o está corrupto.",
+            )
+
         threshold   = normalize_threshold(confidence_threshold)
         result      = _run_full_pipeline(image_bytes, threshold, debug=True)
         analyzed    = result["analyzed"]
@@ -431,6 +505,7 @@ async def debug_detect(
             "narrativa_final": result["narrativa_final"],
             "tiempos":         result["tiempos"],
             "diagnostico":     aviso,
+            "imagen_anotada":  _build_annotated_info(result.get("annotated_path")),
             "pasos": {
                 "1_detecciones": {
                     "total":       n_det,
@@ -501,6 +576,24 @@ async def debug_detect(
 
 
 # ──────────────────────────────────────────────────────────────
+# GET /tts/models
+# ──────────────────────────────────────────────────────────────
+
+@router.get("/tts/models", tags=["Info"])
+async def tts_models():
+    """
+    Modelos Gemini TTS disponibles para seleccionar en /detect (campo
+    tts_model). Cada modelo tiene su propia cuota de RPM en el nivel
+    gratuito de Google AI Studio, así que cambiar de modelo da cuota
+    fresca sin esperar a que se libere la del modelo por defecto.
+    """
+    return {
+        "default": TTS_MODEL,
+        "modelos": get_available_tts_models(),
+    }
+
+
+# ──────────────────────────────────────────────────────────────
 # GET /health
 # ──────────────────────────────────────────────────────────────
 
@@ -535,9 +628,11 @@ async def health_check():
             "activo":    is_llm_active(),
         },
         "tts": {
-            "proveedor": "edge-tts",
-            "voz":       os.getenv("TTS_VOICE_NAME", "es-ES-AlvaroNeural"),
-            "activo":    is_tts_active(),
+            "proveedor":    "Gemini TTS",
+            "modelo":       TTS_MODEL,
+            "voz":          TTS_VOICE,
+            "activo":       is_tts_active(),
+            "ultimo_error": get_last_tts_error(),
         },
         "evaluacion": {
             "dataset_imagenes":    dataset_count,

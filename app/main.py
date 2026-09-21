@@ -101,8 +101,8 @@ app.add_middleware(
 async def startup_event():
     """
     Al arrancar: carga YOLO26s con warm-up para eliminar overhead en la
-    primera petición. edge-tts no requiere inicialización (no usa cliente
-    persistente ni credenciales).
+    primera petición. El cliente de Gemini TTS se inicializa de forma
+    perezosa (singleton) en su primer uso; ver app/services/tts_service.py.
     """
     from app.services.yolo_service import _get_model
     _get_model()

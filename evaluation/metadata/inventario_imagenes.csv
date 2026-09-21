@@ -1,0 +1,27 @@
+﻿archivo,origen,fuente,tipo,licencia,observaciones
+images/web3d/generated/synthetic/W3D-G-02-parque.png,Generada,Generación sintética,Escena sintética,No aplica,Imagen sintética proporcionada para el conjunto de evaluación; conservar el prompt original fuera del repositorio si se desea documentar reproducibilidad.
+images/web3d/generated/synthetic/W3D-G-03-calle.png,Generada,Generación sintética,Escena sintética,No aplica,Imagen sintética proporcionada para el conjunto de evaluación; conservar el prompt original fuera del repositorio si se desea documentar reproducibilidad.
+images/web3d/generated/synthetic/W3D-G-01-granja.png,Generada,Generación sintética,Escena sintética,No aplica,Imagen sintética proporcionada para el conjunto de evaluación; conservar el prompt original fuera del repositorio si se desea documentar reproducibilidad.
+W3D-I-SKF-01-british.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-02-cartoon-low-poly.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-03-clean.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-04-coffee.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-05-interior.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-06-kitchen.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-07-living-room.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-08-low-poly-city.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-09-office.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-10-room.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-11-rooms.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-12-salad.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-13-the-grand-budapest-hotel.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-SKF-14-waiting-room.png,Internet,Sketchfab (URL exacta del modelo/render no suministrada),Escena/render 3D,,VERIFICAR LICENCIA DEL ASSET ESPECÍFICO
+W3D-I-PHV-01-bathroom.png,Internet,Poly Haven,Escena/render 3D,,CC0
+W3D-I-PHV-02-studio.png,Internet,Poly Haven,Escena/render 3D,,CC0
+W3D-I-PHV-03-studio2.png,Internet,Poly Haven,Escena/render 3D,,CC0
+W3D-I-PHV-04-sofa.png,Internet,Poly Haven,Escena/render 3D,,CC0
+W3D-I-JC3D-01-cars.png,Internet,JustCreate3D,Escena/render 3D,,Licencia del pack: uso en desarrollo de juegos/apps y contenido multimedia; revisar condiciones del pack
+W3D-I-JC3D-02-megapolis.png,Internet,JustCreate3D,Escena/render 3D,,Licencia del pack: uso en desarrollo de juegos/apps y contenido multimedia; revisar condiciones del pack
+W3D-I-JC3D-03-salad.png,Internet,JustCreate3D,Escena/render 3D,,Licencia del pack: uso en desarrollo de juegos/apps y contenido multimedia; revisar condiciones del pack
+W3D-I-JC3D-04-school.png,Internet,JustCreate3D,Escena/render 3D,,Licencia del pack: uso en desarrollo de juegos/apps y contenido multimedia; revisar condiciones del pack
+W3D-I-KYK-01-restaurant.png,Internet,KayKit,Escena/render 3D,,CC0
