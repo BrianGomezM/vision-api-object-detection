@@ -35,6 +35,13 @@ dataset/finetune/
 metrics/
 test_results/
 
+# Datos de participantes y retroalimentación (información personal — nunca versionar)
+study_data/
+feedback_data/
+
+# Copias comprimidas del proyecto (pueden incluir .env y datos personales)
+*.zip
+
 # Audio generado por TTS
 audio_output/
 

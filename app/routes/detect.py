@@ -56,6 +56,7 @@ from app.services.tts_service          import (
 )
 from app.services.detection_visualizer import save_annotated_image
 from app.utils.groq_client             import GROQ_MODEL, is_llm_active
+from app.utils.uploads                 import read_upload_limited
 
 router = APIRouter()
 
@@ -310,7 +311,7 @@ async def detect(
     metrics/production_metrics.jsonl para consumo desde GET /api/metrics/summary.
     """
     try:
-        image_bytes = await file.read()
+        image_bytes = await read_upload_limited(file)
         if not image_bytes:
             raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
 
@@ -471,7 +472,7 @@ async def debug_detect(
     No registra métricas de producción (endpoint de diagnóstico).
     """
     try:
-        image_bytes = await file.read()
+        image_bytes = await read_upload_limited(file)
         if not image_bytes:
             raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
 
