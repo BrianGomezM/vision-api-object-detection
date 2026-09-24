@@ -53,6 +53,7 @@ from app.services.llm_enhancer         import generate_description
 from app.services.tts_service          import (
     synthesize_speech, synthesize_and_save, is_tts_active,
     get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_VOICE,
+    TTS_SKIPPED_STATUS, is_tts_disabled_for_evaluation,
 )
 from app.services.detection_visualizer import save_annotated_image
 from app.utils.groq_client             import GROQ_MODEL, is_llm_active
@@ -172,6 +173,8 @@ def _tts_unavailable_reason() -> str:
     err = get_last_tts_error()
     if err is None:
         return "tts_desactivado"
+    if err.get("status") == TTS_SKIPPED_STATUS:
+        return "tts_omitido_evaluacion"
     if err.get("code") == 429 or err.get("status") == "RESOURCE_EXHAUSTED":
         return "cuota_excedida"
     return "error_sintesis"
@@ -402,6 +405,7 @@ async def detect(
                 )
             razon = audio_info["razon"]
             aviso = {
+                "tts_omitido_evaluacion": "TTS omitido intencionalmente (EVALUATION_DISABLE_TTS=true).",
                 "cuota_excedida":  "TTS no disponible: se alcanzó el límite de cuota de Gemini TTS. Intenta de nuevo en un momento.",
                 "tts_desactivado": "TTS no disponible. Verificar que GOOGLE_API_KEY esté configurada.",
                 "error_sintesis":  "TTS no disponible: la síntesis falló. Ver logs del servidor para más detalle.",
@@ -633,6 +637,7 @@ async def health_check():
             "modelo":       TTS_MODEL,
             "voz":          TTS_VOICE,
             "activo":       is_tts_active(),
+            "omitido_por_evaluacion": is_tts_disabled_for_evaluation(),
             "ultimo_error": get_last_tts_error(),
         },
         "evaluacion": {

@@ -143,6 +143,21 @@ TTS_STYLE_INSTRUCTIONS: str = os.getenv(
 # entre 100 y 300 caracteres.
 _MAX_CHARS: int = int(os.getenv("TTS_MAX_CHARS", "4500"))
 
+# ──────────────────────────────────────────────────────────────
+# BLOQUEO DE TTS PARA EVALUACIÓN
+# ──────────────────────────────────────────────────────────────
+# EVALUATION_DISABLE_TTS=true impide cualquier llamada al proveedor de
+# síntesis (p. ej. durante experimentos del LLM). La narrativa se sigue
+# generando y devolviendo; el audio se reporta como omitido intencionalmente.
+# Se lee en cada llamada (no al importar) para poder activarlo por proceso.
+# Por defecto (false) el comportamiento de producción no cambia.
+TTS_SKIPPED_STATUS: str = "TTS_OMITIDO_EVALUACION"
+
+
+def is_tts_disabled_for_evaluation() -> bool:
+    return os.getenv("EVALUATION_DISABLE_TTS", "false").strip().lower() == "true"
+
+
 # Parámetros fijos del audio devuelto por Gemini TTS (documentados por
 # Google; no configurables por la API).
 _SAMPLE_RATE_HZ: int = 24000
@@ -208,6 +223,9 @@ def _pcm_to_mp3(pcm_bytes: bytes) -> bytes:
 
 def _synthesize_gemini_tts(text: str, model: str = None) -> bytes:
     """Genera audio con Gemini TTS y lo retorna ya codificado en MP3."""
+    if is_tts_disabled_for_evaluation():
+        # Bloqueo duro: ninguna ruta de código puede llegar al proveedor.
+        raise RuntimeError(f"{TTS_SKIPPED_STATUS}: EVALUATION_DISABLE_TTS=true")
     client = _get_gemini_client()
     if client is None:
         raise RuntimeError("Cliente Gemini no disponible (sin API key o sin paquete instalado).")
@@ -256,6 +274,14 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         if audio:
             return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
     """
+    global _last_error
+
+    if is_tts_disabled_for_evaluation():
+        logger.warning("[TTS] Omitido intencionalmente: EVALUATION_DISABLE_TTS=true (no se llama al proveedor).")
+        _last_error = {"code": None, "status": TTS_SKIPPED_STATUS,
+                       "message": "TTS omitido intencionalmente por EVALUATION_DISABLE_TTS=true."}
+        return None
+
     if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
         logger.warning("[TTS] Dependencias de Gemini TTS no disponibles. Retornando None.")
         return None
@@ -275,7 +301,6 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
     # defecto en vez de dejarlo pasar sin más a la API de Gemini.
     effective_model = model if model in _ALLOWED_TTS_MODEL_IDS else None
 
-    global _last_error
     _last_error = None
 
     try:
