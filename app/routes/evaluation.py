@@ -58,18 +58,23 @@ router = APIRouter()
 # DIRECTORIOS DE ALMACENAMIENTO
 # ──────────────────────────────────────────────────────────────
 
-_BASE            = Path(".")
-DATASET_DIR      = _BASE / "dataset"
-METRICS_DIR      = _BASE / "metrics"
-TEST_DIR         = _BASE / "test_results"
+from app.storage import data_dir
+
+_BASE            = Path(".")                       # solo para test_images/ (entrada, no datos)
+DATASET_DIR      = data_dir("dataset")              # sin DATA_ROOT: ./dataset
+METRICS_DIR      = data_dir("metrics")              # sin DATA_ROOT: ./metrics
+TEST_DIR         = data_dir("api_tests")            # sin DATA_ROOT: ./test_results
 DATASET_IMAGES   = DATASET_DIR / "images"
 DATASET_LABELS   = DATASET_DIR / "labels"
 DATASET_METADATA = DATASET_DIR / "metadata"
 METRICS_LOG      = METRICS_DIR / "production_metrics.jsonl"
 TEST_RESULTS_LOG = TEST_DIR    / "test_history.jsonl"
 
-for _d in [DATASET_IMAGES, DATASET_LABELS, DATASET_METADATA, METRICS_DIR, TEST_DIR]:
-    _d.mkdir(parents=True, exist_ok=True)
+
+def _ensure_dir(*dirs: Path) -> None:
+    """Crea los directorios solo cuando se va a escribir (antes se creaban al importar el módulo)."""
+    for d in dirs:
+        d.mkdir(parents=True, exist_ok=True)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -97,6 +102,7 @@ def log_metric(data: dict) -> None:
     """
     entry = {"ts": datetime.now(timezone.utc).isoformat(), **data}
     with _metrics_lock:
+        _ensure_dir(METRICS_DIR)
         with open(METRICS_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
@@ -157,6 +163,7 @@ async def upload_to_dataset(
         }
 
     # Guardar imagen
+    _ensure_dir(DATASET_IMAGES, DATASET_LABELS, DATASET_METADATA)
     img_path = DATASET_IMAGES / f"{stem}.jpg"
     img.save(img_path, format="JPEG", quality=90)
 
@@ -682,6 +689,7 @@ async def run_functional_tests(
     }
 
     # Persistir en disco
+    _ensure_dir(TEST_DIR)
     with open(TEST_RESULTS_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(summary, ensure_ascii=False) + "\n")
 
@@ -791,6 +799,7 @@ async def run_load_test(
         "errores": errors[:10],
     }
 
+    _ensure_dir(TEST_DIR)
     with open(TEST_RESULTS_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(result, ensure_ascii=False) + "\n")
 

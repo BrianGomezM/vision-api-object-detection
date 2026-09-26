@@ -41,11 +41,11 @@ from typing import Optional
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
 # ──────────────────────────────────────────────────────────────
 
+from app.storage import data_dir
+
+# Prioridad: TRANSLATION_CACHE_PATH > DATA_ROOT/cache/ > ~/.cache/vision-api/ (histórico)
 _CACHE_FILE: Path = Path(
-    os.getenv(
-        "TRANSLATION_CACHE_PATH",
-        str(Path.home() / ".cache" / "vision-api" / "translation_cache.json"),
-    )
+    os.getenv("TRANSLATION_CACHE_PATH", str(data_dir("cache") / "translation_cache.json"))
 )
 
 # Timeout para la llamada a Google Translate (evita que cuelgue la API)

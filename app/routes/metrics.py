@@ -119,7 +119,9 @@ def get_metrics():
 # FEEDBACK — almacenamiento persistente
 # ──────────────────────────────────────────────────────────────
 
-_FEEDBACK_DIR  = Path(__file__).parent.parent.parent / "feedback_data"
+from app.storage import data_dir
+
+_FEEDBACK_DIR  = data_dir("feedback")          # sin DATA_ROOT: feedback_data/ del repositorio
 _FEEDBACK_FILE = _FEEDBACK_DIR / "feedback.json"
 _feedback_lock = threading.Lock()  # protege lectura/escritura concurrente del JSON
 

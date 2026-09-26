@@ -47,7 +47,9 @@ from app.security import require_api_key
 # de require_api_key (sin efecto en modo desarrollo, cuando API_KEYS está vacío).
 router = APIRouter(dependencies=[Depends(require_api_key)])
 
-_STUDY_DIR = Path(__file__).parent.parent.parent / "study_data" / "sessions"
+from app.storage import data_dir
+
+_STUDY_DIR = data_dir("study_sessions")       # sin DATA_ROOT: study_data/sessions/ del repositorio
 _lock = threading.Lock()
 
 # Formato de session_id generado por create_session: YYYYMMDD_HHMMSS_<slug>.

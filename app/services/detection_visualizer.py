@@ -23,7 +23,10 @@ from PIL import Image, ImageDraw
 
 logger = logging.getLogger(__name__)
 
-DETECTIONS_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "detections_output"
+from app.storage import data_dir, unique_stamp
+
+# Sin DATA_ROOT: detections_output/ del repositorio (comportamiento histórico).
+DETECTIONS_OUTPUT_DIR: Path = data_dir("annotated")
 _MAX_SAVED: int = int(os.getenv("DETECTION_MAX_SAVED", "10"))
 
 # Color por categoría de objeto
@@ -98,12 +101,11 @@ def save_annotated_image(image_bytes: bytes, analyzed_objects: List[Dict]) -> Op
             draw.text((tx + 2, ty + 1), label, fill="#000000")
 
         # Guardar con timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename  = f"detection_{timestamp}.jpg"
+        filename  = f"detection_{unique_stamp()}.jpg"
         out_path  = DETECTIONS_OUTPUT_DIR / filename
         img.save(out_path, format="JPEG", quality=85)
 
-        relative = f"detections_output/{filename}"
+        relative = f"{DETECTIONS_OUTPUT_DIR.name}/{filename}"
         logger.info("[Visualizer] Imagen guardada: %s (%dx%d)", relative, iw, ih)
 
         # Rotación: eliminar las más antiguas si se supera el límite

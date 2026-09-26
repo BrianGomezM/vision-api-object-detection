@@ -342,7 +342,10 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
 # DIRECTORIO DE SALIDA DE AUDIO
 # ──────────────────────────────────────────────────────────────
 
-AUDIO_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "audio_output"
+from app.storage import data_dir, unique_stamp
+
+# Audio generado EN VIVO (no congelado). Sin DATA_ROOT: audio_output/ del repositorio.
+AUDIO_OUTPUT_DIR: Path = data_dir("audio_live")
 
 _MAX_AUDIO_FILES: int = int(os.getenv("TTS_MAX_SAVED_FILES", "5"))
 
@@ -368,13 +371,12 @@ def synthesize_and_save(text: str, filename: str = None, model: str = None) -> O
     AUDIO_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     if filename is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"narrativa_{timestamp}.mp3"
+        filename = f"narrativa_{unique_stamp()}.mp3"
 
     file_path = AUDIO_OUTPUT_DIR / filename
     file_path.write_bytes(audio_bytes)
 
-    relative_path = f"audio_output/{filename}"
+    relative_path = f"{AUDIO_OUTPUT_DIR.name}/{filename}"
     logger.info(
         "[TTS] Audio guardado: %s (%d bytes)",
         relative_path, len(audio_bytes),
