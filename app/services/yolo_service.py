@@ -36,6 +36,7 @@ Referencias:
 
 import os
 import io
+import hashlib
 import numpy as np
 from PIL import Image
 from ultralytics import YOLO
@@ -153,6 +154,56 @@ _NAV_CLASSES: set[str] = set(_CLASS_MIN_CONF.keys()) | {
 _model: YOLO | None = None
 
 
+def _sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def check_weights(weights: str | None = None) -> dict:
+    """
+    Política de pesos (reproducibilidad):
+
+      YOLO_WEIGHTS_SHA256  → si se define, el archivo local DEBE tener ese hash.
+      YOLO_ALLOW_DOWNLOAD  → si los pesos no existen localmente, ¿se permite que
+                             Ultralytics los descargue? Por defecto "true" en el
+                             perfil development (comportamiento histórico) y
+                             "false" en el perfil study (no se descarga "la última
+                             versión disponible" durante una sesión experimental).
+
+    Lanza RuntimeError si la política no se cumple. Retorna un resumen no sensible.
+    """
+    from app.security import app_profile
+
+    weights = weights or YOLO_WEIGHTS
+    default_allow = "false" if app_profile() == "study" else "true"
+    allow_download = os.getenv("YOLO_ALLOW_DOWNLOAD", default_allow).strip().lower() == "true"
+    expected = os.getenv("YOLO_WEIGHTS_SHA256", "").strip().lower()
+
+    if not os.path.exists(weights):
+        if not allow_download:
+            raise RuntimeError(
+                f"[YOLO] '{weights}' no existe localmente y YOLO_ALLOW_DOWNLOAD=false: "
+                "coloque el archivo de pesos verificado antes de arrancar."
+            )
+        if expected:
+            raise RuntimeError(
+                f"[YOLO] '{weights}' no existe localmente y YOLO_WEIGHTS_SHA256 está "
+                "definido: no se descargan pesos sin verificar."
+            )
+        return {"weights": weights, "local": False, "sha256": None, "verificado": False}
+
+    actual = _sha256(weights)
+    if expected and actual != expected:
+        raise RuntimeError(
+            f"[YOLO] Hash de '{weights}' no coincide con YOLO_WEIGHTS_SHA256 "
+            f"(esperado {expected[:12]}…, obtenido {actual[:12]}…)."
+        )
+    return {"weights": weights, "local": True, "sha256": actual, "verificado": bool(expected)}
+
+
 def _get_model() -> YOLO:
     """
     Carga YOLO26 una sola vez (patrón singleton).
@@ -165,6 +216,7 @@ def _get_model() -> YOLO:
     if _model is not None:
         return _model
 
+    check_weights()
     if not os.path.exists(YOLO_WEIGHTS):
         print(
             f"[YOLO] '{YOLO_WEIGHTS}' no encontrado localmente. "

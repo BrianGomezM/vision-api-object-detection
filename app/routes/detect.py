@@ -39,7 +39,7 @@ import base64
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from PIL import Image
 
@@ -59,7 +59,12 @@ from app.services.detection_visualizer import save_annotated_image
 from app.utils.groq_client             import GROQ_MODEL, is_llm_active
 from app.utils.uploads                 import read_upload_limited
 
+from app.security import require_api_key
+
 router = APIRouter()
+# /debug-detect expone el pipeline interno (prompt del LLM, etapas): es un endpoint
+# INTERNO de desarrollo y se monta solo en el perfil "development" (ver app/main.py).
+debug_router = APIRouter()
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
@@ -300,6 +305,7 @@ async def detect(
             "Un id no reconocido cae al TTS_MODEL configurado en .env."
         ),
     ),
+    _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
@@ -465,10 +471,11 @@ async def detect(
 # POST /debug-detect
 # ──────────────────────────────────────────────────────────────
 
-@router.post("/debug-detect", tags=["Diagnóstico"])
+@debug_router.post("/debug-detect", tags=["Diagnóstico"])
 async def debug_detect(
     file: UploadFile = File(...),
     confidence_threshold: float = Form(_DEFAULT_CONF, ge=0.0, le=1.0),
+    _key: str = Depends(require_api_key),
 ):
     """
     Ejecuta el pipeline completo y expone cada etapa con detalle.
@@ -609,18 +616,23 @@ async def health_check():
     Incluye estado del LLM, TTS y los nuevos módulos de evaluación.
     """
     # Contar imágenes en dataset si existe
-    from pathlib import Path as _Path
-    dataset_path = _Path("dataset/metadata")
+    from app.storage import data_dir
+    dataset_path = data_dir("dataset") / "metadata"
     dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
 
-    metrics_path = _Path("metrics/production_metrics.jsonl")
+    metrics_path = data_dir("metrics") / "production_metrics.jsonl"
     metrics_count = 0
     if metrics_path.exists():
         metrics_count = sum(1 for l in metrics_path.read_text().strip().split("\n") if l.strip())
 
+    from app.security import app_profile
+    from app.storage import describe as storage_describe
+
     return {
         "status":  "healthy",
         "version": "3.2.0",
+        "perfil":  app_profile(),
+        "almacenamiento": storage_describe(),
         "modelo": {
             "nombre":  "YOLO26s",
             "weights": YOLO_WEIGHTS,
