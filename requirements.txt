@@ -39,5 +39,8 @@ deep-translator==1.11.4
 google-genai
 lameenc
 
+# ── Catálogo de pruebas y manifiestos de estímulos (app/catalog) ──
+PyYAML
+
 # ── Cliente HTTP (usado por /api/test/* para pruebas de carga) ─
 httpx

@@ -1,0 +1,246 @@
+# Catálogo ÚNICO de pruebas — fuente de verdad para backend y cliente (F3).
+#
+# Qué contiene:
+#   - metricas:        identificadores de las métricas planificadas. Su DEFINICIÓN
+#                      operativa (criterio, umbral, agregación) está POR DEFINIR en
+#                      el CHECKPOINT 3B; aquí solo se referencian.
+#   - datasets:        conjuntos de estímulos. Las imágenes y hashes de cada dataset
+#                      se leen de su manifest (p. ej. stimuli/dataset1/manifest.yaml).
+#   - pruebas_tecnicas: plantillas por bloque (A–D) del Dataset 1. Cada estímulo del
+#                      bloque genera una prueba "<plantilla>-<scene_id>" (p. ej. TEC-A-A1).
+#   - pruebas_usuario: tareas del estudio con usuarios (antes en el cliente,
+#                      lib/study-tests.ts), con el guion del investigador.
+#
+# Qué NO contiene: ground truth ni condiciones de diseño de los estímulos. Esas viven
+# solo en el manifest del dataset y el servidor NO las envía al cliente.
+#
+# disponibilidad.investigador / disponibilidad.participante: si la prueba (y su
+# texto informativo del ícono (!)) puede mostrarse en la vista del investigador o en
+# la del participante. El ícono (!) es solo de la vista del investigador.
+
+schema_version: 1
+
+metricas:
+  - {id: M-DET,    nombre: "Detección por objeto (TP/FP/FN)",               estado: POR_DEFINIR_CP3B}
+  - {id: M-LOC,    nombre: "Localización (IoU caja predicha vs. GT)",        estado: POR_DEFINIR_CP3B}
+  - {id: M-HOR,    nombre: "Posición horizontal (izquierda/centro/derecha)", estado: POR_DEFINIR_CP3B}
+  - {id: M-PROF,   nombre: "Profundidad (cerca/medio/lejos)",                estado: POR_DEFINIR_CP3B}
+  - {id: M-REL,    nombre: "Relaciones espaciales entre objetos",            estado: POR_DEFINIR_CP3B}
+  - {id: M-NAR,    nombre: "Fidelidad de la narrativa respecto a la detección", estado: POR_DEFINIR_CP3B}
+  - {id: M-USR-ID, nombre: "Identificación de objetos por el participante",  estado: POR_DEFINIR_CP3B}
+  - {id: M-USR-ESP, nombre: "Relación espacial reportada por el participante", estado: POR_DEFINIR_CP3B}
+  - {id: M-USR-RUTA, nombre: "Elección de ruta por el participante",         estado: POR_DEFINIR_CP3B}
+  - {id: M-USR-SUBJ, nombre: "Valoraciones subjetivas (escala 1–5)",         estado: POR_DEFINIR_CP3B}
+  - {id: M-PIL,    nombre: "Validación del instrumento (piloto)",            estado: POR_DEFINIR_CP3B}
+
+datasets:
+  - id: dataset1
+    nombre: "Dataset 1 — escenas geométricas controladas A1–D3"
+    manifest: stimuli/dataset1/manifest.yaml
+    estado: FROZEN_V1
+    descripcion: >-
+      18 escenas sintéticas con cámara, posiciones horizontales y profundidades
+      controladas. Condición geométrica conocida por diseño (generador, commit ae85f90).
+  - id: dataset2
+    nombre: "Dataset 2 — variabilidad visual (robustez)"
+    manifest: null
+    estado: PENDIENTE_SELECCION_Y_LICENCIA
+    descripcion: >-
+      Conjunto de robustez / variabilidad visual. Sin imágenes integradas: la selección
+      y la verificación de licencias están pendientes. No tiene ground truth 3D.
+
+pruebas_tecnicas:
+  - id: TEC-A
+    bloque: A
+    dataset: dataset1
+    nombre: "Bloque A — un objeto: posición horizontal × profundidad"
+    objetivo: >-
+      Verificar si el sistema detecta un único objeto (silla) y reporta su posición
+      horizontal y su profundidad en las 9 combinaciones controladas (3 × 3).
+    descripcion: >-
+      Una silla en izquierda, centro o derecha, a distancia cerca, media o lejos.
+      Aísla el efecto de la posición y la distancia sin otros objetos en la escena.
+    metricas: [M-DET, M-LOC, M-HOR, M-PROF, M-NAR]
+    tipo_evaluacion: tecnica_automatica
+    disponibilidad: {investigador: true, participante: false}
+  - id: TEC-B
+    bloque: B
+    dataset: dataset1
+    nombre: "Bloque B — dos objetos lado a lado"
+    objetivo: >-
+      Verificar la detección de dos objetos a la misma profundidad y si el sistema
+      distingue su posición horizontal relativa.
+    descripcion: >-
+      Pares de objetos (silla–mesa, sofá–planta, persona–botella) separados
+      horizontalmente, a distancia media y sin oclusión.
+    metricas: [M-DET, M-LOC, M-HOR, M-REL, M-NAR]
+    tipo_evaluacion: tecnica_automatica
+    disponibilidad: {investigador: true, participante: false}
+  - id: TEC-C
+    bloque: C
+    dataset: dataset1
+    nombre: "Bloque C — relaciones delante de / al lado de"
+    objetivo: >-
+      Verificar la detección y la descripción de relaciones espaciales cuando un
+      objeto está delante de otro (con oclusión parcial) o junto a él.
+    descripcion: >-
+      Silla delante de mesa, sofá al lado de planta y persona delante de mesa, a
+      distancia media. La oclusión está cuantificada por diseño.
+    metricas: [M-DET, M-LOC, M-HOR, M-REL, M-NAR]
+    tipo_evaluacion: tecnica_automatica
+    disponibilidad: {investigador: true, participante: false}
+  - id: TEC-D
+    bloque: D
+    dataset: dataset1
+    nombre: "Bloque D — escenas con varios objetos"
+    objetivo: >-
+      Verificar la detección y la descripción de escenas con tres o cuatro objetos,
+      incluidos objetos apoyados sobre otros.
+    descripcion: >-
+      Tres o cuatro objetos a distancia media (p. ej. silla, mesa y planta; portátil y
+      botella sobre la mesa). Evalúa completitud y orden de la narrativa.
+    metricas: [M-DET, M-LOC, M-HOR, M-REL, M-NAR]
+    tipo_evaluacion: tecnica_automatica
+    disponibilidad: {investigador: true, participante: false}
+
+# Tareas del estudio con usuarios. Migradas sin cambios de contenido desde
+# visionnav-client/lib/study-tests.ts. "metricas_texto" conserva los textos originales;
+# "metricas" las vincula con los identificadores de arriba.
+# estimulos: qué estímulo congelado usa cada tarea → POR DEFINIR (CP3B / F4).
+pruebas_usuario:
+  - id: OBJ-01
+    pista: objetivo
+    nombre: "Identificación de objetos"
+    objetivo: "Medir qué porcentaje de los objetos relevantes de la escena el participante logra identificar a partir del audio."
+    guion_investigador: 'Reproduce el audio generado para la imagen seleccionada. Cuando termine, pregunta: "¿Qué objetos identificaste en la descripción?". Anota la respuesta tal cual la diga, sin corregirlo ni darle pistas.'
+    tipo: imagen
+    metricas: [M-USR-ID]
+    metricas_texto: ["% identificación correcta", "% omisión", "% objetos inventados"]
+    tipo_evaluacion: usuario_objetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-02
+    pista: objetivo
+    nombre: "Relación espacial simple"
+    objetivo: "Medir si el participante ubica correctamente un objeto respecto a sí mismo (izquierda/derecha/frente/detrás) a partir del audio."
+    guion_investigador: 'Tras reproducir el audio, pregunta: "¿Dónde se encuentra [objeto] respecto a usted?". No repitas el audio salvo que el participante lo pida explícitamente; si lo repite, anótalo.'
+    tipo: imagen
+    metricas: [M-USR-ESP]
+    metricas_texto: ["% relaciones espaciales correctas", "repeticiones de audio"]
+    tipo_evaluacion: usuario_objetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-03
+    pista: objetivo
+    nombre: "Elección de ruta libre"
+    objetivo: "Evaluar si, a partir de la narrativa, el participante identifica correctamente la dirección despejada para avanzar en una escena con obstáculos al centro y a un lado."
+    guion_investigador: 'Reproduce el audio de una escena diseñada con objetos al centro y a un lado, y el paso libre hacia el lado contrario. Pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría?". Registra la dirección que indique (izquierda/derecha/frente) y compárala con la dirección real que reportó el sistema.'
+    tipo: ruta
+    metricas: [M-USR-RUTA]
+    metricas_texto: ["precisión de elección de ruta", "tiempo de respuesta", "comprensión de la instrucción de movimiento"]
+    tipo_evaluacion: usuario_objetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-04
+    pista: objetivo
+    nombre: "Actualización de contexto (secuencia)"
+    objetivo: "Evaluar si el participante nota un cambio en la disposición de los objetos entre dos imágenes de la misma escena y ajusta su respuesta."
+    guion_investigador: 'Reproduce el audio de la segunda imagen de una secuencia (misma escena, objetos reubicados) inmediatamente después de OBJ-03. Pregunta: "¿Cambió algo respecto a lo anterior? ¿Hacia dónde avanzaría ahora?". No indiques que hubo un cambio si no lo menciona primero.'
+    tipo: ruta
+    metricas: [M-USR-RUTA]
+    metricas_texto: ["sensibilidad a la actualización de contexto", "consistencia narrativa"]
+    tipo_evaluacion: usuario_objetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-05
+    pista: objetivo
+    nombre: "Calidad de la voz (independiente del contenido)"
+    objetivo: "Medir la calidad percibida del audio en sí (Gemini TTS, voz Sulafat), separada de la comprensión del contenido."
+    guion_investigador: 'Reproduce un audio de referencia neutro (no una narrativa de navegación). Pregunta, para cada criterio: "¿Qué tan clara/rápida/natural/cómoda en volumen te pareció la voz?" en escala de 1 a 5.'
+    tipo: escala
+    criterios: [claridad, velocidad, naturalidad, volumen]
+    metricas: [M-USR-SUBJ]
+    metricas_texto: ["inteligibilidad", "velocidad percibida", "naturalidad", "volumen"]
+    tipo_evaluacion: usuario_subjetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-06
+    pista: objetivo
+    nombre: "Suficiencia de la información"
+    objetivo: "Determinar si el participante percibe la cantidad de información narrada como adecuada, insuficiente o excesiva."
+    guion_investigador: 'Pregunta: "¿Sentiste que la descripción te dio la información que necesitabas? ¿Faltó algo? ¿Sobró algo?". Registra la respuesta abierta y, si es posible, una calificación de suficiencia de 1 a 5.'
+    tipo: escala
+    criterios: [suficiencia, redundancia]
+    metricas: [M-USR-SUBJ]
+    metricas_texto: ["suficiencia de información", "redundancia percibida"]
+    tipo_evaluacion: usuario_subjetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: OBJ-07
+    pista: objetivo
+    nombre: "Utilidad percibida (cierre)"
+    objetivo: "Cerrar la sesión con una valoración global de utilidad y comentarios espontáneos."
+    guion_investigador: 'Pregunta: "En general, ¿qué tan útil te parece este sistema para orientarte en un espacio que no conoces?" (escala 1-5) y deja espacio para comentarios libres.'
+    tipo: escala
+    criterios: [utilidad_general]
+    metricas: [M-USR-SUBJ]
+    metricas_texto: ["utilidad percibida", "satisfacción"]
+    tipo_evaluacion: usuario_subjetiva
+    estimulos: POR_DEFINIR
+    disponibilidad: {investigador: true, participante: false}
+  - id: PIL-01
+    pista: piloto
+    nombre: "Comprensión de las instrucciones"
+    objetivo: "Verificar que las instrucciones del estudio se entienden sin ambigüedad antes de iniciar con la población objetivo."
+    guion_investigador: 'Antes de comenzar las pruebas, pregunta: "¿Quedó claro lo que se te va a pedir en esta sesión?".'
+    tipo: escala
+    criterios: [claridad_instrucciones]
+    metricas: [M-PIL]
+    metricas_texto: ["validación de instrucciones (no es evidencia de accesibilidad)"]
+    tipo_evaluacion: piloto_instrumento
+    estimulos: null
+    disponibilidad: {investigador: true, participante: false}
+  - id: PIL-02
+    pista: piloto
+    nombre: "Duración percibida de la sesión"
+    objetivo: "Estimar si la duración total de la sesión es razonable antes de aplicarla a la población objetivo."
+    guion_investigador: 'Al finalizar, pregunta: "¿Te pareció larga, corta o adecuada la duración de la sesión?".'
+    tipo: texto
+    metricas: [M-PIL]
+    metricas_texto: ["validación de duración"]
+    tipo_evaluacion: piloto_instrumento
+    estimulos: null
+    disponibilidad: {investigador: true, participante: false}
+  - id: PIL-03
+    pista: piloto
+    nombre: "Funcionamiento técnico"
+    objetivo: "Detectar fallas técnicas (audio que no carga, demoras excesivas, errores visibles) antes de la sesión real."
+    guion_investigador: "Registra cualquier falla técnica observada durante la sesión, aunque el participante no la mencione explícitamente."
+    tipo: texto
+    metricas: [M-PIL]
+    metricas_texto: ["validación técnica del instrumento"]
+    tipo_evaluacion: piloto_instrumento
+    estimulos: null
+    disponibilidad: {investigador: true, participante: false}
+  - id: PIL-04
+    pista: piloto
+    nombre: "Claridad del formulario y el consentimiento"
+    objetivo: "Confirmar que el formulario de registro y el texto de consentimiento se entienden sin apoyo adicional."
+    guion_investigador: 'Pregunta: "¿Hubo alguna parte del formulario o del consentimiento que no te quedara clara?".'
+    tipo: texto
+    metricas: [M-PIL]
+    metricas_texto: ["validación de instrumentos de consentimiento"]
+    tipo_evaluacion: piloto_instrumento
+    estimulos: null
+    disponibilidad: {investigador: true, participante: false}
+  - id: PIL-05
+    pista: piloto
+    nombre: "Comentario general"
+    objetivo: "Recoger observaciones libres sobre la logística de la sesión."
+    guion_investigador: 'Pregunta abierta de cierre: "¿Algo que deberíamos ajustar antes de hacer esto con los usuarios reales?".'
+    tipo: texto
+    metricas: [M-PIL]
+    metricas_texto: ["mejora del instrumento"]
+    tipo_evaluacion: piloto_instrumento
+    estimulos: null
+    disponibilidad: {investigador: true, participante: false}
