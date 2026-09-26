@@ -20,3 +20,7 @@ matplotlib
 psutil
 openpyxl
 requests
+
+# ── Pruebas automáticas (tests/) ──────────────────────────────
+pytest
+pytest-cov
