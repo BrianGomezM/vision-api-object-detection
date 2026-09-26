@@ -39,6 +39,7 @@ from fastapi.staticfiles import StaticFiles
 from app.routes.detect     import router as detect_router
 from app.routes.evaluation import router as eval_router
 from app.routes.metrics    import router as metrics_router
+from app.routes.study      import router as study_router
 
 app = FastAPI(
     title="API de Detección de Objetos para Accesibilidad",
@@ -170,3 +171,4 @@ app.mount(
 app.include_router(detect_router,  prefix="/api")
 app.include_router(eval_router,    prefix="/api")
 app.include_router(metrics_router, prefix="/api")  # GET /api/metrics, POST /api/feedback, GET /api/feedback
+app.include_router(study_router,   prefix="/api")  # POST/GET /api/study/sessions — evaluación con usuarios
