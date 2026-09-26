@@ -1,0 +1,207 @@
+{
+  "hallazgo_previo_critico": {
+    "titulo": "El LLM (Groq) no esta funcionando en este entorno durante toda esta prueba",
+    "evidencia": "Cada llamada real a classify_scene() y a generate_description() devolvio: \"Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}\". Confirmado en 20/20 llamadas de clasificacion de escenario y en la llamada de prueba a generate_description().",
+    "implicacion": "Con GROQ_MODEL=llama-3.3-70b-versatile (valor por defecto de app/utils/groq_client.py, no sobrescrito en .env), TANTO la clasificacion de escenario COMO la generacion de narrativa estan cayendo al 100% en sus rutas de fallback manual (heuristica de keywords y _build_manual respectivamente), no al LLM. is_llm_active() devuelve True porque solo verifica que el cliente se pueda construir (API key presente), no que el modelo configurado exista realmente en la API de Groq.",
+    "alcance": "Esto afecta el comportamiento REAL actual de produccion, no solo esta prueba. Si el pipeline de deteccion en vivo usa el mismo GROQ_MODEL, toda narrativa y clasificacion de escenario generada en produccion HOY esta usando las plantillas de respaldo, no el LLM.",
+    "clasificacion_del_hallazgo": "Nuevo (continuando numeracion Hxx de fases previas): H40.",
+    "recomendacion": "Verificar y actualizar GROQ_MODEL a un modelo actualmente disponible en la cuenta de Groq del proyecto antes de cualquier evaluacion formal del Capitulo 5 que dependa de narrativa generada por LLM. No se modifica aqui (fuera del alcance autorizado de esta fase)."
+  },
+
+  "algoritmo_heuristico_documentado": {
+    "ubicacion": "app/services/scene_classifier.py, funcion _classify_heuristic(), diccionario _CONTEXT_GROUPS",
+    "mecanismo": "Para cada uno de los 10 contextos predefinidos (sala de estar, dormitorio, cocina, comedor, oficina, sala de cine, bano, entrada o pasillo, exterior, tienda), se cuenta cuantas de sus keywords aparecen como substring en los nombres de objetos detectados (label_es). Se elige el contexto con mayor conteo via max(scores, key=scores.get).",
+    "umbral_de_confianza": "alta si score>=3, media si score>=2, baja en otro caso (si algun contexto obtuvo score>0).",
+    "manejo_de_empates_CONFIRMADO_POR_CODIGO": "Python's max() sobre un diccionario devuelve la PRIMERA clave que alcanza el valor maximo, en el orden de insercion del diccionario. _CONTEXT_GROUPS esta definido en este orden: sala de estar, dormitorio, cocina, comedor, oficina, sala de cine, bano, entrada o pasillo, exterior, tienda. Por lo tanto, en un empate, 'sala de estar' y 'oficina' tienen ventaja estructural sobre 'sala de cine' y 'tienda' simplemente por aparecer antes en el diccionario, SIN que exista ninguna logica deliberada de priorizacion. No es un mecanismo de desempate disenado; es un efecto colateral no documentado del uso de max() sobre un dict.",
+    "sin_categoria_unknown": "No existe ningun valor de retorno 'unknown' o 'ambiguous'. Si ningun contexto obtiene score>0, se retorna 'espacio interior' con confidence='baja'. Este mismo valor 'espacio interior' se devuelve tanto cuando NO HAY evidencia como en cualquier otro caso sin score - no se distingue una escena verdaderamente vacia de una escena con objetos que simplemente no coinciden con ningun keyword."
+  },
+
+  "reproduccion_del_problema_biblioteca": {
+    "objetos_detectados_coco": ["botella","jarron","libro","mesa de comedor","mochila","persona","planta en maceta","portatil","silla","sofa"],
+    "calculo_exacto_coco": {
+      "sala de estar": "sofa(1) + planta en maceta(1) + jarron(1) = 3",
+      "comedor": "mesa de comedor(1) + silla(1) = 2",
+      "oficina": "silla(1) + portatil(1) + libro(1) = 3",
+      "sala de cine": "silla(1) + sofa(1) = 2",
+      "entrada o pasillo": "planta en maceta(1) + jarron(1) = 2",
+      "tienda": "persona(1) + botella(1) + libro(1) + mochila(1) = 4  <-- MAXIMO"
+    },
+    "resultado_real_obtenido": "tienda (confidence=alta)",
+    "causa_exacta": "El grupo de keywords de 'tienda' (persona, botella, libro, mochila, maleta) coincidio accidentalmente con 4 de los 10 objetos de una biblioteca real, superando a 'sala de estar' y 'oficina' (3 cada uno). Esos 4 objetos (persona, botella, libro, mochila) son extremadamente genericos y aparecen en muchisimos tipos de escena real, no son discriminativos de 'tienda' especificamente.",
+    "objetos_detectados_objects365": ["bolso","botella","cabinet/shelf","carpet","coffee table","escritorio","head phone","lamp","libro","mesa de comedor","mochila","persona","planta en maceta","portatil","silla","sofa","televisor","trolley"],
+    "resultado_objects365": "oficina (confidence=alta)",
+    "causa_exacta_objects365": "'tienda' y 'oficina' EMPATAN en score=4 (tienda: persona+botella+libro+mochila; oficina: silla+escritorio+portatil+libro). El empate se resuelve por orden de insercion del diccionario: 'oficina' aparece antes que 'tienda' en _CONTEXT_GROUPS, por lo que gana 'oficina', no por ninguna evidencia mas fuerte de oficina.",
+    "respuesta_a_ABCDEFGHIJ_del_mensaje": {
+      "A_objetos_detectados": "10 clases distintas (COCO) o 18 (Objects365), ver arriba - el detector funciono razonablemente bien, identifico personas, laptops, libros, mesas, sillas correctamente.",
+      "B_objetos_usados_por_clasificador": "Los mismos, via label_es de analyze_spatial().",
+      "C_regla_que_provoco_la_clasificacion": "max() sobre conteo de keywords, con 'tienda' u 'oficina' ganando por coincidencia numerica accidental o por orden de insercion en empate (ver arriba, con aritmetica exacta).",
+      "D_depende_de_chair": "No exclusivamente. 'silla' contribuyo a 'oficina' y 'comedor' y 'sala de cine' en este caso, pero el factor decisivo real fue la combinacion de 'persona+botella+libro+mochila' (grupo 'tienda') y el orden de insercion del diccionario en el caso Objects365. 'chair' tiene peso estructural (aparece en 3 de los 10 grupos), pero no fue la causa unica de este error especifico.",
+      "E_otros_objetos_disponibles": "Ninguno de los dos vocabularios distingue 'sala de lectura' ni tiene clase para escaleras (visibles en la imagen) ni estanteria como concepto propio de biblioteca en COCO.",
+      "F_problema_del_detector": "No. El detector identifico objetos reales presentes correctamente (libro, persona, laptop, mesa, silla, etc.).",
+      "G_problema_del_scene_classifier": "Si, es la causa principal: (1) no existe categoria 'biblioteca'; (2) el algoritmo de conteo de keywords no pondera la especificidad de cada keyword (persona/libro/botella son demasiado genericos para discriminar 'tienda'); (3) el desempate por orden de insercion no es una decision de diseno documentada.",
+      "H_problema_de_postprocesamiento": "No aplica en este caso - el filtrado de detecciones no fue la causa.",
+      "I_falta_de_categorias": "Si, es un factor central - no existe 'biblioteca' como categoria posible en absoluto.",
+      "J_combinacion_de_factores": "Si. Es una combinacion de (I) categorias faltantes + (G) algoritmo de conteo simple sin ponderacion por especificidad + desempate arbitrario, no un unico factor aislado."
+    }
+  },
+
+  "tabla_de_analisis_por_imagen": [
+    {
+      "imagen": "W3D-I-SKF-09-office.png",
+      "escenario_real": "oficina",
+      "prediccion_coco": "oficina (alta)",
+      "prediccion_objects365": "oficina (alta)",
+      "correcto_coco": true,
+      "correcto_objects365": true,
+      "clasificacion_conocido_desconocido": "known"
+    },
+    {
+      "imagen": "W3D-G-04-Biblioteca.png",
+      "escenario_real": "biblioteca",
+      "prediccion_coco": "tienda (alta)",
+      "prediccion_objects365": "oficina (alta)",
+      "correcto_coco": false,
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "unknown (no existe categoria 'biblioteca')",
+      "generalizable": "El error SI es generalizable a cualquier biblioteca con objetos similares - no depende de una peculiaridad de esta imagen especifica."
+    },
+    {
+      "imagen": "W3D-I-SKF-07-living-room.png",
+      "escenario_real": "sala de estar",
+      "prediccion_coco": "sala de estar (alta)",
+      "prediccion_objects365": "sala de estar (alta)",
+      "correcto_coco": true,
+      "correcto_objects365": true,
+      "clasificacion_conocido_desconocido": "known"
+    },
+    {
+      "imagen": "W3D-I-PHV-03-studio2.png",
+      "escenario_real": "ambiguo (estudio/rincon de lectura)",
+      "prediccion_coco": "sala de estar (media)",
+      "prediccion_objects365": "oficina (alta)",
+      "correcto_coco": false,
+      "correcto_objects365": "parcialmente defendible (hay un escritorio real)",
+      "clasificacion_conocido_desconocido": "ambiguous"
+    },
+    {
+      "imagen": "W3D-G-06-Universidad.png",
+      "escenario_real": "exterior / campus universitario",
+      "prediccion_coco": "tienda (alta)",
+      "prediccion_objects365": "tienda (alta)",
+      "correcto_coco": false,
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "unknown (no existe categoria 'campus exterior')",
+      "generalizable": "Si - cualquier escena de campus universitario con personas+mochilas+libros probablemente active el mismo grupo 'tienda'."
+    },
+    {
+      "imagen": "W3D-I-PHV-01-bathroom.png",
+      "escenario_real": "baño",
+      "prediccion_coco": "sala de estar (media)",
+      "prediccion_objects365": "sala de estar (media)",
+      "correcto_coco": false,
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "known category exists ('bano') pero no fue detectada",
+      "causa": "El detector no produjo 'toilet' en esta imagen especifica (bañera+lavabo sin inodoro visible en el encuadre); sin esa keyword, 'bano' obtiene score=1 (solo 'lavabo'), superado por 'sala de estar' con jarron+planta en maceta=2."
+    },
+    {
+      "imagen": "W3D-I-KYK-01-restaurant.png",
+      "escenario_real": "no aplica (imagen promocional de asset pack)",
+      "prediccion_coco": "comedor (media)",
+      "prediccion_objects365": "espacio interior (baja)",
+      "correcto_coco": "no evaluable",
+      "correcto_objects365": "no evaluable",
+      "clasificacion_conocido_desconocido": "excluido del calculo de aciertos - hallazgo de curaduria del dataset, no del clasificador"
+    },
+    {
+      "imagen": "W3D-I-SKF-14-waiting-room.png",
+      "escenario_real": "sala de espera",
+      "prediccion_coco": "sala de estar (baja)",
+      "prediccion_objects365": "oficina (media)",
+      "correcto_coco": "parcialmente aceptable (confidence baja suprime el scene_intro en la narrativa real, ver detect.py:176-180)",
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "unknown (no existe categoria 'sala de espera')"
+    },
+    {
+      "imagen": "W3D-I-SKF-08-low-poly-city.png",
+      "escenario_real": "exterior / calle",
+      "prediccion_coco": "exterior (media)",
+      "prediccion_objects365": "espacio interior (baja)",
+      "correcto_coco": true,
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "known"
+    },
+    {
+      "imagen": "W3D-I-PHV-04-sofa.png",
+      "escenario_real": "sala de estar",
+      "prediccion_coco": "oficina (media)",
+      "prediccion_objects365": "oficina (alta)",
+      "correcto_coco": false,
+      "correcto_objects365": false,
+      "clasificacion_conocido_desconocido": "known (categoria existe, pero fallo)",
+      "generalizable": "Si - una sala de estar real fue clasificada como oficina en ambos modelos, confirmando que el error no depende de 'chair' aislado sino de la combinacion silla+libro superando a sofa+ausencia de television en el conteo."
+    }
+  ],
+
+  "resumen_cuantitativo": {
+    "imagenes_evaluables": 9,
+    "correctas_coco": 3,
+    "correctas_objects365": 2,
+    "tasa_acierto_coco": "3/9 = 33%",
+    "tasa_acierto_objects365": "2/9 = 22%",
+    "nota": "Muestra deliberadamente pequena y no aleatoria (elegida para cubrir casos conocidos, hibridos y sin categoria) - esta tasa NO debe generalizarse como 'precision del sistema' sin una muestra mas grande y aleatorizada. Sirve unicamente para diagnosticar el mecanismo, no para reportarse como metrica de tesis todavia."
+  },
+
+  "escenarios_dinamicos_abiertos": {
+    "pregunta_metodologica": "¿El sistema fuerza una categoria aunque la evidencia sea insuficiente?",
+    "respuesta": "SI, siempre. classify_scene() SIEMPRE retorna uno de los 10 valores de _CONTEXT_GROUPS o 'espacio interior' - nunca 'unknown' ni 'ambiguous' como valor de scene_type. La UNICA mitigacion existente es que cuando confidence='baja', el texto scene_intro se omite de la narrativa final (detect.py:176-180) - pero el campo escenario.tipo de la respuesta JSON completa SIEMPRE contiene una categoria forzada, nunca None ni 'unknown'.",
+    "conjunto_cerrado_confirmado": "Si. Es un conjunto cerrado de 10 categorias (mas 'espacio interior' como comodin). No hay ningun mecanismo para escenarios hibridos (ej. 'office + classroom') ni para escenarios completamente nuevos fuera de esas 10."
+  },
+
+  "evaluacion_unknown_ambiguous": {
+    "conveniencia_metodologica": "Los datos de esta fase respaldan que SI seria conveniente, con evidencia concreta: 3 de 9 imagenes evaluables (biblioteca, universidad, sala de espera) no tienen ninguna categoria representativa en el conjunto actual, y forzar una categoria produjo errores en las 3. Introducir 'unknown' cuando el score maximo es 0, y 'ambiguous' cuando existe un empate real entre 2+ categorias (como en el caso Objects365 de la biblioteca: tienda=oficina=4), es coherente con la evidencia recogida.",
+    "NO_implementado_en_esta_fase": true
+  },
+
+  "estrategias_evaluadas_seccion_19": {
+    "A_reglas_simples_objeto_individual": {
+      "compatibilidad_generalizacion": "baja",
+      "nota": "Es esencialmente lo que ya existe (una version resumida). Ya demostro fallar en 3/9 casos de este subconjunto pequeño."
+    },
+    "B_puntuacion_acumulada_por_evidencia": {
+      "compatibilidad_generalizacion": "media",
+      "nota": "Es lo que YA existe (_classify_heuristic es una forma simple de esto). El problema no es la acumulacion en si, sino la falta de ponderacion por especificidad y el desempate arbitrario."
+    },
+    "C_evidencia_ponderada_por_objeto": {
+      "compatibilidad_generalizacion": "media-alta",
+      "nota": "Ponderar keywords por que tan discriminativos son (ej. 'inodoro' deberia pesar mas para 'bano' que 'persona' para 'tienda') resolveria directamente la causa raiz identificada en el caso biblioteca."
+    },
+    "D_coocurrencia_de_multiples_objetos": {
+      "compatibilidad_generalizacion": "alta",
+      "nota": "Exigir combinaciones especificas (ej. sofa+tv en vez de solo sofa) reduciria falsos positivos por objetos aislados genericos."
+    },
+    "E_relaciones_espaciales": {
+      "compatibilidad_generalizacion": "no evaluado en esta fase",
+      "nota": "El proyecto ya calcula posicion/distancia (spatial_analyzer.py) pero scene_classifier.py no la consume actualmente. Es una extension razonable pero no investigada aqui - requeriria diseno propio."
+    },
+    "F_combinacion_de_las_anteriores": {
+      "compatibilidad_generalizacion": "alta (en teoria)",
+      "nota": "La opcion mas robusta conceptualmente, pero tambien la mas compleja de implementar y de mantener reproducible."
+    },
+    "G_unknown_ambiguous_cuando_evidencia_insuficiente": {
+      "compatibilidad_generalizacion": "alta, y ortogonal a las demas",
+      "nota": "No es una alternativa excluyente a A-F; es un COMPLEMENTO que cualquiera de las estrategias anteriores deberia incorporar. La evidencia de esta fase respalda fuertemente agregarla, independientemente de que otra estrategia se elija para el calculo de evidencia."
+    },
+    "conclusion_no_definitiva": "Ninguna estrategia se selecciona como definitiva en esta fase. La evidencia sugiere que C+D+G combinadas (evidencia ponderada, con exigencia de co-ocurrencia, y con salida unknown/ambiguous) atacarian directamente las causas identificadas, pero esto es una hipotesis a validar, no una decision de implementacion."
+  },
+
+  "llm_como_alternativa_seccion_20": {
+    "evaluado_solo_como_opcion_documentada_no_implementado": true,
+    "costo": "Groq ofrece capa gratuita con limites de tasa (ya se observaron limites de tasa en el propio traductor de Google Translate durante esta prueba, un problema similar aplicaria a cualquier proveedor LLM con uso intensivo)",
+    "latencia": "Ya es parte del pipeline actual (llm_enhancer.py y scene_classifier.py ya llaman a Groq) - no seria una novedad arquitectonica, pero SI depende de que el modelo configurado exista (ver H40, hallazgo critico de esta fase: el modelo actual ya esta roto)",
+    "reproducibilidad": "Menor que un algoritmo determinista - la salida del LLM puede variar entre llamadas incluso con temperature=0.1, dificultando la trazabilidad exacta que exige el Capitulo 5",
+    "dependencia_externa": "Ya existe (el sistema ya depende de Groq para narrativa) - agregar la clasificacion de escenario al LLM no introduce una dependencia nueva, pero SI la hace mas critica (si Groq falla, se pierde narrativa Y escenario, no solo narrativa)",
+    "complejidad": "Baja incremental, dado que la infraestructura de prompt/parsing ya existe en scene_classifier.py (_classify_with_llm ya esta implementada y ya es el camino PRIMARIO segun el codigo - el problema no es que falte LLM, es que el LLM esta roto ahora mismo, ver H40)",
+    "impacto_metodologico": "El propio codigo YA prioriza LLM sobre heuristica (la heuristica es el fallback, no la estrategia principal). Por tanto, la recomendacion mas directa NO es 'agregar un LLM como parche' (ya existe) sino: (1) arreglar la configuracion del modelo (H40) para que el camino LLM ya disenado vuelva a funcionar, y (2) evaluar si el LLM, una vez funcional, resuelve el caso biblioteca mejor que la heuristica - esto NO se pudo probar en esta fase porque el LLM no respondio ninguna vez.",
+    "conclusion": "No se recomienda 'agregar un LLM' porque ya existe en el codigo. Se documenta como pendiente critico verificar si, una vez corregido H40, el LLM ya disenado resuelve razonablemente el problema sin necesitar la heuristica de respaldo rediseñada."
+  }
+}

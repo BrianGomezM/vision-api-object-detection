@@ -4,32 +4,45 @@ __pycache__/
 *.pyo
 *.pyd
 *.log
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Entorno virtual
+.venv/
 venv/
 env/
 ENV/
 
-# Variables de entorno
+# Variables de entorno (usar .env.example como plantilla, sin secretos)
 .env
 .env.*
+!.env.example
 
-# Modelos (archivos grandes)
+# Credenciales (reglas ESPECÍFICAS; no se usa una regla global *.json, que
+# ocultaba la evidencia JSON de evaluation/results/)
+google_credentials.json
+*credentials*.json
+*service-account*.json
+
+# Modelos (archivos grandes; el hash de referencia está en docs/REPRODUCIBILIDAD.md)
 *.pt
 *.pth
+
+# ── Datos DINÁMICOS: nunca en el repositorio ──────────────────────
+# Con DATA_ROOT definido se escriben fuera del repositorio (ver app/storage.py).
+# Estas reglas cubren las rutas históricas cuando DATA_ROOT no está definido.
 
 # Archivos generados por el sistema de evaluación
 test_results_json/
 charts/
 *.xlsx
 
-# Dataset acumulado para fine-tuning
-# (las imágenes y etiquetas son generadas en producción — no versionar)
+# Dataset acumulado para fine-tuning (imágenes, etiquetas y metadatos subidos)
 dataset/images/
 dataset/labels/
 dataset/finetune/
-# Los metadatos JSON SÍ se pueden versionar si se desea trazabilidad
-# dataset/metadata/   ← descomenta esta línea para excluirlos también
+dataset/metadata/
 
 # Métricas de producción (JSONL, crece con el uso)
 metrics/
@@ -48,6 +61,10 @@ audio_output/
 # Imágenes anotadas generadas por el visualizador de detecciones
 detections_output/
 
+# Cache de librerías
+*.cache
+translation_cache.json
+
 # IDEs
 .vscode/
 .idea/
@@ -56,15 +73,4 @@ detections_output/
 .DS_Store
 Thumbs.db
 
-# Cache de librerías
-*.cache
-/tmp/translation_cache.json
-
-# Credenciales Google Cloud
-google_credentials.json
-*.json
-# NOTA: excluir *.json excluye también los metadatos del dataset.
-# Si quieres versionar dataset/metadata/*.json, reemplaza la línea
-# anterior por entradas específicas:
-# google_credentials.json
-# test_results_json/
+# NOTA: stimuli/ (estímulos congelados de entrada, con hash verificado) SÍ se versiona.

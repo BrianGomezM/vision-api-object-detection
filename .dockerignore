@@ -2,6 +2,8 @@
 .env
 .env.*
 google_credentials.json
+*credentials*.json
+*service-account*.json
 
 # Entornos virtuales y cachés de Python
 .venv/
@@ -10,6 +12,10 @@ env/
 ENV/
 __pycache__/
 *.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
 
 # Git y CI
 .git/
@@ -25,7 +31,31 @@ charts/
 data/
 dataset/
 
-# Documentación e IDE
+# Datos personales de participantes y retroalimentación — nunca en la imagen
+study_data/
+feedback_data/
+
+# Evidencia, scripts de análisis, pruebas y documentación (no se usan en runtime)
+evaluation/
+scripts/
+tests/
+docs/
 README.md
+pytest.ini
+requirements-dev.txt
+requirements.lock.txt
+
+# Código experimental no montado por app/main.py
+app/experimental/
+
+# Pesos no usados por la app (el pipeline usa YOLO_WEIGHTS=yolo26s.pt)
+yolo26s-objv1-150.pt
+
+# IDE
 .vscode/
 .idea/
+
+# NO se excluyen (la app los necesita):
+#   stimuli/          estímulos congelados servidos por /api/catalog
+#   test_images/      imágenes de /api/test/* (perfil development)
+#   app/catalog/      catálogo único de pruebas
