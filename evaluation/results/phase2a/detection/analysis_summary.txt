@@ -1,0 +1,16 @@
+Validación réplica del filtro vs run_yolo() del producto: 82/82 coinciden
+[A] imgsz=640: imágenes con detecciones distintas 22/41; detecciones adicionales con min: 45 (conf 0.15–0.348); solo en max: 0 imágenes; prompt distinto: 21; instrucción distinta: 8; clases añadidas por min: {'dining table': 18, 'potted plant': 9, 'vase': 8, 'couch': 4, 'person': 3, 'chair': 2, 'bottle': 1}
+[A] imgsz=1280: imágenes con detecciones distintas 22/41; detecciones adicionales con min: 50 (conf 0.157–0.349); solo en max: 0 imágenes; prompt distinto: 20; instrucción distinta: 6; clases añadidas por min: {'dining table': 24, 'potted plant': 7, 'couch': 4, 'bottle': 4, 'chair': 3, 'backpack': 2, 'vase': 2, 'bench': 1, 'person': 1, 'suitcase': 1, 'wine glass': 1}
+[B] regla=max: detecciones 640=258 vs 1280=316; imágenes con más en 1280: 22, más en 640: 11, iguales: 8; conf media pareada (n=38): 640=0.686 1280=0.674; prompt distinto: 36; instrucción distinta: 18
+[B] regla=min: detecciones 640=303 vs 1280=366; imágenes con más en 1280: 21, más en 640: 14, iguales: 6; conf media pareada (n=38): 640=0.627 1280=0.619; prompt distinto: 38; instrucción distinta: 17
+[Tiempo] imgsz=640 cpu: mediana 157.2 ms, media 183.0 ms, máx 412.3 ms, CPU 0.969 s/inferencia, RSS máx 878.3 MB, repeticiones idénticas 41/41
+[Tiempo] imgsz=640 cuda:0: mediana 25.0 ms, media 26.4 ms, máx 44.6 ms, CPU 0.031 s/inferencia, RSS máx 1353.7 MB, repeticiones idénticas 41/41
+[Tiempo] imgsz=1280 cpu: mediana 571.8 ms, media 580.6 ms, máx 954.1 ms, CPU 3.391 s/inferencia, RSS máx 1644.4 MB, repeticiones idénticas 41/41
+[Tiempo] imgsz=1280 cuda:0: mediana 71.5 ms, media 73.0 ms, máx 105.6 ms, CPU 0.062 s/inferencia, RSS máx 1485.9 MB, repeticiones idénticas 41/41
+[CPU vs GPU] imgsz=640: imágenes con lista de detecciones (regla max) distinta entre CPU y GPU: 0/41
+[CPU vs GPU] imgsz=1280: imágenes con lista de detecciones (regla max) distinta entre CPU y GPU: 0/41
+[GT n=5] imgsz=640 regla=max: TP=15 FN=2 detectadas_no_confirmadas=4 (clases presentes excluidas por _NAV_CLASSES: 5)
+[GT n=5] imgsz=640 regla=min: TP=15 FN=2 detectadas_no_confirmadas=5 (clases presentes excluidas por _NAV_CLASSES: 5)
+[GT n=5] imgsz=1280 regla=max: TP=15 FN=2 detectadas_no_confirmadas=2 (clases presentes excluidas por _NAV_CLASSES: 5)
+[GT n=5] imgsz=1280 regla=min: TP=16 FN=1 detectadas_no_confirmadas=3 (clases presentes excluidas por _NAV_CLASSES: 5)
+Claves de _CLASS_MIN_CONF inexistentes en COCO-80 (nunca pueden detectarse con yolo26s.pt): ['bag', 'box', 'desk', 'door', 'monitor', 'sofa', 'stairs', 'stool', 'table']

@@ -1,0 +1,21 @@
+imagen,imgsz,regla,gt_presentes_en_NAV,gt_presentes_fuera_de_NAV,detectadas,TP,FN,detectadas_no_confirmadas_por_GT
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,chair; potted plant; tv,keyboard; mouse,chair; laptop; potted plant; tv,chair; potted plant; tv,,laptop
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,chair; dining table; laptop; person; potted plant,book,backpack; bottle; chair; dining table; laptop; person; potted plant,chair; dining table; laptop; person; potted plant,,backpack; bottle
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,max,couch; potted plant; tv,,couch; potted plant; tv,couch; potted plant; tv,,
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,max,chair; vase,book,chair; vase,chair; vase,,
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,backpack; bench; laptop; person,book,backpack; person; potted plant,backpack; person,bench; laptop,potted plant
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,chair; potted plant; tv,keyboard; mouse,chair; laptop; potted plant; tv,chair; potted plant; tv,,laptop
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,chair; dining table; laptop; person; potted plant,book,backpack; bottle; chair; dining table; laptop; person; potted plant,chair; dining table; laptop; person; potted plant,,backpack; bottle
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,couch; potted plant; tv,,couch; dining table; potted plant; tv,couch; potted plant; tv,,dining table
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,min,chair; vase,book,chair; vase,chair; vase,,
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,backpack; bench; laptop; person,book,backpack; person; potted plant,backpack; person,bench; laptop,potted plant
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,max,chair; potted plant; tv,keyboard; mouse,chair; potted plant; tv,chair; potted plant; tv,,
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,chair; dining table; laptop; person; potted plant,book,bottle; chair; couch; dining table; laptop; person; potted plant,chair; dining table; laptop; person; potted plant,,bottle; couch
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,max,couch; potted plant; tv,,couch; potted plant; tv,couch; potted plant; tv,,
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,max,chair; vase,book,chair; vase,chair; vase,,
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,backpack; bench; laptop; person,book,backpack; person,backpack; person,bench; laptop,
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,min,chair; potted plant; tv,keyboard; mouse,chair; potted plant; tv,chair; potted plant; tv,,
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,chair; dining table; laptop; person; potted plant,book,bottle; chair; couch; dining table; laptop; person; potted plant,chair; dining table; laptop; person; potted plant,,bottle; couch
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,couch; potted plant; tv,,couch; dining table; potted plant; tv,couch; potted plant; tv,,dining table
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,min,chair; vase,book,chair; vase,chair; vase,,
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,backpack; bench; laptop; person,book,backpack; bench; person,backpack; bench; person,laptop,
