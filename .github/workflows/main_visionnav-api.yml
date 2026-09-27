@@ -16,7 +16,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Pruebas automáticas antes de construir la imagen. Se excluye la regresión
+  # byte a byte (marca entorno_referencia), que depende de las versiones exactas
+  # del entorno de referencia y se ejecuta localmente (docs/REPRODUCIBILIDAD.md).
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias (torch CPU, como el Dockerfile)
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+          pip install -r requirements.txt pytest
+      - name: Pruebas
+        env:
+          EVALUATION_DISABLE_TTS: "true"
+        run: python -m pytest -m "not entorno_referencia"
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
