@@ -15,7 +15,7 @@ los perfiles.
 
 from fastapi import APIRouter
 
-from app import telemetry
+from app import deploy_identity, telemetry
 from app.core.pipeline import DEFAULT_CONF, MAX_IMAGE_DIM
 from app.profiles import app_profile
 from app.services.yolo_service import YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
@@ -61,6 +61,9 @@ async def health_check():
             "umbral_default": DEFAULT_CONF,
             "max_imagen_px":  MAX_IMAGE_DIM,
         },
+        # Commit desplegado y verificación contra experimental_config.yaml
+        # (app/deploy_identity.py; en production se exige al arrancar).
+        "identidad": deploy_identity.status(),
     }
     if profile == "production":
         return body

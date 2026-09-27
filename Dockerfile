@@ -47,10 +47,14 @@ COPY . .
 
 # ── Ejecución ────────────────────────────────────────────────────────────────
 # Perfil EXPLÍCITO del despliegue: solo POST /api/detect y GET /api/health.
+# GROQ_MODEL: el valor por defecto del código (groq_client.py, núcleo congelado) NO es el
+# del experimento; se fija aquí el congelado. Si el entorno lo cambia, la app no arranca
+# (verificación de identidad contra experimental_config.yaml, app/deploy_identity.py).
 ENV APP_PROFILE=production \
     DATA_ROOT=/tmp/visionnav \
     PYTHONUNBUFFERED=1 \
-    YOLO_CONFIG_DIR=/tmp/ultralytics
+    YOLO_CONFIG_DIR=/tmp/ultralytics \
+    GROQ_MODEL=qwen/qwen3.8-27b
 # Commit de la aplicación (trazabilidad). CI: --build-arg APP_COMMIT=<sha>.
 ARG APP_COMMIT=desconocido
 ENV APP_COMMIT=${APP_COMMIT}

@@ -17,7 +17,7 @@
 | **Superficie expuesta** | Solo `POST /api/detect` y `GET /api/health` (básico). Sin `/docs`, `/openapi.json`, raíz, estáticos ni endpoints internos. Verificado con un servidor real: `scripts/experiment/smoke_production.py`. | `app/main.py`, `app/profiles.py` |
 | **Autenticación** | Ninguna en el uso público (ver §1). Opcional por `X-API-Key` si `API_KEYS` está definido. | `app/security.py` |
 | **Autorización** | No aplica: no hay recursos por usuario y `/api/detect` no guarda nada del usuario (ver persistencia). | — |
-| **Rate limiting** | **Solo por clave.** Sin claves (uso público) **no hay límite de peticiones**. | `app/security.py` |
+| **Rate limiting** | Por IP en production (6/60 s; `X-Forwarded-For` solo con `TRUSTED_PROXY_HOPS`) y por clave cuando hay `API_KEYS`. | `app/ratelimit.py`, `app/security.py` |
 | **Tamaño de subida** | Máximo 10 MB (`MAX_UPLOAD_MB`). Se leen como mucho 10 MB + 1 byte y, si se supera, se responde **413**. | `app/utils/uploads.py` |
 | **Validación del archivo** | Archivo vacío → 400. `PIL.Image.verify()` → 422 si no es una imagen válida. | `app/routes/detect.py` |
 | **Imágenes enormes** | Pillow avisa a partir de ~89,5 Mpx (`MAX_IMAGE_PIXELS`) y rechaza el doble. La imagen se reduce a 800 px antes de la inferencia. | Pillow; `core/pipeline.resize_image` |
@@ -30,9 +30,9 @@
 
 ## 3. Riesgos residuales y propuestas (NO aplicadas; decisión de Brian)
 
-1. **No hay límite de peticiones en el uso público.** Un abuso puede agotar la cuota gratuita de Gemini TTS y de Groq, y ocupar el único worker. Propuestas, de menor a mayor esfuerzo:
+1. ~~No hay límite de peticiones en el uso público~~: **resuelto** con el límite por IP (`app/ratelimit.py`). Texto original: Un abuso puede agotar la cuota gratuita de Gemini TTS y de Groq, y ocupar el único worker. Propuestas, de menor a mayor esfuerzo:
    - (a) restricciones de acceso o límites de la plataforma (Azure App Service o Front Door);
    - (b) un límite por IP en la aplicación, con la salvedad de que detrás del proxy de Azure la IP viene de `X-Forwarded-For`.
 2. ~~Gemini TTS sin timeout~~: **resuelto** (60 s; la configuración congelada se regeneró).
 3. ~~Mensajes de error internos devueltos con HTTP 200~~: **resuelto** (contrato de errores).
-4. **Descarga automática de pesos en la imagen de Docker:** `.gitignore` excluye `*.pt`, así que el build de CI no incluye `yolo26s.pt` y Ultralytics lo descarga al arrancar. Propuesta: incluir los pesos verificados en la imagen y fijar `YOLO_WEIGHTS_SHA256` y `YOLO_ALLOW_DOWNLOAD=false`. **F4 no depende de esto**: el runner local exige los pesos congelados y verifica su hash.
+4. ~~Descarga automática de pesos en la imagen de Docker~~: **resuelto** (pesos incluidos y verificados; `docs/DEPLOYMENT.md` §C). Texto original: `.gitignore` excluye `*.pt`, así que el build de CI no incluye `yolo26s.pt` y Ultralytics lo descarga al arrancar. Propuesta: incluir los pesos verificados en la imagen y fijar `YOLO_WEIGHTS_SHA256` y `YOLO_ALLOW_DOWNLOAD=false`. **F4 no depende de esto**: el runner local exige los pesos congelados y verifica su hash.

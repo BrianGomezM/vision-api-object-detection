@@ -4,6 +4,7 @@ scripts/hardening/docker_evidence.py — pruebas de la imagen Docker de producci
   build (hecho antes, --build-arg APP_COMMIT) · arranque hasta /api/health 200 ·
   pesos presentes, de solo lectura y con el SHA-256 congelado · hash incorrecto,
   pesos ausentes y pesos alterados → el worker NO arranca (salida controlada) ·
+  identidad distinta de experimental_config.yaml (p. ej. GROQ_MODEL) → no arranca ·
   /api/detect con YOLO real SIN claves de proveedores (degradación declarada) ·
   errores 413/415/422/400 · /api/health durante una detección · CORS · limpieza.
 
@@ -63,7 +64,9 @@ def fails_to_boot(label, *args):
     name = f"vn-ev-{uuid.uuid4().hex[:6]}"
     code, out = sh("docker", "run", "--name", name, *args, timeout=180)
     sh("docker", "rm", "-f", name)
-    err = [l for l in out.splitlines() if "RuntimeError: [YOLO]" in l]
+    lines = out.splitlines()
+    err = [l if "RuntimeError: [" in l else l.strip() for i, l in enumerate(lines)
+           if "RuntimeError: [" in l or (i and "RuntimeError: [Identidad]" in lines[i - 1])]
     return {"caso": label, "exit_code": code, "arranco": "Application startup complete" in out,
             "mensaje": err[-1] if err else None, "pasa": code != 0 and bool(err) and "Application startup complete" not in out}
 
@@ -93,6 +96,8 @@ def main():
                       "printf X | dd of=/tmp/visionnav/w.pt bs=1 seek=1000 conv=notrunc 2>/dev/null && "
                       "YOLO_WEIGHTS=/tmp/visionnav/w.pt exec gunicorn --bind=0.0.0.0:8000 --workers 1 "
                       "-k uvicorn.workers.UvicornWorker app.main:app"),
+        fails_to_boot("GROQ_MODEL distinto al congelado", "-e", "GROQ_MODEL=llama-3.3-70b-versatile", IMAGE),
+        fails_to_boot("TTS_VOICE distinta a la congelada", "-e", "TTS_VOICE=Kore", IMAGE),
     ]
 
     name = "vn-ev-ok"
@@ -180,6 +185,9 @@ def main():
         "usuario_sin_privilegios": ev["imagen_info"]["usuario"] == "app",
         "fallos_controlados": all(f["pasa"] for f in ev["fallos_controlados"]),
         "arranque": ev["arranque"]["health_status"] == 200,
+        "identidad_verificada": ev["health"]["body"]["identidad"]["estado"] == "verificada"
+            and ev["health"]["body"]["identidad"]["commit"] == ev["imagen_info"]["APP_COMMIT"]
+            and ev["health"]["body"]["llm"]["modelo"] == "qwen/qwen3.8-27b",
         "detect_degradado_declarado": ev["detect_yolo_real_sin_claves"]["status"] == 200
             and ev["detect_yolo_real_sin_claves"]["x_degradacion"] == "LLM_UNAVAILABLE,TTS_UNAVAILABLE"
             and ev["detect_yolo_real_sin_claves"]["objetos"] > 0,
