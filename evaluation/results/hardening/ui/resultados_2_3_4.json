@@ -1,0 +1,53 @@
+[
+ {
+  "escenario": "cliente maneja 500 (simulado)",
+  "resultado": "PASS",
+  "mensaje": "Mensaje del servidor INTERNAL_ERROR (ID de solicitud: ffffffffffffffffffffffffffffffff)"
+ },
+ {
+  "escenario": "cliente maneja 502 (simulado)",
+  "resultado": "PASS",
+  "mensaje": "Mensaje del servidor TTS_PROVIDER_ERROR (ID de solicitud: ffffffffffffffffffffffffffffffff)"
+ },
+ {
+  "escenario": "cliente maneja 503 (simulado)",
+  "resultado": "PASS",
+  "mensaje": "Mensaje del servidor MODEL_UNAVAILABLE (ID de solicitud: ffffffffffffffffffffffffffffffff)"
+ },
+ {
+  "escenario": "cliente maneja 504 (simulado)",
+  "resultado": "PASS",
+  "mensaje": "Mensaje del servidor LLM_TIMEOUT (ID de solicitud: ffffffffffffffffffffffffffffffff)"
+ },
+ {
+  "escenario": "cliente maneja 429 (simulado)",
+  "resultado": "PASS",
+  "mensaje": "Mensaje del servidor RATE_LIMITED (ID de solicitud: ffffffffffffffffffffffffffffffff)"
+ },
+ {
+  "escenario": "cliente maneja 502 no JSON (proxy)",
+  "resultado": "PASS",
+  "mensaje": "Un servicio externo (lenguaje o voz) devolvió un error."
+ },
+ {
+  "escenario": "cliente: timeout de 180 s",
+  "resultado": "PASS",
+  "segundos": 181,
+  "mensaje": "El servidor no respondió en 180 s. Inténtelo de nuevo más tarde."
+ },
+ {
+  "escenario": "E2E real: LLM y TTS fallan → 200 + aviso de degradación",
+  "resultado": "PASS",
+  "status": 200,
+  "x_degradacion": "LLM_PROVIDER_ERROR,TTS_PROVIDER_ERROR",
+  "aviso": "Narrativa generada por plantilla: el servicio de lenguaje falló.\n\nSin audio: el servicio de voz falló.\n\nID de solicitud: 8fae5798420048dd904170eeb6859b1f"
+ },
+ {
+  "escenario": "429 real por IP (production)",
+  "resultado": "PASS",
+  "status_1": 200,
+  "status_2": 429,
+  "retry_after": "57",
+  "mensaje": "Demasiadas solicitudes. Intente más tarde. (ID de solicitud: ea0abb86a50e4e94a4e4bdeb2682fb1e)"
+ }
+]
