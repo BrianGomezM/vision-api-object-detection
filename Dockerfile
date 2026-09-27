@@ -31,7 +31,9 @@ RUN pip install --no-cache-dir -r requirements-docker.lock.txt \
 # congelado en experimental_config.yaml. ADD --checksum hace FALLAR el build si el
 # archivo cambia. Nunca "latest" sin hash.
 ARG YOLO_WEIGHTS_SHA256=646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
-ADD --checksum=sha256:${YOLO_WEIGHTS_SHA256} \
+# --chmod=0444: ADD crea el archivo root:0600 y el usuario sin privilegios no podría
+# leerlo (detectado al probar la imagen). Solo lectura: nadie lo modifica en ejecución.
+ADD --checksum=sha256:${YOLO_WEIGHTS_SHA256} --chmod=0444 \
     https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26s.pt /app/weights/yolo26s.pt
 # Verificación también en el ARRANQUE: si el archivo no coincide, la app no arranca
 # (app/services/yolo_service.check_weights) y no se descarga nada.
@@ -45,7 +47,8 @@ COPY . .
 # Perfil EXPLÍCITO del despliegue: solo POST /api/detect y GET /api/health.
 ENV APP_PROFILE=production \
     DATA_ROOT=/tmp/visionnav \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    YOLO_CONFIG_DIR=/tmp/visionnav/ultralytics
 # Commit de la aplicación (trazabilidad). CI: --build-arg APP_COMMIT=<sha>.
 ARG APP_COMMIT=desconocido
 ENV APP_COMMIT=${APP_COMMIT}
