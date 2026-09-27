@@ -74,6 +74,16 @@ def data_dir(kind: str) -> Path:
     return root / _LAYOUT[kind] if root else _LEGACY[kind]
 
 
+def resolve_output(kind: str, relative: str) -> Path:
+    """Ruta absoluta de un archivo que un servicio devolvió como "<carpeta>/<archivo>".
+
+    Los servicios devuelven rutas relativas (contrato de la respuesta); leerlas
+    relativas al directorio de trabajo fallaba con DATA_ROOT definido. Se
+    resuelven siempre contra data_dir(kind), con y sin DATA_ROOT.
+    """
+    return data_dir(kind) / Path(relative).name
+
+
 def unique_stamp() -> str:
     """Marca única para nombres de archivo: fecha-hora con microsegundos + 6 hex aleatorios.
 
