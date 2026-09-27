@@ -15,6 +15,42 @@
 
 ---
 
+## Estado de las decisiones (actualizado en el checkpoint final pre-F4, 2026-09-27)
+
+La configuración aprobada está congelada en `experimental_config.yaml` y la verifica `app.experiment.preflight()`.
+
+| # | Decisión | Estado | Resolución / qué falta |
+|---|---|---|---|
+| 1 | Caja de referencia del IoU | **PENDIENTE** | Brian debe aprobar el GT visual modal (opción B). Hace falta código nuevo en el generador, **sin modificar las escenas** |
+| 2 | Profundidad (3 condiciones frente a 4 categorías) | **PENDIENTE** | Aprobar la métrica (monotonía + tabla 3×4) |
+| 3 | Dispositivo | **CERRADA: cpu** | Evidencia E11/E12 (diferencias CPU/GPU ≤ 9·10⁻⁵, repeticiones idénticas). Se fuerza con `CUDA_VISIBLE_DEVICES=-1` y el preflight lo verifica |
+| 4 | Umbral y regla de aceptación | **CERRADA: regla `min(class_min, umbral)`, umbral 0,35** | `docs/AUDITORIA_REGLA_UMBRAL_FASE10.md` §5. Los análisis de sensibilidad (regla alternativa; 0,3/0,5/0,7) siguen **PENDIENTES de aprobación** |
+| 4b | Preprocesamiento de imagen | **CERRADA: ruta del producto** (`core.pipeline.run` → `resize_image` → `run_yolo` → letterbox de Ultralytics) | `experimental_config.yaml` → `imagen`. La fase 10 (imagen original) queda documentada como configuración distinta |
+| 4c | Modelo y pesos | **CERRADA: `yolo26s.pt`, sha256 `646f8bc3…4a1b`** | El preflight detiene la ejecución si no coinciden; no hay descarga automática en F4 |
+| 5 | Número de corridas | **PENDIENTE** | Propuesta: 3 corridas con igualdad por hash |
+| 6 | OBJ-04 / C2-espejo | **PENDIENTE** | No generado |
+| 7 | Definición de VP/FP/FN | **PENDIENTE** | Depende de la decisión 1 |
+| 8 | Posición horizontal | **PENDIENTE** | — |
+| 9 | Relaciones | **PENDIENTE** | — |
+| 10 | Narrativa (codificación, k generaciones) | **PENDIENTE** | — |
+| 11 | Evaluación con usuarios | **PENDIENTE** | — |
+| 12 | Agregación e IC | **PENDIENTE** | — |
+| 13 | Dataset 2 | **PENDIENTE** | Procedencia sin verificar |
+| — | Regla `max()` como configuración oficial | **DESCARTADA** | Cambio de interfaz sin evaluación y nunca desplegado |
+| — | Caja proyectada como referencia de IoU (1-A) | **DESCARTADA** (recomendación) | Contradice la convención del GT; se confirmará al aprobar la decisión 1 |
+
+**Categorías de métricas que no deben mezclarse.** Cada una tiene su capa y su fuente:
+
+| Categoría | Capa | Fuente | Decisiones |
+|---|---|---|---|
+| **Detección** (VP/FP/FN, IoU) | 4 | salida de `run_yolo` (y salida cruda como diagnóstico) | 1, 4, 7 |
+| **Espacial** (columna, profundidad, sobre superficie) | 5 | `analyzed` del pipeline | 2, 8, 9 |
+| **Narrativa** (fidelidad y extremo a extremo) | 6 | texto de la narrativa | 9, 10 |
+| **Evaluación con usuarios** (tareas y valoraciones) | 7 | respuestas de los participantes | 11 |
+| **Latencia** | — | tiempos (`tiempos_ms`, telemetría) | **no forma parte de las métricas del CP3B.** Si se reporta, será aparte y declarando que es CPU local, distinto del despliegue |
+
+**Hallazgo que afecta a F4 (resuelto en el runner, no es una decisión metodológica).** La caché de escenario (10 s, con la lista de objetos como clave) haría que estímulos consecutivos con los mismos objetos (A1–A9: una silla) reutilizaran la respuesta del LLM. El runner debe llamar a `app.experiment.reset_request_state()` antes de cada estímulo, lo que equivale a una solicitud de producción que llega pasados 10 s.
+
 ## 0. Evidencia usada
 
 Todo lo que sigue se obtuvo leyendo código, datos o documentos existentes.

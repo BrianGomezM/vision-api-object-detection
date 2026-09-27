@@ -1,43 +1,51 @@
 # Datos: qué se persiste y qué no
 
-- **Fecha:** 2026-09-27.
+- **Fecha:** 2026-09-27 (actualizado en el checkpoint final pre-F4).
 - **Fuente:** inventario de todas las escrituras a disco de `app/` (`write_*`, `open(..., "a"/"w")`, `.save`, `json.dump`), excluido `app/experimental`, que no está montado.
-- **Código frente a datos:** el código y los estímulos congelados están en el repositorio. Todo lo que la aplicación genera va a `DATA_ROOT`.
+- **Principio:** el código y los estímulos congelados están en el repositorio; los datos generados van a `DATA_ROOT`, **separados por dominio**, para que los datos de participantes no se mezclen con los del producto.
 
-## 1. Ubicación
+## 1. Ubicación y retención
 
-- **Con `DATA_ROOT` definido:** todo lo que escribe la aplicación va **fuera del repositorio**. Ejemplo: `DATA_ROOT=D:/University/T2/Programacion/archivos`.
-- **Sin `DATA_ROOT`:** se usan las rutas históricas del repositorio. Todas están en `.gitignore` y `.dockerignore`.
-- **Carpetas:** se crean solo al escribir.
+| Dominio | Dato | Con `DATA_ROOT` | Sin `DATA_ROOT` (histórico, en `.gitignore`) | Perfiles | Retención |
+|---|---|---|---|---|---|
+| PRODUCTO | Imagen anotada (copia procesada de la imagen del usuario, con cajas) | `product/annotated/` | `detections_output/` | todos | **production: se borra al responder.** development/study: rotación, últimas 10 (`DETECTION_MAX_SAVED`) |
+| PRODUCTO | Audio TTS de la narrativa | `product/audio/` | `audio_output/` | todos | **production: se borra al responder.** development/study: rotación, últimos 5 (`TTS_MAX_SAVED_FILES`) |
+| PRODUCTO | Telemetría: `request_id`, commit, hash de pesos, número de objetos, confianza media, tiempos, escenario. **Sin imagen ni texto** | `product/telemetry/production_metrics.jsonl` | `./metrics/` | todos | sin límite |
+| ESTUDIO | Sesiones: `participant.json` (**datos personales**) y `responses.jsonl` | `study/sessions/<id>/` | `study_data/sessions/` | study, development | permanentes |
+| ESTUDIO | Valoraciones Likert (`/feedback`) | `study/feedback/` | `feedback_data/` | development | permanentes |
+| EVALUACIÓN | Ejecuciones oficiales del protocolo (F4) | `evaluation/runs/` | **no permitido** (exige `DATA_ROOT`) | runner F4 | permanentes |
+| EVALUACIÓN | Paquetes de estímulo congelado (F4) | `evaluation/stimuli_frozen/` | **no permitido** (exige `DATA_ROOT`) | runner F4 | permanentes |
+| EVALUACIÓN | Historial de `/test/*` | `evaluation/api_tests/` | `./test_results/` | development | permanente |
+| DESARROLLO | Dataset de fine-tuning | `development/dataset_finetune/` | `./dataset/` | development | permanente |
+| — | Caché de traducción (solo etiquetas **fuera** del diccionario fijo) | `cache/` | `~/.cache/vision-api/` | todos | sin límite |
 
-| Dato | Con `DATA_ROOT` | Sin `DATA_ROOT` (histórico) | Perfiles que lo escriben | Retención |
-|---|---|---|---|---|
-| Imagen anotada con cajas (copia **procesada** de la imagen del usuario) | `responses/annotated/` | `detections_output/` | todos (`/detect`) | rotación: últimas `DETECTION_MAX_SAVED` (10) |
-| Audio TTS de la narrativa | `audio/live/` | `audio_output/` | todos (`/detect`) | rotación: últimos `TTS_MAX_SAVED_FILES` (5) |
-| Telemetría (objetos, confianza media, tiempos, escenario; **sin imagen ni texto**) | `metrics/production_metrics.jsonl` | `./metrics/` | todos (`/detect`) | sin límite (crece) |
-| Caché de traducción (solo etiquetas **fuera** del diccionario fijo) | `cache/translation_cache.json` | `~/.cache/vision-api/` | todos | sin límite |
-| Sesiones de estudio: `participant.json` (**datos personales**) y `responses.jsonl` | `study/sessions/<id>/` | `study_data/sessions/` | study, development | permanentes |
-| Valoraciones Likert (`/feedback`) | `responses/feedback/` | `feedback_data/` | development | permanentes |
-| Dataset de fine-tuning (imágenes, etiquetas, metadatos, `data.yaml`) | `dataset_finetune/` | `./dataset/` | development | permanentes |
-| Historial de `/test/*` | `evaluations/api_tests/` | `./test_results/` | development | permanente |
+## 2. Por qué existían los archivos de imagen anotada y audio, y qué se decidió
 
-## 2. Qué NO se persiste
+- **Dónde ocurre:**
+  - `save_annotated_image()` en `app/services/detection_visualizer.py`, llamada desde `core.pipeline.run`;
+  - `synthesize_and_save()` en `app/services/tts_service.py`, llamada desde `core.pipeline.run(tts=True)`.
+- **Por qué existe:** el endpoint lee el archivo y lo devuelve en base64 (`data_uri`). En development también se sirve la imagen en `/detections/<archivo>` y el audio puede descargarse. La rotación (10 y 5) limita el espacio en disco.
+- **¿Es necesario para producción?** **No.** El cliente muestra la imagen y reproduce el audio desde `data_uri`, que va en la respuesta. En producción `/detections` no se monta.
+- **Riesgo:** guardaba en el servidor derivados de las imágenes de los usuarios (la imagen anotada) y el audio de narrativas que describen su entorno, sin necesidad.
+- **Decisión aplicada:** en el perfil **production** ambos archivos se **borran tras construir la respuesta**, y `archivo`/`url` se devuelven como `null` (los campos siguen existiendo en el esquema). En development y study se mantiene el comportamiento anterior.
+  - Se escriben y se borran, en lugar de no escribirse, para **no modificar el núcleo**: el pipeline evaluado es idéntico en todos los perfiles, y la regresión lo verifica.
+  - El cliente se ajustó para descargar la imagen desde `data_uri` cuando `archivo` es `null` (commit `c8f95ef`).
 
-- **La imagen original subida a `/detect` no se guarda.** Solo queda la copia anotada (redimensionada, con cajas), con rotación.
-- **La narrativa en texto y las detecciones no se guardan en disco:** van solo en la respuesta HTTP.
-- **Los prompts del LLM no se guardan:** solo se devuelven en modo `debug`, y únicamente en development.
-- **Logs:** van a la salida estándar del proceso. La aplicación no escribe ningún archivo de log.
-- **Ground truth:** no se genera ni se copia. Queda en el repositorio del generador, y el catálogo solo guarda su ruta y su hash (`stimuli/dataset1/manifest.yaml`). Ninguna respuesta de la API lo incluye (`tests/test_catalog.py`).
+## 3. Qué NO se persiste
 
-## 3. Versionado en el repositorio (no son datos dinámicos)
+- La **imagen original** subida a `/detect` (en ningún perfil).
+- La **narrativa en texto**, las **detecciones** y los **prompts del LLM**. Van solo en la respuesta HTTP; los prompts, solo en modo `debug` de development.
+- **Logs:** van a la salida estándar del proceso.
+- **Ground truth:** no se copia. El catálogo guarda solo su ruta y su hash, y ninguna respuesta lo incluye.
 
-- **`stimuli/dataset1/`:** las 18 PNG congeladas y `manifest.yaml`, con hashes verificados frente al generador (`ae85f90`). Son necesarias para las pruebas y para el catálogo.
-- **Evidencia exploratoria (fases 2A–10):** `evaluation/results/`, `evaluation/images/` y `evaluation/metadata/`.
-- **Línea base de regresión:** `tests/regression/*.json`. Se deriva de la evidencia de la fase 2A y no contiene datos de usuarios.
+## 4. Datos históricos (no borrados)
 
-## 4. Pendientes (decisión de Brian)
+- En el repositorio local existen **10 imágenes anotadas** (`detections_output/`) y **5 audios** (`audio_output/`) generados el 21-09-2026 durante pruebas de desarrollo.
+  - Están ignorados por git y no son datos de participantes.
+  - **No se han borrado.** Se pueden eliminar cuando Brian lo apruebe.
+- Las **2 sesiones de estudio** existentes siguen en `study_data/sessions/`, sin migrar ni modificar. Su clasificación está pendiente; una declara 12 años.
 
-- **Producción:** guarda las últimas 10 imágenes anotadas y los últimos 5 audios de los usuarios (comportamiento histórico). ¿Debe seguir haciéndolo? La alternativa es no escribir a disco en producción y devolver la imagen anotada solo en memoria. Sería un cambio de comportamiento; no se ha aplicado.
-- **Sesiones de estudio:** el `session_id` contiene el nombre del participante (seudonimización pendiente). Las 2 sesiones existentes siguen en `study_data/sessions/`, sin migrar ni modificar.
-- **`DATA_ROOT`:** no está definido en el `.env` local. Si se define, la aplicación dejará de ver esas 2 sesiones antiguas.
-- **Paquetes congelados de F4** (`stimuli_frozen/`) y **ejecuciones del protocolo** (`evaluations/runs/`): el diseño está en `docs/ARQUITECTURA_MONOLITO_MODULAR.md` §4.1. Se implementan con F4, tras aprobarse el CP3B.
+## 5. Pendiente
+
+- **`DATA_ROOT`:** sigue sin estar definido en el `.env` local. El runner de F4 **lo exige**, y el preflight falla sin él.
+- **Seudonimización del `session_id`** del estudio: el identificador actual contiene el nombre del participante.

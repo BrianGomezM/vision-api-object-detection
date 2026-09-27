@@ -98,3 +98,27 @@ Las pruebas no ejecutan YOLO, el LLM ni el TTS.
 - **Contratos:** `tests/regression/contracts.json` fija la entrada de `POST /api/detect` y las rutas de cada perfil. Un cambio intencional se regenera con `python tests/regression/test_contracts.py --write` y queda visible en el diff.
 - **Perfil del despliegue:** `ENV APP_PROFILE=production` (Dockerfile). En ese perfil, `YOLO_ALLOW_DOWNLOAD` sigue valiendo `true` por defecto, así que si la imagen no incluye los pesos, Ultralytics los descarga (comportamiento histórico). Fijarlo en `false` exige incluir `yolo26s.pt` en la imagen. Decisión pendiente.
 
+
+## 8. Configuración oficial de F4 y verificación previa (checkpoint pre-F4, 2026-09-27)
+
+- **Configuración única:** `experimental_config.yaml`. La genera `scripts/experiment/freeze_config.py` a partir de los valores **efectivos** en ejecución.
+  - La sección `verificado` contiene: versiones, pesos + SHA-256, hash del código del núcleo (sin depender del fin de línea) y los parámetros de imagen, detección, análisis espacial, narrativa y TTS.
+  - `estado_decisiones` separa lo aprobado de lo pendiente.
+- **Preflight:** `app.experiment.preflight()` **detiene** F4 ante cualquier diferencia, informando del valor esperado y del encontrado. Comprueba:
+  - pesos (hash);
+  - versiones y código del núcleo;
+  - parámetros;
+  - dispositivo (cpu: `CUDA_VISIBLE_DEVICES=-1` antes de importar torch);
+  - variables del runner (`YOLO_WEIGHTS_SHA256`, `YOLO_ALLOW_DOWNLOAD=false`);
+  - `DATA_ROOT` definido;
+  - manifest del Dataset 1 y catálogo;
+  - hash de cada estímulo;
+  - **commit limpio**.
+- **Verificado el 2026-09-27** en el commit `9457355`: preflight correcto, device cpu, 4 hilos de torch.
+- **Pesos en F4:** nunca se descargan. Si faltan o no coinciden, la ejecución se detiene.
+- **Trazabilidad:** `app.experiment.build_manifest()` registra por estímulo: `request_id`, `stimulus_id`, commit, `config_sha256`, pesos, versiones, device, hilos, hashes de entrada, de la imagen procesada y de cada salida, y la narrativa. `/api/detect` devuelve `X-Request-ID` y lo registra en la telemetría.
+- **Preprocesamiento oficial (ruta del producto):**
+  1. `Image.open(...).convert("RGB")`, sin aplicar la orientación EXIF;
+  2. si el lado mayor supera 800 px: escalado Lanczos y JPEG calidad 90 (submuestreo 4:2:0); si no, los bytes originales. El Dataset 1 (PNG RGB 800×450) llega **sin cambios**;
+  3. letterbox de Ultralytics (`rect`, interpolación lineal, relleno 114, múltiplo de 32) a 1280. **Tensor del Dataset 1: 1280×736.**
+- **Regla del umbral:** `min(class_min, umbral)` con umbral 0,35 (`docs/AUDITORIA_REGLA_UMBRAL_FASE10.md` §5). La línea base de regresión se regeneró con el diff registrado en `tests/regression/CAMBIOS_LINEA_BASE.md`.
