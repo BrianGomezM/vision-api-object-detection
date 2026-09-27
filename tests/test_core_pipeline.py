@@ -62,10 +62,10 @@ def test_con_data_root_la_respuesta_lee_los_archivos_generados(make_client, spy,
     """Corrige el defecto latente de F1: con DATA_ROOT las rutas relativas se leían
     contra el directorio de trabajo y la imagen/audio no se encontraban."""
     root = tmp_path / "data_root"
-    (root / "responses" / "annotated").mkdir(parents=True)
-    (root / "audio" / "live").mkdir(parents=True)
-    (root / "responses" / "annotated" / "detection_x.jpg").write_bytes(b"jpg")
-    (root / "audio" / "live" / "narrativa_x.mp3").write_bytes(b"mp3")
+    (root / "product" / "annotated").mkdir(parents=True)
+    (root / "product" / "audio").mkdir(parents=True)
+    (root / "product" / "annotated" / "detection_x.jpg").write_bytes(b"jpg")
+    (root / "product" / "audio" / "narrativa_x.mp3").write_bytes(b"mp3")
     monkeypatch.setenv("DATA_ROOT", str(root))
     body = make_client("development").post("/api/detect", files={"file": ("a.png", _png(), "image/png")}).json()
     assert body["status"] == "success"
@@ -78,3 +78,41 @@ def test_nombres_historicos_siguen_disponibles():
     assert detect._run_full_pipeline is pipeline.run
     assert detect.resize_image is pipeline.resize_image
     assert detect.build_final_narrative is pipeline.build_narrative
+
+
+def test_request_id_unico_por_solicitud(make_client, spy):
+    client = make_client("development")
+    ids = {client.post("/api/detect", files={"file": ("a.png", _png(), "image/png")}).headers["x-request-id"]
+           for _ in range(3)}
+    assert len(ids) == 3 and all(len(i) == 32 for i in ids)
+
+
+def test_production_no_conserva_imagen_anotada_ni_audio(make_client, spy, tmp_path):
+    body = make_client("production").post("/api/detect", files={"file": ("a.png", _png(), "image/png")}).json()
+    assert body["status"] == "success"
+    # la respuesta sigue incluyendo la imagen y el audio embebidos…
+    assert body["imagen_anotada"]["disponible"] and body["imagen_anotada"]["data_uri"]
+    assert body["audio"]["disponible"] and body["audio"]["data_uri"]
+    # …pero no apunta a archivos y estos se borraron del disco
+    assert body["imagen_anotada"]["archivo"] is None and body["imagen_anotada"]["url"] is None
+    assert body["audio"]["archivo"] is None
+    assert not (tmp_path / "detections_output" / "detection_x.jpg").exists()
+    assert not (tmp_path / "audio_output" / "narrativa_x.mp3").exists()
+
+
+def test_development_conserva_los_archivos_como_antes(make_client, spy, tmp_path):
+    make_client("development").post("/api/detect", files={"file": ("a.png", _png(), "image/png")})
+    assert (tmp_path / "detections_output" / "detection_x.jpg").exists()
+
+
+def test_telemetria_registra_request_id_sin_datos_del_usuario(make_client, spy, monkeypatch, tmp_path):
+    from app import telemetry
+    log = tmp_path / "metrics.jsonl"
+    monkeypatch.setattr(telemetry, "METRICS_LOG", log)
+    monkeypatch.setattr(telemetry, "METRICS_DIR", tmp_path)
+    r = make_client("development").post("/api/detect", files={"file": ("a.png", _png(), "image/png")})
+    import json
+    entry = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
+    assert entry["request_id"] == r.headers["x-request-id"]
+    assert {"app_commit", "pesos_sha256"} <= set(entry)
+    assert "narrativa" not in entry and "imagen" not in entry

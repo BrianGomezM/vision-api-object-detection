@@ -120,7 +120,7 @@ def create_app(profile: str | None = None) -> FastAPI:
         # (X-API-Key: clave del investigador, ver app/security.py)
         allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
         # Exponer headers personalizados que /api/detect devuelve en modo audio=true
-        expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File"],
+        expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File", "X-Request-ID"],
     )
 
     # ──────────────────────────────────────────────────────────

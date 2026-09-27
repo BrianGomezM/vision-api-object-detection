@@ -74,6 +74,8 @@ jobs:
             ${{ steps.image-name.outputs.image }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            APP_COMMIT=${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest

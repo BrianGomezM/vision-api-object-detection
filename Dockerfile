@@ -40,6 +40,11 @@ COPY . .
 # servicio (p. ej. APP_PROFILE=study). Ver app/profiles.py.
 ENV APP_PROFILE=production
 
+# Commit de la aplicación (trazabilidad: telemetría y /api/detect → X-Request-ID).
+# La imagen no incluye .git; CI lo pasa con --build-arg APP_COMMIT=<sha>.
+ARG APP_COMMIT=desconocido
+ENV APP_COMMIT=${APP_COMMIT}
+
 EXPOSE 8000
 
 # Mismo comando que usaba startup.sh — timeout alto porque YOLO26s + torch

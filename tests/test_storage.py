@@ -20,13 +20,15 @@ def test_sin_data_root_se_conservan_rutas_historicas():
 def test_con_data_root_todo_queda_fuera_del_repositorio(monkeypatch, tmp_path):
     monkeypatch.setenv("DATA_ROOT", str(tmp_path))
     expected = {
+        "annotated": "product/annotated",
+        "audio_live": "product/audio",
+        "metrics": "product/telemetry",
         "study_sessions": "study/sessions",
-        "feedback": "responses/feedback",
-        "annotated": "responses/annotated",
-        "audio_live": "audio/live",
-        "metrics": "metrics",
-        "api_tests": "evaluations/api_tests",
-        "dataset": "dataset_finetune",
+        "feedback": "study/feedback",
+        "eval_runs": "evaluation/runs",
+        "stimuli_frozen": "evaluation/stimuli_frozen",
+        "api_tests": "evaluation/api_tests",
+        "dataset": "development/dataset_finetune",
         "cache": "cache",
     }
     for kind, rel in expected.items():
@@ -57,3 +59,17 @@ def test_describe_no_expone_la_ruta(monkeypatch, tmp_path):
     info = storage.describe()
     assert info["data_root_configurado"] is True
     assert str(tmp_path) not in str(info)
+
+
+def test_artefactos_de_evaluacion_exigen_data_root():
+    for kind in ("eval_runs", "stimuli_frozen"):
+        with pytest.raises(RuntimeError, match="DATA_ROOT"):
+            storage.data_dir(kind)
+
+
+def test_participantes_y_producto_no_se_mezclan(monkeypatch, tmp_path):
+    monkeypatch.setenv("DATA_ROOT", str(tmp_path))
+    study = storage.data_dir("study_sessions")
+    for kind in ("annotated", "audio_live", "metrics"):
+        assert tmp_path / "product" in storage.data_dir(kind).parents
+        assert study.parent not in storage.data_dir(kind).parents
