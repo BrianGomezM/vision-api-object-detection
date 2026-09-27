@@ -41,11 +41,12 @@ from typing import Optional, Literal
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
-from app.security import require_api_key
+from app.security import require_researcher_key
 
 # Todas las rutas del estudio manejan datos de participantes: quedan detrás
-# de require_api_key (sin efecto en modo desarrollo, cuando API_KEYS está vacío).
-router = APIRouter(dependencies=[Depends(require_api_key)])
+# de require_researcher_key (sin efecto en development sin claves; en production
+# exige RESEARCHER_API_KEYS o API_KEYS y, sin ellas, responde 401).
+router = APIRouter(dependencies=[Depends(require_researcher_key)])
 
 from app.storage import data_dir
 

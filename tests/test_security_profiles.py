@@ -108,16 +108,19 @@ def test_health_informa_perfil_y_almacenamiento(make_client):
 
 # ── Perfil production (despliegue del producto) ─────────────────────────────
 
-def test_production_expone_solo_detect_y_health(make_client):
+def test_production_no_expone_endpoints_internos(make_client):
+    """Production publica detect, health y las rutas que consume el cliente
+    (tests/test_production_routes.py); los endpoints internos siguen sin existir."""
     client = make_client("production")
     assert client.app.openapi_url is None and client.app.docs_url is None and client.app.redoc_url is None
     assert client.get("/api/health").status_code == 200
     assert client.post("/api/detect").status_code == 400          # existe (falta el archivo: INVALID_REQUEST)
-    for path in ("/docs", "/redoc", "/openapi.json", "/", "/api/tts/models", "/api/catalog",
-                 "/api/study/sessions", "/api/metrics", "/api/feedback", "/api/test/results",
-                 "/api/dataset/stats", "/api/finetune/status", "/detections/x.jpg"):
+    for path in ("/docs", "/redoc", "/openapi.json", "/", "/api/metrics", "/api/feedback",
+                 "/api/test/results", "/api/dataset/stats", "/api/finetune/status", "/detections/x.jpg"):
         assert client.get(path).status_code == 404, path
-    assert client.post("/api/debug-detect").status_code == 404
+    for path in ("/api/debug-detect", "/api/dataset/upload", "/api/finetune/prepare",
+                 "/api/test/functional", "/api/test/load", "/api/feedback"):
+        assert client.post(path).status_code == 404, path
 
 
 def test_production_health_basico_sin_datos_internos(make_client):

@@ -15,7 +15,8 @@ import app.security as security
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
     """Cada prueba parte sin claves, perfil por defecto y sin DATA_ROOT."""
-    for var in ("API_KEYS", "APP_PROFILE", "DATA_ROOT", "YOLO_WEIGHTS_SHA256", "YOLO_ALLOW_DOWNLOAD"):
+    for var in ("API_KEYS", "RESEARCHER_API_KEYS", "APP_PROFILE", "DATA_ROOT", "YOLO_WEIGHTS_SHA256",
+                "YOLO_ALLOW_DOWNLOAD"):
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setattr(security, "_MAX_REQUESTS", 10_000)
     security._windows.clear()

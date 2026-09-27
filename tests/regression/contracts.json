@@ -55,8 +55,16 @@
    "POST /api/test/load"
   ],
   "production": [
+   "DELETE,GET /api/study/sessions/{session_id}",
+   "GET /api/catalog",
+   "GET /api/catalog/stimuli/{stimulus_id}/image",
    "GET /api/health",
-   "POST /api/detect"
+   "GET /api/metrics/latency",
+   "GET /api/metrics/summary",
+   "GET /api/tts/models",
+   "GET,POST /api/study/sessions",
+   "POST /api/detect",
+   "POST /api/study/sessions/{session_id}/responses"
   ],
   "study": [
    "DELETE,GET /api/study/sessions/{session_id}",

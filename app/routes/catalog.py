@@ -17,7 +17,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from app.catalog.loader import get_catalog
-from app.security import require_api_key
+from app.security import require_researcher_key
 
 router = APIRouter(tags=["Catálogo"])
 
@@ -25,14 +25,14 @@ router = APIRouter(tags=["Catálogo"])
 @router.get("/catalog")
 def read_catalog(
     vista: Literal["investigador", "participante"] = Query("investigador"),
-    _key: str = Depends(require_api_key),
+    _key: str = Depends(require_researcher_key),
 ):
     catalog = get_catalog()
     return catalog.participant_view() if vista == "participante" else catalog.researcher_view()
 
 
 @router.get("/catalog/stimuli/{stimulus_id}/image")
-def stimulus_image(stimulus_id: str, _key: str = Depends(require_api_key)):
+def stimulus_image(stimulus_id: str, _key: str = Depends(require_researcher_key)):
     stimulus = get_catalog().stimuli.get(stimulus_id)
     if stimulus is None:
         raise HTTPException(status_code=404, detail="Estímulo no encontrado.")

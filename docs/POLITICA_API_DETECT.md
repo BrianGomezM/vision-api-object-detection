@@ -14,7 +14,7 @@
 
 | Control | Estado verificado | Ubicación |
 |---|---|---|
-| **Superficie expuesta** | Solo `POST /api/detect` y `GET /api/health` (básico). Sin `/docs`, `/openapi.json`, raíz, estáticos ni endpoints internos. Verificado con un servidor real: `scripts/experiment/smoke_production.py`. | `app/main.py`, `app/profiles.py` |
+| **Superficie expuesta** | Públicos: `POST /api/detect`, `GET /api/health` (básico) y `GET /api/tts/models`. Con clave del investigador (`RESEARCHER_API_KEYS`; sin claves configuradas → 401, fallo cerrado): `/api/study/*`, `/api/catalog*`, `GET /api/metrics/summary` y `/latency`, que consume el cliente. `RESEARCHER_API_KEYS` **no** hace privado `/api/detect`. Sin `/docs`, `/openapi.json`, raíz, estáticos ni endpoints internos (debug, dataset, fine-tuning, pruebas, feedback). Pruebas: `tests/test_production_routes.py`. | `app/main.py`, `app/profiles.py`, `app/security.py` |
 | **Autenticación** | Ninguna en el uso público (ver §1). Opcional por `X-API-Key` si `API_KEYS` está definido. | `app/security.py` |
 | **Autorización** | No aplica: no hay recursos por usuario y `/api/detect` no guarda nada del usuario (ver persistencia). | — |
 | **Rate limiting** | Por IP en production (6/60 s; `X-Forwarded-For` solo con `TRUSTED_PROXY_HOPS`) y por clave cuando hay `API_KEYS`. | `app/ratelimit.py`, `app/security.py` |
