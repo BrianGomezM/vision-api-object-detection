@@ -39,7 +39,6 @@
    "GET /api/dataset/stats",
    "GET /api/finetune/status",
    "GET /api/health",
-   "GET /api/metrics",
    "GET /api/metrics/latency",
    "GET /api/metrics/summary",
    "GET /api/test/results",

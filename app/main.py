@@ -39,7 +39,6 @@ ENDPOINTS registrados (perfil development):
   /api/finetune/prepare  POST — prepara dataset en formato YOLO (data.yaml)
   /api/finetune/status   GET  — estado del dataset preparado
   /api/feedback          POST/GET — evaluación de usuarios (escala Likert)
-  /api/metrics           GET  — métricas de sesión en memoria
   /api/catalog           GET  — catálogo único de pruebas (sin ground truth)
   /api/study/*                — sesiones de evaluación con usuarios
 """
@@ -202,7 +201,7 @@ def create_app(profile: str | None = None) -> FastAPI:
         # Endpoints INTERNOS: no se montan en el perfil study.
         app.include_router(debug_router,   prefix="/api")  # /debug-detect
         app.include_router(eval_router,    prefix="/api")  # dataset, fine-tuning, pruebas, métricas
-        app.include_router(metrics_router, prefix="/api")  # GET /api/metrics, POST/GET /api/feedback
+        app.include_router(metrics_router, prefix="/api")  # POST/GET /api/feedback
 
         # Imágenes anotadas con bounding boxes: GET /detections/<archivo>.jpg
         detections_dir = data_dir("annotated")

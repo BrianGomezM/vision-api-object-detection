@@ -9,7 +9,7 @@ INTERNAL_PATHS = {
     "/api/debug-detect", "/api/dataset/upload", "/api/dataset/stats",
     "/api/finetune/prepare", "/api/finetune/status", "/api/test/functional",
     "/api/test/load", "/api/test/results", "/api/metrics/summary",
-    "/api/metrics/latency", "/api/metrics", "/api/feedback", "/detections",
+    "/api/metrics/latency", "/api/feedback", "/detections",
 }
 RESEARCHER_PATHS = {"/api/detect", "/api/health", "/api/tts/models", "/api/study/sessions", "/api/catalog"}
 
@@ -142,3 +142,10 @@ def test_dockerfile_fija_el_perfil_production():
     from pathlib import Path
     dockerfile = (Path(__file__).resolve().parents[1] / "Dockerfile").read_text(encoding="utf-8")
     assert "ENV APP_PROFILE=production" in dockerfile
+
+
+@pytest.mark.parametrize("profile", ["development", "study", "production"])
+def test_get_api_metrics_eliminado(make_client, profile):
+    """GET /api/metrics (acumulador en memoria nunca alimentado) se eliminó; las
+    métricas de producción siguen en /api/metrics/summary y /latency (development)."""
+    assert make_client(profile, keys="k1").get("/api/metrics", headers={"X-API-Key": "k1"}).status_code == 404

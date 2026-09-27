@@ -15,8 +15,8 @@ PROPÓSITO:
   - Validación académica del comportamiento del modelo
 
 USO (desde la raíz del proyecto):
-  python diagnostico_yolo.py test_images/sala.jpg
-  python diagnostico_yolo.py test_images/sala.jpg 0.25
+  python scripts/diagnostics/diagnostico_yolo.py test_images/sala.jpg
+  python scripts/diagnostics/diagnostico_yolo.py test_images/sala.jpg 0.25
 
 PARÁMETROS:
   imagen     : ruta a la imagen (JPEG o PNG)
@@ -39,8 +39,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Asegurar que el proyecto raíz está en el path
-ROOT = Path(__file__).resolve().parent
+# Asegurar que el proyecto raíz está en el path (scripts/diagnostics/ → raíz)
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 # Cargar variables de entorno del proyecto

@@ -1,119 +1,30 @@
 """
 app/routes/metrics.py
 
-Endpoints de evaluación para el trabajo de grado.
+Valoraciones de usuarios (encuesta Likert) — perfil development.
+
+Se eliminó GET /api/metrics (métricas "de sesión" en memoria): su acumulador
+record_request() no se llamaba desde ningún sitio, así que siempre devolvía
+contadores vacíos. Las métricas reales de producción están en app/telemetry.py
+y se consultan con GET /api/metrics/summary y /latency.
 
 ENDPOINTS:
-  POST /api/metrics/record   → registra métricas de una petición (llamado internamente)
-  GET  /api/metrics          → resumen agregado de métricas en memoria
   POST /api/feedback         → guarda retroalimentación de usuarios finales
   GET  /api/feedback         → lista todos los registros de feedback (para análisis)
 
 ALMACENAMIENTO:
-  - Métricas: acumulador en memoria (se reinicia al reiniciar el servidor).
   - Feedback: archivo JSON persistente en feedback_data/ para análisis de tesis.
 """
 
 import json
-import time
 import datetime
 import threading
-from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 router = APIRouter()
-
-# ──────────────────────────────────────────────────────────────
-# ACUMULADOR DE MÉTRICAS (en memoria)
-# ──────────────────────────────────────────────────────────────
-
-_metrics: dict = {
-    "total_requests":       0,
-    "total_detections":     0,
-    "tts_success":          0,
-    "tts_failure":          0,
-    "llm_errors":           0,
-    "sum_total_ms":         0.0,
-    "sum_deteccion_ms":     0.0,
-    "sum_llm_ms":           0.0,
-    "sum_tts_ms":           0.0,
-    "sum_objetos":          0,
-    "started_at":           datetime.datetime.utcnow().isoformat() + "Z",
-}
-
-
-def record_request(tiempos: dict, n_objetos: int, tts_ok: bool, llm_error: bool) -> None:
-    """
-    Acumula las métricas de una petición completada.
-    Llamado desde detect.py al final del pipeline.
-    """
-    _metrics["total_requests"]   += 1
-    _metrics["total_detections"] += n_objetos
-    _metrics["sum_objetos"]      += n_objetos
-    _metrics["sum_total_ms"]     += tiempos.get("total_ms", 0.0)
-    _metrics["sum_deteccion_ms"] += tiempos.get("deteccion_ms", 0.0)
-    _metrics["sum_llm_ms"]       += tiempos.get("llm_ms", 0.0)
-    _metrics["sum_tts_ms"]       += tiempos.get("tts_ms", 0.0)
-    if tts_ok:
-        _metrics["tts_success"] += 1
-    else:
-        _metrics["tts_failure"] += 1
-    if llm_error:
-        _metrics["llm_errors"] += 1
-
-
-# ──────────────────────────────────────────────────────────────
-# GET /api/metrics
-# ──────────────────────────────────────────────────────────────
-
-@router.get("/metrics", tags=["Evaluación"])
-def get_metrics():
-    """
-    Retorna métricas agregadas de la sesión actual.
-
-    Útil para:
-      - Evaluar tiempos de respuesta promedio (requisito A28 de la tesis).
-      - Verificar tasa de éxito del TTS.
-      - Monitorear cantidad de objetos detectados por petición.
-
-    Las métricas se acumulan desde el último reinicio del servidor.
-    """
-    n = _metrics["total_requests"]
-    if n == 0:
-        return {
-            "total_requests": 0,
-            "mensaje": "Sin peticiones registradas aún. Envía imágenes al endpoint /api/detect.",
-            "started_at": _metrics["started_at"],
-        }
-
-    return {
-        "total_requests":          n,
-        "started_at":              _metrics["started_at"],
-        "objetos": {
-            "total_detectados":    _metrics["total_detections"],
-            "promedio_por_imagen": round(_metrics["sum_objetos"] / n, 2),
-        },
-        "tiempos_promedio_ms": {
-            "total":     round(_metrics["sum_total_ms"]     / n, 1),
-            "deteccion": round(_metrics["sum_deteccion_ms"] / n, 1),
-            "llm":       round(_metrics["sum_llm_ms"]       / n, 1),
-            "tts":       round(_metrics["sum_tts_ms"]       / n, 1),
-        },
-        "tts": {
-            "exitoso":  _metrics["tts_success"],
-            "fallido":  _metrics["tts_failure"],
-            "tasa_exito": (
-                f"{_metrics['tts_success'] / n:.1%}" if n > 0 else "N/A"
-            ),
-        },
-        "llm": {
-            "errores": _metrics["llm_errors"],
-        },
-    }
-
 
 # ──────────────────────────────────────────────────────────────
 # FEEDBACK — almacenamiento persistente
