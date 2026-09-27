@@ -34,15 +34,16 @@ PIPELINE COMPLETO (app/core/pipeline.py::run — este módulo es solo el adaptad
 """
 
 import io
+from urllib.parse import quote
 import base64
 from pathlib import Path
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Response
-from fastapi.responses import StreamingResponse
-from PIL import Image
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from PIL import Image, UnidentifiedImageError
 
 from app.services.tts_service          import (
-    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_SKIPPED_STATUS,
+    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_SKIPPED_STATUS, TTS_TIMEOUT_STATUS,
 )
 from app.utils.uploads                 import read_upload_limited
 
@@ -69,6 +70,10 @@ from app.storage import resolve_output
 from app import telemetry
 from app import experiment
 from app.profiles import app_profile
+from app.errors import ApiError
+from app.core.pipeline import PipelineStageError
+from app.services.yolo_service import ModelUnavailableError
+from app.utils.groq_client import is_llm_active
 
 # Alias históricos
 build_final_narrative = build_narrative          # usado por app/experimental/batch.py
@@ -120,20 +125,108 @@ def _discard_outputs(annotated_path: str | None, audio_path: str | None) -> None
 
 def _tts_unavailable_reason() -> str:
     """
-    Clasifica por qué no hay audio disponible, para que el cliente pueda
-    mostrar un mensaje útil en vez de un genérico "TTS no disponible":
-      - "cuota_excedida"  : Gemini devolvió 429 / RESOURCE_EXHAUSTED.
-      - "error_sintesis"  : falló por otra razón (ver logs del servidor).
-      - "tts_desactivado" : falta GOOGLE_API_KEY o dependencias no instaladas.
+    Clasifica por qué no hay audio (campo audio.razon de la respuesta):
+      - "tts_omitido_evaluacion": EVALUATION_DISABLE_TTS=true.
+      - "tts_desactivado"       : falta GOOGLE_API_KEY o dependencias.
+      - "cuota_excedida"        : Gemini devolvió 429 / RESOURCE_EXHAUSTED.
+      - "tiempo_agotado"        : el proveedor no respondió dentro de TTS_TIMEOUT_S.
+      - "error_sintesis"        : cualquier otro fallo (detalle en el log).
     """
     err = get_last_tts_error()
     if err is None:
         return "tts_desactivado"
-    if err.get("status") == TTS_SKIPPED_STATUS:
+    status = err.get("status")
+    if status == TTS_SKIPPED_STATUS:
         return "tts_omitido_evaluacion"
-    if err.get("code") == 429 or err.get("status") == "RESOURCE_EXHAUSTED":
+    if status in ("NO_CONFIGURADO", "DEPENDENCIAS_NO_DISPONIBLES"):
+        return "tts_desactivado"
+    if err.get("code") == 429 or status == "RESOURCE_EXHAUSTED":
         return "cuota_excedida"
+    if status == TTS_TIMEOUT_STATUS:
+        return "tiempo_agotado"
     return "error_sintesis"
+
+
+# ── Contrato de errores (app/errors.py) ─────────────────────────────
+_ALLOWED_FORMATS = {"JPEG", "PNG"}                       # contrato: "Imagen JPEG o PNG"
+_SUPPORTED_MAGIC = (bytes.fromhex("89504e470d0a1a0a"), bytes.fromhex("ffd8ff"))   # firmas PNG / JPEG
+_TTS_REASON_CODE = {
+    "tts_omitido_evaluacion": "TTS_UNAVAILABLE", "tts_desactivado": "TTS_UNAVAILABLE",
+    "cuota_excedida": "TTS_QUOTA_EXCEEDED", "tiempo_agotado": "TTS_TIMEOUT",
+    "error_sintesis": "TTS_PROVIDER_ERROR",
+}
+_STAGE_CODE = {
+    "preprocesamiento": "IMAGE_DECODE_ERROR", "deteccion": "DETECTION_ERROR",
+    "espacial": "SPATIAL_ANALYSIS_ERROR", "pasos": "STEP_ESTIMATION_ERROR",
+    "espacio_libre": "FREE_SPACE_ERROR", "decision": "MOVEMENT_DECISION_ERROR",
+    "narrativa": "NARRATIVE_GENERATION_ERROR", "tts": "AUDIO_STORAGE_ERROR",
+}
+_LLM_INVALID_TYPES = {"JSONDecodeError", "ValueError", "KeyError", "IndexError", "AttributeError", "TypeError"}
+
+
+async def _read_valid_image(file: UploadFile) -> bytes:
+    """Lee y valida la subida. Solo acepta JPEG/PNG según el CONTENIDO (no la extensión)."""
+    try:
+        data = await read_upload_limited(file)
+    except HTTPException as exc:
+        if exc.status_code == 413:
+            raise ApiError("PAYLOAD_TOO_LARGE", internal=str(exc.detail))
+        raise
+    if not data:
+        raise ApiError("EMPTY_FILE")
+    try:
+        with Image.open(io.BytesIO(data)) as im:
+            fmt, (w, h) = im.format, im.size
+    except Image.DecompressionBombError as exc:
+        raise ApiError("IMAGE_TOO_LARGE", internal=type(exc).__name__)
+    except UnidentifiedImageError as exc:
+        # Firma de JPEG/PNG pero contenido irreconocible → imagen dañada (422); si no, formato ajeno (415).
+        if data.startswith(_SUPPORTED_MAGIC):
+            raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+        raise ApiError("UNSUPPORTED_IMAGE", internal=type(exc).__name__)
+    except Exception as exc:
+        raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+    if fmt not in _ALLOWED_FORMATS:
+        raise ApiError("UNSUPPORTED_IMAGE", internal=str(fmt))
+    try:                                   # verify() no decodifica píxeles; load() sí (archivos truncados)
+        with Image.open(io.BytesIO(data)) as im:
+            im.verify()
+        with Image.open(io.BytesIO(data)) as im:
+            im.load()
+    except Image.DecompressionBombError as exc:
+        raise ApiError("IMAGE_TOO_LARGE", internal=type(exc).__name__)
+    except Exception as exc:
+        raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+    # El preprocesamiento escala el lado mayor a MAX_IMAGE_DIM: si el menor quedara en 0 px, no es procesable.
+    if max(w, h) > _MAX_IMAGE_DIM and int(min(w, h) * _MAX_IMAGE_DIM / max(w, h)) < 1:
+        raise ApiError("IMAGE_DIMENSIONS_UNSUPPORTED", internal=f"{w}x{h}")
+    return data
+
+
+def _run_core(image_bytes: bytes, threshold: float, debug: bool, **kw) -> dict:
+    """core.pipeline.run con los fallos de etapa traducidos al contrato de errores."""
+    try:
+        return pipeline.run(image_bytes, threshold, debug, **kw)
+    except PipelineStageError as exc:
+        internal = f"{type(exc.cause).__name__}: {exc.cause}"
+        if isinstance(exc.cause, ModelUnavailableError):
+            raise ApiError("MODEL_UNAVAILABLE", internal=internal)
+        raise ApiError(_STAGE_CODE[exc.stage], internal=internal)
+
+
+def _llm_issue(result: dict) -> str | None:
+    """¿La narrativa se generó SIN el LLM previsto? Devuelve el código correspondiente."""
+    if not result["analyzed"]:
+        return None                        # sin objetos no se consulta al LLM
+    for part in (result["desc_result"], result["escenario"]):
+        if part.get("llm_error"):
+            etype = part.get("llm_error_type") or ""
+            if "timeout" in etype.lower():
+                return "LLM_TIMEOUT"
+            return "LLM_INVALID_RESPONSE" if etype in _LLM_INVALID_TYPES else "LLM_PROVIDER_ERROR"
+    if not is_llm_active():
+        return "LLM_UNAVAILABLE"
+    return None
 
 
 # ──────────────────────────────────────────────────────────────
@@ -169,7 +262,7 @@ async def detect(
         ),
     ),
     _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
-    response: Response = None,               # inyectado por FastAPI (cabecera X-Request-ID)
+    request: Request = None,                 # inyectado por FastAPI (request_id del middleware)
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
@@ -183,30 +276,40 @@ async def detect(
     Las métricas de cada solicitud exitosa se registran automáticamente en
     metrics/production_metrics.jsonl para consumo desde GET /api/metrics/summary.
     """
-    # Trazabilidad: identificador por solicitud (cabecera X-Request-ID y telemetría).
-    request_id = experiment.new_request_id()
-    if response is not None:
-        response.headers["X-Request-ID"] = request_id
+    # request_id: lo asigna app/observability.py a TODA solicitud (cabecera X-Request-ID).
+    request_id = getattr(request.state, "request_id", None) if request else None
+    profile    = app_profile()
+    image_bytes = await _read_valid_image(file)
+
+    threshold = normalize_threshold(confidence_threshold)
+    # Núcleo: pipeline completo + TTS (se genera en toda petición, flujo original).
+    # tts_model permite al cliente elegir un modelo alterno con cuota
+    # propia cuando el modelo por defecto agota su RPM gratuito.
+    result     = _run_core(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
+    audio_path = result["audio_path"]
+    tts_ms     = result["tts_ms"]
     try:
-        image_bytes = await read_upload_limited(file)
-        if not image_bytes:
-            raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
+        if request is not None:
+            request.state.weights_sha256 = experiment.weights_identity()["sha256"]
 
-        try:
-            Image.open(io.BytesIO(image_bytes)).verify()
-        except Exception:
-            raise HTTPException(
-                status_code=422,
-                detail="El archivo enviado no es una imagen válida o está corrupto.",
-            )
-
-        threshold = normalize_threshold(confidence_threshold)
-        # Núcleo: pipeline completo + TTS (se genera en toda petición, flujo original).
-        # tts_model permite al cliente elegir un modelo alterno con cuota
-        # propia cuando el modelo por defecto agota su RPM gratuito.
-        result     = pipeline.run(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
-        audio_path = result["audio_path"]
-        tts_ms     = result["tts_ms"]
+        # ── Degradaciones: partes que no se generaron con el componente previsto ──
+        degradations = []
+        if request is not None:
+            request.state.degradations = degradations      # visible en el log también si se lanza un error
+        llm_code = _llm_issue(result)
+        if llm_code:
+            degradations.append(llm_code)
+            if profile == "study":             # estudio formal: nunca narrativa de respaldo silenciosa
+                raise ApiError(llm_code, internal=str(result["desc_result"].get("llm_error")
+                                                      or result["escenario"].get("llm_error")))
+        tts_code = None if audio_path else _TTS_REASON_CODE[_tts_unavailable_reason()]
+        if tts_code:
+            degradations.append(tts_code)
+            if audio or profile == "study":    # el audio es obligatorio: audio=true o estudio
+                raise ApiError(tts_code, internal=str(get_last_tts_error()),
+                               headers={"Retry-After": "60"} if tts_code == "TTS_QUOTA_EXCEEDED" else None)
+        if result["analyzed"] and not result.get("annotated_path"):
+            degradations.append("ANNOTATION_UNAVAILABLE")
 
         # ── Imagen anotada: leer del disco y codificar en base64 ─────
         annotated_info = _build_annotated_info(result.get("annotated_path"))
@@ -251,8 +354,7 @@ async def detect(
         # ── Perfil production: no conservar derivados de la imagen del usuario ──
         # La imagen anotada y el audio ya están en memoria (base64 / stream); en
         # producción no se guardan en disco (docs/DATOS_PERSISTENCIA.md).
-        if app_profile() == "production":
-            _discard_outputs(result.get("annotated_path"), audio_path)
+        if profile == "production":
             annotated_info["archivo"] = annotated_info["url"] = None
             audio_info["archivo"] = None
             audio_path = ""
@@ -268,6 +370,7 @@ async def detect(
                 "deteccion_ms":   result["tiempos"].get("deteccion_ms", 0),
                 "total_ms":       result["tiempos"].get("total_ms", 0),
                 "escenario":      result["escenario"].get("scene_type", "desconocido"),
+                "degradaciones":  degradations,
             })
         except Exception:
             pass  # El registro de métricas nunca debe romper la respuesta principal
@@ -275,9 +378,12 @@ async def detect(
         # ── Modo stream: devuelve MP3 binario ─────────────────
         if audio:
             if raw_bytes:
+                # Las cabeceras HTTP solo admiten latin-1: el texto va codificado en
+                # porcentaje (UTF-8) para no fallar con caracteres como "—" o "“".
                 headers = {
-                    "X-Narrativa":          result["narrativa_final"][:500],
-                    "X-Escenario":          result["escenario"].get("scene_type", ""),
+                    "X-Narrativa":          quote(result["narrativa_final"][:500]),
+                    "X-Escenario":          quote(result["escenario"].get("scene_type", "")),
+                    "X-Texto-Codificacion": "percent-encoded-utf-8",
                     "X-Objetos-Detectados": str(len(result["detections"])),
                     "X-Audio-File":         audio_path,
                     "X-Request-ID":         request_id,
@@ -287,20 +393,6 @@ async def detect(
                     media_type="audio/mpeg",
                     headers=headers,
                 )
-            razon = audio_info["razon"]
-            aviso = {
-                "tts_omitido_evaluacion": "TTS omitido intencionalmente (EVALUATION_DISABLE_TTS=true).",
-                "cuota_excedida":  "TTS no disponible: se alcanzó el límite de cuota de Gemini TTS. Intenta de nuevo en un momento.",
-                "tts_desactivado": "TTS no disponible. Verificar que GOOGLE_API_KEY esté configurada.",
-                "error_sintesis":  "TTS no disponible: la síntesis falló. Ver logs del servidor para más detalle.",
-            }.get(razon, "TTS no disponible.")
-            return {
-                "status":          "success_no_audio",
-                "narrativa_final": result["narrativa_final"],
-                "aviso":           aviso,
-                "metricas":        metricas,
-            }
-
         # ── Modo JSON completo ─────────────────────────────────
         response = {
             "status":           "success",
@@ -337,12 +429,14 @@ async def detect(
                 "prompt_llm":      result["desc_result"].get("prompt"),
             }
 
+        if degradations:
+            return JSONResponse(response, headers={"X-Degradacion": ",".join(degradations)})
         return response
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    finally:
+        # Perfil production: no conservar derivados de la imagen del usuario, tampoco si hubo error.
+        if profile == "production":
+            _discard_outputs(result.get("annotated_path"), result.get("audio_path"))
 
 
 # ──────────────────────────────────────────────────────────────
@@ -360,21 +454,10 @@ async def debug_detect(
     Útil para calibración, validación y diagnóstico académico.
     No registra métricas de producción (endpoint de diagnóstico).
     """
-    try:
-        image_bytes = await read_upload_limited(file)
-        if not image_bytes:
-            raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
-
-        try:
-            Image.open(io.BytesIO(image_bytes)).verify()
-        except Exception:
-            raise HTTPException(
-                status_code=422,
-                detail="El archivo enviado no es una imagen válida o está corrupto.",
-            )
-
-        threshold   = normalize_threshold(confidence_threshold)
-        result      = pipeline.run(image_bytes, threshold, debug=True)
+    image_bytes = await _read_valid_image(file)
+    threshold   = normalize_threshold(confidence_threshold)
+    result      = _run_core(image_bytes, threshold, True)
+    if True:
         analyzed    = result["analyzed"]
         free_space  = result["free_space"]
         decision    = result["decision"]
@@ -459,10 +542,6 @@ async def debug_detect(
             },
         }
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
 
 
 # ──────────────────────────────────────────────────────────────

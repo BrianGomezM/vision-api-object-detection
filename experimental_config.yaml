@@ -2,7 +2,7 @@
 # No editar a mano: regenerar y revisar el diff. `verificado` = valores efectivos en ejecución.
 schema_version: 1
 descripcion: Configuración OFICIAL de F4 (congelada). preflight() exige coincidencia exacta de `verificado`.
-generado_desde_commit: 9223f948375b4fb5597180218b53e11aafbc61d1
+generado_desde_commit: 43e208c2a45f7b187766ad1f14d29d8649e67d67
 estado_decisiones:
   regla_umbral_por_clase: APROBADA (min) — docs/AUDITORIA_REGLA_UMBRAL_FASE10.md §5
   preprocesamiento: 'APROBADO (ruta de producción: core.pipeline.resize_image)'
@@ -34,15 +34,15 @@ verificado:
     sha256: 646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
     bytes: 20422725
   codigo_nucleo_sha256:
-    app/core/pipeline.py: f381128b695a39a1bf98b8c9f5d732ff8c4de1d22532d3517625d63a65bad01d
-    app/services/yolo_service.py: 494428ef80df48882a8b57aee64cbe785479a65c90979fee8ab9ea48ea006892
+    app/core/pipeline.py: 2f940126de6eee0306f2b788599746af72f41e94a5eebd799b0e94828061a95f
+    app/services/yolo_service.py: 549f509eeaf3eb2ff2f5bdfdd3fc0edf262d4198e1004c8ba243ad1d6756c31a
     app/services/spatial_analyzer.py: f910340bdd2bc5899d600c529fd32c46e0084ea5e474c3e336882331107b0096
     app/services/step_estimator.py: 6f69407d14d70d03cbc71fabade086b39d05375a2953f03c168eef1b52892256
     app/services/free_space_analyzer.py: 99f563a1297ee684053d7ce9ebd9762b64cab460f5cf7a54e9550ffdfff95813
     app/services/risk_engine.py: 66102418803510d9212259fa4a0f6f1dff835a2c459c521496ec10e2eea6cf08
-    app/services/scene_classifier.py: 8b606ee343e734674d69044b015375527b79e8ceb9f406790a49dfdb8427b83c
-    app/services/llm_enhancer.py: 1cb9c881de3c72a4c493eb6ea59514bb8172458b7ba78a3eb2fb968a902e0c06
-    app/services/tts_service.py: fedb8100c1885a612fdaa7e0345dffd3ed42803da486a35de5ca54d047c9ce33
+    app/services/scene_classifier.py: c840e3fc89c2c8294ff31b89a6a706d801056727270d6bab2f8c78abf049dca7
+    app/services/llm_enhancer.py: faae775ce6caa1a831050a1e344ddc450d6893612909d3aa7b29bcf0b960a23a
+    app/services/tts_service.py: 55d4ba0fcad33dd5e46e89c020c1a121a3ece1a716af7b2761650b7d8ae986a8
     app/services/detection_visualizer.py: e40c8886c31ece4f40bb1a89366b693606b2c2c413272bc3feee6f29e1d1fd6d
     app/utils/groq_client.py: 63b1a48f315f9fac6647d776dee5fbacbecfdf3fc86ffb4d8d603589f7447c28
     app/utils/translator.py: 50745f2d301b40008b1743af8f80a54970c0e5390a5d9fde5c4d5fb45e76e9c1
@@ -176,6 +176,7 @@ verificado:
     instruccion_estilo: 'Narra con un tono cálido, natural, claro y neutral, ritmo moderado, apto para narración
       educativa, evitando dramatización excesiva:'
     max_chars: 4500
+    timeout_s: 60.0
     pcm:
       sample_rate_hz: 24000
       sample_width_bytes: 2

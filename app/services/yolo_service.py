@@ -158,6 +158,10 @@ _NAV_CLASSES: set[str] = set(_CLASS_MIN_CONF.keys()) | {
 _model: YOLO | None = None
 
 
+class ModelUnavailableError(RuntimeError):
+    """El modelo no pudo cargarse (pesos ausentes, hash distinto, descarga prohibida…)."""
+
+
 def _sha256(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -284,7 +288,10 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
           ]
         }
     """
-    model = _get_model()
+    try:
+        model = _get_model()
+    except Exception as exc:
+        raise ModelUnavailableError(f"{type(exc).__name__}: {exc}") from exc
 
     # Decodificar imagen
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")

@@ -112,7 +112,7 @@ def test_production_expone_solo_detect_y_health(make_client):
     client = make_client("production")
     assert client.app.openapi_url is None and client.app.docs_url is None and client.app.redoc_url is None
     assert client.get("/api/health").status_code == 200
-    assert client.post("/api/detect").status_code == 422          # existe (falta el archivo)
+    assert client.post("/api/detect").status_code == 400          # existe (falta el archivo: INVALID_REQUEST)
     for path in ("/docs", "/redoc", "/openapi.json", "/", "/api/tts/models", "/api/catalog",
                  "/api/study/sessions", "/api/metrics", "/api/feedback", "/api/test/results",
                  "/api/dataset/stats", "/api/finetune/status", "/detections/x.jpg"):

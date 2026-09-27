@@ -93,3 +93,25 @@ def test_config_oficial_coincide_con_la_ejecucion():
                           capture_output=True, text=True, encoding="utf-8", errors="replace",
                           env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     assert proc.returncode == 0, proc.stdout + proc.stderr[-1500:]
+
+
+def _result(**over):
+    base = {"analyzed": [{"label": "chair"}], "desc_result": {"text": "x"}, "escenario": {"scene_type": "s"},
+            "audio_path": "audio_output/a.mp3"}
+    base.update(over)
+    return base
+
+
+def test_assert_complete_acepta_resultado_completo(sim):
+    experiment.assert_complete(_result())
+
+
+@pytest.mark.parametrize("over,msg", [
+    ({"desc_result": {"text": "x", "llm_error": "e", "llm_error_type": "APITimeoutError"}}, "desc_result"),
+    ({"escenario": {"scene_type": "s", "llm_error": "e"}}, "escenario"),
+    ({"escenario": {"scene_type": "s", "cached": True}}, "caché"),
+    ({"audio_path": None}, "sin audio"),
+])
+def test_assert_complete_rechaza_respaldos(sim, over, msg):
+    with pytest.raises(experiment.IncompleteResultError, match=msg):
+        experiment.assert_complete(_result(**over))

@@ -21,10 +21,10 @@
 | **Tamaño de subida** | Máximo 10 MB (`MAX_UPLOAD_MB`). Se leen como mucho 10 MB + 1 byte y, si se supera, se responde **413**. | `app/utils/uploads.py` |
 | **Validación del archivo** | Archivo vacío → 400. `PIL.Image.verify()` → 422 si no es una imagen válida. | `app/routes/detect.py` |
 | **Imágenes enormes** | Pillow avisa a partir de ~89,5 Mpx (`MAX_IMAGE_PIXELS`) y rechaza el doble. La imagen se reduce a 800 px antes de la inferencia. | Pillow; `core/pipeline.resize_image` |
-| **Timeouts** | Groq: 15 s con 2 reintentos (`GROQ_TIMEOUT`, `GROQ_MAX_RETRIES`). Gunicorn: 600 s y **1 worker**. **Gemini TTS: sin timeout explícito** (`genai.Client` con los valores por defecto del SDK). | `groq_client.py`, `Dockerfile`, `tts_service.py` |
+| **Timeouts** | Groq: 15 s con 2 reintentos. **Gemini TTS: 60 s (`TTS_TIMEOUT_S`, añadido en el hardening)**. Gunicorn: 600 s y **1 worker**. | `groq_client.py`, `tts_service.py`, `Dockerfile` |
 | **Concurrencia** | 1 worker. Las solicitudes pesadas se atienden de una en una, lo que limita el consumo pero también la disponibilidad. | `Dockerfile` |
 | **CORS** | Orígenes `localhost:3000/3001`, `CORS_ORIGINS` y la expresión regular `https://visionnav-client(-…)*.vercel.app`. Métodos GET, POST y OPTIONS. Verificado: acepta `*.vercel.app` del proyecto y rechaza un origen ajeno. | `app/main.py` |
-| **Manejo de errores** | 400/413/422 para entradas inválidas. Cualquier otro error devuelve **HTTP 200** con `{"status": "error", "message": str(e)}`: el texto de la excepción llega al cliente. | `app/routes/detect.py` |
+| **Manejo de errores** | **Contrato uniforme** (`docs/CONTRATO_ERRORES.md`): status 400/413/415/422/500/502/503/504 con código, etapa y `request_id`, y **sin texto de excepciones**. Ninguna falla devuelve 200. | `app/errors.py`, `app/routes/detect.py` |
 | **Persistencia de datos del usuario** | No se guarda la imagen subida. La imagen anotada y el audio se **borran tras responder** (van en la respuesta como `data_uri`). La telemetría guarda `request_id`, commit, hash de pesos, número de objetos, confianza media, tiempos y escenario: **sin imagen ni texto**. | `app/routes/detect.py`, `app/telemetry.py` |
 | **Trazabilidad** | Cabecera `X-Request-ID` en cada respuesta, correlacionable con la telemetría. | `app/routes/detect.py` |
 
@@ -33,6 +33,6 @@
 1. **No hay límite de peticiones en el uso público.** Un abuso puede agotar la cuota gratuita de Gemini TTS y de Groq, y ocupar el único worker. Propuestas, de menor a mayor esfuerzo:
    - (a) restricciones de acceso o límites de la plataforma (Azure App Service o Front Door);
    - (b) un límite por IP en la aplicación, con la salvedad de que detrás del proxy de Azure la IP viene de `X-Forwarded-For`.
-2. **Gemini TTS sin timeout:** una llamada colgada puede bloquear el worker hasta 600 s. Propuesta: fijar un timeout en `genai.Client(http_options=...)`. Cambia el núcleo (TTS), así que se haría antes de congelar F4 o después de la evaluación, nunca durante.
-3. **Mensajes de error internos devueltos al cliente** (HTTP 200 + `str(e)`). Propuesta: en production, un mensaje genérico con el `request_id` y el detalle solo en el log. Cambia la respuesta de error (no el esquema).
+2. ~~Gemini TTS sin timeout~~: **resuelto** (60 s; la configuración congelada se regeneró).
+3. ~~Mensajes de error internos devueltos con HTTP 200~~: **resuelto** (contrato de errores).
 4. **Descarga automática de pesos en la imagen de Docker:** `.gitignore` excluye `*.pt`, así que el build de CI no incluye `yolo26s.pt` y Ultralytics lo descarga al arrancar. Propuesta: incluir los pesos verificados en la imagen y fijar `YOLO_WEIGHTS_SHA256` y `YOLO_ALLOW_DOWNLOAD=false`. **F4 no depende de esto**: el runner local exige los pesos congelados y verifica su hash.
