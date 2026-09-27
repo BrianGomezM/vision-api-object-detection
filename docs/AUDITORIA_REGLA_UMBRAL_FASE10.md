@@ -67,3 +67,56 @@ Los datos no permiten elegirla por rendimiento. Elegir la regla que dé mejores 
 - **README de la fase 10:** decir que usó la regla `min()` (la de producción el 20-09) y la **imagen original, sin el redimensionado de producción**.
 - **Tesis §5.2.3:** indicar la configuración exacta (regla y preprocesado) con la que se obtuvieron los recuentos. Evitar sugerir que representan el sistema desplegado hoy.
 - **Tesis, línea 855 y Tabla 9:** alinearlas con la regla que se apruebe.
+
+## 5. DECISIÓN (checkpoint final pre-F4, 2026-09-27): regla oficial `min(class_min, umbral)`
+
+- **Código:** `app/services/yolo_service.py`, función `run_yolo`, línea `effective = min(class_min, confidence_threshold)`.
+- **Configuración:** congelada en `experimental_config.yaml` (`detection.threshold_rule`).
+- **Pruebas que la fijan:** `tests/test_yolo_rule.py`.
+
+### 5.1 Justificación
+
+No se decidió "porque está en la tesis" ni "porque es el código". Se tuvieron en cuenta seis criterios:
+
+| Criterio | `min()` | `max()` |
+|---|---|---|
+| **Trazabilidad histórica** | Vigente del 19-05 al 21-09-2026, unos 4 meses (`de2cff4` → `2c29448`) | Vigente 6 días (21-09 → 27-09), solo en commits locales |
+| **Sistema desplegado** | `origin/main` (último estado conocido, `771ced1`, 25-06-2026) usa `min()`. Es la única versión que ha llegado a Azure por CI. | Nunca subido a `origin` (último estado conocido; `git ls-remote` no pudo verificarse sin credenciales) |
+| **Comportamiento documentado** | La tesis lo dice explícitamente (tabla de `run_yolo`) y la Tabla 9 se justifica con umbrales bajos para obstáculos | Contradice esos dos textos |
+| **Evidencia realmente usada** | Fases 9 y 10 | Solo la fase 2A, que comparaba ambas reglas |
+| **Evidencia de rendimiento** | Ninguna concluyente. Fase 2A (n = 5, exploratoria): VP 16 / FN 1 / no confirmadas 3 | Ídem: 15 / 2 / 2. El cambio se hizo por la interfaz (control deslizante del cliente), **sin evaluación** |
+| **Reproducibilidad** | Determinista (regresión 41/41) | Determinista |
+| **Impacto sobre resultados ya documentados** | Las fases 9 y 10 quedan coherentes **en la regla**; la diferencia de preprocesado sigue documentada (§1, H6) | Obligaría a declarar que las fases 9 y 10, y el texto de la tesis, describen una configuración distinta de la evaluada |
+
+**Por qué se elige `min()`:**
+
+- Es la regla con la que existe trazabilidad (documento, evidencia y despliegue).
+- Su motivación de diseño es de **seguridad del usuario**: no perder obstáculos detectados con baja confianza.
+- El argumento a favor de `max()`, que el control deslizante pueda endurecer el filtro, no afecta al experimento: F4 usa un umbral fijo de 0,35.
+
+**Limitaciones que se declaran:**
+
+- Con `min()`, el umbral del endpoint no puede endurecer las clases que tienen mínimo propio.
+- Las clases con mínimo mayor que el umbral quedan en el umbral: `tv` pasa de 0,40 a 0,35.
+- La confianza interna de la inferencia (0,15) es un piso: `dining table` pasa de 0,10 a 0,15 efectivo.
+- Las claves `door`, `stairs`, `desk`, `table`, `sofa`, `stool`, `bag`, `box` y `monitor` no son clases de COCO-80, así que el modelo nunca las detecta.
+
+### 5.2 Umbrales efectivos oficiales (umbral del endpoint = 0,35; confianza interna = 0,15)
+
+Son 31 clases alcanzables: las de `_NAV_CLASSES` que existen en COCO-80.
+
+| Efectivo | Clases |
+|---|---|
+| 0,15 | dining table (mín. 0,10, acotado por la conf. interna), wine glass |
+| 0,20 | knife, scissors |
+| 0,25 | bottle, potted plant, vase |
+| 0,30 | backpack, bed, bench, cat, chair, clock, couch, dog, person, refrigerator, sink, suitcase, toilet |
+| 0,35 | cell phone, laptop, **tv (mín. 0,40, acotado por el umbral)**, bicycle, bus, car, motorcycle, skateboard, sports ball, truck, umbrella |
+
+**Clases del Dataset 1:** chair 0,30; dining table 0,15; couch 0,30; potted plant 0,25; person 0,30; bottle 0,25; laptop 0,35.
+
+### 5.3 Efecto sobre lo derivado
+
+- **Línea base de regresión regenerada.** Diff en `tests/regression/CAMBIOS_LINEA_BASE.md`: 22/41 imágenes y 50 detecciones añadidas (0,157–0,349), coincidiendo con lo que midió la fase 2A. La nueva línea base reproduce 41/41 lo registrado por la fase 2A con `regla=min`.
+- **Dataset 1:** no se modifica. Todavía no existen resultados derivados del Dataset 1.
+- **Evidencia histórica:** no se recalcula ni se reescribe. La fase 2A (regla `max` en producción, con `min` como variante) y las fases 9 y 10 (`min`, sin redimensionar) se citan con su configuración.
