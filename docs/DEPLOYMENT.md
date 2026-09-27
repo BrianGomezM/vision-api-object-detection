@@ -22,7 +22,7 @@ Evidencia citada (en `evaluation/results/hardening/`):
 | Stack | FastAPI + gunicorn/uvicorn, **1 worker**, pipeline serializado (1 hilo + lock); `/api/health` responde durante una detección | `Dockerfile`, `app/routes/detect.py` |
 | Imagen | `python:3.13-slim`, torch **2.13.0+cpu**, ultralytics 8.4.123, ~530 MB | *(medido)* |
 | Pesos | `yolo26s.pt` **dentro de la imagen**, SHA-256 `646f8bc3…4a1b`, verificado en el build y en el arranque | §C |
-| Memoria | ~490–520 MiB en reposo; **pico 620–790 MB** con detecciones (máx. ~810 MB en corridas previas) | *(medido)* `limites_recursos` |
+| Memoria | ~490–560 MiB en reposo; meseta de ~827 MiB tras 10 detecciones seguidas, **sin crecimiento hasta 40** (sin fugas); **pico máximo observado 918 MiB** | *(medido)* `limites_recursos`, prueba de 40 solicitudes |
 | Arranque | 4–5 s con 8 hilos; **13–14 s con 1 vCPU**, ~9 s con 2 vCPU (carga de YOLO + warm-up) | *(medido)* |
 | Inferencia YOLO | ~0,5–1,4 s con 8 hilos; **3,1–4,9 s con 1 vCPU**; 1,8–2,6 s con 2 vCPU | *(medido)* |
 | LLM (Groq) | ~0,4–0,5 s por llamada (2 llamadas por solicitud); timeout de 15 s con 2 reintentos | `live_smoke` |
@@ -45,7 +45,7 @@ Especificaciones y precios consultados el 2026-09-27; **confirmar en la calculad
 | Criterio | Azure App Service B1 (Linux, contenedor) | Render |
 |---|---|---|
 | FastAPI / Python / Docker | Contenedor desde GHCR (ya configurado). `WEBSITES_PORT=8000` | Contenedor desde Dockerfile o registro. Usa `$PORT` (el `CMD` ya lo respeta) |
-| PyTorch CPU + YOLO: memoria | **1,75 GB: margen ≈ 2,2× sobre el pico medido (810 MB)** | Starter 512 MB: **no arranca** (14 reinicios por OOM en 150 s, *medido*). Standard 2 GB: sí, a 25 USD/mes. Free: RAM no documentada en la página consultada y se suspende, no apto |
+| PyTorch CPU + YOLO: memoria | **1,75 GB: margen ≈ 1,9× sobre el pico máximo medido (918 MiB)** | Starter 512 MB: **no arranca** (14 reinicios por OOM en 150 s, *medido*). Standard 2 GB: sí, a 25 USD/mes. Free: RAM no documentada en la página consultada y se suspende, no apto |
 | CPU / inferencia | 1 núcleo: YOLO ≈ 3,1–4,9 s *(medido con `--cpus=1`)* | Standard 1 CPU: igual. Starter 0,5 CPU: no aplica (OOM) |
 | Arranque | 12–15 s de la app (1 vCPU) + descarga de ~530 MB de imagen en cada nuevo host. **Always On** (disponible en Basic) evita descargas por inactividad | Similar en planes de pago. Free: ~1 min tras cada suspensión |
 | **Timeout HTTP** | **Balanceador: ~230–240 s, NO configurable.** El cliente corta a 180 s, antes que la plataforma | Máx. 100 min (sin riesgo) |
@@ -204,7 +204,36 @@ Registrar en `evaluation/results/hardening/deploy_<sha7>.json`: digest de la ima
 
 ---
 
-## G. Riesgos abiertos (verificables solo en la nube)
+## G. Estado real de Azure (auditoría del 2026-09-27, solo lectura)
+
+| Elemento | Valor encontrado | Requerido | Estado |
+|---|---|---|---|
+| App | `visionnav-api` (rg `rg-visionnav`, Canada Central), **Stopped** | — | Sin cambios |
+| Plan | `ASP-rgvisionnav-aff9`, B1 Linux, 1 instancia | B1, 1 instancia | OK |
+| Imagen configurada | `ghcr.io/…:3a1ddb6…` (versión antigua) | `:<sha>` del commit aprobado | La cambia el paso 3 |
+| `YOLO_IMGSZ` | **640** | sin definir (congelado: 1280) | **P1 pendiente** |
+| `YOLO_WEIGHTS` | `yolo26s.pt` (relativa, no existe en la imagen) | sin definir | **P1 pendiente** |
+| `YOLO_IOU` | 0.45 | sin definir | **P1 pendiente** |
+| `SCM_DO_BUILD_DURING_DEPLOYMENT` | true (resto del despliegue por código) | sin definir | **P1 pendiente** |
+| `WEBSITES_PORT` | ausente | 8000 | **P1 pendiente** |
+| Health check | sin configurar | `/api/health` | **P1 pendiente** |
+| Always On / HTTPS only / TLS / FTPS | on / on / 1.2 / FtpsOnly | = | OK |
+| CORS de la plataforma | desactivado | desactivado | OK |
+| Paquete GHCR | público (pull anónimo verificado) | = | OK |
+
+Con la configuración actual, **la imagen nueva no arranca** (reproducido localmente: `deteccion.imgsz: esperado 1280, encontrado 640` → exit 3). Es la verificación de identidad actuando como se diseñó. P1 **debe aplicarse antes o junto con el paso 3**:
+
+```
+az webapp config appsettings delete -g rg-visionnav -n visionnav-api --setting-names YOLO_IMGSZ YOLO_IOU YOLO_WEIGHTS SCM_DO_BUILD_DURING_DEPLOYMENT -o none
+az webapp config appsettings set    -g rg-visionnav -n visionnav-api --settings WEBSITES_PORT=8000 -o none
+az webapp config set                -g rg-visionnav -n visionnav-api --generic-configurations '{"healthCheckPath": "/api/health"}' -o none
+```
+
+(`-o none` evita que la CLI imprima los valores de las demás variables, que incluyen las claves). Valores anteriores, para revertir: `YOLO_IMGSZ=640`, `YOLO_IOU=0.45`, `YOLO_WEIGHTS=yolo26s.pt`, `SCM_DO_BUILD_DURING_DEPLOYMENT=true`.
+
+**Consecuencia para la tesis:** la demo desplegada anteriormente (`3a1ddb6`) corrió con `imgsz=640`, no con la configuración experimental (1280). Ningún resultado obtenido de esa URL debe presentarse como del sistema evaluado.
+
+## H. Riesgos abiertos (verificables solo en la nube)
 
 1. `TRUSTED_PROXY_HOPS` real de Azure (paso 10).
 2. Latencia real de la CPU de B1 frente a la simulación con `--cpus=1`.
