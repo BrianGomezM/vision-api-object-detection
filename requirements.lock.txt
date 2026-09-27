@@ -1,6 +1,9 @@
-# INSTANTÁNEA del entorno LOCAL de desarrollo (Windows 11, Python 3.13.15, torch cu126, GTX 1050),
-# tomada el 2026-09-26 con pip freeze. Es REGISTRO de reproducibilidad, no lo que instala Docker
-# (Docker usa python:3.11-slim + torch CPU + requirements.txt). Ver docs/REPRODUCIBILIDAD.md.
+# INSTANTÁNEA del entorno EXPERIMENTAL de referencia (Windows 11, Python 3.13.15, torch 2.13.0+cu126,
+# GTX 1050; la inferencia del experimento se fuerza a CPU con CUDA_VISIBLE_DEVICES=-1).
+# pip freeze del 2026-09-27. Es el REGISTRO de lo que se usó en las pruebas y la fase 2A.
+# Producción (Docker, Linux) usa requirements-docker.lock.txt: mismas versiones salvo torch +cpu y uvloop.
+# Incluye herramientas de desarrollo y paquetes que la app no usa (edge-tts, grpcio, pypdf…).
+# Ver requirements.txt (directas de producción) y docs/REPRODUCIBILIDAD.md.
 aiohappyeyeballs==2.7.1
 aiohttp==3.14.3
 aiosignal==1.4.0
@@ -27,6 +30,7 @@ filelock==3.32.3
 fonttools==4.63.0
 frozenlist==1.8.0
 fsspec==2026.7.0
+git-filter-repo==2.47.0
 google-api-core==2.34.0
 google-auth==2.56.3
 google-cloud-texttospeech==2.37.0
@@ -70,6 +74,7 @@ pyasn1_modules==0.4.2
 pycparser==3.0
 pydantic==2.13.4
 pydantic_core==2.46.4
+pyflakes==4.0.0
 Pygments==2.21.0
 pyparsing==3.3.2
 pypdf==6.19.0
@@ -97,6 +102,7 @@ ultralytics-platform==0.1.7
 ultralytics-thop==2.1.6
 urllib3==2.7.0
 uvicorn==0.52.4
+vulture==2.16
 watchfiles==1.2.0
 websockets==16.1.1
 yarl==1.25.1

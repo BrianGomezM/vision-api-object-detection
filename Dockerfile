@@ -2,7 +2,9 @@
 # Imagen de PRODUCCIÓN de la Vision API. Todo se hornea en build time (libs de
 # sistema, torch CPU, ultralytics y los PESOS VERIFICADOS), nada se descarga al
 # arrancar. Ver docs/DEPLOYMENT.md.
-FROM python:3.13-slim
+# Imagen base FIJADA por versión y digest: una 3.13.x nueva cambiaría Python y la
+# verificación de identidad (versiones.python = 3.13.15) impediría arrancar.
+FROM python:3.13.15-slim@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b
 
 # libxcb1/libsm6/libxext6/libglib2.0-0: opencv-python-headless no necesita libGL,
 # pero sí carga libxcb.so.1 en tiempo de import.
@@ -17,9 +19,9 @@ WORKDIR /app
 # en la MISMA versión que el entorno experimental congelado (sin +cu126).
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
     torch==2.13.0 torchvision==0.28.0
-# Resto de dependencias con versión exacta (requirements-docker.lock.txt, generado
-# desde una imagen construida). ultralytics arrastra opencv-python (con GUI, exige
-# libGL): se desinstala y se deja opencv-python-headless.
+# Resto de dependencias: cierre completo con versión exacta (requirements-docker.lock.txt),
+# idéntico al entorno experimental salvo torch +cpu y uvloop (solo Linux). ultralytics
+# arrastra opencv-python (con GUI, exige libGL): se desinstala y queda opencv-python-headless.
 COPY requirements-docker.lock.txt .
 RUN pip install --no-cache-dir -r requirements-docker.lock.txt \
     && pip uninstall -y opencv-python \

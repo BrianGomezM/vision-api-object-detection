@@ -101,7 +101,7 @@ Hay componentes **opcionales**: el LLM (existe una narrativa de plantilla), el a
 - **CORS con la URL real de Vercel:** probado con la expresión regular y un origen simulado.
 - **Recolección de los logs JSON** en la plataforma (Log Stream / App Insights).
 - **Cuotas reales de Groq y Gemini con carga:** solo con los smoke tests manuales `tests/live` (`LIVE_SMOKE_TEST=1`).
-- **Arranque del contenedor Docker** (Python 3.11, torch CPU) con los pesos descargados. El arranque local del perfil production está verificado con `scripts/experiment/smoke_production.py`.
+- ~~Arranque del contenedor Docker~~: verificado localmente con la imagen final (Python 3.13.15, torch CPU, pesos incluidos y verificados; `evaluation/results/hardening/docker/`). El arranque local del perfil production está verificado con `scripts/experiment/smoke_production.py`.
 
 ## 8. Cierre del hardening (2026-09-27)
 

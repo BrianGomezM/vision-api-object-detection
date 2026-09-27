@@ -121,9 +121,12 @@ vision-api-project/
 ├── detections_output/                 # Imágenes anotadas — excluido de Git
 ├── test_images/                       # Imágenes de prueba
 ├── run.py                             # Punto de entrada local
-├── startup.sh                         # Comando de arranque para Azure App Service
-├── requirements.txt                   # Dependencias de producción (lo que despliega Azure)
-├── requirements-dev.txt               # + modelos comparativos y herramientas de análisis
+├── startup.sh                         # OBSOLETO (despliegue anterior por código); Azure usa el Dockerfile
+├── requirements.txt                   # Dependencias directas de producción, versiones fijas
+├── requirements-test.txt              # Pruebas (pytest)
+├── requirements-dev.txt               # Scripts de evaluación y herramientas de desarrollo
+├── requirements.lock.txt              # Instantánea completa del entorno experimental
+├── requirements-docker.lock.txt       # Cierre completo de la imagen de producción
 └── .env                                # Variables de entorno (excluido de Git)
 ```
 
@@ -133,16 +136,17 @@ vision-api-project/
 
 Para usar este proyecto en una computadora hacen falta tres cosas:
 
-1. **Python** (versión 3.11), que es el programa que ejecuta el código.
-2. Una **clave de Groq**, gratuita, que se obtiene creando una cuenta en
-   [console.groq.com](https://console.groq.com). Esta clave permite generar
-   las descripciones en español; sin ella el proyecto no puede iniciar.
+1. **Python 3.13.15**, que es el programa que ejecuta el código (la versión
+   exacta con la que se hicieron las pruebas y los experimentos).
+2. Una **clave de Groq** ([console.groq.com](https://console.groq.com)) para
+   redactar la descripción y una **clave de Google AI Studio** para la voz
+   (Gemini TTS). Sin ellas el servicio funciona, pero con una descripción
+   más simple y sin audio, y lo avisa en cada respuesta.
 3. Opcionalmente, **Docker Desktop**, si se prefiere ejecutar el proyecto
    de la misma forma en que corre en el servidor de producción, en vez de
    instalar cada programa por separado.
 
-No hace falta tarjeta de crédito ni pagar nada para obtener la clave de
-Groq ni para ejecutar el proyecto.
+Ambas claves tienen un nivel gratuito; no hace falta tarjeta de crédito.
 
 ---
 
@@ -160,30 +164,32 @@ Groq ni para ejecutar el proyecto.
    source venv/bin/activate       # en Mac o Linux
    ```
 
-4. Instalar todo lo que el proyecto necesita para funcionar:
+4. Instalar todo lo que el proyecto necesita para funcionar, con las
+   mismas versiones usadas en los experimentos:
 
    ```bash
+   pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
    pip install -r requirements.txt
+   pip install -r requirements-test.txt   # solo si se van a ejecutar las pruebas
    ```
 
-   Este paso puede tardar varios minutos la primera vez, porque descarga
-   el modelo de inteligencia artificial y sus componentes.
+   El archivo del modelo (`yolo26s.pt`, SHA-256 `646f8bc3…4a1b`) debe estar en
+   la carpeta principal; `docs/REPRODUCIBILIDAD.md` explica de dónde se obtiene
+   y cómo se verifica.
 
 5. Crear un archivo de configuración llamado `.env` en la carpeta principal
    del proyecto, con este contenido:
 
    ```
    GROQ_API_KEY=la_clave_obtenida_en_groq
-   YOLO_WEIGHTS=yolo26s.pt
-   YOLO_IMGSZ=1280
-   YOLO_IOU=0.45
-   TTS_VOICE_NAME=es-ES-AlvaroNeural
-   TTS_SPEAKING_RATE=0.95
+   GOOGLE_API_KEY=la_clave_obtenida_en_google_ai_studio
+   GROQ_MODEL=qwen/qwen3.8-27b
    CORS_ORIGINS=https://direccion-del-sitio-web-que-lo-va-a-usar.com
    ```
 
-   Solo `GROQ_API_KEY` es obligatoria. Las demás ya tienen un valor por
-   defecto y pueden dejarse como están. `CORS_ORIGINS` solo es necesaria
+   `.env.example` es la plantilla completa. El resto de parámetros (modelo,
+   voz, umbrales) ya tiene por defecto los valores del experimento y **no
+   debe cambiarse**. `CORS_ORIGINS` solo es necesaria
    si otra página web (por ejemplo, la interfaz visual del proyecto) va a
    consumir este servicio; puede tener varias direcciones separadas por
    coma.
@@ -207,9 +213,15 @@ Esta opción usa exactamente la misma configuración con la que el proyecto
 corre en el servidor de producción.
 
 ```bash
-docker build -t vision-api .
-docker run -p 8000:8000 --env-file .env vision-api
+docker build --build-arg APP_COMMIT=$(git rev-parse HEAD) -t vision-api .
+docker run -p 8000:8000 -e GROQ_API_KEY=... -e GOOGLE_API_KEY=... vision-api
 ```
+
+La imagen ya incluye el modelo verificado y toda la configuración del
+experimento. Solo se le pasan las claves: **no** usar `--env-file .env`
+con un `.env` de desarrollo, porque sus rutas locales (p. ej.
+`YOLO_WEIGHTS=yolo26s.pt`) no existen dentro del contenedor y la imagen se
+negaría a arrancar. Ver `docs/DEPLOYMENT.md`.
 
 En ambos casos, después de unos segundos el proyecto queda disponible en
 la propia computadora, en esta dirección:
