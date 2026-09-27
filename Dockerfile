@@ -34,6 +34,12 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
+# Perfil EXPLÍCITO del despliegue: solo POST /api/detect y GET /api/health,
+# sin /docs ni endpoints internos (debug, dataset, fine-tuning, pruebas,
+# métricas, estudio). Para otro perfil, sobrescribir la variable en el
+# servicio (p. ej. APP_PROFILE=study). Ver app/profiles.py.
+ENV APP_PROFILE=production
+
 EXPOSE 8000
 
 # Mismo comando que usaba startup.sh — timeout alto porque YOLO26s + torch

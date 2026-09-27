@@ -13,7 +13,10 @@ CORS:
   y cualquier origen configurado en la variable CORS_ORIGINS del entorno.
   En desarrollo se aceptan todos los orígenes de localhost.
 
-PERFILES (APP_PROFILE, ver app/security.py):
+PERFILES (APP_PROFILE, ver app/profiles.py):
+  production            → PRODUCTO desplegado: solo POST /api/detect y GET /api/health
+                          (básico). Sin /docs, /redoc, /openapi.json, raíz ni endpoints
+                          internos. Perfil del Dockerfile.
   development (defecto) → todos los endpoints de abajo, igual que antes.
   study                 → solo endpoints del investigador para las sesiones con
                           participantes: /api/detect, /api/health, /api/tts/models,
@@ -45,7 +48,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.routes.detect     import router as detect_router, debug_router
+from app.routes.detect     import router as detect_router, debug_router, tts_router
+from app.routes.health     import router as health_router
 from app.routes.evaluation import router as eval_router
 from app.routes.metrics    import router as metrics_router
 from app.routes.study      import router as study_router
@@ -93,7 +97,10 @@ def create_app(profile: str | None = None) -> FastAPI:
             "participantes no pueden ejecutarse sin autenticación."
         )
 
+    production = profile == "production"
+    docs = {} if not production else {"docs_url": None, "redoc_url": None, "openapi_url": None}
     app = FastAPI(
+        **docs,
         title="API de Detección de Objetos para Accesibilidad",
         description=(
             "Genera descripciones narrativas egocéntricas para personas con ceguera total "
@@ -142,7 +149,6 @@ def create_app(profile: str | None = None) -> FastAPI:
     # RUTA RAÍZ
     # ──────────────────────────────────────────────────────────
 
-    @app.get("/")
     def home():
         if profile == "study":
             return {"message": "API de navegación egocéntrica funcionando 🚀",
@@ -174,11 +180,21 @@ def create_app(profile: str | None = None) -> FastAPI:
             },
         }
 
+    if not production:          # producción no expone la raíz
+        app.get("/")(home)
+
     # ──────────────────────────────────────────────────────────
     # REGISTRO DE ROUTERS
     # ──────────────────────────────────────────────────────────
 
-    app.include_router(detect_router,  prefix="/api")  # /detect, /health, /tts/models
+    # PRODUCTO (todos los perfiles)
+    app.include_router(detect_router,  prefix="/api")  # POST /api/detect
+    app.include_router(health_router,  prefix="/api")  # GET  /api/health
+    if production:
+        return app
+
+    # INVESTIGADOR / ESTUDIO (study y development)
+    app.include_router(tts_router,     prefix="/api")  # GET /api/tts/models
     app.include_router(study_router,   prefix="/api")  # POST/GET /api/study/sessions — evaluación con usuarios
     app.include_router(catalog_router, prefix="/api")  # GET /api/catalog — catálogo único de pruebas
 

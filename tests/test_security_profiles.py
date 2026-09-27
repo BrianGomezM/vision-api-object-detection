@@ -104,3 +104,41 @@ def test_health_informa_perfil_y_almacenamiento(make_client):
     body = make_client("development").get("/api/health").json()
     assert body["perfil"] == "development"
     assert body["almacenamiento"]["data_root_configurado"] is False
+
+
+# ── Perfil production (despliegue del producto) ─────────────────────────────
+
+def test_production_expone_solo_detect_y_health(make_client):
+    client = make_client("production")
+    assert client.app.openapi_url is None and client.app.docs_url is None and client.app.redoc_url is None
+    assert client.get("/api/health").status_code == 200
+    assert client.post("/api/detect").status_code == 422          # existe (falta el archivo)
+    for path in ("/docs", "/redoc", "/openapi.json", "/", "/api/tts/models", "/api/catalog",
+                 "/api/study/sessions", "/api/metrics", "/api/feedback", "/api/test/results",
+                 "/api/dataset/stats", "/api/finetune/status", "/detections/x.jpg"):
+        assert client.get(path).status_code == 404, path
+    assert client.post("/api/debug-detect").status_code == 404
+
+
+def test_production_health_basico_sin_datos_internos(make_client):
+    body = make_client("production").get("/api/health").json()
+    assert body["perfil"] == "production"
+    assert {"modelo", "llm", "tts", "configuracion"} <= set(body)          # campos que usa el cliente
+    assert not ({"evaluacion", "almacenamiento"} & set(body))
+    assert not ({"ultimo_error", "omitido_por_evaluacion"} & set(body["tts"]))
+
+
+def test_development_health_conserva_la_informacion_interna(make_client):
+    body = make_client("development").get("/api/health").json()
+    assert {"evaluacion", "almacenamiento"} <= set(body) and "ultimo_error" in body["tts"]
+
+
+def test_production_detect_exige_clave_si_hay_claves(make_client):
+    client = make_client("production", keys="k1")
+    assert client.post("/api/detect", files={"file": ("a.jpg", b"x", "image/jpeg")}).status_code == 401
+
+
+def test_dockerfile_fija_el_perfil_production():
+    from pathlib import Path
+    dockerfile = (Path(__file__).resolve().parents[1] / "Dockerfile").read_text(encoding="utf-8")
+    assert "ENV APP_PROFILE=production" in dockerfile

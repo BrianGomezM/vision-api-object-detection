@@ -6,7 +6,8 @@ Endpoints de producción de la API de navegación egocéntrica.
 ENDPOINTS:
   POST /api/detect        → narrativa completa para producción (JSON o audio MP3)
   POST /api/debug-detect  → pipeline paso a paso para diagnóstico
-  GET  /api/health        → estado del servicio y configuración activa
+  GET  /api/tts/models    → modelos TTS disponibles (tts_router)
+  (GET /api/health está en app/routes/health.py)
 
 CAMBIOS RESPECTO A LA VERSIÓN ANTERIOR:
   - Se añade llamada a log_metric() al final de /detect para registrar
@@ -40,12 +41,9 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from PIL import Image
 
-from app.services.yolo_service          import YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
 from app.services.tts_service          import (
-    is_tts_active, get_last_tts_error, get_available_tts_models,
-    TTS_MODEL, TTS_VOICE, TTS_SKIPPED_STATUS, is_tts_disabled_for_evaluation,
+    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_SKIPPED_STATUS,
 )
-from app.utils.groq_client             import GROQ_MODEL, is_llm_active
 from app.utils.uploads                 import read_upload_limited
 
 from app.security import require_api_key
@@ -54,6 +52,8 @@ router = APIRouter()
 # /debug-detect expone el pipeline interno (prompt del LLM, etapas): es un endpoint
 # INTERNO de desarrollo y se monta solo en el perfil "development" (ver app/main.py).
 debug_router = APIRouter()
+# /tts/models alimenta el selector de modelo TTS del cliente (development/study).
+tts_router = APIRouter()
 
 # ──────────────────────────────────────────────────────────────
 # NÚCLEO: el pipeline vive en app/core/pipeline.py. Estos nombres se
@@ -439,7 +439,7 @@ async def debug_detect(
 # GET /tts/models
 # ──────────────────────────────────────────────────────────────
 
-@router.get("/tts/models", tags=["Info"])
+@tts_router.get("/tts/models", tags=["Info"])
 async def tts_models():
     """
     Modelos Gemini TTS disponibles para seleccionar en /detect (campo
@@ -450,70 +450,4 @@ async def tts_models():
     return {
         "default": TTS_MODEL,
         "modelos": get_available_tts_models(),
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# GET /health
-# ──────────────────────────────────────────────────────────────
-
-@router.get("/health", tags=["Info"])
-async def health_check():
-    """
-    Retorna el estado del servicio y la configuración activa.
-    Incluye estado del LLM, TTS y los nuevos módulos de evaluación.
-    """
-    # Contar imágenes en dataset si existe
-    from app.storage import data_dir
-    dataset_path = data_dir("dataset") / "metadata"
-    dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
-
-    metrics_count = telemetry.count_metrics()
-
-    from app.security import app_profile
-    from app.storage import describe as storage_describe
-
-    return {
-        "status":  "healthy",
-        "version": "3.2.0",
-        "perfil":  app_profile(),
-        "almacenamiento": storage_describe(),
-        "modelo": {
-            "nombre":  "YOLO26s",
-            "weights": YOLO_WEIGHTS,
-            "imgsz":   YOLO_IMGSZ,
-            "iou":     YOLO_IOU,
-        },
-        "llm": {
-            "proveedor": "Groq",
-            "modelo":    GROQ_MODEL,
-            "activo":    is_llm_active(),
-        },
-        "tts": {
-            "proveedor":    "Gemini TTS",
-            "modelo":       TTS_MODEL,
-            "voz":          TTS_VOICE,
-            "activo":       is_tts_active(),
-            "omitido_por_evaluacion": is_tts_disabled_for_evaluation(),
-            "ultimo_error": get_last_tts_error(),
-        },
-        "evaluacion": {
-            "dataset_imagenes":    dataset_count,
-            "metricas_registradas": metrics_count,
-            "endpoints": [
-                "POST /api/dataset/upload",
-                "GET  /api/dataset/stats",
-                "GET  /api/metrics/summary",
-                "GET  /api/metrics/latency",
-                "POST /api/test/functional",
-                "POST /api/test/load",
-                "GET  /api/test/results",
-                "POST /api/finetune/prepare",
-                "GET  /api/finetune/status",
-            ],
-        },
-        "configuracion": {
-            "umbral_default": _DEFAULT_CONF,
-            "max_imagen_px":  _MAX_IMAGE_DIM,
-        },
     }

@@ -55,6 +55,10 @@
    "POST /api/test/functional",
    "POST /api/test/load"
   ],
+  "production": [
+   "GET /api/health",
+   "POST /api/detect"
+  ],
   "study": [
    "DELETE,GET /api/study/sessions/{session_id}",
    "DOCS /docs",

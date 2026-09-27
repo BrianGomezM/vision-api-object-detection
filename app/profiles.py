@@ -8,11 +8,14 @@ consultarlo sin arrastrar la capa HTTP.
   development (defecto): comportamiento histórico, todos los endpoints montados.
   study               : sesiones con participantes. Solo endpoints del investigador
                         (detect, health, tts/models, study, catalog); exige API_KEYS.
+  production          : despliegue del producto. Solo POST /api/detect y
+                        GET /api/health (básico); sin /docs ni endpoints internos.
+                        Es el perfil del Dockerfile (ENV APP_PROFILE=production).
 """
 
 import os
 
-APP_PROFILES = ("development", "study")
+APP_PROFILES = ("development", "study", "production")
 
 
 def app_profile() -> str:
