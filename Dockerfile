@@ -50,13 +50,13 @@ COPY . .
 ENV APP_PROFILE=production \
     DATA_ROOT=/tmp/visionnav \
     PYTHONUNBUFFERED=1 \
-    YOLO_CONFIG_DIR=/tmp/visionnav/ultralytics
+    YOLO_CONFIG_DIR=/tmp/ultralytics
 # Commit de la aplicación (trazabilidad). CI: --build-arg APP_COMMIT=<sha>.
 ARG APP_COMMIT=desconocido
 ENV APP_COMMIT=${APP_COMMIT}
 
 # Usuario sin privilegios; solo DATA_ROOT (efímero) es escribible.
-RUN useradd --create-home --uid 10001 app && mkdir -p /tmp/visionnav && chown -R app /tmp/visionnav
+RUN useradd --create-home --uid 10001 app && mkdir -p /tmp/visionnav /tmp/ultralytics && chown -R app /tmp/visionnav /tmp/ultralytics
 USER app
 
 EXPOSE 8000
