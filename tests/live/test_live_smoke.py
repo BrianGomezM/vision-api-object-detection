@@ -36,7 +36,9 @@ pytestmark = [
 
 REPO = Path(__file__).resolve().parents[2]
 IMAGE = REPO / "test_images" / "05_sala_muebles.jpg"
-EVIDENCE = REPO / "evaluation" / "results" / "hardening" / "live_smoke.jsonl"
+# Durante la ejecución la evidencia se escribe FUERA del repositorio (LIVE_SMOKE_EVIDENCE),
+# para que el árbol siga limpio y cada registro corresponda al commit exacto.
+EVIDENCE = Path(os.getenv("LIVE_SMOKE_EVIDENCE", str(REPO / "evaluation" / "results" / "hardening" / "live_smoke.jsonl")))
 
 
 def _sha(b: bytes) -> str:
