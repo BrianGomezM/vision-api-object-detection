@@ -168,6 +168,7 @@ def runtime_snapshot() -> dict:
             "proveedor": "Gemini TTS", "modelo": tts.TTS_MODEL, "voz": tts.TTS_VOICE,
             "instruccion_estilo": tts.TTS_STYLE_INSTRUCTIONS,
             "max_chars": tts._MAX_CHARS,
+            "timeout_s": tts.TTS_TIMEOUT_S,
             "pcm": {"sample_rate_hz": tts._SAMPLE_RATE_HZ, "sample_width_bytes": tts._SAMPLE_WIDTH_BYTES,
                     "channels": tts._CHANNELS},
         },
@@ -289,3 +290,26 @@ def build_manifest(*, request_id: str, run_context: dict, input_bytes: bytes, re
         "narrativa": result["narrativa_final"],
         "tiempos_ms": result["tiempos"],
     }
+
+
+class IncompleteResultError(RuntimeError):
+    """Un resultado del pipeline no puede congelarse: alguna parte usó un respaldo."""
+
+
+def assert_complete(result: dict, *, require_audio: bool = True) -> None:
+    """F4 / estudio: un estímulo congelado NUNCA puede contener una narrativa de
+    respaldo (plantilla sin LLM) ni carecer de audio. Lanza IncompleteResultError."""
+    from app.utils.groq_client import is_llm_active
+    problems = []
+    if result["analyzed"]:
+        for name in ("desc_result", "escenario"):
+            if result[name].get("llm_error"):
+                problems.append(f"{name}: respaldo por error del LLM ({result[name].get('llm_error_type')})")
+        if not is_llm_active():
+            problems.append("LLM no configurado: la narrativa sería de plantilla")
+        if result["escenario"].get("cached"):
+            problems.append("escenario reutilizado de la caché (falta reset_request_state())")
+    if require_audio and not result.get("audio_path"):
+        problems.append("sin audio (TTS no disponible o fallido)")
+    if problems:
+        raise IncompleteResultError("; ".join(problems))

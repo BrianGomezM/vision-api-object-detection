@@ -26,10 +26,12 @@ CONFIGURACIÓN (variables de entorno):
   API_DEFAULT_CONF  → umbral de confianza por defecto       (default: 0.35)
 """
 
+import hashlib
 import io
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 
 from PIL import Image
 
@@ -45,6 +47,30 @@ from app.services.detection_visualizer import save_annotated_image
 
 MAX_IMAGE_DIM: int   = int(os.getenv("API_MAX_IMAGE_DIM", "800"))
 DEFAULT_CONF: float  = float(os.getenv("API_DEFAULT_CONF", "0.35"))
+
+
+class PipelineStageError(Exception):
+    """Fallo atribuido a una etapa del pipeline. `cause` es la excepción original.
+
+    Etapas: preprocesamiento, deteccion, espacial, pasos, espacio_libre, decision,
+    narrativa, tts. El adaptador HTTP traduce (etapa, causa) a un status y un código
+    de error (app/errors.py); el pipeline no conoce HTTP.
+    """
+
+    def __init__(self, stage: str, cause: BaseException):
+        super().__init__(f"{stage}: {type(cause).__name__}")
+        self.stage = stage
+        self.cause = cause
+
+
+@contextmanager
+def _stage(name: str):
+    try:
+        yield
+    except PipelineStageError:
+        raise
+    except Exception as exc:
+        raise PipelineStageError(name, exc) from exc
 
 
 def _ms(t: float) -> float:
@@ -111,22 +137,28 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
     tiempos: dict = {}
     t_total = time.time()
 
-    image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
+    with _stage("preprocesamiento"):
+        image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
+    # Identidad de la entrada: la caché de escenario solo se reutiliza para esta imagen.
+    input_scope = hashlib.sha256(image_bytes).hexdigest()
 
     # 1. Detección YOLO26s
     t1         = time.time()
-    det_result = run_yolo(image_bytes, threshold)
-    detections = det_result.get("detections", [])
+    with _stage("deteccion"):
+        det_result = run_yolo(image_bytes, threshold)
+        detections = det_result.get("detections", [])
     tiempos["deteccion_ms"] = _ms(t1)
 
     # 2. Análisis espacial egocéntrico
     t2       = time.time()
-    analyzed = analyze_spatial(detections, width, height)
+    with _stage("espacial"):
+        analyzed = analyze_spatial(detections, width, height)
     tiempos["espacial_ms"] = _ms(t2)
 
     # 3. Estimación de pasos
     t3       = time.time()
-    analyzed = estimate_steps(analyzed, width, height)
+    with _stage("pasos"):
+        analyzed = estimate_steps(analyzed, width, height)
     tiempos["pasos_ms"] = _ms(t3)
 
     # 3.5 Visualización: guardar imagen con bounding boxes anotados
@@ -137,12 +169,14 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
 
     # 4. Análisis de espacio libre
     t4         = time.time()
-    free_space = calculate_free_space(analyzed, width)
+    with _stage("espacio_libre"):
+        free_space = calculate_free_space(analyzed, width)
     tiempos["espacio_ms"] = _ms(t4)
 
     # 5. Decisión de movimiento
     t5       = time.time()
-    decision = decide_movement(analyzed, free_space)
+    with _stage("decision"):
+        decision = decide_movement(analyzed, free_space)
     tiempos["decision_ms"] = _ms(t5)
 
     # 6-7. Clasificación de escenario + descripción egocéntrica (ambas LLM/Groq).
@@ -150,22 +184,24 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
     # ejecutan en paralelo en vez de secuencial: recorta esta parte del
     # pipeline a ~max(t6, t7) en vez de t6 + t7.
     t67 = time.time()
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        future_scene = executor.submit(classify_scene, analyzed)
-        future_desc  = executor.submit(generate_description, analyzed, debug)
-        scene_info   = future_scene.result()
-        desc_result  = future_desc.result()
+    with _stage("narrativa"):
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            future_scene = executor.submit(classify_scene, analyzed, input_scope)
+            future_desc  = executor.submit(generate_description, analyzed, debug)
+            scene_info   = future_scene.result()
+            desc_result  = future_desc.result()
     tiempos["escenario_ms"] = tiempos["llm_ms"] = _ms(t67)
 
-    scene_intro = (
-        scene_info.get("scene_intro", "")
-        if scene_info.get("confidence") in ("media", "alta")
-        else ""
-    )
-    description = desc_result.get("text", "")
+    with _stage("narrativa"):
+        scene_intro = (
+            scene_info.get("scene_intro", "")
+            if scene_info.get("confidence") in ("media", "alta")
+            else ""
+        )
+        description = desc_result.get("text", "")
 
-    # 8. Narrativa final
-    narrativa = build_narrative(scene_intro, description, decision["instruction"])
+        # 8. Narrativa final
+        narrativa = build_narrative(scene_intro, description, decision["instruction"])
     tiempos["total_ms"] = _ms(t_total)
 
     result = {
@@ -188,7 +224,8 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
     # 9. TTS (el endpoint siempre lo pide; el modelo alterno permite otra cuota RPM)
     if tts:
         t_tts = time.time()
-        result["audio_path"] = synthesize_and_save(narrativa, model=tts_model)
+        with _stage("tts"):
+            result["audio_path"] = synthesize_and_save(narrativa, model=tts_model)
         result["tts_ms"]     = _ms(t_tts)
 
     return result

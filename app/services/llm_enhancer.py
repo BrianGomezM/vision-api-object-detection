@@ -256,4 +256,5 @@ DESCRIPCIÓN (solo objetos detectados, en orden de urgencia):"""
         return {
             "text":      _build_manual(relevant),
             "llm_error": str(e),
+            "llm_error_type": type(e).__name__,
         }

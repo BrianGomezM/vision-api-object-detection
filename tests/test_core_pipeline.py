@@ -31,7 +31,8 @@ def spy(monkeypatch, tmp_path):
     def fake_run(image_bytes, threshold, debug=False, *, tts=False, tts_model=None):
         calls.append({"threshold": threshold, "debug": debug, "tts": tts, "tts_model": tts_model})
         res = {"narrativa_final": "n.", "escenario": {}, "decision": {"instruction": "i"},
-               "analyzed": [], "free_space": {}, "detections": [], "desc_result": {"text": ""},
+               "analyzed": [], "detections": [],
+               "free_space": {"zones": {}, "raw_zones": {}, "best_direction": "center", "situation": "clear"}, "desc_result": {"text": ""},
                "tiempos": {"total_ms": 1.0}, "annotated_path": "detections_output/detection_x.jpg",
                "image_bytes": image_bytes, "imagen": {"original": "8x8", "procesada": "8x8"}}
         if tts:

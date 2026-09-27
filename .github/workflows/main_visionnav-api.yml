@@ -33,7 +33,7 @@ jobs:
       - name: Pruebas
         env:
           EVALUATION_DISABLE_TTS: "true"
-        run: python -m pytest -m "not entorno_referencia"
+        run: python -m pytest -m "not entorno_referencia and not live_smoke"
 
   build:
     needs: test

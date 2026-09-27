@@ -55,6 +55,8 @@ from app.routes.study      import router as study_router
 from app.routes.catalog    import router as catalog_router
 from app.security import app_profile, dev_mode
 from app.storage import data_dir
+from app import errors
+from app.observability import RequestContextMiddleware
 
 
 # ──────────────────────────────────────────────────────────────
@@ -109,6 +111,12 @@ def create_app(profile: str | None = None) -> FastAPI:
     )
     app.state.profile = profile
 
+    # Contrato de errores (app/errors.py) y request_id + log por solicitud
+    # (app/observability.py). El middleware se añade ANTES que CORS para quedar
+    # por dentro: las respuestas de error también llevan las cabeceras CORS.
+    errors.install(app)
+    app.add_middleware(RequestContextMiddleware)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ALLOWED_ORIGINS,
@@ -120,7 +128,8 @@ def create_app(profile: str | None = None) -> FastAPI:
         # (X-API-Key: clave del investigador, ver app/security.py)
         allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
         # Exponer headers personalizados que /api/detect devuelve en modo audio=true
-        expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File", "X-Request-ID"],
+        expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File", "X-Request-ID",
+                        "X-Degradacion", "X-Texto-Codificacion"],
     )
 
     # ──────────────────────────────────────────────────────────

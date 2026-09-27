@@ -31,9 +31,12 @@ def main() -> int:
            "CUDA_VISIBLE_DEVICES": "-1", "YOLO_ALLOW_DOWNLOAD": "false",
            "YOLO_WEIGHTS_SHA256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
            "DATA_ROOT": tempfile.mkdtemp(prefix="smoke_prod_"), "PYTHONIOENCODING": "utf-8"}
+    # La salida del servidor va a un ARCHIVO: una tubería sin leer se llena (log JSON por
+    # solicitud) y bloquea al servidor.
+    log_path = Path(env["DATA_ROOT"]) / "server.log"
+    log_file = open(log_path, "w", encoding="utf-8")
     proc = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--port", str(PORT)],
-                            cwd=REPO, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            text=True, encoding="utf-8", errors="replace")
+                            cwd=REPO, env=env, stdout=log_file, stderr=subprocess.STDOUT)
     results, ok = [], True
     try:
         t0 = time.time()
@@ -59,7 +62,14 @@ def main() -> int:
         leaked = {"evaluacion", "almacenamiento"} & set(h) or {"ultimo_error"} & set(h.get("tts", {}))
         results.append(("health sin datos internos", sorted(leaked) or "ok", not leaked))
         ok &= h.get("perfil") == "production" and not leaked
-        check("POST /api/detect sin archivo (existe; sin inferencia)", httpx.post(f"{BASE}/api/detect"), 422)
+        bad = check("POST /api/detect sin archivo (existe; sin inferencia)", httpx.post(f"{BASE}/api/detect"), 400)
+        e = bad.json().get("error", {})
+        fmt_ok = e.get("code") == "INVALID_REQUEST" and e.get("request_id") == bad.headers.get("x-request-id")
+        ok &= fmt_ok
+        results.append(("error con contrato y request_id", e.get("code"), fmt_ok))
+        txt = check("POST /api/detect con texto (415, sin inferencia)",
+                    httpx.post(f"{BASE}/api/detect", files={"file": ("a.txt", b"hola", "text/plain")}), 415)
+        results.append(("415 UNSUPPORTED_IMAGE", txt.json()["error"]["code"], txt.json()["error"]["code"] == "UNSUPPORTED_IMAGE"))
         for method, path in [("GET", "/docs"), ("GET", "/redoc"), ("GET", "/openapi.json"), ("GET", "/"),
                              ("POST", "/api/debug-detect"), ("GET", "/api/dataset/stats"),
                              ("POST", "/api/dataset/upload"), ("GET", "/api/finetune/status"),
@@ -81,11 +91,17 @@ def main() -> int:
     finally:
         proc.terminate()
         try:
-            log = proc.communicate(timeout=20)[0]
+            proc.wait(timeout=20)
         except subprocess.TimeoutExpired:
-            proc.kill(); log = proc.communicate()[0]
+            proc.kill()
+        log_file.close()
+        log = log_path.read_text(encoding="utf-8", errors="replace")
     for name, val, good in results:
         print(f"{'OK ' if good else 'FALLO'}  {name}: {val}")
+    reqs = [l for l in log.splitlines() if l.startswith('{"ts"')]
+    results.append(("líneas de log JSON con request_id", len(reqs), len(reqs) >= 20))
+    ok &= len(reqs) >= 20
+    print("ejemplo de log:", reqs[1] if len(reqs) > 1 else "—")
     wlines = [l for l in log.splitlines() if "[YOLO]" in l or "ERROR" in l or "Traceback" in l]
     print("--- log del servidor (YOLO/errores) ---\n" + "\n".join(wlines[:12]))
     print("RESULTADO:", "OK" if ok else "FALLO")

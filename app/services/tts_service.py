@@ -143,6 +143,11 @@ TTS_STYLE_INSTRUCTIONS: str = os.getenv(
 # entre 100 y 300 caracteres.
 _MAX_CHARS: int = int(os.getenv("TTS_MAX_CHARS", "4500"))
 
+# Timeout de la llamada al proveedor (segundos). Antes no había timeout: una
+# llamada colgada podía bloquear el único worker hasta el timeout de gunicorn.
+TTS_TIMEOUT_S: float = float(os.getenv("TTS_TIMEOUT_S", "60"))
+TTS_TIMEOUT_STATUS: str = "TIMEOUT"
+
 # ──────────────────────────────────────────────────────────────
 # BLOQUEO DE TTS PARA EVALUACIÓN
 # ──────────────────────────────────────────────────────────────
@@ -200,7 +205,8 @@ def _get_gemini_client():
         logger.warning("[TTS] GOOGLE_API_KEY no definida en .env. TTS desactivado.")
         return None
 
-    _client = genai.Client(api_key=api_key)
+    _client = genai.Client(api_key=api_key,
+                           http_options=genai_types.HttpOptions(timeout=int(TTS_TIMEOUT_S * 1000)))
     logger.info("[TTS] Cliente Gemini inicializado. Modelo: %s  Voz: %s", TTS_MODEL, TTS_VOICE)
     return _client
 
@@ -275,6 +281,7 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
             return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
     """
     global _last_error
+    _last_error = None          # el motivo de fallo es de ESTA solicitud, nunca de una anterior
 
     if is_tts_disabled_for_evaluation():
         logger.warning("[TTS] Omitido intencionalmente: EVALUATION_DISABLE_TTS=true (no se llama al proveedor).")
@@ -284,10 +291,16 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
 
     if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
         logger.warning("[TTS] Dependencias de Gemini TTS no disponibles. Retornando None.")
+        _last_error = {"code": None, "status": "DEPENDENCIAS_NO_DISPONIBLES", "message": "Paquetes de TTS no instalados."}
+        return None
+
+    if _get_gemini_client() is None:
+        _last_error = {"code": None, "status": "NO_CONFIGURADO", "message": "Cliente Gemini no disponible (sin API key)."}
         return None
 
     if not text or not text.strip():
         logger.warning("[TTS] Texto vacío recibido. No se genera audio.")
+        _last_error = {"code": None, "status": "TEXTO_VACIO", "message": "Texto vacío."}
         return None
 
     if len(text) > _MAX_CHARS:
@@ -332,6 +345,9 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
                 "[TTS] Error durante la síntesis: %s %s — %s",
                 exc.code, exc.status, exc.message,
             )
+        elif "timeout" in type(exc).__name__.lower() or isinstance(exc, TimeoutError):
+            _last_error = {"code": None, "status": TTS_TIMEOUT_STATUS, "message": type(exc).__name__}
+            logger.error("[TTS] Timeout del proveedor tras %.0f s (%s)", TTS_TIMEOUT_S, type(exc).__name__)
         else:
             _last_error = {"code": None, "status": type(exc).__name__, "message": str(exc)}
             logger.error("[TTS] Error durante la síntesis (%s): %s", type(exc).__name__, exc)
