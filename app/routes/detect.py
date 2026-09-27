@@ -33,7 +33,11 @@ PIPELINE COMPLETO (app/core/pipeline.py::run — este módulo es solo el adaptad
  11. log_metric()           — registrar métricas de producción (NUEVO)
 """
 
+import asyncio
+import functools
 import io
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import quote
 import base64
 from pathlib import Path
@@ -208,6 +212,38 @@ async def _read_valid_image(file: UploadFile) -> bytes:
     return data
 
 
+# ── Serialización del pipeline sin bloquear el bucle de eventos ────────────
+# El pipeline (YOLO, LLM, TTS) es bloqueante y comparte estado de módulo (modelo,
+# caché de escenario, último error del TTS). Se ejecuta en UN HILO DEDICADO
+# (ejecutor de 1 hilo, cola FIFO), mientras el bucle de eventos queda libre para
+# /api/health, el límite por IP y las solicitudes en cola. Un solo hilo = una sola
+# ejecución a la vez y siempre el mismo hilo (PyTorch reserva memoria por hilo: con
+# un pool de hilos la memoria crecía ~250 MB). El candado de hilos es una defensa
+# adicional por si otro código llama al pipeline. Todo lo que lee estado compartido
+# del pipeline (motivo del fallo del TTS) se captura DENTRO de la sección serializada.
+_PIPELINE_LOCK = threading.Lock()
+_PIPELINE_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pipeline")
+
+
+def _serialized(fn, *args, **kwargs):
+    with _PIPELINE_LOCK:
+        return fn(*args, **kwargs)
+
+
+async def _run_serialized(fn, *args, **kwargs):
+    # Si el cliente se desconecta, la tarea en curso termina igualmente en el hilo
+    # dedicado; nunca se ejecutan dos pipelines en paralelo.
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_PIPELINE_EXECUTOR, functools.partial(_serialized, fn, *args, **kwargs))
+
+
+def _run_detect_locked(image_bytes, threshold, debug, tts_model):
+    result = _run_core(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
+    tts_last = get_last_tts_error()
+    tts_reason = None if result["audio_path"] else _tts_unavailable_reason()
+    return result, tts_last, tts_reason
+
+
 def _run_core(image_bytes: bytes, threshold: float, debug: bool, **kw) -> dict:
     """core.pipeline.run con los fallos de etapa traducidos al contrato de errores."""
     try:
@@ -299,7 +335,7 @@ async def detect(
     # Núcleo: pipeline completo + TTS (se genera en toda petición, flujo original).
     # tts_model permite al cliente elegir un modelo alterno con cuota
     # propia cuando el modelo por defecto agota su RPM gratuito.
-    result     = _run_core(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
+    result, tts_last, tts_reason = await _run_serialized(_run_detect_locked, image_bytes, threshold, debug, tts_model)
     audio_path = result["audio_path"]
     tts_ms     = result["tts_ms"]
     keep_outputs = False                   # los archivos solo se conservan en un éxito fuera de production
@@ -318,11 +354,11 @@ async def detect(
                 raise ApiError(llm_code, headers=_retry_headers(llm_retry),
                                internal=str(result["desc_result"].get("llm_error")
                                             or result["escenario"].get("llm_error")))
-        tts_code = None if audio_path else _TTS_REASON_CODE[_tts_unavailable_reason()]
+        tts_code = None if audio_path else _TTS_REASON_CODE[tts_reason]
         if tts_code:
             degradations.append(tts_code)
             if audio or profile == "study":    # el audio es obligatorio: audio=true o estudio
-                last = get_last_tts_error() or {}
+                last = tts_last or {}
                 raise ApiError(tts_code, internal=str(last), headers=_retry_headers(last.get("retry_after_s")))
         if result["analyzed"] and not result.get("annotated_path"):
             degradations.append("ANNOTATION_UNAVAILABLE")
@@ -346,7 +382,7 @@ async def detect(
             raw_bytes  = None
             audio_info = {
                 "disponible":   False,
-                "razon":        _tts_unavailable_reason(),
+                "razon":        tts_reason,
                 "archivo":      None,
                 "content_type": None,
                 "data_base64":  None,
@@ -476,7 +512,7 @@ async def debug_detect(
     """
     image_bytes = await _read_valid_image(file)
     threshold   = normalize_threshold(confidence_threshold)
-    result      = _run_core(image_bytes, threshold, True)
+    result      = await _run_serialized(_run_core, image_bytes, threshold, True)
     try:
         analyzed    = result["analyzed"]
         free_space  = result["free_space"]
