@@ -8,8 +8,10 @@ consultarlo sin arrastrar la capa HTTP.
   development (defecto): comportamiento histórico, todos los endpoints montados.
   study               : sesiones con participantes. Solo endpoints del investigador
                         (detect, health, tts/models, study, catalog); exige API_KEYS.
-  production          : despliegue del producto. Solo POST /api/detect y
-                        GET /api/health (básico); sin /docs ni endpoints internos.
+  production          : despliegue del producto. POST /api/detect y GET /api/health
+                        (básico), /api/tts/models y las rutas del investigador que
+                        usa el cliente (study, catálogo, métricas; con
+                        RESEARCHER_API_KEYS); sin /docs ni endpoints internos.
                         Es el perfil del Dockerfile (ENV APP_PROFILE=production).
 """
 

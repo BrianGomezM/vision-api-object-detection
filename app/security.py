@@ -69,6 +69,13 @@ def dev_mode() -> bool:
     return not _api_keys()
 
 
+# Claves SOLO del investigador (RESEARCHER_API_KEYS). Protegen las rutas del estudio
+# (/api/study/*, /api/catalog*, métricas) sin exigir clave en /api/detect, que en
+# production es público (docs/POLITICA_API_DETECT.md). Se suman a API_KEYS.
+def _researcher_keys() -> set[str]:
+    return {k.strip() for k in os.getenv("RESEARCHER_API_KEYS", "").split(",") if k.strip()}
+
+
 # ── Perfil de aplicación: definido en app/profiles.py (sin FastAPI); re-exportado aquí.
 from app.profiles import APP_PROFILES, app_profile  # noqa: E402,F401
 
@@ -164,7 +171,36 @@ async def require_api_key(
     if not keys:
         response.headers["X-Auth-Mode"] = "dev-no-auth"
         return "dev"
+    return _validate_key(response, x_api_key, keys)
 
+
+async def require_researcher_key(
+    response:    Response,
+    x_api_key:   Optional[str] = Header(None, alias="X-API-Key"),
+) -> str:
+    """
+    Dependencia de las rutas del investigador (datos de participantes, catálogo,
+    métricas). Acepta API_KEYS y RESEARCHER_API_KEYS.
+
+    A diferencia de require_api_key, en production NUNCA hay modo desarrollo: sin
+    claves configuradas las rutas responden 401 (fallo cerrado), para que los
+    datos de participantes no queden públicos junto al /api/detect público.
+    En development/study sin claves conserva el comportamiento de require_api_key.
+    """
+    keys = _api_keys() | _researcher_keys()
+    if not keys:
+        if app_profile() == "production":
+            raise HTTPException(
+                status_code=401,
+                detail="Rutas del investigador desactivadas: el servidor no tiene RESEARCHER_API_KEYS.",
+                headers={"WWW-Authenticate": "ApiKey"},
+            )
+        response.headers["X-Auth-Mode"] = "dev-no-auth"
+        return "dev"
+    return _validate_key(response, x_api_key, keys)
+
+
+def _validate_key(response: Response, x_api_key: Optional[str], keys: set[str]) -> str:
     # ── Validar presencia del header ──────────────────────────
     if not x_api_key:
         raise HTTPException(

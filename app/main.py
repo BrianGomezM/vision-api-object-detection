@@ -14,9 +14,14 @@ CORS:
   En desarrollo se aceptan todos los orígenes de localhost.
 
 PERFILES (APP_PROFILE, ver app/profiles.py):
-  production            → PRODUCTO desplegado: solo POST /api/detect y GET /api/health
-                          (básico). Sin /docs, /redoc, /openapi.json, raíz ni endpoints
-                          internos. Perfil del Dockerfile.
+  production            → PRODUCTO desplegado: POST /api/detect (público) y GET /api/health
+                          (básico), más las rutas que consume el cliente actual:
+                          GET /api/tts/models (público), /api/study/*, /api/catalog* y
+                          GET /api/metrics/summary|latency, estas con clave del
+                          investigador (RESEARCHER_API_KEYS; sin claves → 401).
+                          Sin /docs, /redoc, /openapi.json, raíz ni endpoints internos
+                          (debug, dataset, fine-tuning, pruebas, feedback, /detections).
+                          Perfil del Dockerfile.
   development (defecto) → todos los endpoints de abajo, igual que antes.
   study                 → solo endpoints del investigador para las sesiones con
                           participantes: /api/detect, /api/health, /api/tts/models,
@@ -44,16 +49,16 @@ ENDPOINTS registrados (perfil development):
 """
 
 import os
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.routes.detect     import router as detect_router, debug_router, tts_router
 from app.routes.health     import router as health_router
-from app.routes.evaluation import router as eval_router
+from app.routes.evaluation import router as eval_router, metrics_summary, metrics_latency
 from app.routes.metrics    import router as metrics_router
 from app.routes.study      import router as study_router
 from app.routes.catalog    import router as catalog_router
-from app.security import app_profile, dev_mode
+from app.security import app_profile, dev_mode, require_researcher_key
 from app.storage import data_dir
 from app import errors
 from app.observability import RequestContextMiddleware
@@ -131,7 +136,7 @@ def create_app(profile: str | None = None) -> FastAPI:
         allow_origin_regex=_CORS_ORIGIN_REGEX,
         allow_credentials=True,
         # Métodos necesarios para los endpoints del sistema
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],   # DELETE: /api/study/sessions/{id}
         # Headers que el cliente Next.js envía en peticiones multipart y JSON
         # (X-API-Key: clave del investigador, ver app/security.py)
         allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
@@ -212,13 +217,22 @@ def create_app(profile: str | None = None) -> FastAPI:
     # PRODUCTO (todos los perfiles)
     app.include_router(detect_router,  prefix="/api")  # POST /api/detect
     app.include_router(health_router,  prefix="/api")  # GET  /api/health
-    if production:
-        return app
 
-    # INVESTIGADOR / ESTUDIO (study y development)
+    # INVESTIGADOR / ESTUDIO (todos los perfiles): lo consume el cliente actual.
+    # /api/tts/models es público (solo lista de modelos); study y catálogo exigen
+    # clave del investigador (require_researcher_key: en production, fallo cerrado).
     app.include_router(tts_router,     prefix="/api")  # GET /api/tts/models
     app.include_router(study_router,   prefix="/api")  # POST/GET /api/study/sessions — evaluación con usuarios
     app.include_router(catalog_router, prefix="/api")  # GET /api/catalog — catálogo único de pruebas
+    if production:
+        # Métricas agregadas de /api/detect (pestaña Métricas), solo lectura y con
+        # clave del investigador. El resto de eval_router sigue fuera de production.
+        researcher = [Depends(require_researcher_key)]
+        app.add_api_route("/api/metrics/summary", metrics_summary, methods=["GET"],
+                          tags=["Métricas"], dependencies=researcher)
+        app.add_api_route("/api/metrics/latency", metrics_latency, methods=["GET"],
+                          tags=["Métricas"], dependencies=researcher)
+        return app
 
     if profile == "development":
         # Endpoints INTERNOS: no se montan en el perfil study.
