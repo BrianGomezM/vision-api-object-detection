@@ -57,13 +57,23 @@ load_dotenv()
 # CONFIGURACIÓN
 # ──────────────────────────────────────────────────────────────
 
-# Claves válidas cargadas desde .env.
+# Claves válidas: se leen de API_KEYS en cada solicitud (no se cachean al
+# importar), para que el perfil y las pruebas puedan configurarlas.
 # Cada clave debe ser un string único y difícil de adivinar.
-_raw_keys: str = os.getenv("API_KEYS", "")
-API_KEYS: set[str] = {k.strip() for k in _raw_keys.split(",") if k.strip()}
+def _api_keys() -> set[str]:
+    return {k.strip() for k in os.getenv("API_KEYS", "").split(",") if k.strip()}
 
-# Si no hay claves configuradas → modo desarrollo (sin autenticación).
-# En producción SIEMPRE debe haber al menos una clave definida.
+
+def dev_mode() -> bool:
+    """Sin claves configuradas → modo desarrollo (sin autenticación)."""
+    return not _api_keys()
+
+
+# ── Perfil de aplicación: definido en app/profiles.py (sin FastAPI); re-exportado aquí.
+from app.profiles import APP_PROFILES, app_profile  # noqa: E402,F401
+
+
+API_KEYS: set[str] = _api_keys()     # compatibilidad: valor al importar (solo informativo)
 DEV_MODE: bool = not API_KEYS
 
 # Máximo de peticiones permitidas por clave dentro de la ventana de tiempo.
@@ -150,7 +160,8 @@ async def require_api_key(
     Retorna la clave validada (útil para logging por clave).
     """
     # ── Modo desarrollo: sin autenticación ────────────────────
-    if DEV_MODE:
+    keys = _api_keys()
+    if not keys:
         response.headers["X-Auth-Mode"] = "dev-no-auth"
         return "dev"
 
@@ -166,7 +177,7 @@ async def require_api_key(
         )
 
     # ── Validar que la clave esté autorizada ──────────────────
-    if x_api_key not in API_KEYS:
+    if x_api_key not in keys:
         raise HTTPException(
             status_code=401,
             detail="API Key inválida o no autorizada.",
@@ -208,9 +219,11 @@ def security_status() -> dict:
     Retorna el estado de la configuración de seguridad.
     No expone las claves, solo metadatos.
     """
+    keys = _api_keys()
     return {
-        "autenticacion": "desactivada (modo desarrollo)" if DEV_MODE else "activa (API Key)",
-        "claves_configuradas": 0 if DEV_MODE else len(API_KEYS),
+        "perfil": app_profile(),
+        "autenticacion": "desactivada (modo desarrollo)" if not keys else "activa (API Key)",
+        "claves_configuradas": len(keys),
         "rate_limit": {
             "max_requests": _MAX_REQUESTS,
             "ventana_segundos": _WINDOW_SECONDS,

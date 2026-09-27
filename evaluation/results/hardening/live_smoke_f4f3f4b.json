@@ -1,0 +1,230 @@
+{
+ "fecha_utc": "2026-09-27T09:06:08.371429+00:00",
+ "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+ "arbol_limpio": true,
+ "experimental_config_verificado": true,
+ "preflight": {
+  "commit": {
+   "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+   "dirty": false,
+   "source": "git"
+  },
+  "config_sha256": "f3cefea0dcc3d8b0da0aaebb0c437764b55de34f368d3c18f5aba86d4b7546c0",
+  "config_version": 1,
+  "weights": {
+   "file": "yolo26s.pt",
+   "sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
+   "bytes": 20422725
+  },
+  "versiones": {
+   "python": "3.13.15",
+   "torch": "2.13.0+cu126",
+   "torchvision": "0.28.0+cu126",
+   "ultralytics": "8.4.123",
+   "numpy": "2.5.2",
+   "pillow": "12.3.0",
+   "opencv-python-headless": "5.0.0.93",
+   "groq": "1.6.0",
+   "google-genai": "2.24.0",
+   "lameenc": "1.8.4",
+   "fastapi": "0.141.1",
+   "PyYAML": "6.0.3"
+  },
+  "device": "cpu",
+  "torch_threads": 4,
+  "verificado_utc": "2026-09-27T09:05:37.594592+00:00"
+ },
+ "identidad": {
+  "pesos": {
+   "file": "yolo26s.pt",
+   "sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
+   "bytes": 20422725
+  },
+  "llm": {
+   "proveedor": "Groq",
+   "modelo": "qwen/qwen3.8-27b"
+  },
+  "tts": {
+   "proveedor": "Gemini TTS",
+   "modelo": "models/gemini-3.1-flash-tts-preview",
+   "voz": "Sulafat"
+  },
+  "versiones": {
+   "python": "3.13.15",
+   "torch": "2.13.0+cu126",
+   "torchvision": "0.28.0+cu126",
+   "ultralytics": "8.4.123",
+   "numpy": "2.5.2",
+   "pillow": "12.3.0",
+   "opencv-python-headless": "5.0.0.93",
+   "groq": "1.6.0",
+   "google-genai": "2.24.0",
+   "lameenc": "1.8.4",
+   "fastapi": "0.141.1",
+   "PyYAML": "6.0.3"
+  }
+ },
+ "pytest": [
+  "4 passed, 1 warning in 27.06s"
+ ],
+ "resultado": "PASS",
+ "problemas": [],
+ "dataset1_intacto": true,
+ "registros": [
+  {
+   "ts": "2026-09-27T09:05:44.141851+00:00",
+   "test": "yolo",
+   "commit": {
+    "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+    "dirty": false,
+    "source": "git"
+   },
+   "llm": {
+    "proveedor": "Groq",
+    "modelo": "qwen/qwen3.8-27b"
+   },
+   "tts": {
+    "proveedor": "Gemini TTS",
+    "modelo": "models/gemini-3.1-flash-tts-preview",
+    "voz": "Sulafat"
+   },
+   "device": "cpu",
+   "imagen": "05_sala_muebles.jpg",
+   "latencia_ms_incluye_carga": 1958.3,
+   "detecciones": [
+    [
+     "couch",
+     0.956
+    ],
+    [
+     "tv",
+     0.912
+    ],
+    [
+     "potted plant",
+     0.851
+    ],
+    [
+     "potted plant",
+     0.837
+    ],
+    [
+     "couch",
+     0.827
+    ],
+    [
+     "chair",
+     0.698
+    ],
+    [
+     "couch",
+     0.566
+    ],
+    [
+     "potted plant",
+     0.487
+    ]
+   ],
+   "pesos_sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b"
+  },
+  {
+   "ts": "2026-09-27T09:05:44.691426+00:00",
+   "test": "llm",
+   "commit": {
+    "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+    "dirty": false,
+    "source": "git"
+   },
+   "llm": {
+    "proveedor": "Groq",
+    "modelo": "qwen/qwen3.8-27b"
+   },
+   "tts": {
+    "proveedor": "Gemini TTS",
+    "modelo": "models/gemini-3.1-flash-tts-preview",
+    "voz": "Sulafat"
+   },
+   "device": "cpu",
+   "latencia_ms": 430.0,
+   "texto": "Sofá a tu derecha a aproximadamente 2 pasos.",
+   "error": null,
+   "error_tipo": null,
+   "texto_sha256": "c28acd4b04c680f44c8c4f855127ec078ad165e7dd23c43bfb4f8b328072d59b"
+  },
+  {
+   "ts": "2026-09-27T09:05:46.886233+00:00",
+   "test": "tts",
+   "commit": {
+    "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+    "dirty": false,
+    "source": "git"
+   },
+   "llm": {
+    "proveedor": "Groq",
+    "modelo": "qwen/qwen3.8-27b"
+   },
+   "tts": {
+    "proveedor": "Gemini TTS",
+    "modelo": "models/gemini-3.1-flash-tts-preview",
+    "voz": "Sulafat"
+   },
+   "device": "cpu",
+   "latencia_ms": 2076.4,
+   "bytes": 12288,
+   "audio_sha256": "0bbc645ba8569bbbbd4193012165c98d8ecb18df3abe99cadce772defe1dd7cc",
+   "duracion_s_estimada": 1.54,
+   "error": null
+  },
+  {
+   "ts": "2026-09-27T09:06:05.895953+00:00",
+   "test": "endpoint",
+   "commit": {
+    "commit": "f4f3f4b3c78e8b567df25a1b66c454440b7aa488",
+    "dirty": false,
+    "source": "git"
+   },
+   "llm": {
+    "proveedor": "Groq",
+    "modelo": "qwen/qwen3.8-27b"
+   },
+   "tts": {
+    "proveedor": "Gemini TTS",
+    "modelo": "models/gemini-3.1-flash-tts-preview",
+    "voz": "Sulafat"
+   },
+   "device": "cpu",
+   "status": 200,
+   "latencia_ms": 18761.1,
+   "request_id": "961bac4fb6be4d2ab2070dc6f532273b",
+   "degradaciones": null,
+   "objetos": 8,
+   "tiempos_ms": {
+    "deteccion_ms": 534.11,
+    "espacial_ms": 0.21,
+    "pasos_ms": 0.04,
+    "visualizer_ms": 17.78,
+    "espacio_ms": 0.1,
+    "decision_ms": 0.02,
+    "escenario_ms": 341.98,
+    "llm_ms": 341.98,
+    "total_ms": 1150.48,
+    "tts_ms": 17354.43
+   },
+   "escenario": {
+    "tipo": "sala de estar",
+    "confianza": "alta",
+    "intro": "Parece que estás en una sala de estar."
+   },
+   "narrativa": "Parece que estás en una sala de estar. Sofá a tu derecha a aproximadamente 2 pasos. 3 sofás y 2 sillas a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta a tu izquierda a aproximadamente 5 pasos y 1 planta en maceta frente a ti a aproximadamente 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+   "narrativa_sha256": "53c0fbd86a967c1c85c6a9f076c83400026a981cd38ca8d757affbd8d6370574",
+   "audio_disponible": true,
+   "audio_razon": null,
+   "audio_bytes": 249408,
+   "audio_sha256": "8893ce0b22baa198b44632cdefa3e26a3cdd8c9f87220703820895b8f67396cf",
+   "audio_duracion_s_estimada": 31.18,
+   "imagen_anotada": true,
+   "error": null
+  }
+ ],
+ "salida_pytest": "[Security] ADVERTENCIA: API_KEYS no configurado. Modo desarrollo activo — sin autenticación.\n[YOLO] Cargando: yolo26s.pt  imgsz=1280  iou=0.45  augment=False\n[YOLO] Warm-up en curso...\n[YOLO] Modelo listo para inferencia.\n{\n \"ts\": \"2026-09-27T09:05:44.141851+00:00\",\n \"test\": \"yolo\",\n \"commit\": {\n  \"commit\": \"f4f3f4b3c78e8b567df25a1b66c454440b7aa488\",\n  \"dirty\": false,\n  \"source\": \"git\"\n },\n \"llm\": {\n  \"proveedor\": \"Groq\",\n  \"modelo\": \"qwen/qwen3.8-27b\"\n },\n \"tts\": {\n  \"proveedor\": \"Gemini TTS\",\n  \"modelo\": \"models/gemini-3.1-flash-tts-preview\",\n  \"voz\": \"Sulafat\"\n },\n \"device\": \"cpu\",\n \"imagen\": \"05_sala_muebles.jpg\",\n \"latencia_ms_incluye_carga\": 1958.3,\n \"detecciones\": [\n  [\n   \"couch\",\n   0.956\n  ],\n  [\n   \"tv\",\n   0.912\n  ],\n  [\n   \"potted plant\",\n   0.851\n  ],\n  [\n   \"potted plant\",\n   0.837\n  ],\n  [\n   \"couch\",\n   0.827\n  ],\n  [\n   \"chair\",\n   0.698\n  ],\n  [\n   \"couch\",\n   0.566\n  ],\n  [\n   \"potted plant\",\n   0.487\n  ]\n ],\n \"pesos_sha256\": \"646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b\"\n}\n.[Groq] Cliente inicializado. Modelo: qwen/qwen3.8-27b  Timeout: 15.0s\n{\n \"ts\": \"2026-09-27T09:05:44.691426+00:00\",\n \"test\": \"llm\",\n \"commit\": {\n  \"commit\": \"f4f3f4b3c78e8b567df25a1b66c454440b7aa488\",\n  \"dirty\": false,\n  \"source\": \"git\"\n },\n \"llm\": {\n  \"proveedor\": \"Groq\",\n  \"modelo\": \"qwen/qwen3.8-27b\"\n },\n \"tts\": {\n  \"proveedor\": \"Gemini TTS\",\n  \"modelo\": \"models/gemini-3.1-flash-tts-preview\",\n  \"voz\": \"Sulafat\"\n },\n \"device\": \"cpu\",\n \"latencia_ms\": 430.0,\n \"texto\": \"Sofá a tu derecha a aproximadamente 2 pasos.\",\n \"error\": null,\n \"error_tipo\": null,\n \"texto_sha256\": \"c28acd4b04c680f44c8c4f855127ec078ad165e7dd23c43bfb4f8b328072d59b\"\n}\n.{\n \"ts\": \"2026-09-27T09:05:46.886233+00:00\",\n \"test\": \"tts\",\n \"commit\": {\n  \"commit\": \"f4f3f4b3c78e8b567df25a1b66c454440b7aa488\",\n  \"dirty\": false,\n  \"source\": \"git\"\n },\n \"llm\": {\n  \"proveedor\": \"Groq\",\n  \"modelo\": \"qwen/qwen3.8-27b\"\n },\n \"tts\": {\n  \"proveedor\": \"Gemini TTS\",\n  \"modelo\": \"models/gemini-3.1-flash-tts-preview\",\n  \"voz\": \"Sulafat\"\n },\n \"device\": \"cpu\",\n \"latencia_ms\": 2076.4,\n \"bytes\": 12288,\n \"audio_sha256\": \"0bbc645ba8569bbbbd4193012165c98d8ecb18df3abe99cadce772defe1dd7cc\",\n \"duracion_s_estimada\": 1.54,\n \"error\": null\n}\n.[Translator] Caché cargado: 0 entradas desde C:\\Users\\braya\\.cache\\vision-api\\translation_cache.json (30 ignoradas por estar en el diccionario fijo)\n{\n \"ts\": \"2026-09-27T09:06:05.895953+00:00\",\n \"test\": \"endpoint\",\n \"commit\": {\n  \"commit\": \"f4f3f4b3c78e8b567df25a1b66c454440b7aa488\",\n  \"dirty\": false,\n  \"source\": \"git\"\n },\n \"llm\": {\n  \"proveedor\": \"Groq\",\n  \"modelo\": \"qwen/qwen3.8-27b\"\n },\n \"tts\": {\n  \"proveedor\": \"Gemini TTS\",\n  \"modelo\": \"models/gemini-3.1-flash-tts-preview\",\n  \"voz\": \"Sulafat\"\n },\n \"device\": \"cpu\",\n \"status\": 200,\n \"latencia_ms\": 18761.1,\n \"request_id\": \"961bac4fb6be4d2ab2070dc6f532273b\",\n \"degradaciones\": null,\n \"objetos\": 8,\n \"tiempos_ms\": {\n  \"deteccion_ms\": 534.11,\n  \"espacial_ms\": 0.21,\n  \"pasos_ms\": 0.04,\n  \"visualizer_ms\": 17.78,\n  \"espacio_ms\": 0.1,\n  \"decision_ms\": 0.02,\n  \"escenario_ms\": 341.98,\n  \"llm_ms\": 341.98,\n  \"total_ms\": 1150.48,\n  \"tts_ms\": 17354.43\n },\n \"escenario\": {\n  \"tipo\": \"sala de estar\",\n  \"confianza\": \"alta\",\n  \"intro\": \"Parece que estás en una sala de estar.\"\n },\n \"narrativa\": \"Parece que estás en una sala de estar. Sofá a tu derecha a aproximadamente 2 pasos. 3 sofás y 2 sillas a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta a tu izquierda a aproximadamente 5 pasos y 1 planta en maceta frente a ti a aproximadamente 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.\",\n \"narrativa_sha256\": \"53c0fbd86a967c1c85c6a9f076c83400026a981cd38ca8d757affbd8d6370574\",\n \"audio_disponible\": true,\n \"audio_razon\": null,\n \"audio_bytes\": 249408,\n \"audio_sha256\": \"8893ce0b22baa198b44632cdefa3e26a3cdd8c9f87220703820895b8f67396cf\",\n \"audio_duracion_s_estimada\": 31.18,\n \"imagen_anotada\": true,\n \"error\": null\n}\n.\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  D:\\University\\T2\\Programacion\\vision-api-object-detection\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 1 warning in 27.06s\n"
+}

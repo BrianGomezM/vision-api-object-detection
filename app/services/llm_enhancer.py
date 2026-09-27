@@ -32,6 +32,7 @@ CONFIGURACIÓN (.env):
 
 import os
 from app.utils.groq_client import get_groq_client, GROQ_MODEL
+from app.utils.provider_errors import describe_groq_error
 from app.services.step_estimator import steps_to_text
 
 # ──────────────────────────────────────────────────────────────
@@ -256,4 +257,7 @@ DESCRIPCIÓN (solo objetos detectados, en orden de urgencia):"""
         return {
             "text":      _build_manual(relevant),
             "llm_error": str(e),
+            "llm_error_type": type(e).__name__,
+            "llm_error_kind": describe_groq_error(e)["kind"],
+            "llm_retry_after_s": describe_groq_error(e)["retry_after_s"],
         }

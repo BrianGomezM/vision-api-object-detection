@@ -1,0 +1,5 @@
+imgsz,regla,imagenes,detecciones_total,detecciones_media_por_imagen,imagenes_sin_detecciones,confianza_media,confianza_min,objetos_navegacion_tras_agrupar,lineas_prompt_total,clases_distintas
+640,max,41,258,6.29,2,0.669,0.35,161,167,21
+640,min,41,303,7.39,1,0.611,0.15,193,185,21
+1280,max,41,316,7.71,3,0.69,0.351,176,163,20
+1280,min,41,366,8.93,3,0.632,0.157,199,177,21

@@ -1,0 +1,88 @@
+{
+  "modelo": "qwen/qwen3.8-27b",
+  "records": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 348.4,
+      "uso_llm": true,
+      "objetos_de_entrada": [
+        "planta en maceta",
+        "ratón",
+        "silla",
+        "teclado",
+        "televisor"
+      ],
+      "prompt_enviado": "Eres un sistema de navegación para personas con ceguera total.\nTu única función es describir el entorno detectado en lenguaje egocéntrico estricto.\n\nOBJETOS DETECTADOS (ordenados de más cercano a más lejano):\n- 2 sillas: justo frente a ti a aproximadamente 4 pasos\n- 2 sillas: frente a ti a aproximadamente 5 pasos\n- 4 sillas: un poco más adelante frente a ti a aproximadamente 6 pasos\n- planta en maceta: un poco más adelante, a tu izquierda a aproximadamente 6 pasos\n- televisor: cerca a tu derecha\n\nREGLAS OBLIGATORIAS — sin excepción:\n1. SOLO menciona objetos de la lista. NUNCA menciones lo que NO está.\n2. Usa SIEMPRE el nombre completo del objeto. NUNCA uses \"otro\", \"este\", \"ese\".\n3. El objeto con MENOS pasos va primero. Respeta el orden de la lista.\n4. Si hay una puerta en la lista, menciónala al inicio.\n5. Usa SOLO estas referencias: \"frente a ti\", \"a tu derecha\", \"a tu izquierda\", \"al fondo a tu derecha\", \"al fondo a tu izquierda\", \"al fondo\".\n6. Incluye los pasos cuando estén disponibles: \"sofá a tu derecha a aproximadamente 2 pasos\".\n7. NUNCA uses instrucciones de movimiento (no digas avanza, gira, detente, puedes).\n8. Si hay varios del mismo objeto, agrúpalos: \"2 sofás a tu izquierda a aproximadamente 4 pasos\".\n9. Máximo 3 oraciones. Máximo 60 palabras. Lenguaje directo y claro.\n10. Usa \"aproximadamente\" para los pasos, son estimaciones.\n\nDESCRIPCIÓN (solo objetos detectados, en orden de urgencia):",
+      "texto_generado": "2 sillas justo frente a ti a aproximadamente 4 pasos. 2 sillas frente a ti a aproximadamente 5 pasos. 4 sillas un poco más adelante frente a ti a aproximadamente 6 pasos.",
+      "llm_error": null
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 356.8,
+      "uso_llm": true,
+      "objetos_de_entrada": [
+        "botella",
+        "jarrón",
+        "libro",
+        "mesa de comedor",
+        "mochila",
+        "persona",
+        "planta en maceta",
+        "portátil",
+        "silla",
+        "sofá"
+      ],
+      "prompt_enviado": "Eres un sistema de navegación para personas con ceguera total.\nTu única función es describir el entorno detectado en lenguaje egocéntrico estricto.\n\nOBJETOS DETECTADOS (ordenados de más cercano a más lejano):\n- 2 mesa de comedores: justo a tu izquierda a aproximadamente 2 pasos\n- silla: justo frente a ti a aproximadamente 3 pasos\n- mochila: justo frente a ti a aproximadamente 4 pasos\n- persona: frente a ti a aproximadamente 5 pasos\n- 4 sillas: frente a ti a aproximadamente 5 pasos\n- 2 mesa de comedores: frente a ti a aproximadamente 5 pasos\n- mochila: frente a ti\n\nREGLAS OBLIGATORIAS — sin excepción:\n1. SOLO menciona objetos de la lista. NUNCA menciones lo que NO está.\n2. Usa SIEMPRE el nombre completo del objeto. NUNCA uses \"otro\", \"este\", \"ese\".\n3. El objeto con MENOS pasos va primero. Respeta el orden de la lista.\n4. Si hay una puerta en la lista, menciónala al inicio.\n5. Usa SOLO estas referencias: \"frente a ti\", \"a tu derecha\", \"a tu izquierda\", \"al fondo a tu derecha\", \"al fondo a tu izquierda\", \"al fondo\".\n6. Incluye los pasos cuando estén disponibles: \"sofá a tu derecha a aproximadamente 2 pasos\".\n7. NUNCA uses instrucciones de movimiento (no digas avanza, gira, detente, puedes).\n8. Si hay varios del mismo objeto, agrúpalos: \"2 sofás a tu izquierda a aproximadamente 4 pasos\".\n9. Máximo 3 oraciones. Máximo 60 palabras. Lenguaje directo y claro.\n10. Usa \"aproximadamente\" para los pasos, son estimaciones.\n\nDESCRIPCIÓN (solo objetos detectados, en orden de urgencia):",
+      "texto_generado": "2 mesa de comedores a tu izquierda a aproximadamente 2 pasos. silla frente a ti a aproximadamente 3 pasos. mochila frente a ti a aproximadamente 4 pasos.",
+      "llm_error": null
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 338.3,
+      "uso_llm": true,
+      "objetos_de_entrada": [
+        "cuenco",
+        "planta en maceta",
+        "sofá",
+        "televisor"
+      ],
+      "prompt_enviado": "Eres un sistema de navegación para personas con ceguera total.\nTu única función es describir el entorno detectado en lenguaje egocéntrico estricto.\n\nOBJETOS DETECTADOS (ordenados de más cercano a más lejano):\n- sofá: justo a tu derecha a aproximadamente 3 pasos\n- sofá: frente a ti a aproximadamente 5 pasos\n- planta en maceta: cerca a tu izquierda a aproximadamente 5 pasos\n- televisor: cerca a tu izquierda\n\nREGLAS OBLIGATORIAS — sin excepción:\n1. SOLO menciona objetos de la lista. NUNCA menciones lo que NO está.\n2. Usa SIEMPRE el nombre completo del objeto. NUNCA uses \"otro\", \"este\", \"ese\".\n3. El objeto con MENOS pasos va primero. Respeta el orden de la lista.\n4. Si hay una puerta en la lista, menciónala al inicio.\n5. Usa SOLO estas referencias: \"frente a ti\", \"a tu derecha\", \"a tu izquierda\", \"al fondo a tu derecha\", \"al fondo a tu izquierda\", \"al fondo\".\n6. Incluye los pasos cuando estén disponibles: \"sofá a tu derecha a aproximadamente 2 pasos\".\n7. NUNCA uses instrucciones de movimiento (no digas avanza, gira, detente, puedes).\n8. Si hay varios del mismo objeto, agrúpalos: \"2 sofás a tu izquierda a aproximadamente 4 pasos\".\n9. Máximo 3 oraciones. Máximo 60 palabras. Lenguaje directo y claro.\n10. Usa \"aproximadamente\" para los pasos, son estimaciones.\n\nDESCRIPCIÓN (solo objetos detectados, en orden de urgencia):",
+      "texto_generado": "Sofá a tu derecha a aproximadamente 3 pasos. Sofá frente a ti a aproximadamente 5 pasos. Planta en maceta a tu izquierda a aproximadamente 5 pasos.",
+      "llm_error": null
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 349.4,
+      "uso_llm": true,
+      "objetos_de_entrada": [
+        "boca de incendios",
+        "camión",
+        "coche",
+        "paraguas",
+        "semáforo"
+      ],
+      "prompt_enviado": "Eres un sistema de navegación para personas con ceguera total.\nTu única función es describir el entorno detectado en lenguaje egocéntrico estricto.\n\nOBJETOS DETECTADOS (ordenados de más cercano a más lejano):\n- camión: un poco más adelante, a tu derecha a aproximadamente 5 pasos\n- camión: un poco más adelante frente a ti a aproximadamente 6 pasos\n- coche: un poco más adelante frente a ti a aproximadamente 6 pasos\n- coche: un poco más adelante, a tu derecha a aproximadamente 6 pasos\n\nREGLAS OBLIGATORIAS — sin excepción:\n1. SOLO menciona objetos de la lista. NUNCA menciones lo que NO está.\n2. Usa SIEMPRE el nombre completo del objeto. NUNCA uses \"otro\", \"este\", \"ese\".\n3. El objeto con MENOS pasos va primero. Respeta el orden de la lista.\n4. Si hay una puerta en la lista, menciónala al inicio.\n5. Usa SOLO estas referencias: \"frente a ti\", \"a tu derecha\", \"a tu izquierda\", \"al fondo a tu derecha\", \"al fondo a tu izquierda\", \"al fondo\".\n6. Incluye los pasos cuando estén disponibles: \"sofá a tu derecha a aproximadamente 2 pasos\".\n7. NUNCA uses instrucciones de movimiento (no digas avanza, gira, detente, puedes).\n8. Si hay varios del mismo objeto, agrúpalos: \"2 sofás a tu izquierda a aproximadamente 4 pasos\".\n9. Máximo 3 oraciones. Máximo 60 palabras. Lenguaje directo y claro.\n10. Usa \"aproximadamente\" para los pasos, son estimaciones.\n\nDESCRIPCIÓN (solo objetos detectados, en orden de urgencia):",
+      "texto_generado": "Un camión a tu derecha a aproximadamente 5 pasos. Un camión y un coche frente a ti a aproximadamente 6 pasos. Un coche a tu derecha a aproximadamente 6 pasos.",
+      "llm_error": null
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 332.3,
+      "uso_llm": true,
+      "objetos_de_entrada": [
+        "jarrón",
+        "libro",
+        "planta en maceta",
+        "silla"
+      ],
+      "prompt_enviado": "Eres un sistema de navegación para personas con ceguera total.\nTu única función es describir el entorno detectado en lenguaje egocéntrico estricto.\n\nOBJETOS DETECTADOS (ordenados de más cercano a más lejano):\n- silla: justo frente a ti a aproximadamente 3 pasos\n- 2 jarrónes: frente a ti a aproximadamente 5 pasos\n- planta en maceta: un poco más adelante frente a ti a aproximadamente 6 pasos\n\nREGLAS OBLIGATORIAS — sin excepción:\n1. SOLO menciona objetos de la lista. NUNCA menciones lo que NO está.\n2. Usa SIEMPRE el nombre completo del objeto. NUNCA uses \"otro\", \"este\", \"ese\".\n3. El objeto con MENOS pasos va primero. Respeta el orden de la lista.\n4. Si hay una puerta en la lista, menciónala al inicio.\n5. Usa SOLO estas referencias: \"frente a ti\", \"a tu derecha\", \"a tu izquierda\", \"al fondo a tu derecha\", \"al fondo a tu izquierda\", \"al fondo\".\n6. Incluye los pasos cuando estén disponibles: \"sofá a tu derecha a aproximadamente 2 pasos\".\n7. NUNCA uses instrucciones de movimiento (no digas avanza, gira, detente, puedes).\n8. Si hay varios del mismo objeto, agrúpalos: \"2 sofás a tu izquierda a aproximadamente 4 pasos\".\n9. Máximo 3 oraciones. Máximo 60 palabras. Lenguaje directo y claro.\n10. Usa \"aproximadamente\" para los pasos, son estimaciones.\n\nDESCRIPCIÓN (solo objetos detectados, en orden de urgencia):",
+      "texto_generado": "Silla justo frente a ti a aproximadamente 3 pasos. 2 jarrones frente a ti a aproximadamente 5 pasos. Planta en maceta un poco más adelante frente a ti a aproximadamente 6 pasos.",
+      "llm_error": null
+    }
+  ]
+}

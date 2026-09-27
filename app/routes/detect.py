@@ -6,7 +6,8 @@ Endpoints de producción de la API de navegación egocéntrica.
 ENDPOINTS:
   POST /api/detect        → narrativa completa para producción (JSON o audio MP3)
   POST /api/debug-detect  → pipeline paso a paso para diagnóstico
-  GET  /api/health        → estado del servicio y configuración activa
+  GET  /api/tts/models    → modelos TTS disponibles (tts_router)
+  (GET /api/health está en app/routes/health.py)
 
 CAMBIOS RESPECTO A LA VERSIÓN ANTERIOR:
   - Se añade llamada a log_metric() al final de /detect para registrar
@@ -18,7 +19,7 @@ CONFIGURACIÓN (variables de entorno en .env):
   API_MAX_IMAGE_DIM   → dimensión máxima de imagen antes de inferencia (default: 800)
   API_DEFAULT_CONF    → umbral de confianza por defecto del endpoint   (default: 0.35)
 
-PIPELINE COMPLETO (_run_full_pipeline):
+PIPELINE COMPLETO (app/core/pipeline.py::run — este módulo es solo el adaptador HTTP):
   1. resize_image()         — escalar imagen si excede MAX_IMAGE_DIM
   2. run_yolo()             — detectar objetos con YOLO26s
   3. analyze_spatial()      — enriquecer con posición + categoría + prioridad
@@ -32,99 +33,55 @@ PIPELINE COMPLETO (_run_full_pipeline):
  11. log_metric()           — registrar métricas de producción (NUEVO)
 """
 
-import time
-import os
+import asyncio
+import functools
 import io
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import quote
 import base64
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from fastapi.responses import StreamingResponse
-from PIL import Image
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from PIL import Image, UnidentifiedImageError
 
-from app.services.yolo_service          import run_yolo, YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
-from app.services.spatial_analyzer     import analyze_spatial
-from app.services.step_estimator       import estimate_steps
-from app.services.free_space_analyzer  import calculate_free_space
-from app.services.risk_engine          import decide_movement
-from app.services.scene_classifier     import classify_scene
-from app.services.llm_enhancer         import generate_description
 from app.services.tts_service          import (
-    synthesize_speech, synthesize_and_save, is_tts_active,
-    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_VOICE,
+    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_SKIPPED_STATUS, TTS_TIMEOUT_STATUS,
 )
-from app.services.detection_visualizer import save_annotated_image
-from app.utils.groq_client             import GROQ_MODEL, is_llm_active
+from app.utils.uploads                 import read_upload_limited
+
+from app.security import require_api_key
 
 router = APIRouter()
+# /debug-detect expone el pipeline interno (prompt del LLM, etapas): es un endpoint
+# INTERNO de desarrollo y se monta solo en el perfil "development" (ver app/main.py).
+debug_router = APIRouter()
+# /tts/models alimenta el selector de modelo TTS del cliente (development/study).
+tts_router = APIRouter()
 
 # ──────────────────────────────────────────────────────────────
-# CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
+# NÚCLEO: el pipeline vive en app/core/pipeline.py. Estos nombres se
+# re-exportan por compatibilidad (scripts de evidencia y app/experimental).
 # ──────────────────────────────────────────────────────────────
 
-_MAX_IMAGE_DIM: int   = int(os.getenv("API_MAX_IMAGE_DIM", "800"))
-_DEFAULT_CONF: float  = float(os.getenv("API_DEFAULT_CONF", "0.35"))
+from app.core import pipeline
+from app.core.pipeline import (                      # noqa: F401  (re-export)
+    resize_image, build_narrative, normalize_threshold, _ms,
+    DEFAULT_CONF as _DEFAULT_CONF, MAX_IMAGE_DIM as _MAX_IMAGE_DIM,
+)
+from app.storage import resolve_output
+from app import telemetry
+from app import experiment
+from app.profiles import app_profile
+from app.errors import ApiError
+from app.core.pipeline import PipelineStageError
+from app.services.yolo_service import ModelUnavailableError
+from app.utils.groq_client import is_llm_active
 
-
-# ──────────────────────────────────────────────────────────────
-# UTILIDADES INTERNAS
-# ──────────────────────────────────────────────────────────────
-
-def _ms(t: float) -> float:
-    return round((time.time() - t) * 1000, 2)
-
-
-def normalize_threshold(value: float) -> float:
-    return max(0.0, min(1.0, float(value)))
-
-
-def resize_image(image_bytes: bytes, max_dim: int = None) -> tuple:
-    """
-    Redimensiona la imagen si alguna dimensión supera max_dim,
-    preservando la relación de aspecto con filtro LANCZOS.
-    Retorna (bytes, new_w, new_h, orig_w, orig_h).
-    """
-    max_dim = max_dim or _MAX_IMAGE_DIM
-    img     = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    ow, oh  = img.size
-
-    if max(ow, oh) > max_dim:
-        ratio  = max_dim / max(ow, oh)
-        nw, nh = int(ow * ratio), int(oh * ratio)
-        img    = img.resize((nw, nh), Image.Resampling.LANCZOS)
-        buf    = io.BytesIO()
-        img.save(buf, format="JPEG", quality=90)
-        return buf.getvalue(), nw, nh, ow, oh
-
-    return image_bytes, ow, oh, ow, oh
-
-
-def build_narrative(scene_intro: str, description: str, instruction: str) -> str:
-    """
-    Ensambla la narrativa final concatenando intro de escenario,
-    descripción del entorno e instrucción de movimiento.
-    Maneja puntuación automáticamente.
-    """
-    parts = [p.strip() for p in [scene_intro, description, instruction] if p and p.strip()]
-    if not parts:
-        return "No se detectaron objetos. Avanza con precaución."
-
-    result = ""
-    for part in parts:
-        if result:
-            sep = " " if result.rstrip().endswith(".") else ". "
-            result += sep
-        result += part
-
-    if not result.rstrip().endswith("."):
-        result = result.rstrip() + "."
-
-    return result
-
-
-# Alias para compatibilidad con batch.py que importa build_final_narrative
-build_final_narrative = build_narrative
+# Alias históricos
+build_final_narrative = build_narrative          # usado por app/experimental/batch.py
+_run_full_pipeline = pipeline.run                 # nombre anterior del orquestador
 
 
 def _build_annotated_info(annotated_path: str | None) -> dict:
@@ -145,7 +102,7 @@ def _build_annotated_info(annotated_path: str | None) -> dict:
         return info
 
     try:
-        ann_bytes = Path(annotated_path).read_bytes()
+        ann_bytes = resolve_output("annotated", annotated_path).read_bytes()
         ann_b64   = base64.b64encode(ann_bytes).decode("utf-8")
         info = {
             "disponible":  True,
@@ -160,108 +117,166 @@ def _build_annotated_info(annotated_path: str | None) -> dict:
     return info
 
 
+def _discard_outputs(annotated_path: str | None, audio_path: str | None) -> None:
+    """Borra los archivos que el pipeline escribió para esta solicitud (perfil production)."""
+    for kind, rel in (("annotated", annotated_path), ("audio_live", audio_path)):
+        if rel:
+            try:
+                resolve_output(kind, rel).unlink(missing_ok=True)
+            except OSError:
+                pass  # nunca debe romper la respuesta
+
+
 def _tts_unavailable_reason() -> str:
     """
-    Clasifica por qué no hay audio disponible, para que el cliente pueda
-    mostrar un mensaje útil en vez de un genérico "TTS no disponible":
-      - "cuota_excedida"  : Gemini devolvió 429 / RESOURCE_EXHAUSTED.
-      - "error_sintesis"  : falló por otra razón (ver logs del servidor).
-      - "tts_desactivado" : falta GOOGLE_API_KEY o dependencias no instaladas.
+    Por qué no hay audio (campo audio.razon de la respuesta):
+      - "tts_omitido_evaluacion" : EVALUATION_DISABLE_TTS=true.
+      - "tts_desactivado"        : falta GOOGLE_API_KEY o dependencias.
+      - "cuota_excedida"         : cuota del proveedor agotada (p. ej. diaria).
+      - "limite_proveedor"       : límite de solicitudes del proveedor (429 por minuto).
+      - "proveedor_no_disponible": el proveedor está caído o devolvió 5xx.
+      - "tiempo_agotado"         : el proveedor no respondió dentro de TTS_TIMEOUT_S.
+      - "error_sintesis"         : cualquier otro fallo (detalle en el log).
     """
     err = get_last_tts_error()
     if err is None:
         return "tts_desactivado"
-    if err.get("code") == 429 or err.get("status") == "RESOURCE_EXHAUSTED":
-        return "cuota_excedida"
-    return "error_sintesis"
+    status, kind = err.get("status"), err.get("kind")
+    if status == TTS_SKIPPED_STATUS:
+        return "tts_omitido_evaluacion"
+    if status in ("NO_CONFIGURADO", "DEPENDENCIAS_NO_DISPONIBLES"):
+        return "tts_desactivado"
+    return {"quota_exhausted": "cuota_excedida", "rate_limited": "limite_proveedor",
+            "unavailable": "proveedor_no_disponible", "timeout": "tiempo_agotado"}.get(kind, "error_sintesis")
 
 
-# ──────────────────────────────────────────────────────────────
-# PIPELINE COMPLETO
-# ──────────────────────────────────────────────────────────────
+# ── Contrato de errores (app/errors.py) ─────────────────────────────
+_ALLOWED_FORMATS = {"JPEG", "PNG"}                       # contrato: "Imagen JPEG o PNG"
+_SUPPORTED_MAGIC = (bytes.fromhex("89504e470d0a1a0a"), bytes.fromhex("ffd8ff"))   # firmas PNG / JPEG
+_TTS_REASON_CODE = {
+    "tts_omitido_evaluacion": "TTS_UNAVAILABLE", "tts_desactivado": "TTS_UNAVAILABLE",
+    "cuota_excedida": "TTS_QUOTA_EXCEEDED", "limite_proveedor": "TTS_RATE_LIMITED",
+    "proveedor_no_disponible": "TTS_PROVIDER_UNAVAILABLE", "tiempo_agotado": "TTS_TIMEOUT",
+    "error_sintesis": "TTS_PROVIDER_ERROR",
+}
+_LLM_KIND_CODE = {
+    "timeout": "LLM_TIMEOUT", "rate_limited": "LLM_RATE_LIMITED", "quota_exhausted": "LLM_RATE_LIMITED",
+    "unavailable": "LLM_PROVIDER_UNAVAILABLE", "invalid_response": "LLM_INVALID_RESPONSE",
+    "provider_error": "LLM_PROVIDER_ERROR",
+}
+_STAGE_CODE = {
+    "preprocesamiento": "IMAGE_DECODE_ERROR", "deteccion": "DETECTION_ERROR",
+    "espacial": "SPATIAL_ANALYSIS_ERROR", "pasos": "STEP_ESTIMATION_ERROR",
+    "espacio_libre": "FREE_SPACE_ERROR", "decision": "MOVEMENT_DECISION_ERROR",
+    "narrativa": "NARRATIVE_GENERATION_ERROR", "tts": "AUDIO_STORAGE_ERROR",
+}
+_LLM_INVALID_TYPES = {"JSONDecodeError", "ValueError", "KeyError", "IndexError", "AttributeError", "TypeError"}
 
-def _run_full_pipeline(image_bytes: bytes, threshold: float, debug: bool = False) -> dict:
-    """
-    Ejecuta el pipeline completo de detección → narrativa.
-    Cada etapa mide su tiempo para las métricas del endpoint.
-    """
-    tiempos: dict = {}
-    t_total = time.time()
 
-    image_bytes, width, height, w_orig, h_orig = resize_image(image_bytes)
+async def _read_valid_image(file: UploadFile) -> bytes:
+    """Lee y valida la subida. Solo acepta JPEG/PNG según el CONTENIDO (no la extensión)."""
+    try:
+        data = await read_upload_limited(file)
+    except HTTPException as exc:
+        if exc.status_code == 413:
+            raise ApiError("PAYLOAD_TOO_LARGE", internal=str(exc.detail))
+        raise
+    if not data:
+        raise ApiError("EMPTY_FILE")
+    try:
+        with Image.open(io.BytesIO(data)) as im:
+            fmt, (w, h) = im.format, im.size
+    except Image.DecompressionBombError as exc:
+        raise ApiError("IMAGE_TOO_LARGE", internal=type(exc).__name__)
+    except UnidentifiedImageError as exc:
+        # Firma de JPEG/PNG pero contenido irreconocible → imagen dañada (422); si no, formato ajeno (415).
+        if data.startswith(_SUPPORTED_MAGIC):
+            raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+        raise ApiError("UNSUPPORTED_IMAGE", internal=type(exc).__name__)
+    except Exception as exc:
+        raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+    if fmt not in _ALLOWED_FORMATS:
+        raise ApiError("UNSUPPORTED_IMAGE", internal=str(fmt))
+    try:                                   # verify() no decodifica píxeles; load() sí (archivos truncados)
+        with Image.open(io.BytesIO(data)) as im:
+            im.verify()
+        with Image.open(io.BytesIO(data)) as im:
+            im.load()
+    except Image.DecompressionBombError as exc:
+        raise ApiError("IMAGE_TOO_LARGE", internal=type(exc).__name__)
+    except Exception as exc:
+        raise ApiError("INVALID_IMAGE", internal=type(exc).__name__)
+    # El preprocesamiento escala el lado mayor a MAX_IMAGE_DIM: si el menor quedara en 0 px, no es procesable.
+    if max(w, h) > _MAX_IMAGE_DIM and int(min(w, h) * _MAX_IMAGE_DIM / max(w, h)) < 1:
+        raise ApiError("IMAGE_DIMENSIONS_UNSUPPORTED", internal=f"{w}x{h}")
+    return data
 
-    # 1. Detección YOLO26s
-    t1         = time.time()
-    det_result = run_yolo(image_bytes, threshold)
-    detections = det_result.get("detections", [])
-    tiempos["deteccion_ms"] = _ms(t1)
 
-    # 2. Análisis espacial egocéntrico
-    t2       = time.time()
-    analyzed = analyze_spatial(detections, width, height)
-    tiempos["espacial_ms"] = _ms(t2)
+# ── Serialización del pipeline sin bloquear el bucle de eventos ────────────
+# El pipeline (YOLO, LLM, TTS) es bloqueante y comparte estado de módulo (modelo,
+# caché de escenario, último error del TTS). Se ejecuta en UN HILO DEDICADO
+# (ejecutor de 1 hilo, cola FIFO), mientras el bucle de eventos queda libre para
+# /api/health, el límite por IP y las solicitudes en cola. Un solo hilo = una sola
+# ejecución a la vez y siempre el mismo hilo (PyTorch reserva memoria por hilo: con
+# un pool de hilos la memoria crecía ~250 MB). El candado de hilos es una defensa
+# adicional por si otro código llama al pipeline. Todo lo que lee estado compartido
+# del pipeline (motivo del fallo del TTS) se captura DENTRO de la sección serializada.
+_PIPELINE_LOCK = threading.Lock()
+_PIPELINE_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pipeline")
 
-    # 3. Estimación de pasos
-    t3       = time.time()
-    analyzed = estimate_steps(analyzed, width, height)
-    tiempos["pasos_ms"] = _ms(t3)
 
-    # 3.5 Visualización: guardar imagen con bounding boxes anotados
-    # Se ejecuta aquí porque analyzed ya contiene bbox + label_es + categoría + pasos.
-    t_vis             = time.time()
-    annotated_path    = save_annotated_image(image_bytes, analyzed)
-    tiempos["visualizer_ms"] = _ms(t_vis)
+def _serialized(fn, *args, **kwargs):
+    with _PIPELINE_LOCK:
+        return fn(*args, **kwargs)
 
-    # 4. Análisis de espacio libre
-    t4         = time.time()
-    free_space = calculate_free_space(analyzed, width)
-    tiempos["espacio_ms"] = _ms(t4)
 
-    # 5. Decisión de movimiento
-    t5       = time.time()
-    decision = decide_movement(analyzed, free_space)
-    tiempos["decision_ms"] = _ms(t5)
+async def _run_serialized(fn, *args, **kwargs):
+    # Si el cliente se desconecta, la tarea en curso termina igualmente en el hilo
+    # dedicado; nunca se ejecutan dos pipelines en paralelo.
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_PIPELINE_EXECUTOR, functools.partial(_serialized, fn, *args, **kwargs))
 
-    # 6-7. Clasificación de escenario + descripción egocéntrica (ambas LLM/Groq).
-    # Son independientes entre sí (solo dependen de `analyzed`), así que se
-    # ejecutan en paralelo en vez de secuencial: recorta esta parte del
-    # pipeline a ~max(t6, t7) en vez de t6 + t7. Antes de este cambio ambas
-    # llamadas de red se esperaban una tras otra sin necesidad.
-    t67 = time.time()
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        future_scene = executor.submit(classify_scene, analyzed)
-        future_desc  = executor.submit(generate_description, analyzed, debug)
-        scene_info   = future_scene.result()
-        desc_result  = future_desc.result()
-    tiempos["escenario_ms"] = tiempos["llm_ms"] = _ms(t67)
 
-    scene_intro = (
-        scene_info.get("scene_intro", "")
-        if scene_info.get("confidence") in ("media", "alta")
-        else ""
-    )
-    description = desc_result.get("text", "")
+def _run_detect_locked(image_bytes, threshold, debug, tts_model):
+    result = _run_core(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
+    tts_last = get_last_tts_error()
+    tts_reason = None if result["audio_path"] else _tts_unavailable_reason()
+    return result, tts_last, tts_reason
 
-    # 8. Narrativa final
-    narrativa = build_narrative(scene_intro, description, decision["instruction"])
-    tiempos["total_ms"] = _ms(t_total)
 
-    return {
-        "narrativa_final": narrativa,
-        "escenario":       scene_info,
-        "decision":        decision,
-        "analyzed":        analyzed,
-        "free_space":      free_space,
-        "detections":      detections,
-        "desc_result":     desc_result,
-        "tiempos":         tiempos,
-        "annotated_path":  annotated_path,   # ruta relativa o None si no hay objetos
-        "image_bytes":     image_bytes,      # bytes procesados (para base64 en endpoint)
-        "imagen": {
-            "original":  f"{w_orig}x{h_orig}",
-            "procesada": f"{width}x{height}",
-        },
-    }
+def _run_core(image_bytes: bytes, threshold: float, debug: bool, **kw) -> dict:
+    """core.pipeline.run con los fallos de etapa traducidos al contrato de errores."""
+    try:
+        return pipeline.run(image_bytes, threshold, debug, **kw)
+    except PipelineStageError as exc:
+        # Una solicitud fallida no deja archivos (en ningún perfil).
+        _discard_outputs(exc.outputs.get("annotated"), exc.outputs.get("audio_live"))
+        internal = f"{type(exc.cause).__name__}: {exc.cause}"
+        if isinstance(exc.cause, ModelUnavailableError):
+            raise ApiError("MODEL_UNAVAILABLE", internal=internal)
+        raise ApiError(_STAGE_CODE[exc.stage], internal=internal)
+
+
+def _llm_issue(result: dict) -> tuple[str | None, int | None]:
+    """¿La narrativa se generó SIN el LLM previsto? (código, Retry-After del proveedor o None)."""
+    if not result["analyzed"]:
+        return None, None                  # sin objetos no se consulta al LLM
+    for part in (result["desc_result"], result["escenario"]):
+        if part.get("llm_error"):
+            kind = part.get("llm_error_kind")
+            if kind is None:               # compatibilidad: solo el tipo
+                etype = part.get("llm_error_type") or ""
+                kind = ("timeout" if "timeout" in etype.lower()
+                        else "invalid_response" if etype in _LLM_INVALID_TYPES else "provider_error")
+            return _LLM_KIND_CODE[kind], part.get("llm_retry_after_s")
+    if not is_llm_active():
+        return "LLM_UNAVAILABLE", None
+    return None, None
+
+
+def _retry_headers(seconds) -> dict | None:
+    """Retry-After SOLO con el valor que informó el proveedor; nunca uno inventado."""
+    return {"Retry-After": str(int(seconds))} if seconds else None
 
 
 # ──────────────────────────────────────────────────────────────
@@ -296,6 +311,8 @@ async def detect(
             "Un id no reconocido cae al TTS_MODEL configurado en .env."
         ),
     ),
+    _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
+    request: Request = None,                 # inyectado por FastAPI (request_id del middleware)
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
@@ -309,34 +326,48 @@ async def detect(
     Las métricas de cada solicitud exitosa se registran automáticamente en
     metrics/production_metrics.jsonl para consumo desde GET /api/metrics/summary.
     """
+    # request_id: lo asigna app/observability.py a TODA solicitud (cabecera X-Request-ID).
+    request_id = getattr(request.state, "request_id", None) if request else None
+    profile    = app_profile()
+    image_bytes = await _read_valid_image(file)
+
+    threshold = normalize_threshold(confidence_threshold)
+    # Núcleo: pipeline completo + TTS (se genera en toda petición, flujo original).
+    # tts_model permite al cliente elegir un modelo alterno con cuota
+    # propia cuando el modelo por defecto agota su RPM gratuito.
+    result, tts_last, tts_reason = await _run_serialized(_run_detect_locked, image_bytes, threshold, debug, tts_model)
+    audio_path = result["audio_path"]
+    tts_ms     = result["tts_ms"]
+    keep_outputs = False                   # los archivos solo se conservan en un éxito fuera de production
     try:
-        image_bytes = await file.read()
-        if not image_bytes:
-            raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
+        if request is not None:
+            request.state.weights_sha256 = experiment.weights_identity()["sha256"]
 
-        try:
-            Image.open(io.BytesIO(image_bytes)).verify()
-        except Exception:
-            raise HTTPException(
-                status_code=422,
-                detail="El archivo enviado no es una imagen válida o está corrupto.",
-            )
-
-        threshold = normalize_threshold(confidence_threshold)
-        result    = _run_full_pipeline(image_bytes, threshold, debug)
+        # ── Política de degradación (docs/CONTRATO_ERRORES.md §3) ──
+        degradations = []
+        if request is not None:
+            request.state.degradations = degradations      # visible en el log también si se lanza un error
+        llm_code, llm_retry = _llm_issue(result)
+        if llm_code:
+            degradations.append(llm_code)
+            if profile == "study":             # estudio formal: nunca narrativa de respaldo silenciosa
+                raise ApiError(llm_code, headers=_retry_headers(llm_retry),
+                               internal=str(result["desc_result"].get("llm_error")
+                                            or result["escenario"].get("llm_error")))
+        tts_code = None if audio_path else _TTS_REASON_CODE[tts_reason]
+        if tts_code:
+            degradations.append(tts_code)
+            if audio or profile == "study":    # el audio es obligatorio: audio=true o estudio
+                last = tts_last or {}
+                raise ApiError(tts_code, internal=str(last), headers=_retry_headers(last.get("retry_after_s")))
+        if result["analyzed"] and not result.get("annotated_path"):
+            degradations.append("ANNOTATION_UNAVAILABLE")
 
         # ── Imagen anotada: leer del disco y codificar en base64 ─────
         annotated_info = _build_annotated_info(result.get("annotated_path"))
 
-        # TTS: se genera en toda petición junto con la detección (flujo original).
-        # tts_model permite al cliente elegir un modelo alterno con cuota
-        # propia cuando el modelo por defecto agota su RPM gratuito.
-        t_tts      = time.time()
-        audio_path = synthesize_and_save(result["narrativa_final"], model=tts_model)
-        tts_ms     = _ms(t_tts)
-
         if audio_path:
-            raw_bytes  = Path(audio_path).read_bytes()
+            raw_bytes  = resolve_output("audio_live", audio_path).read_bytes()
             b64_str    = base64.b64encode(raw_bytes).decode("utf-8")
             audio_info = {
                 "disponible":   True,
@@ -351,7 +382,7 @@ async def detect(
             raw_bytes  = None
             audio_info = {
                 "disponible":   False,
-                "razon":        _tts_unavailable_reason(),
+                "razon":        tts_reason,
                 "archivo":      None,
                 "content_type": None,
                 "data_base64":  None,
@@ -372,15 +403,26 @@ async def detect(
             "imagen":             result["imagen"],
         }
 
-        # ── Registrar métricas de producción (NUEVO) ──────────
+        # ── Perfil production: no conservar derivados de la imagen del usuario ──
+        # La imagen anotada y el audio ya están en memoria (base64 / stream); en
+        # producción no se guardan en disco (docs/DATOS_PERSISTENCIA.md).
+        if profile == "production":
+            annotated_info["archivo"] = annotated_info["url"] = None
+            audio_info["archivo"] = None
+            audio_path = ""
+
+        # ── Registrar métricas de producción (sin imagen ni texto del usuario) ──
         try:
-            from app.routes.evaluation import log_metric
-            log_metric({
+            telemetry.log_metric({
+                "request_id":     request_id,
+                "app_commit":     experiment.app_commit()["commit"],
+                "pesos_sha256":   experiment.weights_identity()["sha256"],
                 "objetos":        len(result["detections"]),
                 "confianza_prom": avg_conf,
                 "deteccion_ms":   result["tiempos"].get("deteccion_ms", 0),
                 "total_ms":       result["tiempos"].get("total_ms", 0),
                 "escenario":      result["escenario"].get("scene_type", "desconocido"),
+                "degradaciones":  degradations,
             })
         except Exception:
             pass  # El registro de métricas nunca debe romper la respuesta principal
@@ -388,30 +430,23 @@ async def detect(
         # ── Modo stream: devuelve MP3 binario ─────────────────
         if audio:
             if raw_bytes:
+                # Las cabeceras HTTP solo admiten latin-1: el texto va codificado en
+                # porcentaje (UTF-8) para no fallar con caracteres como "—" o "“".
                 headers = {
-                    "X-Narrativa":          result["narrativa_final"][:500],
-                    "X-Escenario":          result["escenario"].get("scene_type", ""),
+                    "X-Narrativa":          quote(result["narrativa_final"][:500]),
+                    "X-Escenario":          quote(result["escenario"].get("scene_type", "")),
+                    "X-Texto-Codificacion": "percent-encoded-utf-8",
+                    **({"X-Degradacion": ",".join(degradations)} if degradations else {}),
                     "X-Objetos-Detectados": str(len(result["detections"])),
                     "X-Audio-File":         audio_path,
+                    "X-Request-ID":         request_id,
                 }
+                keep_outputs = profile != "production"
                 return StreamingResponse(
                     io.BytesIO(raw_bytes),
                     media_type="audio/mpeg",
                     headers=headers,
                 )
-            razon = audio_info["razon"]
-            aviso = {
-                "cuota_excedida":  "TTS no disponible: se alcanzó el límite de cuota de Gemini TTS. Intenta de nuevo en un momento.",
-                "tts_desactivado": "TTS no disponible. Verificar que GOOGLE_API_KEY esté configurada.",
-                "error_sintesis":  "TTS no disponible: la síntesis falló. Ver logs del servidor para más detalle.",
-            }.get(razon, "TTS no disponible.")
-            return {
-                "status":          "success_no_audio",
-                "narrativa_final": result["narrativa_final"],
-                "aviso":           aviso,
-                "metricas":        metricas,
-            }
-
         # ── Modo JSON completo ─────────────────────────────────
         response = {
             "status":           "success",
@@ -448,43 +483,37 @@ async def detect(
                 "prompt_llm":      result["desc_result"].get("prompt"),
             }
 
+        keep_outputs = profile != "production"
+        if degradations:
+            return JSONResponse(response, headers={"X-Degradacion": ",".join(degradations)})
         return response
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    finally:
+        # Production nunca conserva derivados de la imagen del usuario; ningún perfil
+        # conserva los archivos de una solicitud fallida (cualquier excepción).
+        if not keep_outputs:
+            _discard_outputs(result.get("annotated_path"), result.get("audio_path"))
 
 
 # ──────────────────────────────────────────────────────────────
 # POST /debug-detect
 # ──────────────────────────────────────────────────────────────
 
-@router.post("/debug-detect", tags=["Diagnóstico"])
+@debug_router.post("/debug-detect", tags=["Diagnóstico"])
 async def debug_detect(
     file: UploadFile = File(...),
     confidence_threshold: float = Form(_DEFAULT_CONF, ge=0.0, le=1.0),
+    _key: str = Depends(require_api_key),
 ):
     """
     Ejecuta el pipeline completo y expone cada etapa con detalle.
     Útil para calibración, validación y diagnóstico académico.
     No registra métricas de producción (endpoint de diagnóstico).
     """
+    image_bytes = await _read_valid_image(file)
+    threshold   = normalize_threshold(confidence_threshold)
+    result      = await _run_serialized(_run_core, image_bytes, threshold, True)
     try:
-        image_bytes = await file.read()
-        if not image_bytes:
-            raise HTTPException(status_code=400, detail="El archivo enviado está vacío.")
-
-        try:
-            Image.open(io.BytesIO(image_bytes)).verify()
-        except Exception:
-            raise HTTPException(
-                status_code=422,
-                detail="El archivo enviado no es una imagen válida o está corrupto.",
-            )
-
-        threshold   = normalize_threshold(confidence_threshold)
-        result      = _run_full_pipeline(image_bytes, threshold, debug=True)
         analyzed    = result["analyzed"]
         free_space  = result["free_space"]
         decision    = result["decision"]
@@ -568,18 +597,17 @@ async def debug_detect(
                 },
             },
         }
-
-    except HTTPException:
+    except BaseException:
+        _discard_outputs(result.get("annotated_path"), None)     # una solicitud fallida no deja archivos
         raise
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+
 
 
 # ──────────────────────────────────────────────────────────────
 # GET /tts/models
 # ──────────────────────────────────────────────────────────────
 
-@router.get("/tts/models", tags=["Info"])
+@tts_router.get("/tts/models", tags=["Info"])
 async def tts_models():
     """
     Modelos Gemini TTS disponibles para seleccionar en /detect (campo
@@ -590,67 +618,4 @@ async def tts_models():
     return {
         "default": TTS_MODEL,
         "modelos": get_available_tts_models(),
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# GET /health
-# ──────────────────────────────────────────────────────────────
-
-@router.get("/health", tags=["Info"])
-async def health_check():
-    """
-    Retorna el estado del servicio y la configuración activa.
-    Incluye estado del LLM, TTS y los nuevos módulos de evaluación.
-    """
-    # Contar imágenes en dataset si existe
-    from pathlib import Path as _Path
-    dataset_path = _Path("dataset/metadata")
-    dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
-
-    metrics_path = _Path("metrics/production_metrics.jsonl")
-    metrics_count = 0
-    if metrics_path.exists():
-        metrics_count = sum(1 for l in metrics_path.read_text().strip().split("\n") if l.strip())
-
-    return {
-        "status":  "healthy",
-        "version": "3.2.0",
-        "modelo": {
-            "nombre":  "YOLO26s",
-            "weights": YOLO_WEIGHTS,
-            "imgsz":   YOLO_IMGSZ,
-            "iou":     YOLO_IOU,
-        },
-        "llm": {
-            "proveedor": "Groq",
-            "modelo":    GROQ_MODEL,
-            "activo":    is_llm_active(),
-        },
-        "tts": {
-            "proveedor":    "Gemini TTS",
-            "modelo":       TTS_MODEL,
-            "voz":          TTS_VOICE,
-            "activo":       is_tts_active(),
-            "ultimo_error": get_last_tts_error(),
-        },
-        "evaluacion": {
-            "dataset_imagenes":    dataset_count,
-            "metricas_registradas": metrics_count,
-            "endpoints": [
-                "POST /api/dataset/upload",
-                "GET  /api/dataset/stats",
-                "GET  /api/metrics/summary",
-                "GET  /api/metrics/latency",
-                "POST /api/test/functional",
-                "POST /api/test/load",
-                "GET  /api/test/results",
-                "POST /api/finetune/prepare",
-                "GET  /api/finetune/status",
-            ],
-        },
-        "configuracion": {
-            "umbral_default": _DEFAULT_CONF,
-            "max_imagen_px":  _MAX_IMAGE_DIM,
-        },
     }

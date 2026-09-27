@@ -1,0 +1,47 @@
+## 1. Integridad
+registros=72 | combinaciones esperadas=72 | presentes=72 | faltantes=0 | inesperadas=0 | duplicadas=0
+llamadas (2 tareas por combinación)=144 | modelos=3 | imágenes=8 | repeticiones=[1, 2, 3]
+campos por registro presentes en todos: True | la entrada (prompt) de cada imagen es idéntica entre modelos y repeticiones: True
+
+## 2. Resultados por modelo
+qwen/qwen3.8-27b: narrativa con texto=24/24 · vacía sin error=0/24 · error declarado=0/24 · escenario del LLM=24/24 · escenario con error (se usó heurística)=0/24 (0.0 %) · latencia narrativa mediana=324 ms [259–2463] · latencia escenario mediana=363 ms [268–2510]
+openai/gpt-oss-120b: narrativa con texto=0/24 · vacía sin error=24/24 · error declarado=0/24 · escenario del LLM=2/24 · escenario con error (se usó heurística)=22/24 (91.7 %) · latencia narrativa mediana=823 ms [574–3897] · latencia escenario mediana=754 ms [583–2945]
+openai/gpt-oss-20b: narrativa con texto=0/24 · vacía sin error=24/24 · error declarado=0/24 · escenario del LLM=6/24 · escenario con error (se usó heurística)=18/24 (75.0 %) · latencia narrativa mediana=576 ms [332–4173] · latencia escenario mediana=1074 ms [335–2613]
+
+## 3. Errores
+openai/gpt-oss-120b | escenario | json_truncado (cadena sin cerrar): 4
+openai/gpt-oss-120b | escenario | respuesta_vacia (JSON vacío): 18
+openai/gpt-oss-120b | narrativa | respuesta_vacia_sin_error (el producto la acepta como éxito): 24
+openai/gpt-oss-20b | escenario | json_malformado: 3
+openai/gpt-oss-20b | escenario | json_truncado (cadena sin cerrar): 2
+openai/gpt-oss-20b | escenario | respuesta_vacia (JSON vacío): 13
+openai/gpt-oss-20b | narrativa | respuesta_vacia_sin_error (el producto la acepta como éxito): 24
+qwen/qwen3.8-27b escenario: por imagen {} | por repetición {}
+openai/gpt-oss-120b escenario: por imagen {'W3D-I-SKF-09-office.png': 3, 'W3D-G-04-Biblioteca.png': 3, 'W3D-I-SKF-07-living-room.png': 2, 'W3D-I-PHV-03-studio2.png': 3, 'W3D-G-06-Universidad.png': 2, '02_calle_carros.jpg': 3, '03_escritorio_objetos.jpg': 3, '05_sala_muebles.jpg': 3} | por repetición {1: 6, 2: 8, 3: 8}
+openai/gpt-oss-20b escenario: por imagen {'W3D-I-SKF-09-office.png': 3, 'W3D-G-04-Biblioteca.png': 3, 'W3D-I-PHV-03-studio2.png': 2, 'W3D-G-06-Universidad.png': 2, '02_calle_carros.jpg': 3, '03_escritorio_objetos.jpg': 3, '05_sala_muebles.jpg': 2} | por repetición {1: 6, 2: 7, 3: 5}
+
+## 4. Variabilidad entre repeticiones (modelo × imagen × tarea)
+qwen/qwen3.8-27b | narrativa: {'idénticas': 4, 'variación lingüística': 3, 'cambio de orientación; cambio de información (pasos)': 1}
+qwen/qwen3.8-27b | escenario: {'idénticas': 8}
+openai/gpt-oss-120b | narrativa: {'error (narrativa vacía)': 8}
+openai/gpt-oss-120b | escenario: {'error en las 3 (heurística)': 6, 'error en alguna repetición': 2}
+openai/gpt-oss-20b | narrativa: {'error (narrativa vacía)': 8}
+openai/gpt-oss-20b | escenario: {'error en las 3 (heurística)': 4, 'idénticas': 1, 'error en alguna repetición': 3}
+
+## 5. Calidad observable (narrativas con texto)
+qwen/qwen3.8-27b: narrativas=24 | líneas de entrada=132 → conservadas=88, omitidas=12, dirección alterada=26, pasos alterados=6 | objetos fuera del prompt en 0 | pasos inexistentes en 0 | verbos de movimiento en 0 | >60 palabras en 0 | referencias fuera de la regla 5 en 18
+openai/gpt-oss-120b: sin narrativas con texto → no evaluable
+openai/gpt-oss-20b: sin narrativas con texto → no evaluable
+
+## 5b. Entrada (generada por el producto antes del LLM)
+W3D-I-SKF-09-office.png: sin pasos: '- televisor: cerca a tu derecha' | referencia fuera de la regla 5: 'justo frente a ti a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'un poco más adelante, a tu izquierda a aproximadamente 6 pasos' | referencia fuera de la regla 5: 'cerca a tu derecha'
+W3D-G-04-Biblioteca.png: pluralización '2 mesa de comedores' | sin pasos: '- silla: cerca a tu izquierda' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 2 pasos' | referencia fuera de la regla 5: 'justo frente a ti a aproximadamente 3 pasos' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda' | objetos de la entrada no confirmados por el inventario de referencia: ['couch']
+W3D-I-SKF-07-living-room.png: sin pasos: '- televisor: cerca a tu izquierda' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 3 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda'
+W3D-I-PHV-03-studio2.png: referencia fuera de la regla 5: 'justo frente a ti a aproximadamente 3 pasos'
+W3D-G-06-Universidad.png: sin pasos: '- 3 personas: al fondo frente a ti' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu derecha a aproximadamente 6 pasos'
+02_calle_carros.jpg: sin pasos: '- 3 coches: cerca a tu izquierda' | referencia fuera de la regla 5: 'justo frente a ti a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu derecha a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda'
+03_escritorio_objetos.jpg: sin pasos: '- persona: al fondo, a tu derecha' | sin pasos: '- televisor: frente a ti' | sin pasos: '- portátil: justo a tu derecha' | sin pasos: '- 2 portátiles: cerca a tu derecha' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 1 paso' | referencia fuera de la regla 5: 'un poco más adelante, a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'justo a tu derecha' | referencia fuera de la regla 5: 'cerca a tu derecha'
+05_sala_muebles.jpg: sin pasos: '- silla: cerca a tu izquierda' | referencia fuera de la regla 5: 'justo a tu derecha a aproximadamente 2 pasos' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'justo a tu izquierda a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda a aproximadamente 4 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda a aproximadamente 5 pasos' | referencia fuera de la regla 5: 'cerca a tu izquierda'
+
+Archivos originales sin cambios (SHA-256 antes = después): True
+SHA-256 originales: llm_runs.jsonl=bc0ac628139a7d7e, llm_stability.jsonl=0d2dd7165ea6a32d, run_meta.jsonl=0954485b0913e0b8

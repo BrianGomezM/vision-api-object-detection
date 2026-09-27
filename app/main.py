@@ -13,7 +13,18 @@ CORS:
   y cualquier origen configurado en la variable CORS_ORIGINS del entorno.
   En desarrollo se aceptan todos los orígenes de localhost.
 
-ENDPOINTS registrados:
+PERFILES (APP_PROFILE, ver app/profiles.py):
+  production            → PRODUCTO desplegado: solo POST /api/detect y GET /api/health
+                          (básico). Sin /docs, /redoc, /openapi.json, raíz ni endpoints
+                          internos. Perfil del Dockerfile.
+  development (defecto) → todos los endpoints de abajo, igual que antes.
+  study                 → solo endpoints del investigador para las sesiones con
+                          participantes: /api/detect, /api/health, /api/tts/models,
+                          /api/study/*, /api/catalog*. NO monta endpoints internos
+                          (debug, dataset, fine-tuning, pruebas, métricas/feedback,
+                          /detections) y se niega a arrancar sin API_KEYS.
+
+ENDPOINTS registrados (perfil development):
   /api/detect        POST — narrativa completa (JSON o audio MP3)
   /api/debug-detect  POST — pipeline paso a paso
   /api/health        GET  — estado del servicio
@@ -28,26 +39,25 @@ ENDPOINTS registrados:
   /api/finetune/prepare  POST — prepara dataset en formato YOLO (data.yaml)
   /api/finetune/status   GET  — estado del dataset preparado
   /api/feedback          POST/GET — evaluación de usuarios (escala Likert)
-  /api/metrics           GET  — métricas de sesión en memoria
+  /api/catalog           GET  — catálogo único de pruebas (sin ground truth)
+  /api/study/*                — sesiones de evaluación con usuarios
 """
 
 import os
-from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.routes.detect     import router as detect_router
+from app.routes.detect     import router as detect_router, debug_router, tts_router
+from app.routes.health     import router as health_router
 from app.routes.evaluation import router as eval_router
 from app.routes.metrics    import router as metrics_router
-
-app = FastAPI(
-    title="API de Detección de Objetos para Accesibilidad",
-    description=(
-        "Genera descripciones narrativas egocéntricas para personas con ceguera total "
-        "en entornos Web 3D. Incluye endpoints de evaluación, dataset y fine-tuning."
-    ),
-    version="3.2.0",
-)
+from app.routes.study      import router as study_router
+from app.routes.catalog    import router as catalog_router
+from app.security import app_profile, dev_mode
+from app.storage import data_dir
+from app import errors
+from app.observability import RequestContextMiddleware
+from app import ratelimit
 
 
 # ──────────────────────────────────────────────────────────────
@@ -79,94 +89,149 @@ _CORS_ORIGIN_REGEX = os.getenv(
     r"^https://visionnav-client(-[a-zA-Z0-9]+)*\.vercel\.app$",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=_CORS_ORIGIN_REGEX,
-    allow_credentials=True,
-    # Métodos necesarios para los endpoints del sistema
-    allow_methods=["GET", "POST", "OPTIONS"],
-    # Headers que el cliente Next.js envía en peticiones multipart y JSON
-    allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With"],
-    # Exponer headers personalizados que /api/detect devuelve en modo audio=true
-    expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File"],
-)
+
+def create_app(profile: str | None = None) -> FastAPI:
+    """Construye la aplicación según el perfil (por defecto, APP_PROFILE)."""
+    profile = profile or app_profile()
+    if profile == "study" and dev_mode():
+        raise RuntimeError(
+            "APP_PROFILE=study exige API_KEYS configuradas: las sesiones con "
+            "participantes no pueden ejecutarse sin autenticación."
+        )
+
+    production = profile == "production"
+    docs = {} if not production else {"docs_url": None, "redoc_url": None, "openapi_url": None}
+    app = FastAPI(
+        **docs,
+        title="API de Detección de Objetos para Accesibilidad",
+        description=(
+            "Genera descripciones narrativas egocéntricas para personas con ceguera total "
+            "en entornos Web 3D. Incluye endpoints de evaluación, dataset y fine-tuning."
+        ),
+        version="3.2.0",
+    )
+    app.state.profile = profile
+
+    # Contrato de errores (app/errors.py) y request_id + log por solicitud
+    # (app/observability.py). El middleware se añade ANTES que CORS para quedar
+    # por dentro: las respuestas de error también llevan las cabeceras CORS.
+    errors.install(app)
+    # Límite por IP del endpoint público (production por defecto; app/ratelimit.py).
+    # Se añade ANTES que RequestContext para quedar por dentro: el 429 lleva request_id.
+    if ratelimit.enabled_for(profile):
+        rl = ratelimit.settings()
+        app.state.ip_limiter = ratelimit.SlidingWindowLimiter(rl["requests"], rl["window_s"])
+        app.add_middleware(ratelimit.IpRateLimitMiddleware, limiter=app.state.ip_limiter,
+                           trusted_hops=rl["trusted_hops"])
+    app.add_middleware(RequestContextMiddleware)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,
+        allow_origin_regex=_CORS_ORIGIN_REGEX,
+        allow_credentials=True,
+        # Métodos necesarios para los endpoints del sistema
+        allow_methods=["GET", "POST", "OPTIONS"],
+        # Headers que el cliente Next.js envía en peticiones multipart y JSON
+        # (X-API-Key: clave del investigador, ver app/security.py)
+        allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
+        # Exponer headers personalizados que /api/detect devuelve en modo audio=true
+        expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File", "X-Request-ID",
+                        "X-Degradacion", "X-Texto-Codificacion",
+                        "Retry-After", "X-RateLimit-Limit", "X-RateLimit-Remaining"],
+    )
+
+    # ──────────────────────────────────────────────────────────
+    # EVENTOS DE CICLO DE VIDA
+    # ──────────────────────────────────────────────────────────
+
+    @app.on_event("startup")
+    async def startup_event():
+        """
+        Al arrancar: carga YOLO26s con warm-up para eliminar overhead en la
+        primera petición. El cliente de Gemini TTS se inicializa de forma
+        perezosa (singleton) en su primer uso; ver app/services/tts_service.py.
+        """
+        # production: lo desplegado debe ser EXACTAMENTE la configuración congelada
+        # (app/deploy_identity.py); si difiere, el worker no arranca.
+        if profile == "production":
+            from app import deploy_identity
+            deploy_identity.verify()
+        from app.services.yolo_service import _get_model
+        _get_model()
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        """Al cerrar: guarda el caché de traducciones EN→ES en disco."""
+        from app.utils.translator import flush_cache_to_disk
+        flush_cache_to_disk()
+        print("[App] Caché de traducciones guardado. Hasta pronto.")
+
+    # ──────────────────────────────────────────────────────────
+    # RUTA RAÍZ
+    # ──────────────────────────────────────────────────────────
+
+    def home():
+        if profile == "study":
+            return {"message": "API de navegación egocéntrica funcionando 🚀",
+                    "version": "3.2.0", "perfil": profile}
+        return {
+            "message": "API de navegación egocéntrica funcionando 🚀",
+            "version": "3.2.0",
+            "perfil": profile,
+            "endpoints": {
+                # Producción
+                "detect":          "POST /api/detect",
+                "debug_detect":    "POST /api/debug-detect",
+                "health":          "GET  /api/health",
+                "catalog":         "GET  /api/catalog",
+                # Dataset y fine-tuning
+                "dataset_upload":  "POST /api/dataset/upload",
+                "dataset_stats":   "GET  /api/dataset/stats",
+                "finetune_prepare":"POST /api/finetune/prepare",
+                "finetune_status": "GET  /api/finetune/status",
+                # Métricas
+                "metrics_summary": "GET  /api/metrics/summary",
+                "metrics_latency": "GET  /api/metrics/latency",
+                # Pruebas
+                "test_functional": "POST /api/test/functional",
+                "test_load":       "POST /api/test/load",
+                "test_results":    "GET  /api/test/results",
+                # Documentación
+                "docs":            "/docs",
+            },
+        }
+
+    if not production:          # producción no expone la raíz
+        app.get("/")(home)
+
+    # ──────────────────────────────────────────────────────────
+    # REGISTRO DE ROUTERS
+    # ──────────────────────────────────────────────────────────
+
+    # PRODUCTO (todos los perfiles)
+    app.include_router(detect_router,  prefix="/api")  # POST /api/detect
+    app.include_router(health_router,  prefix="/api")  # GET  /api/health
+    if production:
+        return app
+
+    # INVESTIGADOR / ESTUDIO (study y development)
+    app.include_router(tts_router,     prefix="/api")  # GET /api/tts/models
+    app.include_router(study_router,   prefix="/api")  # POST/GET /api/study/sessions — evaluación con usuarios
+    app.include_router(catalog_router, prefix="/api")  # GET /api/catalog — catálogo único de pruebas
+
+    if profile == "development":
+        # Endpoints INTERNOS: no se montan en el perfil study.
+        app.include_router(debug_router,   prefix="/api")  # /debug-detect
+        app.include_router(eval_router,    prefix="/api")  # dataset, fine-tuning, pruebas, métricas
+        app.include_router(metrics_router, prefix="/api")  # POST/GET /api/feedback
+
+        # Imágenes anotadas con bounding boxes: GET /detections/<archivo>.jpg
+        detections_dir = data_dir("annotated")
+        detections_dir.mkdir(parents=True, exist_ok=True)
+        app.mount("/detections", StaticFiles(directory=str(detections_dir)), name="detections")
+
+    return app
 
 
-# ──────────────────────────────────────────────────────────────
-# EVENTOS DE CICLO DE VIDA
-# ──────────────────────────────────────────────────────────────
-
-@app.on_event("startup")
-async def startup_event():
-    """
-    Al arrancar: carga YOLO26s con warm-up para eliminar overhead en la
-    primera petición. El cliente de Gemini TTS se inicializa de forma
-    perezosa (singleton) en su primer uso; ver app/services/tts_service.py.
-    """
-    from app.services.yolo_service import _get_model
-    _get_model()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Al cerrar: guarda el caché de traducciones EN→ES en disco."""
-    from app.utils.translator import flush_cache_to_disk
-    flush_cache_to_disk()
-    print("[App] Caché de traducciones guardado. Hasta pronto.")
-
-
-# ──────────────────────────────────────────────────────────────
-# RUTA RAÍZ
-# ──────────────────────────────────────────────────────────────
-
-@app.get("/")
-def home():
-    return {
-        "message": "API de navegación egocéntrica funcionando 🚀",
-        "version": "3.2.0",
-        "endpoints": {
-            # Producción
-            "detect":          "POST /api/detect",
-            "debug_detect":    "POST /api/debug-detect",
-            "health":          "GET  /api/health",
-            # Dataset y fine-tuning
-            "dataset_upload":  "POST /api/dataset/upload",
-            "dataset_stats":   "GET  /api/dataset/stats",
-            "finetune_prepare":"POST /api/finetune/prepare",
-            "finetune_status": "GET  /api/finetune/status",
-            # Métricas
-            "metrics_summary": "GET  /api/metrics/summary",
-            "metrics_latency": "GET  /api/metrics/latency",
-            # Pruebas
-            "test_functional": "POST /api/test/functional",
-            "test_load":       "POST /api/test/load",
-            "test_results":    "GET  /api/test/results",
-            # Documentación
-            "docs":            "/docs",
-        },
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# ARCHIVOS ESTÁTICOS — imágenes anotadas con bounding boxes
-# Accesibles en: GET /detections/<nombre_archivo>.jpg
-# ──────────────────────────────────────────────────────────────
-
-_DETECTIONS_DIR = Path("detections_output")
-_DETECTIONS_DIR.mkdir(parents=True, exist_ok=True)
-
-app.mount(
-    "/detections",
-    StaticFiles(directory=str(_DETECTIONS_DIR)),
-    name="detections",
-)
-
-
-# ──────────────────────────────────────────────────────────────
-# REGISTRO DE ROUTERS
-# ──────────────────────────────────────────────────────────────
-
-app.include_router(detect_router,  prefix="/api")
-app.include_router(eval_router,    prefix="/api")
-app.include_router(metrics_router, prefix="/api")  # GET /api/metrics, POST /api/feedback, GET /api/feedback
+app = create_app()

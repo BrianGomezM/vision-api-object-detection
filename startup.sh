@@ -20,4 +20,6 @@ apt-get update && apt-get install -y --no-install-recommends libxcb1 libsm6 libx
 # directamente sobre el gunicorn WSGI por defecto. --timeout 600 evita
 # que Azure mate la petición mientras YOLO26s + torch cargan en el primer
 # arranque (cold start).
+# Perfil del despliegue (ver app/profiles.py); sobrescribible desde el servicio.
+export APP_PROFILE="${APP_PROFILE:-production}"
 gunicorn --bind=0.0.0.0 --timeout 600 --workers 1 -k uvicorn.workers.UvicornWorker app.main:app

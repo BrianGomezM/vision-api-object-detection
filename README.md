@@ -1,410 +1,382 @@
-# Vision API — Navegación Egocéntrica para Personas con Ceguera Total
+VisionNav API
 
-API backend que convierte imágenes de entornos Web 3D en descripciones
-auditivas, pensada como apoyo de navegación para personas con ceguera
-total. Detecta objetos con un modelo YOLO, los ubica en el espacio relativo
-al usuario, estima la distancia en pasos y genera una narrativa hablada en
-español — todo en una sola petición HTTP.
+API REST desarrollada para generar descripciones narrativas egocéntricas accesibles a partir de imágenes de escenas Web 3D.
 
-Este proyecto es el backend de un trabajo de grado orientado a
-accesibilidad digital.
+El sistema recibe una imagen, detecta objetos relevantes, analiza su posición respecto al observador, genera una descripción en español y, cuando se solicita, produce el audio de la narrativa.
 
-**Modelo de detección:** YOLO26s (Ultralytics 2026) — seleccionado tras una
-evaluación comparativa contra Faster R-CNN, Mask R-CNN y SSD (ver rama
-`comparativa/multi-modelo`).
+El proyecto corresponde al backend del Trabajo de Grado II. El cliente web se encuentra en un repositorio independiente.
 
----
+1. Requisitos
 
-## Tabla de contenidos
+Para ejecutar el proyecto localmente se requiere como mínimo:
 
-- [Cómo funciona](#cómo-funciona)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Qué se necesita antes de empezar](#qué-se-necesita-antes-de-empezar)
-- [Cómo instalar el proyecto](#cómo-instalar-el-proyecto)
-- [Cómo poner en marcha el proyecto](#cómo-poner-en-marcha-el-proyecto)
-- [Cómo comprobar que funciona](#cómo-comprobar-que-funciona)
-- [Endpoints](#endpoints)
-- [Flujo de fine-tuning](#flujo-de-fine-tuning)
-- [Despliegue](#despliegue)
-- [Ramas del repositorio](#ramas-del-repositorio)
+Python 3.13.15.
 
----
+Git.
 
-## Cómo funciona
+Los pesos yolo26s.pt.
 
-```
-Imagen (JPEG/PNG)
-  │
-  ├─ resize_image()           Máx 800px, ratio preservado
-  │
-  ├─ run_yolo()               YOLO26s — detección con umbrales por clase
-  │
-  ├─ analyze_spatial()        Cuadrícula 3×3 — posición egocéntrica + categoría
-  │
-  ├─ estimate_steps()         Heurística monocular — pasos por objeto
-  │
-  ├─ save_annotated_image()   Imagen con bounding boxes (debug/visualización)
-  │
-  ├─ calculate_free_space()   Fracción bloqueada por columna (izq/centro/der)
-  │
-  ├─ decide_movement()        Instrucción: avanzar / desviar / detenerse
-  │
-  ├─ classify_scene()         LLM → tipo de escenario (sala, cocina, calle...)
-  │
-  ├─ generate_description()   LLM → descripción egocéntrica con pasos
-  │
-  ├─ build_narrative()        Escenario + descripción + instrucción
-  │
-  └─ log_metric()             Registra métricas en production_metrics.jsonl
-```
+Una clave de Groq para generar la narrativa.
 
-**Narrativa de ejemplo:**
+Una clave de Google AI Studio para generar el audio.
 
-```
-Parece que estás en una sala de estar.
-Sofá a tu derecha a aproximadamente 2 pasos.
-3 sillas frente a ti a aproximadamente 5 pasos.
-Televisor al fondo a tu izquierda.
-Puedes avanzar hacia el frente.
-Tienes aproximadamente 4 pasos libres antes del primer obstáculo.
-```
+Docker, únicamente si se desea ejecutar la versión contenerizada.
 
----
+Pesos del modelo
 
-## Estructura del proyecto
+El archivo yolo26s.pt debe estar disponible en la raíz del proyecto cuando se ejecuta la API directamente con Python.
 
-```
-vision-api-project/
-├── app/
-│   ├── main.py                        # FastAPI app, CORS, routers, eventos de ciclo de vida
-│   ├── routes/
-│   │   ├── detect.py                  # /detect, /debug-detect, /health
-│   │   ├── evaluation.py              # /dataset/*, /metrics/*, /test/*, /finetune/*
-│   │   └── metrics.py                 # /metrics, /feedback
-│   ├── services/
-│   │   ├── yolo_service.py            # Detección YOLO26s
-│   │   ├── spatial_analyzer.py        # Cuadrícula 3×3 + categorías + prioridad
-│   │   ├── step_estimator.py          # Estimación de pasos (heurística monocular)
-│   │   ├── free_space_analyzer.py     # Zonas navegables libres
-│   │   ├── risk_engine.py             # Decisión de movimiento
-│   │   ├── llm_enhancer.py            # Descripción egocéntrica (Groq/Llama)
-│   │   ├── scene_classifier.py        # Clasificación de escenario (Groq/Llama)
-│   │   ├── detection_visualizer.py    # Imagen anotada con bounding boxes
-│   │   └── tts_service.py             # Síntesis de voz (edge-tts, sin costo)
-│   └── utils/
-│       ├── translator.py              # Traducción EN→ES dinámica con caché
-│       └── groq_client.py             # Singleton cliente Groq
-├── app/experimental/                  # Modelos comparativos (no se cargan en prod)
-│   ├── fasterrcnn_service.py
-│   ├── maskrcnn_service.py
-│   ├── ssd_service.py
-│   ├── batch.py
-│   └── diagnostico_yolo.py
-├── dataset/                           # Generado en producción — excluido de Git
-│   ├── images/                        # Imágenes subidas con /api/dataset/upload
-│   ├── labels/                        # Etiquetas YOLO auto-generadas (class cx cy bw bh)
-│   ├── metadata/                      # JSON de metadatos por imagen
-│   └── finetune/                      # Dataset preparado para yolo train
-├── metrics/                           # Generado en producción — excluido de Git
-├── test_results/                      # Resultados de pruebas — excluido de Git
-├── audio_output/                      # MP3 generados por TTS — excluido de Git
-├── detections_output/                 # Imágenes anotadas — excluido de Git
-├── test_images/                       # Imágenes de prueba
-├── run.py                             # Punto de entrada local
-├── startup.sh                         # Comando de arranque para Azure App Service
-├── requirements.txt                   # Dependencias de producción (lo que despliega Azure)
-├── requirements-dev.txt               # + modelos comparativos y herramientas de análisis
-└── .env                                # Variables de entorno (excluido de Git)
-```
+SHA-256 esperado:
 
----
+646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
 
-## Qué se necesita antes de empezar
+2. Obtener el proyecto
 
-Para usar este proyecto en una computadora hacen falta tres cosas:
+Clonar el repositorio y entrar en su directorio:
 
-1. **Python** (versión 3.11), que es el programa que ejecuta el código.
-2. Una **clave de Groq**, gratuita, que se obtiene creando una cuenta en
-   [console.groq.com](https://console.groq.com). Esta clave permite generar
-   las descripciones en español; sin ella el proyecto no puede iniciar.
-3. Opcionalmente, **Docker Desktop**, si se prefiere ejecutar el proyecto
-   de la misma forma en que corre en el servidor de producción, en vez de
-   instalar cada programa por separado.
+git clone https://github.com/BrianGomezM/vision-api-object-detection.git
+cd vision-api-object-detection
 
-No hace falta tarjeta de crédito ni pagar nada para obtener la clave de
-Groq ni para ejecutar el proyecto.
+El repositorio no contiene las claves de los servicios externos ni el archivo .env.
 
----
+3. Configuración
 
-## Cómo instalar el proyecto
+Crear el archivo .env a partir del ejemplo incluido:
 
-1. Descargar el proyecto a la computadora (clonar el repositorio o
-   descargarlo como archivo comprimido y extraerlo).
-2. Abrir una terminal dentro de la carpeta del proyecto.
-3. Crear un espacio separado para instalar los programas que necesita el
-   proyecto, sin mezclarlos con el resto de la computadora:
+cp .env.example .env
 
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate          # en Windows
-   source venv/bin/activate       # en Mac o Linux
-   ```
+En Windows PowerShell:
 
-4. Instalar todo lo que el proyecto necesita para funcionar:
+Copy-Item .env.example .env
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Como mínimo, configurar:
 
-   Este paso puede tardar varios minutos la primera vez, porque descarga
-   el modelo de inteligencia artificial y sus componentes.
+GROQ_API_KEY=...
+GOOGLE_API_KEY=...
+APP_PROFILE=development
 
-5. Crear un archivo de configuración llamado `.env` en la carpeta principal
-   del proyecto, con este contenido:
+No se debe publicar ni versionar el archivo .env.
 
-   ```
-   GROQ_API_KEY=la_clave_obtenida_en_groq
-   YOLO_WEIGHTS=yolo26s.pt
-   YOLO_IMGSZ=1280
-   YOLO_IOU=0.45
-   TTS_VOICE_NAME=es-ES-AlvaroNeural
-   TTS_SPEAKING_RATE=0.95
-   CORS_ORIGINS=https://direccion-del-sitio-web-que-lo-va-a-usar.com
-   ```
+4. Ejecución local
 
-   Solo `GROQ_API_KEY` es obligatoria. Las demás ya tienen un valor por
-   defecto y pueden dejarse como están. `CORS_ORIGINS` solo es necesaria
-   si otra página web (por ejemplo, la interfaz visual del proyecto) va a
-   consumir este servicio; puede tener varias direcciones separadas por
-   coma.
+Crear un entorno virtual e instalar las dependencias:
 
----
+Windows PowerShell
 
-## Cómo poner en marcha el proyecto
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
+pip install -r requirements.txt
 
-Hay dos formas de hacerlo. Cualquiera de las dos deja el proyecto
-funcionando en la misma dirección.
+Linux/macOS
 
-### Opción 1: directamente con Python
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
+pip install -r requirements.txt
 
-```bash
+Iniciar la API:
+
 python run.py
-```
 
-### Opción 2: con Docker
+Por defecto estará disponible en:
 
-Esta opción usa exactamente la misma configuración con la que el proyecto
-corre en el servidor de producción.
-
-```bash
-docker build -t vision-api .
-docker run -p 8000:8000 --env-file .env vision-api
-```
-
-En ambos casos, después de unos segundos el proyecto queda disponible en
-la propia computadora, en esta dirección:
-
-```
 http://127.0.0.1:8000
-```
 
----
+Comprobar que el servicio está funcionando:
 
-## Cómo comprobar que funciona
+curl http://127.0.0.1:8000/api/health
 
-1. Abrir en el navegador la dirección `http://127.0.0.1:8000/docs`.
-   Se muestra una página con la lista de todas las funciones disponibles
-   del proyecto, y permite probarlas sin necesidad de escribir código.
+5. Primera prueba
 
-2. Comprobar el estado general: abrir
-   `http://127.0.0.1:8000/api/health`. Si el proyecto está funcionando,
-   se muestra un mensaje indicando que el servicio está activo, junto con
-   el estado de cada componente (detección de objetos, generación de
-   texto y de voz).
+Enviar una imagen al endpoint de detección:
 
-3. Probar la función principal: en la página `/docs`, buscar
-   `POST /api/detect`, presionar "Try it out", y subir una de las
-   imágenes de ejemplo incluidas en la carpeta `test_images`. El
-   resultado incluye una descripción en español de lo que aparece en la
-   imagen.
+curl -F "file=@test_images/05_sala_muebles.jpg" \
+     http://127.0.0.1:8000/api/detect
 
-4. Probar automáticamente que todo funciona correctamente: en la misma
-   página `/docs`, buscar `POST /api/test/functional` y ejecutarlo. Este
-   paso revisa por sí solo varias funciones del proyecto y devuelve un
-   resumen de cuáles pasaron y cuáles no.
+El endpoint devuelve la narrativa y la información generada por el pipeline.
 
-5. Probar que el proyecto soporta varias solicitudes al mismo tiempo: en
-   `/docs`, buscar `POST /api/test/load` y ejecutarlo. Simula varias
-   personas usando el servicio a la vez y muestra cuánto tiempo tarda en
-   responder.
+Para solicitar audio:
 
----
+curl -X POST \
+     -F "file=@test_images/05_sala_muebles.jpg" \
+     -F "audio=true" \
+     http://127.0.0.1:8000/api/detect \
+     --output respuesta.mp3
 
-## Endpoints
+6. Flujo de procesamiento
 
-### Producción
+La API procesa cada imagen mediante las siguientes etapas:
 
-#### `POST /api/detect`
-Detección + narrativa completa.
+Imagen
+  ↓
+Validación
+  ↓
+Preprocesamiento
+  ↓
+Detección de objetos con YOLO26s
+  ↓
+Filtrado de objetos relevantes
+  ↓
+Análisis espacial egocéntrico
+  ↓
+Estimación de distancia en pasos
+  ↓
+Análisis de espacio libre y movimiento
+  ↓
+Generación de narrativa con LLM
+  ↓
+Conversión de texto a audio con TTS
+  ↓
+Respuesta de la API
 
-```
-form-data:
-  file                  JPEG/PNG
-  confidence_threshold  float 0.0–1.0  (default: 0.35)
-  debug                 bool           (default: false)
-  audio                 bool           (default: false)
-```
+Los parámetros experimentales se encuentran registrados en experimental_config.yaml.
 
-Respuesta JSON:
-```json
-{
-  "status": "success",
-  "narrativa_final": "Parece que estás en una sala de estar. Sofá a tu derecha...",
-  "escenario": { "tipo": "sala de estar", "confianza": "alta" },
-  "audio": { "disponible": true, "data_uri": "data:audio/mpeg;base64,..." },
-  "imagen_anotada": { "disponible": true, "url": "/detections/detection_xxx.jpg" },
-  "metricas": {
-    "total_ms": 2317,
-    "deteccion_ms": 1.2,
-    "objetos_detectados": 7,
-    "confianza_prom": 0.758
-  }
-}
-```
+7. API principal
 
-#### `POST /api/debug-detect`
-Pipeline paso a paso — diagnóstico y validación.
+POST /api/detect
 
-#### `GET /api/health`
-Estado del servicio, modelos activos y conteo del dataset.
+Recibe una imagen mediante multipart/form-data.
 
----
+Campo
 
-### Dataset y Fine-Tuning
+Tipo
 
-#### `POST /api/dataset/upload`
-Almacena una imagen y la etiqueta automáticamente con YOLO26s.
+Descripción
 
-```
-form-data:
-  file        JPEG/PNG
-  scene_type  str   (default: "unknown")
-  source      str   (default: "web3d")
-  auto_label  bool  (default: true)
-```
+file
 
-#### `GET /api/dataset/stats`
-Estadísticas del dataset: total, etiquetadas, distribución por escena, top clases.
+archivo
 
-#### `POST /api/finetune/prepare`
-Organiza el dataset en formato YOLO y genera `data.yaml`.
+Imagen JPEG o PNG. Es obligatorio.
 
-```
-form-data:
-  train_split  float  (default: 0.8)
-  min_images   int    (default: 10)
-```
+confidence_threshold
 
-Respuesta incluye el comando completo para ejecutar `yolo train`.
+número
 
-#### `GET /api/finetune/status`
-Estado del dataset preparado y comando de entrenamiento.
+Umbral de confianza de la solicitud.
 
----
+audio
 
-### Métricas y evaluación de usuarios
+booleano
 
-#### `GET /api/metrics/summary?limit=500`
-Promedio, p50, p90, p95, p99 de tiempos de respuesta en producción.
+Solicita la generación de audio.
 
-#### `GET /api/metrics/latency?limit=100`
-Historial de latencias para graficar en frontend.
+debug
 
-#### `POST /api/feedback` / `GET /api/feedback`
-Registro y consulta de evaluación de usuarios (escala Likert).
+booleano
 
----
+Incluye información adicional del procesamiento.
 
-### Pruebas
+tts_model
 
-#### `POST /api/test/functional`
-Suite de 7 pruebas funcionales automáticas. Requiere servidor activo.
+texto
 
-```
-form-data:
-  base_url  str  (default: "http://127.0.0.1:8000")
-```
+Permite seleccionar un modelo TTS disponible en los perfiles que lo soportan.
 
-#### `POST /api/test/load`
-Prueba de carga parametrizable.
+Ejemplo:
 
-```
-form-data:
-  n_requests   int    (default: 10)
-  concurrency  int    (default: 3)
-  base_url     str    (default: "http://127.0.0.1:8000")
-  image_path   str    (default: "test_images/sala.jpg")
-```
+curl -X POST \
+     -F "file=@test_images/05_sala_muebles.jpg" \
+     -F "confidence_threshold=0.35" \
+     http://127.0.0.1:8000/api/detect
 
-#### `GET /api/test/results?limit=20`
-Historial de ejecuciones de pruebas (funcionales y carga), más recientes primero.
+GET /api/health
 
----
+Comprueba el estado de la API y de los componentes principales.
 
-## Flujo de fine-tuning
+curl http://127.0.0.1:8000/api/health
 
-```
-1. Usar el sistema en producción (cliente Web 3D envía imágenes a /api/detect)
-2. Cada imagen interesante → POST /api/dataset/upload  (se etiqueta automáticamente)
-3. GET /api/dataset/stats  → verificar que finetune_ready = true (≥50 imágenes)
-4. POST /api/finetune/prepare  → genera dataset/finetune/data.yaml
-5. Ejecutar el comando retornado:
-   yolo train model=yolo26s.pt data=dataset/finetune/data.yaml epochs=50 imgsz=640 batch=8
-6. Reemplazar yolo26s.pt con los nuevos pesos (runs/detect/train/weights/best.pt)
-```
+La documentación interactiva de OpenAPI está disponible durante el desarrollo en:
 
----
+http://127.0.0.1:8000/docs
 
-## Despliegue
+8. Perfiles de ejecución
 
-El backend se despliega en Azure App Service (Linux) como **contenedor
-Docker** — ver [Dockerfile](Dockerfile). Se eligió este enfoque en vez del
-despliegue por código (Oryx) porque Oryx reinstalaba `torch`/`ultralytics`
-y las libs de sistema (`libxcb1`, etc. — requeridas por
-`opencv-python-headless`) en **cada arranque del contenedor**, no solo en
-cada deploy, haciendo cualquier reinicio lento y dependiente de la
-disponibilidad de los mirrors de Debian en ese momento. Con Docker, todo
-eso queda horneado en la imagen en build time.
+La variable APP_PROFILE determina las funciones disponibles.
 
-1. **Plan de App Service:** se recomienda **B1** (1.75 GB RAM) — el modelo
-   YOLO26s sobre `torch` necesita más memoria de la que ofrece el plan
-   gratuito F1.
-2. **CI/CD:** `.github/workflows/main_visionnav-api.yml` construye la
-   imagen en cada push a `main`, la publica en GitHub Container Registry
-   (`ghcr.io/<owner>/vision-api-object-detection`) y actualiza el App
-   Service para que la use.
-3. **Configuración de la pila (una sola vez, manual en el Portal):**
-   *Configuración → Configuración general → Pila* → cambiar a **Contenedor
-   Docker** → Imagen única → Origen: *Otros registros de contenedores* →
-   URL del registro `https://ghcr.io` → Imagen y etiqueta
-   `ghcr.io/<owner>/vision-api-object-detection:latest`. El paquete en
-   GitHub debe estar en visibilidad **pública** (Settings del paquete en
-   GitHub) para que Azure pueda descargarlo sin credenciales.
-4. **Variables de entorno:** configurar en *Configuración → Variables de
-   entorno* las mismas claves del `.env` local (`GROQ_API_KEY`,
-   `CORS_ORIGINS` con el dominio del cliente desplegado en Vercel, etc.)
-   — estas nunca van dentro de la imagen. No se requiere ninguna clave de
-   pago: `GROQ_API_KEY` es gratuita y el audio se genera con `edge-tts`,
-   que no necesita clave ni tarjeta.
-5. Los pesos de YOLO26s no se versionan en Git; si no están presentes en el
-   contenedor, Ultralytics los descarga automáticamente en el primer
-   arranque.
+Perfil
 
----
+Uso
 
-## Ramas del repositorio
+development
 
-| Rama | Descripción |
-|---|---|
-| `main` | Producción — YOLO26s + pipeline completo + endpoints de evaluación |
-| `comparativa/multi-modelo` | Investigación — 4 modelos + batch (A9–A11) |
+Desarrollo y pruebas locales. Incluye documentación y herramientas de evaluación.
+
+study
+
+Sesiones de evaluación con participantes. Incluye los recursos necesarios para el estudio.
+
+production
+
+Ejecución desplegada. Expone únicamente los endpoints necesarios para el servicio.
+
+Para ejecutar otro perfil de forma local:
+
+APP_PROFILE=study python run.py
+
+En PowerShell:
+
+$env:APP_PROFILE="study"
+python run.py
+
+9. Ejecución con Docker
+
+Docker permite ejecutar la configuración destinada a producción.
+
+Construir la imagen:
+
+docker build --build-arg APP_COMMIT=$(git rev-parse HEAD) -t visionnav-api .
+
+En PowerShell:
+
+docker build --build-arg APP_COMMIT=$(git rev-parse HEAD) -t visionnav-api .
+
+Ejecutar el contenedor:
+
+docker run -p 8000:8000 \
+  -e GROQ_API_KEY="TU_CLAVE_GROQ" \
+  -e GOOGLE_API_KEY="TU_CLAVE_GOOGLE" \
+  visionnav-api
+
+Después comprobar:
+
+curl http://127.0.0.1:8000/api/health
+
+La imagen contiene los pesos del modelo y verifica su integridad antes de iniciar.
+
+No utilizar el .env de desarrollo directamente con --env-file, porque puede contener rutas que no existen dentro del contenedor.
+
+10. Pruebas
+
+La suite de pruebas se ejecuta con:
+
+python -m pytest
+
+Las pruebas cubren, entre otros aspectos:
+
+contrato de errores;
+
+validación y límites de entrada;
+
+limpieza de archivos temporales;
+
+control de solicitudes;
+
+request_id;
+
+estado de salud;
+
+integración del pipeline con proveedores simulados;
+
+comportamiento de la imagen Docker.
+
+Las pruebas automatizadas no sustituyen la evaluación experimental del sistema ni las pruebas con usuarios.
+
+La documentación detallada se encuentra en:
+
+docs/PRUEBAS.md
+
+11. Evaluación experimental
+
+La configuración experimental se encuentra en:
+
+experimental_config.yaml
+
+El proyecto incluye mecanismos para comprobar la correspondencia entre el código, los pesos, las versiones, los parámetros y los estímulos utilizados en la evaluación.
+
+La evaluación formal F4 todavía se encuentra pendiente. Por esta razón, los resultados de las pruebas de software no deben interpretarse como resultados finales de la evaluación con usuarios.
+
+La documentación del protocolo se encuentra en:
+
+docs/CP3B_PROTOCOLO_EVALUACION.md
+docs/CP3B_MATRIZ_DECISIONES.md
+
+12. Reproducibilidad
+
+Los principales elementos del entorno se encuentran versionados o registrados mediante archivos de configuración y dependencias fijadas.
+
+Archivos principales:
+
+experimental_config.yaml
+requirements.txt
+requirements-test.txt
+requirements-dev.txt
+requirements.lock.txt
+requirements-docker.lock.txt
+
+La guía completa se encuentra en:
+
+docs/REPRODUCIBILIDAD.md
+
+13. Despliegue
+
+El backend está preparado para ejecutarse mediante Docker y desplegarse en Azure App Service.
+
+El despliegue de Azure debe validarse con la configuración correspondiente a la versión experimental actual. La configuración anterior de Azure no debe utilizarse como evidencia de los resultados actuales.
+
+El cliente web se mantiene en un repositorio independiente y puede desplegarse en Vercel. La URL del backend se configura mediante NEXT_PUBLIC_API_URL en el cliente.
+
+La información operativa del despliegue se encuentra en:
+
+docs/DEPLOYMENT.md
+
+14. Estructura principal
+
+app/
+  core/           Pipeline principal
+  services/       Detección, análisis espacial, pasos, narrativa y TTS
+  routes/         Endpoints de la API
+  catalog/        Catálogo de estímulos
+  utils/          Utilidades y clientes de servicios externos
+  main.py         Configuración de la aplicación
+
+stimuli/           Estímulos del estudio
+test_images/       Imágenes para pruebas
+tests/             Pruebas automatizadas
+scripts/           Scripts de experimentación y pruebas
+evaluation/        Resultados y evidencias de evaluación
+docs/              Documentación técnica
+
+Dockerfile
+run.py
+experimental_config.yaml
+requirements*.txt
+
+15. Documentación
+
+Archivo
+
+Contenido
+
+docs/CONTRATO_ERRORES.md
+
+Contrato de errores y degradaciones
+
+docs/POLITICA_API_DETECT.md
+
+Políticas del endpoint de detección
+
+docs/DATOS_PERSISTENCIA.md
+
+Datos almacenados y persistencia
+
+docs/REPRODUCIBILIDAD.md
+
+Configuración y reproducibilidad
+
+docs/PRUEBAS.md
+
+Pruebas del sistema
+
+docs/DEPLOYMENT.md
+
+Despliegue
+
+docs/CP3B_PROTOCOLO_EVALUACION.md
+
+Protocolo de evaluación
+
+docs/CP3B_MATRIZ_DECISIONES.md
+
+Decisiones de evaluación

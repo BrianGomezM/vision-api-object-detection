@@ -1,0 +1,76 @@
+{
+ "detect_request": {
+  "properties": {
+   "audio": {
+    "default": false,
+    "type": "boolean"
+   },
+   "confidence_threshold": {
+    "default": 0.35,
+    "maximum": 1.0,
+    "minimum": 0.0,
+    "type": "number"
+   },
+   "debug": {
+    "default": false,
+    "type": "boolean"
+   },
+   "file": {
+    "contentMediaType": "application/octet-stream",
+    "type": "string"
+   },
+   "tts_model": {
+    "type": "string"
+   }
+  },
+  "required": [
+   "file"
+  ]
+ },
+ "routes": {
+  "development": [
+   "DELETE,GET /api/study/sessions/{session_id}",
+   "DOCS /docs",
+   "DOCS /openapi.json",
+   "DOCS /redoc",
+   "GET /",
+   "GET /api/catalog",
+   "GET /api/catalog/stimuli/{stimulus_id}/image",
+   "GET /api/dataset/stats",
+   "GET /api/finetune/status",
+   "GET /api/health",
+   "GET /api/metrics/latency",
+   "GET /api/metrics/summary",
+   "GET /api/test/results",
+   "GET /api/tts/models",
+   "GET,POST /api/feedback",
+   "GET,POST /api/study/sessions",
+   "MOUNT /detections",
+   "POST /api/dataset/upload",
+   "POST /api/debug-detect",
+   "POST /api/detect",
+   "POST /api/finetune/prepare",
+   "POST /api/study/sessions/{session_id}/responses",
+   "POST /api/test/functional",
+   "POST /api/test/load"
+  ],
+  "production": [
+   "GET /api/health",
+   "POST /api/detect"
+  ],
+  "study": [
+   "DELETE,GET /api/study/sessions/{session_id}",
+   "DOCS /docs",
+   "DOCS /openapi.json",
+   "DOCS /redoc",
+   "GET /",
+   "GET /api/catalog",
+   "GET /api/catalog/stimuli/{stimulus_id}/image",
+   "GET /api/health",
+   "GET /api/tts/models",
+   "GET,POST /api/study/sessions",
+   "POST /api/detect",
+   "POST /api/study/sessions/{session_id}/responses"
+  ]
+ }
+}

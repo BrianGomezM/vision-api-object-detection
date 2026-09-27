@@ -1,0 +1,405 @@
+{
+  "variant": "D_estructural_escena",
+  "scene_context_nuevas_clases": [
+    "book",
+    "bowl",
+    "cup",
+    "fork",
+    "keyboard",
+    "microwave",
+    "mouse",
+    "oven",
+    "remote",
+    "toaster",
+    "toothbrush"
+  ],
+  "records": [
+    {
+      "image": "generated/synthetic/W3D-G-01-granja.png",
+      "clases_tras_filtro": [],
+      "num_objetos": 0,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-02-parque.png",
+      "clases_tras_filtro": [
+        "bench",
+        "bicycle"
+      ],
+      "num_objetos": 4,
+      "scene_type": "espacio exterior",
+      "confidence": "media",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-03-calle.png",
+      "clases_tras_filtro": [
+        "bench",
+        "car",
+        "chair",
+        "person",
+        "potted plant"
+      ],
+      "num_objetos": 14,
+      "scene_type": "espacio exterior",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "clases_tras_filtro": [
+        "backpack",
+        "book",
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "laptop",
+        "person",
+        "potted plant"
+      ],
+      "num_objetos": 39,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-05-Ciudad.png",
+      "clases_tras_filtro": [
+        "backpack",
+        "bus",
+        "car",
+        "dog",
+        "person",
+        "potted plant"
+      ],
+      "num_objetos": 18,
+      "scene_type": "espacio exterior",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "clases_tras_filtro": [
+        "backpack",
+        "book",
+        "cup",
+        "laptop",
+        "person"
+      ],
+      "num_objetos": 28,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/justcreate3d/W3D-I-JC3D-01-cars.png",
+      "clases_tras_filtro": [
+        "bench",
+        "car",
+        "truck",
+        "umbrella"
+      ],
+      "num_objetos": 13,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/justcreate3d/W3D-I-JC3D-02-megapolis.png",
+      "clases_tras_filtro": [
+        "bench"
+      ],
+      "num_objetos": 1,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/justcreate3d/W3D-I-JC3D-03-salad.png",
+      "clases_tras_filtro": [
+        "bottle",
+        "chair",
+        "couch",
+        "potted plant"
+      ],
+      "num_objetos": 11,
+      "scene_type": "sala de estar",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/justcreate3d/W3D-I-JC3D-04-school.png",
+      "clases_tras_filtro": [
+        "book",
+        "chair",
+        "clock",
+        "cup",
+        "dining table",
+        "tv"
+      ],
+      "num_objetos": 42,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "clases_tras_filtro": [
+        "bowl"
+      ],
+      "num_objetos": 1,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "clases_tras_filtro": [
+        "potted plant",
+        "vase"
+      ],
+      "num_objetos": 2,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-02-studio.png",
+      "clases_tras_filtro": [
+        "chair",
+        "couch",
+        "potted plant"
+      ],
+      "num_objetos": 3,
+      "scene_type": "sala de estar",
+      "confidence": "media",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "clases_tras_filtro": [
+        "book",
+        "chair",
+        "potted plant",
+        "vase"
+      ],
+      "num_objetos": 21,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "clases_tras_filtro": [
+        "chair",
+        "couch"
+      ],
+      "num_objetos": 4,
+      "scene_type": "sala de estar",
+      "confidence": "media",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-01-british.png",
+      "clases_tras_filtro": [
+        "bottle",
+        "chair",
+        "cup",
+        "dining table"
+      ],
+      "num_objetos": 40,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png",
+      "clases_tras_filtro": [
+        "chair",
+        "dining table",
+        "person"
+      ],
+      "num_objetos": 13,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-03-clean.png",
+      "clases_tras_filtro": [
+        "bottle",
+        "vase"
+      ],
+      "num_objetos": 3,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-04-coffee.png",
+      "clases_tras_filtro": [
+        "chair",
+        "dining table",
+        "microwave",
+        "potted plant"
+      ],
+      "num_objetos": 17,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-05-interior.png",
+      "clases_tras_filtro": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ],
+      "num_objetos": 11,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-06-kitchen.png",
+      "clases_tras_filtro": [
+        "bowl",
+        "vase"
+      ],
+      "num_objetos": 2,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "clases_tras_filtro": [
+        "bowl",
+        "couch",
+        "potted plant",
+        "tv"
+      ],
+      "num_objetos": 5,
+      "scene_type": "sala de estar",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "clases_tras_filtro": [
+        "truck"
+      ],
+      "num_objetos": 2,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "clases_tras_filtro": [
+        "chair",
+        "keyboard",
+        "mouse",
+        "potted plant",
+        "tv"
+      ],
+      "num_objetos": 11,
+      "scene_type": "oficina",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-10-room.png",
+      "clases_tras_filtro": [
+        "chair",
+        "couch",
+        "potted plant",
+        "vase"
+      ],
+      "num_objetos": 11,
+      "scene_type": "sala de estar",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-11-rooms.png",
+      "clases_tras_filtro": [
+        "bowl",
+        "potted plant",
+        "vase"
+      ],
+      "num_objetos": 3,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-12-salad.png",
+      "clases_tras_filtro": [
+        "bowl"
+      ],
+      "num_objetos": 1,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png",
+      "clases_tras_filtro": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ],
+      "num_objetos": 28,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "clases_tras_filtro": [
+        "book",
+        "couch",
+        "dining table"
+      ],
+      "num_objetos": 5,
+      "scene_type": "comedor",
+      "confidence": "media",
+      "llm_error": null,
+      "reutilizo_llamada_previa": true
+    }
+  ]
+}

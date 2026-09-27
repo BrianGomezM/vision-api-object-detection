@@ -1,0 +1,89 @@
+modelo,imagen,repeticion,tarea,tipo,mensaje,latencia_ms,escenario_heuristico_usado
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),582.7,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),690.4,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),619.7,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),619.9,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),652.3,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),691.4,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,2,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 4 column 18 (char 76),615.1,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,3,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 4 column 18 (char 76),637.5,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),862.5,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),596.2,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),707.9,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),624.1,tienda
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1833.0,tienda
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1748.5,exterior
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1712.0,exterior
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,3,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 3 column 17 (char 54),2896.8,exterior
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2944.9,tienda
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1782.9,tienda
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1750.7,tienda
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1733.4,sala de estar
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,2,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 2 column 17 (char 18),2699.7,sala de estar
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2881.8,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,740.0,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,687.0,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,603.4,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,590.3,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,574.4,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,629.3,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,615.4,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,854.0,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,743.1,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,741.6,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,715.0,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,711.6,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,1427.6,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,792.7,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,1846.0,
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3868.7,
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3797.8,
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3762.9,
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2635.7,
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2903.3,
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3858.0,
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3897.2,
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3815.8,
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2863.4,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),557.3,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),373.1,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),553.0,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),436.8,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),495.5,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),368.2,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),376.2,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),579.6,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,2,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 4 column 18 (char 79),1648.5,tienda
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,3,escenario,json_malformado,Expecting value: line 4 column 17 (char 78),2527.2,tienda
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,1,escenario,json_malformado,Expecting property name enclosed in double quotes: line 1 column 2 (char 1),2547.8,exterior
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2538.0,exterior
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2521.4,exterior
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,1,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2525.1,tienda
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,2,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),2612.7,tienda
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,3,escenario,respuesta_vacia (JSON vacío),Expecting value: line 1 column 1 (char 0),1714.4,tienda
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,1,escenario,json_truncado (cadena sin cerrar),Unterminated string starting at: line 1 column 2 (char 1),2533.2,sala de estar
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,2,escenario,json_malformado,Expecting property name enclosed in double quotes: line 1 column 2 (char 1),2591.3,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,477.3,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,332.1,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,425.8,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,463.2,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,401.9,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,565.0,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,520.1,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,457.7,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,403.3,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,560.9,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,518.8,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,587.2,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,381.3,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,4173.0,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3596.1,
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2539.5,
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3593.6,
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3596.4,
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2626.8,
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2739.2,
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3729.9,
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,1,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3622.9,
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,2,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,2710.3,
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,3,narrativa,respuesta_vacia_sin_error (el producto la acepta como éxito),,3579.1,

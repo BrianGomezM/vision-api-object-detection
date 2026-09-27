@@ -1,0 +1,231 @@
+{
+  "records": [
+    {
+      "image": "01_persona_bolso.jpg",
+      "clases_A": [
+        "person",
+        "suitcase"
+      ],
+      "clases_D": [
+        "person",
+        "suitcase"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "espacio interior",
+      "scene_D": "espacio interior",
+      "cambio_escena": false
+    },
+    {
+      "image": "02_calle_carros.jpg",
+      "clases_A": [
+        "car",
+        "person",
+        "truck"
+      ],
+      "clases_D": [
+        "car",
+        "person",
+        "truck"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "espacio exterior",
+      "scene_D": "espacio exterior",
+      "cambio_escena": false
+    },
+    {
+      "image": "03_escritorio_objetos.jpg",
+      "clases_A": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person"
+      ],
+      "clases_D": [
+        "bottle",
+        "cell phone",
+        "cup",
+        "keyboard",
+        "laptop",
+        "mouse",
+        "person"
+      ],
+      "clases_nuevas_en_D": [
+        "cup",
+        "keyboard",
+        "mouse"
+      ],
+      "scene_A": "espacio interior",
+      "scene_D": "oficina",
+      "cambio_escena": true
+    },
+    {
+      "image": "04_cocina_utensilios.jpg",
+      "clases_A": [
+        "dining table"
+      ],
+      "clases_D": [
+        "bowl",
+        "dining table"
+      ],
+      "clases_nuevas_en_D": [
+        "bowl"
+      ],
+      "scene_A": "espacio interior",
+      "scene_D": "comedor",
+      "cambio_escena": true
+    },
+    {
+      "image": "05_sala_muebles.jpg",
+      "clases_A": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ],
+      "clases_D": [
+        "bowl",
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ],
+      "clases_nuevas_en_D": [
+        "bowl"
+      ],
+      "scene_A": "sala de estar",
+      "scene_D": "sala de estar",
+      "cambio_escena": false
+    },
+    {
+      "image": "06_bicicleta_persona.jpg",
+      "clases_A": [
+        "backpack",
+        "person"
+      ],
+      "clases_D": [
+        "backpack",
+        "person"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "espacio interior",
+      "scene_D": "espacio interior",
+      "cambio_escena": false
+    },
+    {
+      "image": "07_perro_parque.jpg",
+      "clases_A": [
+        "dog",
+        "person"
+      ],
+      "clases_D": [
+        "dog",
+        "person"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "espacio interior",
+      "scene_D": "espacio interior",
+      "cambio_escena": false
+    },
+    {
+      "image": "08_mercado_productos.jpg",
+      "clases_A": [
+        "dining table",
+        "person"
+      ],
+      "clases_D": [
+        "bowl",
+        "cup",
+        "dining table",
+        "person"
+      ],
+      "clases_nuevas_en_D": [
+        "bowl",
+        "cup"
+      ],
+      "scene_A": "comedor",
+      "scene_D": "comedor",
+      "cambio_escena": false
+    },
+    {
+      "image": "09_objetos_pequenos.jpg",
+      "clases_A": [
+        "cell phone",
+        "dining table"
+      ],
+      "clases_D": [
+        "book",
+        "cell phone",
+        "cup",
+        "dining table",
+        "keyboard",
+        "mouse"
+      ],
+      "clases_nuevas_en_D": [
+        "book",
+        "cup",
+        "keyboard",
+        "mouse"
+      ],
+      "scene_A": "comedor",
+      "scene_D": "espacio interior",
+      "cambio_escena": true
+    },
+    {
+      "image": "10_escena_compleja.jpg",
+      "clases_A": [
+        "car"
+      ],
+      "clases_D": [
+        "car"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "espacio exterior",
+      "scene_D": "espacio exterior",
+      "cambio_escena": false
+    },
+    {
+      "image": "11_escritorio.jpeg",
+      "clases_A": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ],
+      "clases_D": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "sala de estar",
+      "scene_D": "sala de estar",
+      "cambio_escena": false
+    },
+    {
+      "image": "12_sala.jpg",
+      "clases_A": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ],
+      "clases_D": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ],
+      "clases_nuevas_en_D": [],
+      "scene_A": "sala de estar",
+      "scene_D": "sala de estar",
+      "cambio_escena": false
+    }
+  ]
+}

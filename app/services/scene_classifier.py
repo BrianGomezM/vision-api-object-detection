@@ -30,6 +30,7 @@ import json
 import time
 from typing import Dict, List, Optional
 from app.utils.groq_client import get_groq_client, GROQ_MODEL
+from app.utils.provider_errors import describe_groq_error
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
@@ -185,7 +186,11 @@ CRÍTICO:
 
     except Exception as e:
         result = _classify_heuristic(object_names)
+        info = describe_groq_error(e)
         result["llm_error"] = str(e)
+        result["llm_error_type"] = info["type"]
+        result["llm_error_kind"] = info["kind"]
+        result["llm_retry_after_s"] = info["retry_after_s"]
         return result
 
 
@@ -255,12 +260,16 @@ def _classify_heuristic(object_names: List[str]) -> Dict:
 # FUNCIÓN PÚBLICA
 # ──────────────────────────────────────────────────────────────
 
-def classify_scene(analyzed_objects: List[Dict]) -> Dict:
+def classify_scene(analyzed_objects: List[Dict], cache_scope: str = "") -> Dict:
     """
     Clasifica el tipo de escenario a partir de los objetos detectados.
 
     Parámetros:
         analyzed_objects : salida de analyze_spatial()
+        cache_scope      : identidad de la ENTRADA (core.pipeline pasa el SHA-256 de la
+                           imagen procesada). La caché solo se reutiliza para la misma
+                           entrada y los mismos objetos: dos estímulos distintos con los
+                           mismos objetos (p. ej. A1–A9) NUNCA comparten la respuesta.
 
     Retorna dict con:
         "scene_type"  : nombre completo del escenario en español
@@ -284,7 +293,7 @@ def classify_scene(analyzed_objects: List[Dict]) -> Dict:
     ]
 
     global _scene_cache, _scene_cache_ts, _scene_cache_key
-    cache_key = _make_cache_key(object_names)
+    cache_key = f"{cache_scope}#{_make_cache_key(object_names)}"
     now       = time.monotonic()
 
     if (
@@ -294,8 +303,9 @@ def classify_scene(analyzed_objects: List[Dict]) -> Dict:
     ):
         return {**_scene_cache, "cached": True}
 
-    result           = _classify_with_llm(object_names)
-    _scene_cache     = result
-    _scene_cache_ts  = now
-    _scene_cache_key = cache_key
+    result = _classify_with_llm(object_names)
+    if "llm_error" not in result:        # un fallo del proveedor no se reutiliza
+        _scene_cache     = result
+        _scene_cache_ts  = now
+        _scene_cache_key = cache_key
     return result

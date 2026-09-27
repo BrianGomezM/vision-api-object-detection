@@ -1,0 +1,153 @@
+{
+  "records": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "escenario_A_actual": {
+        "clases": [
+          "chair",
+          "potted plant",
+          "tv"
+        ],
+        "scene_type": "sala de estar",
+        "confidence": "media",
+        "llm_error": null
+      },
+      "escenario_B_hipotesis_book_keyboard_mouse": {
+        "clases": [
+          "chair",
+          "keyboard",
+          "mouse",
+          "potted plant",
+          "tv"
+        ],
+        "clases_nuevas_por_hipotesis": [
+          "keyboard",
+          "mouse"
+        ],
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "llm_error": null
+      },
+      "cambio_de_clasificacion": true
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "escenario_A_actual": {
+        "clases": [
+          "backpack",
+          "bottle",
+          "chair",
+          "couch",
+          "dining table",
+          "laptop",
+          "person",
+          "potted plant"
+        ],
+        "scene_type": "comedor",
+        "confidence": "alta",
+        "llm_error": null
+      },
+      "escenario_B_hipotesis_book_keyboard_mouse": {
+        "clases": [
+          "backpack",
+          "book",
+          "bottle",
+          "chair",
+          "couch",
+          "dining table",
+          "laptop",
+          "person",
+          "potted plant"
+        ],
+        "clases_nuevas_por_hipotesis": [
+          "book"
+        ],
+        "scene_type": "comedor",
+        "confidence": "alta",
+        "llm_error": null
+      },
+      "cambio_de_clasificacion": false
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "escenario_A_actual": {
+        "clases": [
+          "chair",
+          "potted plant",
+          "vase"
+        ],
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "llm_error": null
+      },
+      "escenario_B_hipotesis_book_keyboard_mouse": {
+        "clases": [
+          "book",
+          "chair",
+          "potted plant",
+          "vase"
+        ],
+        "clases_nuevas_por_hipotesis": [
+          "book"
+        ],
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "llm_error": null
+      },
+      "cambio_de_clasificacion": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "escenario_A_actual": {
+        "clases": [
+          "couch",
+          "potted plant",
+          "tv"
+        ],
+        "scene_type": "sala de estar",
+        "confidence": "alta",
+        "llm_error": null
+      },
+      "escenario_B_hipotesis_book_keyboard_mouse": {
+        "clases": [
+          "couch",
+          "potted plant",
+          "tv"
+        ],
+        "clases_nuevas_por_hipotesis": [],
+        "scene_type": "sala de estar",
+        "confidence": "alta",
+        "llm_error": null
+      },
+      "cambio_de_clasificacion": false
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "escenario_A_actual": {
+        "clases": [
+          "backpack",
+          "laptop",
+          "person"
+        ],
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "llm_error": null
+      },
+      "escenario_B_hipotesis_book_keyboard_mouse": {
+        "clases": [
+          "backpack",
+          "book",
+          "laptop",
+          "person"
+        ],
+        "clases_nuevas_por_hipotesis": [
+          "book"
+        ],
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "llm_error": null
+      },
+      "cambio_de_clasificacion": false
+    }
+  ]
+}
