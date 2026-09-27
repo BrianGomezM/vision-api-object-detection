@@ -339,18 +339,22 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         # incluye la API key (el SDK la envía por header, no en la URL/cuerpo),
         # así que es seguro registrarlo — a diferencia del texto de la excepción
         # completa, que sí podría incluir detalles de transporte no deseados.
+        info = describe_genai_error(exc)
         if isinstance(exc, genai_errors.APIError):
             _last_error = {"code": exc.code, "status": exc.status, "message": exc.message}
             logger.error(
                 "[TTS] Error durante la síntesis: %s %s — %s",
                 exc.code, exc.status, exc.message,
             )
-        elif "timeout" in type(exc).__name__.lower() or isinstance(exc, TimeoutError):
+        elif info["kind"] == "timeout":
             _last_error = {"code": None, "status": TTS_TIMEOUT_STATUS, "message": type(exc).__name__}
             logger.error("[TTS] Timeout del proveedor tras %.0f s (%s)", TTS_TIMEOUT_S, type(exc).__name__)
         else:
             _last_error = {"code": None, "status": type(exc).__name__, "message": str(exc)}
             logger.error("[TTS] Error durante la síntesis (%s): %s", type(exc).__name__, exc)
+        # Categoría y tiempo de reintento (SOLO si el proveedor lo informa)
+        _last_error["kind"] = info["kind"]
+        _last_error["retry_after_s"] = info["retry_after_s"]
         return None
 
 
@@ -358,7 +362,8 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
 # DIRECTORIO DE SALIDA DE AUDIO
 # ──────────────────────────────────────────────────────────────
 
-from app.storage import data_dir, unique_stamp
+from app.storage import data_dir, unique_stamp, rotate
+from app.utils.provider_errors import describe_genai_error
 
 # Audio generado EN VIVO (no congelado). Sin DATA_ROOT: audio_output/ del repositorio.
 AUDIO_OUTPUT_DIR: Path = data_dir("audio_live")
@@ -398,16 +403,9 @@ def synthesize_and_save(text: str, filename: str = None, model: str = None) -> O
         relative_path, len(audio_bytes),
     )
 
-    existing = sorted(
-        AUDIO_OUTPUT_DIR.glob("narrativa_*.mp3"),
-        key=lambda f: f.stat().st_mtime,
-    )
-    for old_file in existing[:-_MAX_AUDIO_FILES]:
-        try:
-            old_file.unlink()
-            logger.info("[TTS] Archivo antiguo eliminado: %s", old_file.name)
-        except OSError as e:
-            logger.warning("[TTS] No se pudo eliminar %s: %s", old_file.name, e)
+    # Rotación segura ante solicitudes simultáneas (no borra archivos recientes; storage.rotate)
+    for name in rotate(AUDIO_OUTPUT_DIR, "narrativa_*.mp3", _MAX_AUDIO_FILES):
+        logger.info("[TTS] Archivo antiguo eliminado: %s", name)
 
     return relative_path
 

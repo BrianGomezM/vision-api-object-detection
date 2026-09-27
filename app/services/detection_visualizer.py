@@ -23,7 +23,7 @@ from PIL import Image, ImageDraw
 
 logger = logging.getLogger(__name__)
 
-from app.storage import data_dir, unique_stamp
+from app.storage import data_dir, unique_stamp, rotate
 
 # Sin DATA_ROOT: detections_output/ del repositorio (comportamiento histórico).
 DETECTIONS_OUTPUT_DIR: Path = data_dir("annotated")
@@ -109,16 +109,9 @@ def save_annotated_image(image_bytes: bytes, analyzed_objects: List[Dict]) -> Op
         logger.info("[Visualizer] Imagen guardada: %s (%dx%d)", relative, iw, ih)
 
         # Rotación: eliminar las más antiguas si se supera el límite
-        existing = sorted(
-            DETECTIONS_OUTPUT_DIR.glob("detection_*.jpg"),
-            key=lambda f: f.stat().st_mtime,
-        )
-        for old in existing[:-_MAX_SAVED]:
-            try:
-                old.unlink()
-                logger.info("[Visualizer] Imagen antigua eliminada: %s", old.name)
-            except OSError as e:
-                logger.warning("[Visualizer] No se pudo eliminar %s: %s", old.name, e)
+        # (segura ante solicitudes simultáneas: no borra archivos recientes; ver storage.rotate)
+        for name in rotate(DETECTIONS_OUTPUT_DIR, "detection_*.jpg", _MAX_SAVED):
+            logger.info("[Visualizer] Imagen antigua eliminada: %s", name)
 
         return relative
 

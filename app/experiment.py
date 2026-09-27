@@ -297,8 +297,13 @@ class IncompleteResultError(RuntimeError):
 
 
 def assert_complete(result: dict, *, require_audio: bool = True) -> None:
-    """F4 / estudio: un estímulo congelado NUNCA puede contener una narrativa de
-    respaldo (plantilla sin LLM) ni carecer de audio. Lanza IncompleteResultError."""
+    """Requisitos del PROTOCOLO F4 para congelar un estímulo (IncompleteResultError si no):
+      - narrativa generada por el LLM (no la plantilla de respaldo);
+      - audio generado;
+      - generación FRESCA del escenario para este estímulo. La caché de escenario es
+        válida en producción (misma imagen en < 10 s → misma respuesta), pero el
+        protocolo exige una llamada propia por estímulo/generación: el runner llama a
+        reset_request_state() antes de cada una, y aquí se comprueba que se hizo."""
     from app.utils.groq_client import is_llm_active
     problems = []
     if result["analyzed"]:
@@ -308,7 +313,8 @@ def assert_complete(result: dict, *, require_audio: bool = True) -> None:
         if not is_llm_active():
             problems.append("LLM no configurado: la narrativa sería de plantilla")
         if result["escenario"].get("cached"):
-            problems.append("escenario reutilizado de la caché (falta reset_request_state())")
+            problems.append("escenario servido desde la caché: el protocolo F4 exige generación fresca "
+                            "por estímulo (llamar a reset_request_state() antes de cada generación)")
     if require_audio and not result.get("audio_path"):
         problems.append("sin audio (TTS no disponible o fallido)")
     if problems:

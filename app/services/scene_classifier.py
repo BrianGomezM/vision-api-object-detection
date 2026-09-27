@@ -30,6 +30,7 @@ import json
 import time
 from typing import Dict, List, Optional
 from app.utils.groq_client import get_groq_client, GROQ_MODEL
+from app.utils.provider_errors import describe_groq_error
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DINÁMICA DESDE VARIABLES DE ENTORNO
@@ -185,8 +186,11 @@ CRÍTICO:
 
     except Exception as e:
         result = _classify_heuristic(object_names)
+        info = describe_groq_error(e)
         result["llm_error"] = str(e)
-        result["llm_error_type"] = type(e).__name__
+        result["llm_error_type"] = info["type"]
+        result["llm_error_kind"] = info["kind"]
+        result["llm_retry_after_s"] = info["retry_after_s"]
         return result
 
 

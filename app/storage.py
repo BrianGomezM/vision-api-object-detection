@@ -101,6 +101,39 @@ def resolve_output(kind: str, relative: str) -> Path:
     return data_dir(kind) / Path(relative).name
 
 
+ROTATION_MIN_AGE_S: float = 60.0
+
+
+def rotate(directory: Path, pattern: str, keep: int, *, min_age_s: float = ROTATION_MIN_AGE_S) -> list[str]:
+    """Conserva los `keep` archivos más recientes de `directory` que cumplen `pattern`.
+
+    Seguro ante solicitudes simultáneas:
+      - nunca borra archivos con menos de `min_age_s` segundos (pueden pertenecer a
+        una solicitud en curso que aún no los ha leído);
+      - tolera archivos que otra solicitud borró entre el listado y el borrado.
+    Devuelve los nombres borrados.
+    """
+    import time
+    entries = []
+    for f in directory.glob(pattern):
+        try:
+            entries.append((f.stat().st_mtime, f))
+        except OSError:
+            continue                                 # ya no existe
+    entries.sort()
+    cutoff = time.time() - min_age_s
+    removed = []
+    for mtime, f in entries[:-keep] if keep > 0 else entries:
+        if mtime >= cutoff:
+            continue                                 # reciente: posiblemente en uso
+        try:
+            f.unlink()
+            removed.append(f.name)
+        except OSError:
+            pass
+    return removed
+
+
 def unique_stamp() -> str:
     """Marca única para nombres de archivo: fecha-hora con microsegundos + 6 hex aleatorios.
 

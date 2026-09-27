@@ -57,6 +57,7 @@ from app.security import app_profile, dev_mode
 from app.storage import data_dir
 from app import errors
 from app.observability import RequestContextMiddleware
+from app import ratelimit
 
 
 # ──────────────────────────────────────────────────────────────
@@ -115,6 +116,13 @@ def create_app(profile: str | None = None) -> FastAPI:
     # (app/observability.py). El middleware se añade ANTES que CORS para quedar
     # por dentro: las respuestas de error también llevan las cabeceras CORS.
     errors.install(app)
+    # Límite por IP del endpoint público (production por defecto; app/ratelimit.py).
+    # Se añade ANTES que RequestContext para quedar por dentro: el 429 lleva request_id.
+    if ratelimit.enabled_for(profile):
+        rl = ratelimit.settings()
+        app.state.ip_limiter = ratelimit.SlidingWindowLimiter(rl["requests"], rl["window_s"])
+        app.add_middleware(ratelimit.IpRateLimitMiddleware, limiter=app.state.ip_limiter,
+                           trusted_hops=rl["trusted_hops"])
     app.add_middleware(RequestContextMiddleware)
 
     app.add_middleware(
@@ -129,7 +137,8 @@ def create_app(profile: str | None = None) -> FastAPI:
         allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
         # Exponer headers personalizados que /api/detect devuelve en modo audio=true
         expose_headers=["X-Narrativa", "X-Escenario", "X-Objetos-Detectados", "X-Audio-File", "X-Request-ID",
-                        "X-Degradacion", "X-Texto-Codificacion"],
+                        "X-Degradacion", "X-Texto-Codificacion",
+                        "Retry-After", "X-RateLimit-Limit", "X-RateLimit-Remaining"],
     )
 
     # ──────────────────────────────────────────────────────────
