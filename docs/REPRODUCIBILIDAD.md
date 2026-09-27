@@ -56,21 +56,18 @@ Política de pesos, implementada en `yolo_service.check_weights`:
 | `TTS_MODEL` / `TTS_VOICE` | `models/gemini-3.1-flash-tts-preview` / `Sulafat` |
 | `TTS_STYLE_INSTRUCTIONS` | definida en `.env`; debe copiarse literal en cada paquete de estímulo congelado (F4) |
 
-## 4. Diferencias conocidas entre el entorno local y Docker (sin resolver)
+## 4. Entorno local frente a la imagen Docker (resuelto el 2026-09-27)
 
-| Aspecto | Local | Docker (`Dockerfile`) |
+| Aspecto | Local (referencia) | Docker (`Dockerfile`) |
 |---|---|---|
-| Python | 3.13.15 | 3.11 (`python:3.11-slim`) |
-| torch | 2.13.0+cu126 (GPU) | la última versión CPU en el momento del build |
-| Dispositivo YOLO | GPU: `run_yolo` no fija `device` | CPU |
-| Dependencias | fijadas en `requirements.lock.txt` | `requirements.txt` sin versiones |
-| Pesos | `yolo26s.pt` local, con hash verificado | si el archivo no está en el contexto de build, Ultralytics lo descarga |
+| Python | 3.13.15 | 3.13.15 (`python:3.13-slim`) |
+| torch / torchvision | 2.13.0+cu126 / 0.28.0+cu126 | 2.13.0+cpu / 0.28.0+cpu (mismo número; el experimento se ejecuta en CPU) |
+| Dispositivo YOLO | CPU (`CUDA_VISIBLE_DEVICES=-1` en F4) | CPU (sin CUDA) |
+| Dependencias | `requirements.lock.txt` | `requirements-docker.lock.txt` (exactas, generadas en Linux; mismas versiones de las librerías del núcleo) |
+| Pesos | `yolo26s.pt` local, con hash verificado | release fija `ultralytics/assets v8.4.0`, `ADD --checksum` (el build falla si difiere) + verificación al arrancar |
+| Identidad | `preflight()` (F4) | `app/deploy_identity.py`: en production la app no arranca si difiere de `experimental_config.yaml` (tolera solo la ruta de los pesos y el sufijo `+cpu`) |
 
-**Propuesta, pendiente de aprobación.** No se ha aplicado ningún cambio de lo siguiente:
-
-- fijar versiones en un `requirements.txt` compatible con Python 3.11 y CPU;
-- fijar la versión de torch en el Dockerfile;
-- copiar los pesos verificados en la imagen y definir `YOLO_WEIGHTS_SHA256` y `YOLO_ALLOW_DOWNLOAD=false`.
+Evidencia: `evaluation/results/hardening/docker/`. El plan de despliegue está en `docs/DEPLOYMENT.md`.
 
 El **dispositivo de inferencia** para la evaluación formal (CPU o GPU) es una decisión de CP3B, porque los resultados pueden diferir ligeramente entre los dos.
 
@@ -96,7 +93,7 @@ Las pruebas no ejecutan YOLO, el LLM ni el TTS.
 - **Comprobación:** `tests/regression/test_pipeline_regression.py` exige una salida **idéntica** (sin tiempos ni marcas de archivo).
 - **Marca `entorno_referencia`:** esa prueba depende de las versiones exactas del entorno local (Pillow, etc.; ver `requirements.lock.txt`), así que se excluye en CI.
 - **Contratos:** `tests/regression/contracts.json` fija la entrada de `POST /api/detect` y las rutas de cada perfil. Un cambio intencional se regenera con `python tests/regression/test_contracts.py --write` y queda visible en el diff.
-- **Perfil del despliegue:** `ENV APP_PROFILE=production` (Dockerfile). En ese perfil, `YOLO_ALLOW_DOWNLOAD` sigue valiendo `true` por defecto, así que si la imagen no incluye los pesos, Ultralytics los descarga (comportamiento histórico). Fijarlo en `false` exige incluir `yolo26s.pt` en la imagen. Decisión pendiente.
+- **Perfil del despliegue:** `ENV APP_PROFILE=production` (Dockerfile). La imagen incluye `yolo26s.pt` verificado y fija `YOLO_WEIGHTS_SHA256` y `YOLO_ALLOW_DOWNLOAD=false`: nunca se descargan pesos (resuelto el 2026-09-27).
 
 
 ## 8. Configuración oficial de F4 y verificación previa (checkpoint pre-F4, 2026-09-27)

@@ -152,6 +152,11 @@ def create_app(profile: str | None = None) -> FastAPI:
         primera petición. El cliente de Gemini TTS se inicializa de forma
         perezosa (singleton) en su primer uso; ver app/services/tts_service.py.
         """
+        # production: lo desplegado debe ser EXACTAMENTE la configuración congelada
+        # (app/deploy_identity.py); si difiere, el worker no arranca.
+        if profile == "production":
+            from app import deploy_identity
+            deploy_identity.verify()
         from app.services.yolo_service import _get_model
         _get_model()
 

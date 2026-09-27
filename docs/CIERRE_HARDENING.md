@@ -38,9 +38,10 @@
 - **Decisión:** el worker único es **aceptable para el alcance actual** (demo pública con límite por IP y estudio con un investigador que lanza una solicitud a la vez). Motivos:
   - es seguro frente al estado compartido;
   - el plan de Azure (1,75 GB) no admite dos workers de unos 750 MB cada uno con margen.
-- **Riesgo antes del despliegue:** si se activa el *Health check* de Azure App Service, un `/api/health` que tarda hasta 35 s puede marcar la instancia como no sana.
-  - **Opciones:** no activarlo, o ejecutar el pipeline en un hilo con un candado (`run_in_threadpool` + `asyncio.Lock`). La segunda mantiene la serialización y libera `/api/health`.
-  - **No se aplicó:** es una decisión pendiente de aprobación.
+- **Resuelto (2026-09-27, commit 3799b23):** el pipeline se ejecuta en un único hilo dedicado (`ThreadPoolExecutor(max_workers=1)`) y bajo un candado, así que se mantiene la serialización y `/api/health` queda libre.
+  - Medido: `/api/health` responde en ≤ 139 ms durante 1, 2, 3 y 5 detecciones simultáneas (`concurrencia.json`).
+  - Pruebas: `tests/test_health_during_detect.py`.
+  - En Docker con 1 detección: ≤ 76 ms (`docker/docker_<commit>.json`).
 
 ## 3. Tabla de requisitos y evidencias
 
@@ -55,7 +56,7 @@
 | H7 | Smoke tests con proveedores reales | `evaluation/results/hardening/live_smoke.jsonl` (4/4) | PASS | YOLO, Groq y Gemini operativos |
 | H8 | Cliente: 200/400/413/415/422/429/500/502/503/504/timeout/sin audio/study/degradación/sin voz del navegador | `evaluation/results/hardening/ui/` (16/16 + capturas) | PASS | Interfaz verificada en navegador real |
 | H9 | E2E real local (cliente → API → YOLO → LLM → TTS → reproducción) y fallos reales de LLM/TTS | Escenarios de UI "E2E real" (éxito: audio de 27,7 s) y "claves inválidas" | PASS | Flujo completo verificado |
-| H10 | Concurrencia con worker único medida | `concurrencia.json` | PASS (con hallazgo: health bloqueado) | Decisión en §2 |
+| H10 | Concurrencia con worker único medida | `concurrencia.json` | PASS | Health bloqueado: resuelto (§2) |
 | H11 | EXIF analizado | §1 | PASS (decisión documentada) | Sin impacto en el Dataset 1 |
 | H12 | Regresión del pipeline idéntica | `tests/regression` (41/41) | PASS | Núcleo sin cambios de salida |
 | H13 | Configuración congelada coherente | preflight en commit limpio; diff: solo hashes del código | PASS | Parámetros congelados intactos |
@@ -75,5 +76,5 @@
 - **CORS** con la URL real de Vercel.
 - **Timeouts:** el del proxy de Azure (~230 s) frente al cliente (180 s) y a gunicorn (600 s).
 - **Logs:** recolección de los logs JSON (Log Stream).
-- **Health check:** comportamiento del *Health check* si se activa (§2).
-- **Arranque:** del contenedor (Python 3.11, torch CPU) y descarga o inclusión de los pesos.
+- **Health check:** activarlo en `/api/health` (ya no se bloquea, §2).
+- **Arranque:** medido localmente con la imagen final (Python 3.13, torch CPU, pesos incluidos y verificados): 12–15 s con 1 vCPU. Queda pendiente la descarga de la imagen en Azure. Ver `docs/DEPLOYMENT.md`.

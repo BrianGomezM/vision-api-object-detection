@@ -23,13 +23,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Mismas versiones EXACTAS que la imagen (Python 3.13, torch CPU 2.13.0,
+      # requirements-docker.lock.txt): lo probado es lo que se despliega.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Instalar dependencias (torch CPU, como el Dockerfile)
+          python-version: "3.13"
+      - name: Instalar dependencias (idénticas al Dockerfile)
         run: |
-          pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
-          pip install -r requirements.txt pytest
+          pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
+          pip install -r requirements-docker.lock.txt pytest==9.1.1
       - name: Pruebas
         env:
           EVALUATION_DISABLE_TTS: "true"
