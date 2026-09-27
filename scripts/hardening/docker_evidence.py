@@ -65,10 +65,10 @@ def fails_to_boot(label, *args):
     code, out = sh("docker", "run", "--name", name, *args, timeout=180)
     sh("docker", "rm", "-f", name)
     lines = out.splitlines()
-    err = [l if "RuntimeError: [" in l else l.strip() for i, l in enumerate(lines)
-           if "RuntimeError: [" in l or (i and "RuntimeError: [Identidad]" in lines[i - 1])]
+    err = [l.strip() for i, l in enumerate(lines) if "RuntimeError: [" in l
+           or (l.startswith("  - ") and any("RuntimeError: [Identidad]" in x for x in lines[:i]))]
     return {"caso": label, "exit_code": code, "arranco": "Application startup complete" in out,
-            "mensaje": err[-1] if err else None, "pasa": code != 0 and bool(err) and "Application startup complete" not in out}
+            "mensaje": err or None, "pasa": code != 0 and bool(err) and "Application startup complete" not in out}
 
 
 def main():
@@ -92,9 +92,9 @@ def main():
         fails_to_boot("YOLO_WEIGHTS_SHA256 incorrecto", "-e", "YOLO_WEIGHTS_SHA256=" + "0" * 64, IMAGE),
         fails_to_boot("pesos ausentes", "-e", "YOLO_WEIGHTS=/app/weights/no_existe.pt", IMAGE),
         fails_to_boot("pesos alterados (1 byte)", "--entrypoint", "sh", IMAGE, "-c",
-                      "cp /app/weights/yolo26s.pt /tmp/visionnav/w.pt && chmod u+w /tmp/visionnav/w.pt && "
-                      "printf X | dd of=/tmp/visionnav/w.pt bs=1 seek=1000 conv=notrunc 2>/dev/null && "
-                      "YOLO_WEIGHTS=/tmp/visionnav/w.pt exec gunicorn --bind=0.0.0.0:8000 --workers 1 "
+                      "cp /app/weights/yolo26s.pt /tmp/visionnav/yolo26s.pt && chmod u+w /tmp/visionnav/yolo26s.pt && "
+                      "printf X | dd of=/tmp/visionnav/yolo26s.pt bs=1 seek=1000 conv=notrunc 2>/dev/null && "
+                      "YOLO_WEIGHTS=/tmp/visionnav/yolo26s.pt exec gunicorn --bind=0.0.0.0:8000 --workers 1 "
                       "-k uvicorn.workers.UvicornWorker app.main:app"),
         fails_to_boot("GROQ_MODEL distinto al congelado", "-e", "GROQ_MODEL=llama-3.3-70b-versatile", IMAGE),
         fails_to_boot("TTS_VOICE distinta a la congelada", "-e", "TTS_VOICE=Kore", IMAGE),
