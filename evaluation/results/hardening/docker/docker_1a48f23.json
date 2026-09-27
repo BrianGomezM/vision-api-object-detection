@@ -1,0 +1,267 @@
+{
+ "fecha_utc": "2026-09-27T09:49:32.155470+00:00",
+ "imagen": "visionnav-api:1a48f23",
+ "imagen_info": {
+  "id": "sha256:c6343faf3e172d688f2cd535ebd13fe7473b53ece8ebbfe2b0916b3c2f49c5d9",
+  "tamano_mb": 528,
+  "usuario": "app",
+  "APP_COMMIT": "1a48f23c10b2478f0a810c60002e65b2fd828214",
+  "APP_PROFILE": "production",
+  "DATA_ROOT": "/tmp/visionnav",
+  "YOLO_WEIGHTS": "/app/weights/yolo26s.pt",
+  "YOLO_WEIGHTS_SHA256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
+  "YOLO_ALLOW_DOWNLOAD": "false",
+  "PYTHON_VERSION": "3.13.15"
+ },
+ "pesos": {
+  "stat": "444 root 20422725",
+  "sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
+  "sha256_ok": true,
+  "pt_locales_copiados": 0,
+  "escritura": "solo_lectura",
+  "versiones": "2.13.0+cpu 8.4.123 5.0.0 False"
+ },
+ "fallos_controlados": [
+  {
+   "caso": "YOLO_WEIGHTS_SHA256 incorrecto",
+   "exit_code": 3,
+   "arranco": false,
+   "mensaje": [
+    "RuntimeError: [YOLO] Hash de '/app/weights/yolo26s.pt' no coincide con YOLO_WEIGHTS_SHA256 (esperado 000000000000…, obtenido 646f8bc3fe0a…)."
+   ],
+   "pasa": true
+  },
+  {
+   "caso": "pesos ausentes",
+   "exit_code": 3,
+   "arranco": false,
+   "mensaje": [
+    "RuntimeError: [Identidad] El despliegue NO coincide con experimental_config.yaml:",
+    "- deteccion.weights: esperado 'yolo26s.pt', encontrado '/app/weights/no_existe.pt'",
+    "- pesos.bytes: esperado 20422725, encontrado None",
+    "- pesos.file: esperado 'yolo26s.pt', encontrado 'no_existe.pt'",
+    "- pesos.sha256: esperado '646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b', encontrado None"
+   ],
+   "pasa": true
+  },
+  {
+   "caso": "pesos alterados (1 byte)",
+   "exit_code": 3,
+   "arranco": false,
+   "mensaje": [
+    "RuntimeError: [Identidad] El despliegue NO coincide con experimental_config.yaml:",
+    "- pesos.sha256: esperado '646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b', encontrado '4c49ddf2f8d8c064d6ac7225141d4daf5bf5a26dcc6abe7004c4397dfc135d30'"
+   ],
+   "pasa": true
+  },
+  {
+   "caso": "GROQ_MODEL distinto al congelado",
+   "exit_code": 3,
+   "arranco": false,
+   "mensaje": [
+    "RuntimeError: [Identidad] El despliegue NO coincide con experimental_config.yaml:",
+    "- narrativa.modelo: esperado 'qwen/qwen3.8-27b', encontrado 'llama-3.3-70b-versatile'"
+   ],
+   "pasa": true
+  },
+  {
+   "caso": "TTS_VOICE distinta a la congelada",
+   "exit_code": 3,
+   "arranco": false,
+   "mensaje": [
+    "RuntimeError: [Identidad] El despliegue NO coincide con experimental_config.yaml:",
+    "- tts.voz: esperado 'Sulafat', encontrado 'Kore'"
+   ],
+   "pasa": true
+  }
+ ],
+ "arranque": {
+  "health_status": 200,
+  "segundos_hasta_health_200": 4.8
+ },
+ "health": {
+  "status": 200,
+  "ms": 4.0,
+  "request_id": "261e8cc7ddaa4646991a5678ba013e51",
+  "body": {
+   "status": "healthy",
+   "version": "3.2.0",
+   "perfil": "production",
+   "modelo": {
+    "nombre": "YOLO26s",
+    "weights": "/app/weights/yolo26s.pt",
+    "imgsz": 1280,
+    "iou": 0.45
+   },
+   "llm": {
+    "proveedor": "Groq",
+    "modelo": "qwen/qwen3.8-27b",
+    "activo": false
+   },
+   "tts": {
+    "proveedor": "Gemini TTS",
+    "modelo": "models/gemini-3.1-flash-tts-preview",
+    "voz": "Sulafat",
+    "activo": false
+   },
+   "configuracion": {
+    "umbral_default": 0.35,
+    "max_imagen_px": 800
+   },
+   "identidad": {
+    "estado": "verificada",
+    "config_sha256": "f3cefea0dcc3d8b0da0aaebb0c437764b55de34f368d3c18f5aba86d4b7546c0",
+    "pesos_sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b",
+    "diferencias_toleradas": [
+     "deteccion.weights: esperado 'yolo26s.pt', encontrado '/app/weights/yolo26s.pt'",
+     "versiones.torch: esperado '2.13.0+cu126', encontrado '2.13.0+cpu'",
+     "versiones.torchvision: esperado '0.28.0+cu126', encontrado '0.28.0+cpu'"
+    ],
+    "commit": "1a48f23c10b2478f0a810c60002e65b2fd828214"
+   }
+  }
+ },
+ "detect_yolo_real_sin_claves": {
+  "status": 200,
+  "ms": 1241.9,
+  "request_id": "39a8cfd52aa3437ebde61b50538555b4",
+  "x_degradacion": "LLM_UNAVAILABLE,TTS_UNAVAILABLE",
+  "objetos": 8,
+  "narrativa": "Parece que estás en una sala de estar. Planta en maceta frente a ti a aproximadamente 6 pasos. Sofá justo a tu derecha a aproximadamente 2 pasos. Sofá justo a tu izquierda a aproximadamente 4 pasos. Silla justo a tu izquierda a aproximadamente 4 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+  "audio": {
+   "disponible": false,
+   "razon": "tts_desactivado"
+  },
+  "imagen_anotada_disponible": true
+ },
+ "health_durante_detect": {
+  "detect_status": 200,
+  "detect_ms": 1228.1,
+  "muestras": 19,
+  "health_ms_max": 31.3
+ },
+ "errores": [
+  {
+   "caso": "texto",
+   "status": 422,
+   "code": "INVALID_IMAGE",
+   "stage": "validacion",
+   "request_id_coincide": true
+  },
+  {
+   "caso": "jpg truncado",
+   "status": 422,
+   "code": "INVALID_IMAGE",
+   "stage": "validacion",
+   "request_id_coincide": true
+  },
+  {
+   "caso": "GIF",
+   "status": 415,
+   "code": "UNSUPPORTED_IMAGE",
+   "stage": "validacion",
+   "request_id_coincide": true
+  },
+  {
+   "caso": "12 MB",
+   "status": 413,
+   "code": "PAYLOAD_TOO_LARGE",
+   "stage": "validacion",
+   "request_id_coincide": true
+  },
+  {
+   "caso": "sin archivo",
+   "status": 400,
+   "code": "INVALID_REQUEST"
+  }
+ ],
+ "limite_ip": {
+  "statuses": [
+   200,
+   200,
+   200,
+   200,
+   200,
+   429,
+   429,
+   429
+  ],
+  "retry_after": "55",
+  "code": "RATE_LIMITED"
+ },
+ "cors": [
+  {
+   "origen": "https://visionnav-client.vercel.app",
+   "preflight": 200,
+   "allow_origin": "https://visionnav-client.vercel.app"
+  },
+  {
+   "origen": "https://visionnav-client-abc123-team.vercel.app",
+   "preflight": 200,
+   "allow_origin": "https://visionnav-client-abc123-team.vercel.app"
+  },
+  {
+   "origen": "http://localhost:3000",
+   "preflight": 200,
+   "allow_origin": "http://localhost:3000"
+  },
+  {
+   "origen": "https://evil.example.com",
+   "preflight": 400,
+   "allow_origin": null
+  },
+  {
+   "origen": "https://visionnav-client.vercel.app.evil.com",
+   "preflight": 400,
+   "allow_origin": null
+  }
+ ],
+ "rutas_no_expuestas": {
+  "/docs": 404,
+  "/api/debug/detect": 404,
+  "/openapi.json": 404
+ },
+ "archivos_en_DATA_ROOT": [
+  "/tmp/visionnav/product/telemetry/production_metrics.jsonl"
+ ],
+ "memoria_tras_pruebas": "660.9MiB / 1.709GiB",
+ "logs": {
+  "lineas_json": 42,
+  "request_ids_unicos": true,
+  "app_commit": [
+   "1a48f23c10b2478f0a810c60002e65b2fd828214"
+  ],
+  "ejemplo": {
+   "ts": "2026-09-27T09:51:15.228193+00:00",
+   "request_id": "53d4eeb3f0734c0986d562ed69d0f788",
+   "method": "GET",
+   "path": "/openapi.json",
+   "status": 404,
+   "duration_ms": 0.9,
+   "perfil": "production",
+   "app_commit": "1a48f23c10b2478f0a810c60002e65b2fd828214",
+   "error_code": "NOT_FOUND",
+   "stage": "solicitud",
+   "degradaciones": null
+  },
+  "claves_en_logs": false
+ },
+ "checks": {
+  "sha256_pesos": true,
+  "sin_pt_locales": true,
+  "pesos_solo_lectura": true,
+  "usuario_sin_privilegios": true,
+  "fallos_controlados": true,
+  "arranque": true,
+  "identidad_verificada": true,
+  "detect_degradado_declarado": true,
+  "health_durante_detect": true,
+  "errores": true,
+  "limite_ip": true,
+  "cors": true,
+  "rutas_no_expuestas": true,
+  "limpieza": true,
+  "logs": true
+ },
+ "resultado": "PASS"
+}
