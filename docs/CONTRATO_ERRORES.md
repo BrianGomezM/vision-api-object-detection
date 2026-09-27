@@ -19,7 +19,7 @@ Toda respuesta de error tiene la misma forma:
 - **`message`** es un texto **fijo por código**. Nunca incluye `str(excepción)`, rutas, trazas, claves ni detalles del proveedor. El detalle técnico va al log del servidor con el mismo `request_id`.
 - **`detail`** replica el mensaje, por compatibilidad con clientes que leían `detail`.
 - **`request_id`** lo genera el servidor para **toda** solicitud y va también en la cabecera `X-Request-ID`. Si el cliente envía un `X-Request-ID`, se ignora (evita inyección en logs).
-- **Ninguna falla devuelve HTTP 200.** Antes, cualquier excepción del pipeline devolvía `200 {"status":"error","message": str(e)}`, filtrando el texto de la excepción. Una prueba estática impide reintroducirlo.
+- **Ningún FALLO FUNCIONAL devuelve HTTP 200.** Solo puede haber un 200 con la cabecera `X-Degradacion` cuando falla una parte OPCIONAL en ese contexto (§3). Antes, cualquier excepción del pipeline devolvía `200 {"status":"error","message": str(e)}`, filtrando el texto de la excepción; una prueba estática impide reintroducirlo.
 
 ## 2. Auditoría del pipeline: errores posibles y tratamiento
 
@@ -37,8 +37,8 @@ Toda respuesta de error tiene la misma forma:
 | deteccion | excepción en la inferencia o resultado malformado | 200 con `str(e)` | **500 `DETECTION_ERROR`** | ídem |
 | espacial / pasos / espacio_libre / decision | excepción en `analyze_spatial` / `estimate_steps` / `calculate_free_space` / `decide_movement` | 200 con `str(e)` | **500** `SPATIAL_ANALYSIS_ERROR` / `STEP_ESTIMATION_ERROR` / `FREE_SPACE_ERROR` / `MOVEMENT_DECISION_ERROR` | ídem |
 | narrativa | excepción al ensamblar (`build_narrative`, selección de objetos) | 200 con `str(e)` | **500 `NARRATIVE_GENERATION_ERROR`** | ídem |
-| narrativa (LLM) | error del proveedor, timeout (15 s × 3 intentos), respuesta inválida (JSON roto, `choices` vacío), LLM no configurado | **silencioso**: narrativa de plantilla con 200 | **degradación declarada** o error según el perfil (§3): `LLM_PROVIDER_ERROR` 502, `LLM_TIMEOUT` 504, `LLM_INVALID_RESPONSE` 502, `LLM_UNAVAILABLE` 503 | + tipo de error |
-| tts | error del proveedor, cuota (429), timeout (**nuevo: 60 s**, antes sin timeout), no configurado o desactivado | JSON: 200 con `audio.razon`. `audio=true`: **200 `success_no_audio`** | **degradación declarada** o error (§3): `TTS_PROVIDER_ERROR` 502, `TTS_TIMEOUT` 504, `TTS_QUOTA_EXCEEDED` 503 (+ `Retry-After: 60`), `TTS_UNAVAILABLE` 503 | ídem |
+| narrativa (LLM) | error del proveedor, límite (429), proveedor caído (5xx/conexión), timeout (15 s × 3 intentos), respuesta inválida (JSON roto, `choices` vacío), LLM no configurado | **silencioso**: narrativa de plantilla con 200 | **degradación declarada** o error según el perfil (§3): `LLM_PROVIDER_ERROR` 502, `LLM_RATE_LIMITED` 503, `LLM_PROVIDER_UNAVAILABLE` 503, `LLM_TIMEOUT` 504, `LLM_INVALID_RESPONSE` 502, `LLM_UNAVAILABLE` 503 | + categoría del error |
+| tts | error del proveedor, límite por minuto (429), cuota diaria agotada (429 `PerDay`), proveedor caído (5xx/UNAVAILABLE), timeout (**nuevo: 60 s**), no configurado o desactivado | JSON: 200 con `audio.razon`. `audio=true`: **200 `success_no_audio`** | **degradación declarada** o error (§3): `TTS_PROVIDER_ERROR` 502, `TTS_TIMEOUT` 504, `TTS_RATE_LIMITED` 503, `TTS_QUOTA_EXCEEDED` 503, `TTS_PROVIDER_UNAVAILABLE` 503, `TTS_UNAVAILABLE` 503. `Retry-After` **solo** si el proveedor lo informa (§8.2) | ídem |
 | tts | fallo al guardar el MP3 (directorio no escribible) | 200 con `str(e)` | **500 `AUDIO_STORAGE_ERROR`** | ídem |
 | anotación | fallo al dibujar o guardar la imagen anotada (el visualizador ya lo captura) | silencioso | **degradación declarada** `ANNOTATION_UNAVAILABLE` (200) | ídem |
 | cualquiera | excepción no prevista | 200 con `str(e)` | **500 `INTERNAL_ERROR`** | traza completa en el log |
@@ -80,13 +80,14 @@ Hay componentes **opcionales**: el LLM (existe una narrativa de plantilla), el a
 
 **Concurrencia.** `/api/detect` es `async` y ejecuta el pipeline bloqueante en el hilo del bucle de eventos, así que **cada worker atiende una solicitud a la vez**. Se mantiene así a propósito: el estado compartido (último error del TTS, caché de escenario, modelo) no tiene condiciones de carrera. Con 1 worker (Dockerfile), la capacidad es de una solicitud en curso.
 
-## 5. Caché de escenario (crítico para F4 y el estudio)
+## 5. Caché de escenario
 
-- **Antes.** La clave era solo la lista de objetos, con un TTL de 10 s. Nueve estímulos distintos con una silla (A1–A9) producían **una sola** llamada al LLM, y A2–A9 heredaban la respuesta de A1. Reproducido en `tests/test_scene_cache.py`, que fallaba con el código anterior.
-- **Ahora:**
-  - la clave incluye el **SHA-256 de la imagen procesada**: solo reutiliza para la misma imagen;
-  - los resultados de respaldo (con error del LLM) **no se cachean**;
-  - el runner de F4 llama a `reset_request_state()` entre generaciones, y `assert_complete()` rechaza un escenario cacheado.
+- **Finalidad:** evitar llamadas repetidas al LLM cuando llega **la misma imagen** varias veces seguidas (reintentos o un cliente que reenvía el mismo fotograma). No es un error en sí.
+- **Clave:** `SHA-256 de la imagen procesada # lista ordenada de objetos` (`scene_classifier.classify_scene(..., cache_scope)`), con un TTL de 10 s (`LLM_SCENE_CACHE_TTL`) y una sola entrada.
+- **Imágenes diferentes nunca comparten resultado:** su hash es distinto. Antes la clave era solo la lista de objetos, y A1–A9, que tienen una silla cada una, compartían la respuesta de A1. Las pruebas `tests/test_scene_cache.py` (pipeline y HTTP) comprueban 9 llamadas y 9 narrativas distintas.
+- **Misma imagen:** dentro de 10 s reutiliza el escenario (`cached: true`); pasado ese tiempo, llama de nuevo.
+- **Errores:** una respuesta de respaldo (error del LLM) **no se guarda**, así que la siguiente solicitud vuelve a intentarlo.
+- **F4:** el **protocolo** exige una generación nueva por estímulo y por generación (la variabilidad del LLM forma parte de lo que se mide). El runner llama a `reset_request_state()` antes de cada una, y `assert_complete()` comprueba que el escenario no vino de la caché. Es una exigencia del protocolo, no una invalidez de la caché.
 
 ## 6. Observabilidad
 
@@ -101,3 +102,71 @@ Hay componentes **opcionales**: el LLM (existe una narrativa de plantilla), el a
 - **Recolección de los logs JSON** en la plataforma (Log Stream / App Insights).
 - **Cuotas reales de Groq y Gemini con carga:** solo con los smoke tests manuales `tests/live` (`LIVE_SMOKE_TEST=1`).
 - **Arranque del contenedor Docker** (Python 3.11, torch CPU) con los pesos descargados. El arranque local del perfil production está verificado con `scripts/experiment/smoke_production.py`.
+
+## 8. Cierre del hardening (2026-09-27)
+
+### 8.1 Política HTTP: respuestas explícitas
+
+- **A. Cuándo 4xx/5xx.** Entrada inválida (400/413/415/422), fallo de cualquier etapa (500), modelo no disponible (503) y fallo de un componente **obligatorio en ese contexto**: el TTS con `audio=true` o en study, y el LLM en study (502/503/504).
+- **B. Cuándo 200 con degradación.** Solo si falla una parte **opcional en ese contexto**: el LLM en production o development (se entrega la narrativa de plantilla), el audio con `audio=false` en production o development, y la imagen anotada en cualquier perfil. Siempre con `X-Degradacion`, registro en log y telemetría, y aviso en el cliente.
+- **C. `audio=false`.** El audio es opcional fuera de study: un fallo del TTS da 200 con `audio.disponible=false`, `audio.razon` y `X-Degradacion`.
+- **D. `audio=true`.** El audio **es** la respuesta: un fallo del TTS es un error (502/503/504) en todos los perfiles. Una degradación del LLM o de la anotación se declara en la cabecera de la respuesta MP3 (añadido en el cierre; antes faltaba).
+- **E. production.** B y C.
+- **F. development.** Igual que production, para reproducir el comportamiento del producto.
+- **G. study.** El LLM y el audio son obligatorios: cualquier fallo es un error. Solo la anotación puede degradarse.
+
+**Matriz formal**, verificada por `tests/test_policy_matrix.py` con 27 casos:
+
+| condición | perfil | audio | HTTP | código / degradación | cliente |
+|---|---|---|---|---|---|
+| todo correcto | cualquiera | no / sí | 200 | — | narrativa, imagen y audio |
+| LLM falla | production, development | no / sí | 200 | `X-Degradacion: LLM_*` | narrativa + aviso "narrativa por plantilla" |
+| LLM falla | study | no / sí | 502 / 503 / 504 | `LLM_*` | error + ID; no presentar el estímulo |
+| TTS falla | production, development | no | 200 | `X-Degradacion: TTS_*` | narrativa sin audio + aviso |
+| TTS falla | production, development | sí | 502 / 503 / 504 | `TTS_*` | error + ID |
+| TTS falla | study | no / sí | 502 / 503 / 504 | `TTS_*` | error + ID; aviso "no presente este estímulo"; sin voz del navegador |
+| sin imagen anotada | cualquiera | no / sí | 200 | `X-Degradacion: ANNOTATION_UNAVAILABLE` | aviso |
+| imagen inválida | cualquiera | — | 400 / 413 / 415 / 422 | `EMPTY_FILE` / `PAYLOAD_TOO_LARGE` / `UNSUPPORTED_IMAGE` / `INVALID_IMAGE`… | error + ID |
+| fallo de una etapa | cualquiera | — | 500 | `*_ERROR` | error + ID |
+| modelo no disponible | cualquiera | — | 503 | `MODEL_UNAVAILABLE` | error + ID |
+| límite por IP superado | production | — | 429 | `RATE_LIMITED` + `Retry-After` exacto | error + ID |
+
+### 8.2 `Retry-After`
+
+- **Se envía solo con un valor real:**
+  - el límite por IP propio, calculado de forma exacta;
+  - la cabecera `retry-after` de Groq;
+  - el `RetryInfo.retryDelay` de Gemini.
+- **Nunca se inventa.** El `Retry-After: 60` fijo anterior se eliminó.
+- **Categorías de proveedor distinguidas** (`app/utils/provider_errors.py`):
+  - **límite por minuto** (`*_RATE_LIMITED`, 503, con `Retry-After` si el proveedor lo informa);
+  - **cuota agotada** (`TTS_QUOTA_EXCEEDED`, 503, **sin** `Retry-After`: la cuota diaria de Gemini, `quotaId` con `PerDay`, no se recupera en segundos);
+  - **proveedor no disponible** (`*_PROVIDER_UNAVAILABLE`, 503);
+  - **timeout** (504);
+  - **error del proveedor** (502).
+- **Pruebas:** `tests/test_error_contract.py::test_LMN_tts` y `::test_llm_limite_y_no_disponible`.
+
+### 8.3 Límite por IP (production)
+
+- **Implementación:** `app/ratelimit.py`.
+- **Límite:** 6 solicitudes cada 60 s por IP en `POST /api/detect` (`RATE_LIMIT_IP_REQUESTS`, `RATE_LIMIT_IP_WINDOW_S`), con ventana deslizante.
+- **Rechazo temprano:** se aplica **antes** de leer la subida y de consumir el LLM o el TTS.
+- **Respuesta:** 429 `RATE_LIMITED` con `Retry-After` exacto y el `request_id`.
+- **Alcance:** `/api/health` no está limitado. Study y development no tienen límite por IP (study usa el límite por clave del investigador). Se puede forzar con `RATE_LIMIT_IP_ENABLED`.
+- **IP del cliente:**
+  - con `TRUSTED_PROXY_HOPS=0` (por defecto) se usa la IP del par TCP e **ignora** `X-Forwarded-For`, que el cliente puede falsear;
+  - con N proxies de confianza, se usa la N-ésima entrada contando desde la derecha;
+  - Azure App Service añade una entrada, así que se configuraría `TRUSTED_PROXY_HOPS=1`. **Esto debe verificarse en el despliegue.**
+- **Pruebas:** `tests/test_ratelimit_and_request_id.py`.
+
+### 8.4 Limpieza de archivos
+
+- **Regla:** production no conserva nada. Development y study solo conservan los archivos de un éxito. **Una solicitud fallida nunca deja archivos**, en ningún perfil.
+- **Cómo se consigue:** los fallos de etapa llevan la lista de lo ya escrito (`PipelineStageError.outputs`), y el adaptador la borra en cualquier excepción.
+- **Pruebas:** `tests/test_cleanup.py` cubre 13 casos × 3 perfiles = 39. Si se anula la limpieza, fallan 23; es decir, la prueba detecta el defecto.
+
+### 8.5 Rotación segura ante concurrencia
+
+- **Defecto encontrado:** la rotación de archivos (conservar los últimos 10 y 5) de una solicitud podía borrar el archivo recién escrito por otra solicitud simultánea antes de que esta lo leyera, lo que daba 500.
+- **Corrección:** `storage.rotate()` nunca borra archivos con menos de 60 s de antigüedad y tolera archivos que desaparecen entre medias.
+- **Pruebas:** `tests/test_storage.py` y `test_S_concurrencia…`, estable en ejecuciones repetidas.

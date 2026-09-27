@@ -63,8 +63,8 @@ class Simulated:
         # detector: lista de (clase, conf, [x1,y1,x2,y2]) o callable(pil_image) -> lista
         self.boxes = [(56, 0.9, [40.0, 60.0, 120.0, 200.0])]
         self.yolo_mode = "ok"            # ok | model_unavailable | predict_error | invalid_result
-        self.llm_mode = "ok"             # ok | error | timeout | invalid
-        self.tts_mode = "ok"             # ok | error | timeout | quota | not_configured
+        self.llm_mode = "ok"             # ok | error | timeout | invalid | rate_limited | unavailable
+        self.tts_mode = "ok"             # ok | error | timeout | rate_limited | rate_limited_noinfo | quota_day | unavailable | not_configured
         self.llm_calls = 0
         self.tts_calls = 0
 
@@ -102,6 +102,13 @@ class Simulated:
                 if sim.llm_mode == "timeout":
                     import groq
                     raise groq.APITimeoutError(request=_httpx.Request("POST", "https://api.groq.com"))
+                if sim.llm_mode in ("rate_limited", "unavailable"):
+                    import groq
+                    req = _httpx.Request("POST", "https://api.groq.com")
+                    if sim.llm_mode == "rate_limited":
+                        raise groq.RateLimitError("rate limit", body=None, response=_httpx.Response(
+                            429, headers={"retry-after": "7"}, request=req))
+                    raise groq.InternalServerError("upstream", body=None, response=_httpx.Response(503, request=req))
                 if sim.llm_mode == "invalid":
                     content = "esto no es json" if scene else None
                     if not scene:
@@ -122,10 +129,22 @@ class Simulated:
             raise RuntimeError("Gemini 500 internal: key AIzaSECRETO")
         if self.tts_mode == "timeout":
             raise _httpx.ReadTimeout("read timed out")
-        if self.tts_mode == "quota":
+        if self.tts_mode in ("rate_limited", "rate_limited_noinfo", "quota_day"):
             from google.genai import errors as genai_errors
+            details = []
+            if self.tts_mode == "rate_limited":         # formato real de Gemini: por minuto + RetryInfo
+                details = [{"@type": "type.googleapis.com/google.rpc.QuotaFailure", "violations": [
+                               {"quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"}]},
+                           {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "17s"}]
+            if self.tts_mode == "quota_day":            # cuota DIARIA: sin tiempo de recuperación
+                details = [{"@type": "type.googleapis.com/google.rpc.QuotaFailure", "violations": [
+                               {"quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier"}]}]
             raise genai_errors.ClientError(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED",
-                                                          "message": "Resource exhausted"}})
+                                                          "message": "Resource exhausted", "details": details}})
+        if self.tts_mode == "unavailable":
+            from google.genai import errors as genai_errors
+            raise genai_errors.ServerError(503, {"error": {"code": 503, "status": "UNAVAILABLE",
+                                                          "message": "The model is overloaded."}})
         return tts_service._pcm_to_mp3(b"\x00\x00" * 2400)   # MP3 real (lameenc) de 0.1 s
 
 

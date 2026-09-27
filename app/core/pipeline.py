@@ -61,6 +61,9 @@ class PipelineStageError(Exception):
         super().__init__(f"{stage}: {type(cause).__name__}")
         self.stage = stage
         self.cause = cause
+        # Archivos que el pipeline ya escribió antes del fallo (ruta relativa por tipo).
+        # El adaptador los borra: una solicitud fallida no deja archivos.
+        self.outputs: dict = {}
 
 
 @contextmanager
@@ -134,6 +137,15 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
     Con tts=True añade al resultado "audio_path" (ruta relativa o None) y
     "tts_ms". tiempos["total_ms"] NO incluye el TTS (igual que antes).
     """
+    produced: dict = {}
+    try:
+        return _run(image_bytes, threshold, debug, tts, tts_model, produced)
+    except PipelineStageError as exc:
+        exc.outputs = dict(produced)
+        raise
+
+
+def _run(image_bytes, threshold, debug, tts, tts_model, produced) -> dict:
     tiempos: dict = {}
     t_total = time.time()
 
@@ -165,6 +177,7 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
     # Se ejecuta aquí porque analyzed ya contiene bbox + label_es + categoría + pasos.
     t_vis             = time.time()
     annotated_path    = save_annotated_image(image_bytes, analyzed)
+    produced["annotated"] = annotated_path
     tiempos["visualizer_ms"] = _ms(t_vis)
 
     # 4. Análisis de espacio libre
@@ -226,6 +239,7 @@ def run(image_bytes: bytes, threshold: float, debug: bool = False,
         t_tts = time.time()
         with _stage("tts"):
             result["audio_path"] = synthesize_and_save(narrativa, model=tts_model)
+            produced["audio_live"] = result["audio_path"]
         result["tts_ms"]     = _ms(t_tts)
 
     return result

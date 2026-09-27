@@ -143,13 +143,16 @@ def test_O_llm_no_configurado(make_client, sim, monkeypatch):
 
 # ── L–N, TTS ─────────────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("mode,code,status,razon", [
-    ("error", "TTS_PROVIDER_ERROR", 502, "error_sintesis"),
-    ("timeout", "TTS_TIMEOUT", 504, "tiempo_agotado"),
-    ("quota", "TTS_QUOTA_EXCEEDED", 503, "cuota_excedida"),
-    ("not_configured", "TTS_UNAVAILABLE", 503, "tts_desactivado"),
+@pytest.mark.parametrize("mode,code,status,razon,retry_after", [
+    ("error", "TTS_PROVIDER_ERROR", 502, "error_sintesis", None),
+    ("timeout", "TTS_TIMEOUT", 504, "tiempo_agotado", None),
+    ("rate_limited", "TTS_RATE_LIMITED", 503, "limite_proveedor", "17"),        # RetryInfo del proveedor
+    ("rate_limited_noinfo", "TTS_RATE_LIMITED", 503, "limite_proveedor", None), # sin dato: sin Retry-After
+    ("quota_day", "TTS_QUOTA_EXCEEDED", 503, "cuota_excedida", None),          # cuota diaria: sin Retry-After
+    ("unavailable", "TTS_PROVIDER_UNAVAILABLE", 503, "proveedor_no_disponible", None),
+    ("not_configured", "TTS_UNAVAILABLE", 503, "tts_desactivado", None),
 ])
-def test_LMN_tts(make_client, sim, mode, code, status, razon):
+def test_LMN_tts(make_client, sim, mode, code, status, razon, retry_after):
     sim.tts_mode = mode
     dev = make_client("development")
     # JSON (audio opcional): 200 + audio no disponible con su razón + degradación declarada
@@ -157,12 +160,23 @@ def test_LMN_tts(make_client, sim, mode, code, status, razon):
     assert r.status_code == 200 and r.json()["audio"]["disponible"] is False
     assert r.json()["audio"]["razon"] == razon and code in r.headers["x-degradacion"]
     # audio=true (el audio ES la respuesta): error, nunca 200
-    err = assert_error(post(dev, audio="true"), status, code)
-    if code == "TTS_QUOTA_EXCEEDED":
-        assert post(dev, audio="true").headers["retry-after"] == "60"
+    r = post(dev, audio="true")
+    err = assert_error(r, status, code)
+    assert r.headers.get("retry-after") == retry_after          # solo si el proveedor lo informó
     assert err["stage"] == "tts"
     # estudio: el audio es obligatorio
     assert_error(post(make_client("study", keys="k"), headers={"X-API-Key": "k"}), status, code)
+
+
+@pytest.mark.parametrize("mode,code,status,retry_after", [
+    ("rate_limited", "LLM_RATE_LIMITED", 503, "7"), ("unavailable", "LLM_PROVIDER_UNAVAILABLE", 503, None)])
+def test_llm_limite_y_no_disponible(make_client, sim, mode, code, status, retry_after):
+    sim.llm_mode = mode
+    r = post(make_client("development"))
+    assert r.status_code == 200 and code in r.headers["x-degradacion"] and "retry-after" not in r.headers
+    r = post(make_client("study", keys="k"), headers={"X-API-Key": "k"})
+    assert_error(r, status, code)
+    assert r.headers.get("retry-after") == retry_after
 
 
 def test_Q_directorio_de_datos_no_escribible(dev, sim, monkeypatch, tmp_path):

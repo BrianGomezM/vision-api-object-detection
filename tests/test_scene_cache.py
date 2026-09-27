@@ -93,3 +93,35 @@ def test_reset_request_state_fuerza_una_generacion_nueva(fakes):
     experiment.reset_request_state()
     pipeline.run(data, 0.35)
     assert fakes.scene_calls == 2
+
+
+def test_A1_A9_por_http_nueve_narrativas_distintas(make_client, sim, monkeypatch):
+    """Mismo escenario del bloque A pero por /api/detect: A1..A9 (una silla cada una) consecutivas."""
+    def one_chair(img):                    # una silla cuya posición depende de la imagen
+        x = float(sum(img.resize((4, 4)).convert("L").getdata()) % 600)
+        return [(56, 0.9, [x, 200.0, x + 60, 320.0])]
+    sim.boxes = one_chair
+    counter = {"n": 0}
+    base = sim.groq().create
+
+    from app.services import scene_classifier, llm_enhancer
+    import json as _j
+
+    class _Numbered:
+        def __init__(self):
+            self.chat = type("Ch", (), {"completions": self})()
+
+        def create(self, **kw):
+            counter["n"] += 1
+            r = base(**kw)
+            if kw["messages"][0]["content"].startswith("Clasificas"):
+                r.choices[0].message.content = _j.dumps({"scene_type": f"escena {counter['n']}", "confidence": "alta",
+                                                         "scene_intro": f"Escena {counter['n']}."})
+            return r
+    c = _Numbered()
+    monkeypatch.setattr(scene_classifier, "get_groq_client", lambda: c)
+    monkeypatch.setattr(llm_enhancer, "get_groq_client", lambda: c)
+    client = make_client("development")
+    narratives = [client.post("/api/detect", files={"file": (p.name, p.read_bytes(), "image/png")}).json()["narrativa_final"]
+                  for p in BLOCK_A]
+    assert len(set(narratives)) == 9, narratives           # ninguna narrativa reutilizada entre A1..A9

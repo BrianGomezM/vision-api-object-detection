@@ -125,26 +125,25 @@ def _discard_outputs(annotated_path: str | None, audio_path: str | None) -> None
 
 def _tts_unavailable_reason() -> str:
     """
-    Clasifica por qué no hay audio (campo audio.razon de la respuesta):
-      - "tts_omitido_evaluacion": EVALUATION_DISABLE_TTS=true.
-      - "tts_desactivado"       : falta GOOGLE_API_KEY o dependencias.
-      - "cuota_excedida"        : Gemini devolvió 429 / RESOURCE_EXHAUSTED.
-      - "tiempo_agotado"        : el proveedor no respondió dentro de TTS_TIMEOUT_S.
-      - "error_sintesis"        : cualquier otro fallo (detalle en el log).
+    Por qué no hay audio (campo audio.razon de la respuesta):
+      - "tts_omitido_evaluacion" : EVALUATION_DISABLE_TTS=true.
+      - "tts_desactivado"        : falta GOOGLE_API_KEY o dependencias.
+      - "cuota_excedida"         : cuota del proveedor agotada (p. ej. diaria).
+      - "limite_proveedor"       : límite de solicitudes del proveedor (429 por minuto).
+      - "proveedor_no_disponible": el proveedor está caído o devolvió 5xx.
+      - "tiempo_agotado"         : el proveedor no respondió dentro de TTS_TIMEOUT_S.
+      - "error_sintesis"         : cualquier otro fallo (detalle en el log).
     """
     err = get_last_tts_error()
     if err is None:
         return "tts_desactivado"
-    status = err.get("status")
+    status, kind = err.get("status"), err.get("kind")
     if status == TTS_SKIPPED_STATUS:
         return "tts_omitido_evaluacion"
     if status in ("NO_CONFIGURADO", "DEPENDENCIAS_NO_DISPONIBLES"):
         return "tts_desactivado"
-    if err.get("code") == 429 or status == "RESOURCE_EXHAUSTED":
-        return "cuota_excedida"
-    if status == TTS_TIMEOUT_STATUS:
-        return "tiempo_agotado"
-    return "error_sintesis"
+    return {"quota_exhausted": "cuota_excedida", "rate_limited": "limite_proveedor",
+            "unavailable": "proveedor_no_disponible", "timeout": "tiempo_agotado"}.get(kind, "error_sintesis")
 
 
 # ── Contrato de errores (app/errors.py) ─────────────────────────────
@@ -152,8 +151,14 @@ _ALLOWED_FORMATS = {"JPEG", "PNG"}                       # contrato: "Imagen JPE
 _SUPPORTED_MAGIC = (bytes.fromhex("89504e470d0a1a0a"), bytes.fromhex("ffd8ff"))   # firmas PNG / JPEG
 _TTS_REASON_CODE = {
     "tts_omitido_evaluacion": "TTS_UNAVAILABLE", "tts_desactivado": "TTS_UNAVAILABLE",
-    "cuota_excedida": "TTS_QUOTA_EXCEEDED", "tiempo_agotado": "TTS_TIMEOUT",
+    "cuota_excedida": "TTS_QUOTA_EXCEEDED", "limite_proveedor": "TTS_RATE_LIMITED",
+    "proveedor_no_disponible": "TTS_PROVIDER_UNAVAILABLE", "tiempo_agotado": "TTS_TIMEOUT",
     "error_sintesis": "TTS_PROVIDER_ERROR",
+}
+_LLM_KIND_CODE = {
+    "timeout": "LLM_TIMEOUT", "rate_limited": "LLM_RATE_LIMITED", "quota_exhausted": "LLM_RATE_LIMITED",
+    "unavailable": "LLM_PROVIDER_UNAVAILABLE", "invalid_response": "LLM_INVALID_RESPONSE",
+    "provider_error": "LLM_PROVIDER_ERROR",
 }
 _STAGE_CODE = {
     "preprocesamiento": "IMAGE_DECODE_ERROR", "deteccion": "DETECTION_ERROR",
@@ -208,25 +213,34 @@ def _run_core(image_bytes: bytes, threshold: float, debug: bool, **kw) -> dict:
     try:
         return pipeline.run(image_bytes, threshold, debug, **kw)
     except PipelineStageError as exc:
+        # Una solicitud fallida no deja archivos (en ningún perfil).
+        _discard_outputs(exc.outputs.get("annotated"), exc.outputs.get("audio_live"))
         internal = f"{type(exc.cause).__name__}: {exc.cause}"
         if isinstance(exc.cause, ModelUnavailableError):
             raise ApiError("MODEL_UNAVAILABLE", internal=internal)
         raise ApiError(_STAGE_CODE[exc.stage], internal=internal)
 
 
-def _llm_issue(result: dict) -> str | None:
-    """¿La narrativa se generó SIN el LLM previsto? Devuelve el código correspondiente."""
+def _llm_issue(result: dict) -> tuple[str | None, int | None]:
+    """¿La narrativa se generó SIN el LLM previsto? (código, Retry-After del proveedor o None)."""
     if not result["analyzed"]:
-        return None                        # sin objetos no se consulta al LLM
+        return None, None                  # sin objetos no se consulta al LLM
     for part in (result["desc_result"], result["escenario"]):
         if part.get("llm_error"):
-            etype = part.get("llm_error_type") or ""
-            if "timeout" in etype.lower():
-                return "LLM_TIMEOUT"
-            return "LLM_INVALID_RESPONSE" if etype in _LLM_INVALID_TYPES else "LLM_PROVIDER_ERROR"
+            kind = part.get("llm_error_kind")
+            if kind is None:               # compatibilidad: solo el tipo
+                etype = part.get("llm_error_type") or ""
+                kind = ("timeout" if "timeout" in etype.lower()
+                        else "invalid_response" if etype in _LLM_INVALID_TYPES else "provider_error")
+            return _LLM_KIND_CODE[kind], part.get("llm_retry_after_s")
     if not is_llm_active():
-        return "LLM_UNAVAILABLE"
-    return None
+        return "LLM_UNAVAILABLE", None
+    return None, None
+
+
+def _retry_headers(seconds) -> dict | None:
+    """Retry-After SOLO con el valor que informó el proveedor; nunca uno inventado."""
+    return {"Retry-After": str(int(seconds))} if seconds else None
 
 
 # ──────────────────────────────────────────────────────────────
@@ -288,26 +302,28 @@ async def detect(
     result     = _run_core(image_bytes, threshold, debug, tts=True, tts_model=tts_model)
     audio_path = result["audio_path"]
     tts_ms     = result["tts_ms"]
+    keep_outputs = False                   # los archivos solo se conservan en un éxito fuera de production
     try:
         if request is not None:
             request.state.weights_sha256 = experiment.weights_identity()["sha256"]
 
-        # ── Degradaciones: partes que no se generaron con el componente previsto ──
+        # ── Política de degradación (docs/CONTRATO_ERRORES.md §3) ──
         degradations = []
         if request is not None:
             request.state.degradations = degradations      # visible en el log también si se lanza un error
-        llm_code = _llm_issue(result)
+        llm_code, llm_retry = _llm_issue(result)
         if llm_code:
             degradations.append(llm_code)
             if profile == "study":             # estudio formal: nunca narrativa de respaldo silenciosa
-                raise ApiError(llm_code, internal=str(result["desc_result"].get("llm_error")
-                                                      or result["escenario"].get("llm_error")))
+                raise ApiError(llm_code, headers=_retry_headers(llm_retry),
+                               internal=str(result["desc_result"].get("llm_error")
+                                            or result["escenario"].get("llm_error")))
         tts_code = None if audio_path else _TTS_REASON_CODE[_tts_unavailable_reason()]
         if tts_code:
             degradations.append(tts_code)
             if audio or profile == "study":    # el audio es obligatorio: audio=true o estudio
-                raise ApiError(tts_code, internal=str(get_last_tts_error()),
-                               headers={"Retry-After": "60"} if tts_code == "TTS_QUOTA_EXCEEDED" else None)
+                last = get_last_tts_error() or {}
+                raise ApiError(tts_code, internal=str(last), headers=_retry_headers(last.get("retry_after_s")))
         if result["analyzed"] and not result.get("annotated_path"):
             degradations.append("ANNOTATION_UNAVAILABLE")
 
@@ -384,10 +400,12 @@ async def detect(
                     "X-Narrativa":          quote(result["narrativa_final"][:500]),
                     "X-Escenario":          quote(result["escenario"].get("scene_type", "")),
                     "X-Texto-Codificacion": "percent-encoded-utf-8",
+                    **({"X-Degradacion": ",".join(degradations)} if degradations else {}),
                     "X-Objetos-Detectados": str(len(result["detections"])),
                     "X-Audio-File":         audio_path,
                     "X-Request-ID":         request_id,
                 }
+                keep_outputs = profile != "production"
                 return StreamingResponse(
                     io.BytesIO(raw_bytes),
                     media_type="audio/mpeg",
@@ -429,13 +447,15 @@ async def detect(
                 "prompt_llm":      result["desc_result"].get("prompt"),
             }
 
+        keep_outputs = profile != "production"
         if degradations:
             return JSONResponse(response, headers={"X-Degradacion": ",".join(degradations)})
         return response
 
     finally:
-        # Perfil production: no conservar derivados de la imagen del usuario, tampoco si hubo error.
-        if profile == "production":
+        # Production nunca conserva derivados de la imagen del usuario; ningún perfil
+        # conserva los archivos de una solicitud fallida (cualquier excepción).
+        if not keep_outputs:
             _discard_outputs(result.get("annotated_path"), result.get("audio_path"))
 
 
@@ -457,7 +477,7 @@ async def debug_detect(
     image_bytes = await _read_valid_image(file)
     threshold   = normalize_threshold(confidence_threshold)
     result      = _run_core(image_bytes, threshold, True)
-    if True:
+    try:
         analyzed    = result["analyzed"]
         free_space  = result["free_space"]
         decision    = result["decision"]
@@ -541,6 +561,9 @@ async def debug_detect(
                 },
             },
         }
+    except BaseException:
+        _discard_outputs(result.get("annotated_path"), None)     # una solicitud fallida no deja archivos
+        raise
 
 
 

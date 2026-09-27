@@ -73,3 +73,34 @@ def test_participantes_y_producto_no_se_mezclan(monkeypatch, tmp_path):
     for kind in ("annotated", "audio_live", "metrics"):
         assert tmp_path / "product" in storage.data_dir(kind).parents
         assert study.parent not in storage.data_dir(kind).parents
+
+
+def test_rotacion_conserva_n_y_no_borra_recientes(tmp_path):
+    import os
+    import time
+    old = time.time() - 3600
+    for i in range(8):
+        f = tmp_path / f"detection_{i}.jpg"
+        f.write_bytes(b"x")
+        os.utime(f, (old + i, old + i))
+    for i in range(8, 10):                       # dos archivos "en curso" (recientes)
+        (tmp_path / f"detection_{i}.jpg").write_bytes(b"x")
+    removed = storage.rotate(tmp_path, "detection_*.jpg", keep=3)
+    left = sorted(p.name for p in tmp_path.iterdir())
+    assert "detection_8.jpg" in left and "detection_9.jpg" in left       # recientes: nunca se borran
+    assert len(removed) == 7 and left == ["detection_7.jpg", "detection_8.jpg", "detection_9.jpg"]
+
+
+def test_rotacion_tolera_archivos_que_desaparecen(tmp_path, monkeypatch):
+    import os
+    import time
+    f = tmp_path / "detection_0.jpg"
+    f.write_bytes(b"x")
+    os.utime(f, (time.time() - 3600,) * 2)
+    orig = type(f).unlink
+
+    def vanish(self, *a, **k):                    # otra solicitud lo borró primero
+        orig(self)
+        raise FileNotFoundError(self)
+    monkeypatch.setattr(type(f), "unlink", vanish)
+    assert storage.rotate(tmp_path, "detection_*.jpg", keep=0) == []
