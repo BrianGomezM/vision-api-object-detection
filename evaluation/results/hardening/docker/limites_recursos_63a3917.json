@@ -1,0 +1,123 @@
+{
+ "fecha_utc": "2026-09-27T11:24:10.463462+00:00",
+ "imagen": "visionnav-api:63a3917",
+ "app_commit": "63a3917f0c6cb864290889bd68775511528ec399",
+ "host": "Windows 11 + Docker Desktop (WSL2), 8 hilos; la CPU de la nube puede ser más lenta",
+ "nota": "detect sin claves: solo YOLO + narrativa por reglas; LLM/TTS añaden ~0.5 s y ~2–17 s de red",
+ "escenarios": [
+  {
+   "plan": "Render Starter (0.5 CPU / 512 MB)",
+   "cpus": 0.5,
+   "memoria": "512m",
+   "health_200": false,
+   "arranque_s": "no sano en 150 s",
+   "detect": [],
+   "pico_memoria_mb": null,
+   "reinicios_worker_por_oom": 1
+  },
+  {
+   "plan": "1 vCPU / 1 GB",
+   "cpus": 1,
+   "memoria": "1024m",
+   "health_200": true,
+   "arranque_s": 13.9,
+   "detect": [
+    {
+     "imagen": "05_sala_muebles.jpg",
+     "status": 200,
+     "s": 4.73
+    },
+    {
+     "imagen": "10_escena_compleja.jpg",
+     "status": 200,
+     "s": 4.89
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "s": 3.73
+    }
+   ],
+   "pico_memoria_mb": 791,
+   "reinicios_worker_por_oom": 0
+  },
+  {
+   "plan": "Azure App Service B1 (1 vCPU / 1.75 GB)",
+   "cpus": 1,
+   "memoria": "1750m",
+   "health_200": true,
+   "arranque_s": 12.1,
+   "detect": [
+    {
+     "imagen": "05_sala_muebles.jpg",
+     "status": 200,
+     "s": 6.25
+    },
+    {
+     "imagen": "10_escena_compleja.jpg",
+     "status": 200,
+     "s": 4.25
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "s": 4.48
+    }
+   ],
+   "pico_memoria_mb": 682,
+   "reinicios_worker_por_oom": 0
+  },
+  {
+   "plan": "Render Standard (1 CPU / 2 GB)",
+   "cpus": 1,
+   "memoria": "2048m",
+   "health_200": true,
+   "arranque_s": 14.2,
+   "detect": [
+    {
+     "imagen": "05_sala_muebles.jpg",
+     "status": 200,
+     "s": 5.37
+    },
+    {
+     "imagen": "10_escena_compleja.jpg",
+     "status": 200,
+     "s": 6.28
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "s": 6.15
+    }
+   ],
+   "pico_memoria_mb": 645,
+   "reinicios_worker_por_oom": 0
+  },
+  {
+   "plan": "Azure App Service B2 (2 vCPU / 3.5 GB)",
+   "cpus": 2,
+   "memoria": "3584m",
+   "health_200": true,
+   "arranque_s": 8.9,
+   "detect": [
+    {
+     "imagen": "05_sala_muebles.jpg",
+     "status": 200,
+     "s": 2.97
+    },
+    {
+     "imagen": "10_escena_compleja.jpg",
+     "status": 200,
+     "s": 2.05
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "s": 2.03
+    }
+   ],
+   "pico_memoria_mb": 654,
+   "reinicios_worker_por_oom": 0
+  }
+ ]
+}

@@ -60,16 +60,55 @@ Política de pesos, implementada en `yolo_service.check_weights`:
 
 | Aspecto | Local (referencia) | Docker (`Dockerfile`) |
 |---|---|---|
-| Python | 3.13.15 | 3.13.15 (`python:3.13-slim`) |
+| Python | 3.13.15 | 3.13.15 (`python:3.13.15-slim@sha256:7c61056e…`, fijada por digest) |
 | torch / torchvision | 2.13.0+cu126 / 0.28.0+cu126 | 2.13.0+cpu / 0.28.0+cpu (mismo número; el experimento se ejecuta en CPU) |
 | Dispositivo YOLO | CPU (`CUDA_VISIBLE_DEVICES=-1` en F4) | CPU (sin CUDA) |
-| Dependencias | `requirements.lock.txt` | `requirements-docker.lock.txt` (exactas, generadas en Linux; mismas versiones de las librerías del núcleo) |
+| Dependencias | `requirements.lock.txt` | `requirements-docker.lock.txt`: cierre completo generado en la imagen con las versiones de `requirements.lock.txt` como restricción. **Las 70 versiones compartidas son idénticas**; solo difieren torch/torchvision (`+cpu`) y `uvloop` (exclusivo de Linux) |
 | Pesos | `yolo26s.pt` local, con hash verificado | release fija `ultralytics/assets v8.4.0`, `ADD --checksum` (el build falla si difiere) + verificación al arrancar |
 | Identidad | `preflight()` (F4) | `app/deploy_identity.py`: en production la app no arranca si difiere de `experimental_config.yaml` (tolera solo la ruta de los pesos y el sufijo `+cpu`) |
 
 Evidencia: `evaluation/results/hardening/docker/`. El plan de despliegue está en `docs/DEPLOYMENT.md`.
 
-El **dispositivo de inferencia** para la evaluación formal (CPU o GPU) es una decisión de CP3B, porque los resultados pueden diferir ligeramente entre los dos.
+El **dispositivo de inferencia** para la evaluación formal es CPU (CP3B D3, cerrada).
+
+### 4.1 torch `+cu126` frente a `+cpu`, y Windows frente a Linux (verificado el 2026-09-27)
+
+- **Qué es cada uno.** `2.13.0+cu126` y `2.13.0+cpu` son la **misma versión** de PyTorch en dos compilaciones. La primera incluye los kernels CUDA 12.6 (~2,5 GB); la segunda solo CPU (~200 MB). Sobre CPU ejecutan el mismo código de PyTorch.
+- **Dispositivo de los experimentos.**
+  - **Fase 2A:** ejecutó YOLO **en CPU y en GPU** (`device` explícito, GTX 1050) con torch `+cu126`, 4 hilos y Windows (`phase2a/detection/run_meta.jsonl`). La diferencia CPU/GPU fue ≤ 9·10⁻⁵ en confianza (E11). La configuración oficial es **CPU**.
+  - **Smoke tests y preflight:** fuerzan CPU con `CUDA_VISIBLE_DEVICES=-1`.
+  - **F4 aún no se ha ejecutado.**
+  - La demo antigua de Azure (`3a1ddb6`) corrió en CPU pero con `YOLO_IMGSZ=640`, así que no es la configuración experimental.
+- **Qué compara la regresión (§7).** Toma las **cajas crudas de YOLO registradas** en la fase 2A (1280, CPU) y ejecuta el resto del pipeline real. Compara preprocesado, filtrado, análisis espacial, pasos, espacio libre, decisión, prompts del LLM, narrativa por reglas y respuesta de `/api/detect`. **No ejecuta YOLO, ni el LLM real (respuestas fijas), ni el TTS.** Por sí sola no demuestra nada sobre torch.
+- **Verificación directa de YOLO** (`scripts/hardening/compare_yolo_raw.py`, 41 imágenes y 619 cajas frente a la fase 2A):
+
+  | Entorno | torch | Idénticas bit a bit | Diferencia máx. de confianza | Diferencia máx. de caja |
+  |---|---|---|---|---|
+  | Windows (referencia) | `+cu126` forzado a CPU | **41/41** | 0 | 0 px |
+  | Windows | `+cpu` (entorno aislado) | **41/41** | 0 | 0 px |
+  | Linux (imagen Docker) | `+cpu` | 1/41 (mismas clases, en el mismo orden, 41/41) | 6,4·10⁻⁵ | 0 px (redondeo a 0,01) |
+
+- **Conclusión.**
+  - La **distribución de torch no influye**: `+cpu` y `+cu126` son idénticos bit a bit en la misma plataforma.
+  - La pequeña diferencia se debe a la **plataforma** (binarios de Linux frente a Windows).
+- **Impacto aguas abajo** (`scripts/hardening/downstream_from_boxes.py`, el pipeline determinista completo alimentado con las cajas de Linux):
+  - una sola diferencia: un objeto de una imagen muestra confianza 0,758 en lugar de 0,759;
+  - ningún cruce de umbral;
+  - la misma narrativa, los mismos prompts y las mismas decisiones.
+- **Límite residual.** Una caja de la referencia está a 1,3·10⁻⁵ de un umbral (`book` 0,200013, clase que el filtro descarta de todos modos). En otras imágenes, una detección a menos de ~10⁻⁴ de un umbral podría resolverse distinto en Linux.
+- **Implicación.** El experimento F4 se ejecuta con el runner local (Windows, referencia). La demo en Azure (Linux) es equivalente a efectos prácticos, pero **no idéntica bit a bit**. Así debe declararse.
+
+Evidencia: `evaluation/results/hardening/torch/`.
+
+### 4.2 Archivos de dependencias
+
+| Archivo | Contenido | Uso |
+|---|---|---|
+| `requirements.txt` | 19 dependencias **directas** de producción, versión exacta del entorno experimental | Instalación mínima reproducible |
+| `requirements-test.txt` | pytest 9.1.1, pytest-cov 7.1.0 | Pruebas |
+| `requirements-dev.txt` | Scripts de evaluación y análisis estático (fijados) | Desarrollo |
+| `requirements.lock.txt` | `pip freeze` completo del entorno experimental (Windows) | Registro |
+| `requirements-docker.lock.txt` | Cierre completo de la imagen (Linux) | Dockerfile y CI |
 
 ## 5. Estímulos
 
@@ -80,11 +119,11 @@ El **dispositivo de inferencia** para la evaluación formal (CPU o GPU) es una d
 ## 6. Pruebas
 
 ```
-.venv/Scripts/python -m pip install -r requirements-dev.txt   # o: pip install pytest pytest-cov
+.venv/Scripts/python -m pip install -r requirements-test.txt
 .venv/Scripts/python -m pytest
 ```
 
-Las pruebas no ejecutan YOLO, el LLM ni el TTS.
+Las pruebas no ejecutan YOLO, el LLM ni el TTS. La clasificación completa y los resultados están en `docs/PRUEBAS.md`.
 
 ## 7. Regresión del pipeline (desde el 2026-09-27)
 

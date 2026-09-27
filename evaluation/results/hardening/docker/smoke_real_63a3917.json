@@ -1,0 +1,40 @@
+{
+ "fecha_utc": "2026-09-27",
+ "imagen_docker": "visionnav-api:63a3917",
+ "app_commit": "63a3917f0c6cb864290889bd68775511528ec399",
+ "limites": "--cpus=1 --memory=1750m (equivalente a Azure B1)",
+ "perfil": "production",
+ "credenciales": "GROQ_API_KEY y GOOGLE_API_KEY (valores no registrados)",
+ "entrada": "test_images/05_sala_muebles.jpg",
+ "status": 200,
+ "x_request_id": "9b8c356ee3594cbd83c646a580f50a91",
+ "x_degradacion": null,
+ "objetos": 8,
+ "tiempos_ms": {
+  "deteccion_ms": 5246.31,
+  "espacial_ms": 0.32,
+  "pasos_ms": 0.04,
+  "visualizer_ms": 16.39,
+  "espacio_ms": 0.06,
+  "decision_ms": 0.01,
+  "escenario_ms": 917.15,
+  "llm_ms": 917.15,
+  "total_ms": 6675.34,
+  "tts_ms": 14771.58
+ },
+ "narrativa": "Parece que estás en una sala de estar. Sofá a tu derecha a aproximadamente 2 pasos. 2 sofás y 1 silla a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta y 1 silla cerca a tu izquierda. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+ "narrativa_sha256": "d6076fc6df24ed2001b49a016354b870c313474dcb7077e2485cba62e80dde0f",
+ "audio": {
+  "disponible": true,
+  "bytes": 189312,
+  "sha256": "a7d7af143927152be39a737cb5160f7b390adce4ac1b1dafdfd52fff521637e0"
+ },
+ "imagen_anotada": true,
+ "health_identidad": "verificada (toleradas: 3)",
+ "archivos_tras_respuesta": [
+  "/tmp/visionnav/product/telemetry/production_metrics.jsonl"
+ ],
+ "pico_memoria_mib": 628,
+ "claves_en_logs": 0,
+ "resultado": "PASS"
+}
