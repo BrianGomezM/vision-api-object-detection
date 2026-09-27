@@ -7,12 +7,19 @@ RESPONSABILIDAD:
   Traducir cualquier label COCO (o de modelos futuros) al español sin
   necesidad de mantener un diccionario estático completo en el código.
 
-CASCADA DE RESOLUCIÓN (en orden de velocidad):
+CASCADA DE RESOLUCIÓN:
   1. lru_cache en memoria   → O(1), sin I/O, solo dura la sesión actual
-  2. Caché persistente JSON → entre sesiones, sin llamada a API
-  3. Diccionario estático   → etiquetas COCO más comunes, sin internet
+  2. Diccionario estático   → FUENTE DE VERDAD. Cubre las 80 clases COCO de
+                              yolo26s.pt (verificado). Si la etiqueta está aquí,
+                              ningún otro nivel puede cambiar su traducción.
+  3. Caché persistente JSON → SOLO para etiquetas fuera del diccionario
+                              (p. ej. modelos futuros); nunca las sobrescribe.
   4. Google Translate API   → para labels desconocidos, con timeout
   5. Fallback               → retorna el label original en inglés
+
+  Antes, la caché en disco se consultaba ANTES que el diccionario: una entrada
+  antigua podía cambiar la etiqueta de la narrativa según la máquina. Se
+  invirtió el orden para que el resultado semántico sea reproducible.
 
 CONFIGURACIÓN (variables de entorno en .env):
   TRANSLATION_CACHE_PATH → ruta del archivo de caché JSON
@@ -192,8 +199,11 @@ def _load_cache() -> None:
     try:
         if _CACHE_FILE.exists():
             with open(_CACHE_FILE, "r", encoding="utf-8") as f:
-                _disk_cache = json.load(f)
-            print(f"[Translator] Caché cargado: {len(_disk_cache)} entradas desde {_CACHE_FILE}")
+                loaded = json.load(f)
+            # Las etiquetas del diccionario fijo nunca se toman de la caché.
+            _disk_cache = {k: v for k, v in loaded.items() if k not in _STATIC_DICT}
+            print(f"[Translator] Caché cargado: {len(_disk_cache)} entradas desde {_CACHE_FILE} "
+                  f"({len(loaded) - len(_disk_cache)} ignoradas por estar en el diccionario fijo)")
     except Exception as e:
         print(f"[Translator] No se pudo cargar caché: {e}")
         _disk_cache = {}
@@ -294,8 +304,8 @@ def translate_label(text: str) -> str:
 
     Cascada:
       1. lru_cache (esta función)
-      2. _disk_cache (JSON en disco)
-      3. _STATIC_DICT (diccionario COCO integrado)
+      2. _STATIC_DICT (diccionario COCO integrado) — fuente de verdad
+      3. _disk_cache (JSON en disco) — solo etiquetas fuera del diccionario
       4. Google Translate (con timeout)
       5. Retorna original en inglés
 
@@ -309,17 +319,14 @@ def translate_label(text: str) -> str:
 
     key = text.strip().lower()
 
-    # Nivel 2: caché en disco (entre sesiones)
+    # Nivel 2: diccionario estático COCO (fuente de verdad, sin internet).
+    # La caché no se consulta ni se escribe para estas etiquetas.
+    if key in _STATIC_DICT:
+        return _STATIC_DICT[key]
+
+    # Nivel 3: caché en disco (solo etiquetas fuera del diccionario)
     if key in _disk_cache:
         return _disk_cache[key]
-
-    # Nivel 3: diccionario estático COCO (sin internet)
-    if key in _STATIC_DICT:
-        translated = _STATIC_DICT[key]
-        # Promover al caché en disco para consistencia
-        _disk_cache[key] = translated
-        _save_cache_if_needed()
-        return translated
 
     # Nivel 4: Google Translate (para labels desconocidos)
     translated = _translate_online(key)
