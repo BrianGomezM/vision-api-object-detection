@@ -22,9 +22,9 @@ Evidencia citada (en `evaluation/results/hardening/`):
 | Stack | FastAPI + gunicorn/uvicorn, **1 worker**, pipeline serializado (1 hilo + lock); `/api/health` responde durante una detección | `Dockerfile`, `app/routes/detect.py` |
 | Imagen | `python:3.13-slim`, torch **2.13.0+cpu**, ultralytics 8.4.123, ~530 MB | *(medido)* |
 | Pesos | `yolo26s.pt` **dentro de la imagen**, SHA-256 `646f8bc3…4a1b`, verificado en el build y en el arranque | §C |
-| Memoria | ~490–520 MiB en reposo; **pico 660–810 MB** con detecciones | *(medido)* `limites_recursos` |
-| Arranque | 4–5 s con 8 hilos; **12–15 s con 1 vCPU** (carga de YOLO + warm-up) | *(medido)* |
-| Inferencia YOLO | ~0,5–1,4 s con 8 hilos; **3,4–4,9 s con 1 vCPU**; 2,1–2,4 s con 2 vCPU | *(medido)* |
+| Memoria | ~490–520 MiB en reposo; **pico 620–790 MB** con detecciones (máx. ~810 MB en corridas previas) | *(medido)* `limites_recursos` |
+| Arranque | 4–5 s con 8 hilos; **13–14 s con 1 vCPU**, ~9 s con 2 vCPU (carga de YOLO + warm-up) | *(medido)* |
+| Inferencia YOLO | ~0,5–1,4 s con 8 hilos; **3,1–4,9 s con 1 vCPU**; 1,8–2,6 s con 2 vCPU | *(medido)* |
 | LLM (Groq) | ~0,4–0,5 s por llamada (2 llamadas por solicitud); timeout de 15 s con 2 reintentos | `live_smoke` |
 | TTS (Gemini) | ~2 s para una frase; ~16 s para una narrativa completa; timeout de 60 s | `live_smoke` |
 | Solicitud completa | ~19 s en local con proveedores reales; en 1 vCPU, ~+4 s | *(medido / estimado)* |
@@ -45,8 +45,8 @@ Especificaciones y precios consultados el 2026-09-27; **confirmar en la calculad
 | Criterio | Azure App Service B1 (Linux, contenedor) | Render |
 |---|---|---|
 | FastAPI / Python / Docker | Contenedor desde GHCR (ya configurado). `WEBSITES_PORT=8000` | Contenedor desde Dockerfile o registro. Usa `$PORT` (el `CMD` ya lo respeta) |
-| PyTorch CPU + YOLO: memoria | **1,75 GB: margen ≈ 2,2× sobre el pico medido (810 MB)** | Starter 512 MB: **no arranca** *(medido)*. Standard 2 GB: sí, a 25 USD/mes. Free: RAM no documentada en la página consultada y se suspende, no apto |
-| CPU / inferencia | 1 núcleo: YOLO ≈ 3,4–4,9 s *(medido con `--cpus=1`)* | Standard 1 CPU: igual. Starter 0,5 CPU: no aplica (OOM) |
+| PyTorch CPU + YOLO: memoria | **1,75 GB: margen ≈ 2,2× sobre el pico medido (810 MB)** | Starter 512 MB: **no arranca** (14 reinicios por OOM en 150 s, *medido*). Standard 2 GB: sí, a 25 USD/mes. Free: RAM no documentada en la página consultada y se suspende, no apto |
+| CPU / inferencia | 1 núcleo: YOLO ≈ 3,1–4,9 s *(medido con `--cpus=1`)* | Standard 1 CPU: igual. Starter 0,5 CPU: no aplica (OOM) |
 | Arranque | 12–15 s de la app (1 vCPU) + descarga de ~530 MB de imagen en cada nuevo host. **Always On** (disponible en Basic) evita descargas por inactividad | Similar en planes de pago. Free: ~1 min tras cada suspensión |
 | **Timeout HTTP** | **Balanceador: ~230–240 s, NO configurable.** El cliente corta a 180 s, antes que la plataforma | Máx. 100 min (sin riesgo) |
 | LLM / TTS externos | Salida a Internet sin restricción; latencia similar | Igual |
@@ -70,7 +70,7 @@ Por qué:
 2. La infraestructura, el pipeline OIDC y la documentación de la tesis ya son Azure; cambiar de plataforma añade riesgo sin beneficio medible.
 3. El despliegue por imagen `:<sha>` más la verificación de identidad al arrancar (§C) garantizan que lo desplegado es lo evaluado.
 
-**Riesgo propio de Azure:** el timeout no configurable de ~240 s. Con el pipeline serializado (~20–25 s por solicitud en 1 vCPU), una cola de más de 7–9 solicitudes simultáneas superaría los 180 s del cliente. Queda acotado por el límite por IP (6/60 s) y por el uso previsto, que es un solo participante a la vez en el estudio. Si hiciera falta más capacidad, pasar a B2 (2 vCPU: YOLO ~2,2 s) sin cambiar nada más.
+**Riesgo propio de Azure:** el timeout no configurable de ~240 s. Con el pipeline serializado (~20–25 s por solicitud en 1 vCPU), una cola de más de 7–9 solicitudes simultáneas superaría los 180 s del cliente. Queda acotado por el límite por IP (6/60 s) y por el uso previsto, que es un solo participante a la vez en el estudio. Si hiciera falta más capacidad, pasar a B2 (2 vCPU: YOLO ~1,8–2,6 s) sin cambiar nada más.
 
 **Render** queda como alternativa documentada solo con **Standard (2 GB)**. Starter y Free quedan descartados por evidencia.
 
