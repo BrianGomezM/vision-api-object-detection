@@ -76,11 +76,21 @@ Tienes aproximadamente 4 pasos libres antes del primer obstáculo.
 ```
 vision-api-project/
 ├── app/
-│   ├── main.py                        # FastAPI app, CORS, routers, eventos de ciclo de vida
+│   ├── main.py                        # create_app(perfil): CORS, routers por perfil, ciclo de vida
+│   ├── profiles.py                    # APP_PROFILE: production | study | development
+│   ├── security.py                    # API keys y rate limit
+│   ├── storage.py                     # DATA_ROOT: dónde se escriben los datos
+│   ├── telemetry.py                   # métricas de producción (JSONL)
+│   ├── core/
+│   │   └── pipeline.py                # ORQUESTADOR ÚNICO del producto (lo usan /detect y la evaluación)
 │   ├── routes/
-│   │   ├── detect.py                  # /detect, /debug-detect, /health
-│   │   ├── evaluation.py              # /dataset/*, /metrics/*, /test/*, /finetune/*
-│   │   └── metrics.py                 # /metrics, /feedback
+│   │   ├── detect.py                  # /detect (producto), /debug-detect, /tts/models
+│   │   ├── health.py                  # /health
+│   │   ├── evaluation.py              # /dataset/*, /metrics/summary|latency, /test/*, /finetune/*  (development)
+│   │   ├── metrics.py                 # /feedback  (development)
+│   │   ├── study.py                   # /study/sessions*  (study, development)
+│   │   └── catalog.py                 # /catalog*  (study, development)
+│   ├── catalog/                       # catálogo único de pruebas (catalog.yaml) + cargador
 │   ├── services/
 │   │   ├── yolo_service.py            # Detección YOLO26s
 │   │   ├── spatial_analyzer.py        # Cuadrícula 3×3 + categorías + prioridad

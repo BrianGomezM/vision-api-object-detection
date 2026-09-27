@@ -88,3 +88,13 @@ El **dispositivo de inferencia** para la evaluación formal (CPU o GPU) es una d
 ```
 
 Las pruebas no ejecutan YOLO, el LLM ni el TTS.
+
+## 7. Regresión del pipeline (desde el 2026-09-27)
+
+- **Línea base:** `tests/regression/baseline_phase2a.json`. Es la salida determinista del pipeline sobre las 41 imágenes de la fase 2A, obtenida con las cajas crudas registradas en esa fase, Groq simulado y el TTS omitido.
+- **Fidelidad:** se verificó contra lo registrado en la fase 2A, 41/41 en preprocesado, detecciones, instrucción, espacio libre y líneas del prompt.
+- **Comprobación:** `tests/regression/test_pipeline_regression.py` exige una salida **idéntica** (sin tiempos ni marcas de archivo).
+- **Marca `entorno_referencia`:** esa prueba depende de las versiones exactas del entorno local (Pillow, etc.; ver `requirements.lock.txt`), así que se excluye en CI.
+- **Contratos:** `tests/regression/contracts.json` fija la entrada de `POST /api/detect` y las rutas de cada perfil. Un cambio intencional se regenera con `python tests/regression/test_contracts.py --write` y queda visible en el diff.
+- **Perfil del despliegue:** `ENV APP_PROFILE=production` (Dockerfile). En ese perfil, `YOLO_ALLOW_DOWNLOAD` sigue valiendo `true` por defecto, así que si la imagen no incluye los pesos, Ultralytics los descarga (comportamiento histórico). Fijarlo en `false` exige incluir `yolo26s.pt` en la imagen. Decisión pendiente.
+
