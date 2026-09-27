@@ -16,7 +16,7 @@ ENDPOINTS:
   GET  /api/finetune/status    — estado del dataset preparado para fine-tuning
 
 FUNCIÓN PÚBLICA:
-  log_metric(data)  — registrar métricas desde detect.py tras cada detección exitosa
+  log_metric(data)  — re-exportado desde app/telemetry.py (compatibilidad)
 
 ALMACENAMIENTO EN DISCO:
   dataset/images/     imágenes subidas por usuarios
@@ -38,7 +38,6 @@ import asyncio
 import hashlib
 import shutil
 import random
-import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from collections import defaultdict
@@ -62,12 +61,10 @@ from app.storage import data_dir
 
 _BASE            = Path(".")                       # solo para test_images/ (entrada, no datos)
 DATASET_DIR      = data_dir("dataset")              # sin DATA_ROOT: ./dataset
-METRICS_DIR      = data_dir("metrics")              # sin DATA_ROOT: ./metrics
 TEST_DIR         = data_dir("api_tests")            # sin DATA_ROOT: ./test_results
 DATASET_IMAGES   = DATASET_DIR / "images"
 DATASET_LABELS   = DATASET_DIR / "labels"
 DATASET_METADATA = DATASET_DIR / "metadata"
-METRICS_LOG      = METRICS_DIR / "production_metrics.jsonl"
 TEST_RESULTS_LOG = TEST_DIR    / "test_history.jsonl"
 
 
@@ -78,40 +75,11 @@ def _ensure_dir(*dirs: Path) -> None:
 
 
 # ──────────────────────────────────────────────────────────────
-# FUNCIÓN PÚBLICA: REGISTRO DE MÉTRICAS
-# Llamar desde detect.py tras cada solicitud exitosa a /api/detect
+# TELEMETRÍA: el registro vive en app/telemetry.py (lo usa /api/detect).
+# Este router solo la LEE para /metrics/summary y /metrics/latency.
 # ──────────────────────────────────────────────────────────────
 
-_metrics_lock = threading.Lock()
-
-
-def log_metric(data: dict) -> None:
-    """
-    Registra una entrada de métrica en el log JSONL de producción.
-    Thread-safe mediante lock.
-
-    Uso desde detect.py (al final de _run_full_pipeline o del endpoint):
-        from app.routes.evaluation import log_metric
-        log_metric({
-            "objetos":        len(detections),
-            "confianza_prom": avg_conf,
-            "deteccion_ms":   tiempos["deteccion_ms"],
-            "total_ms":       tiempos["total_ms"],
-            "escenario":      scene_type,
-        })
-    """
-    entry = {"ts": datetime.now(timezone.utc).isoformat(), **data}
-    with _metrics_lock:
-        _ensure_dir(METRICS_DIR)
-        with open(METRICS_LOG, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-
-
-def _read_metrics(limit: int = 1000) -> list:
-    if not METRICS_LOG.exists():
-        return []
-    lines = [l for l in METRICS_LOG.read_text(encoding="utf-8").strip().split("\n") if l.strip()]
-    return [json.loads(l) for l in lines[-limit:]]
+from app.telemetry import log_metric, read_metrics as _read_metrics   # noqa: F401  (re-export)
 
 
 # ──────────────────────────────────────────────────────────────

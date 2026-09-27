@@ -69,18 +69,8 @@ def dev_mode() -> bool:
     return not _api_keys()
 
 
-# ── Perfil de aplicación ─────────────────────────────────────
-#   development (defecto): comportamiento histórico, todos los endpoints montados.
-#   study               : sesiones con participantes. Solo endpoints del investigador
-#                         (detect, health, tts/models, study, catalog); exige API_KEYS.
-APP_PROFILES = ("development", "study")
-
-
-def app_profile() -> str:
-    profile = os.getenv("APP_PROFILE", "development").strip().lower() or "development"
-    if profile not in APP_PROFILES:
-        raise ValueError(f"APP_PROFILE inválido: {profile!r} (use uno de {APP_PROFILES})")
-    return profile
+# ── Perfil de aplicación: definido en app/profiles.py (sin FastAPI); re-exportado aquí.
+from app.profiles import APP_PROFILES, app_profile  # noqa: E402,F401
 
 
 API_KEYS: set[str] = _api_keys()     # compatibilidad: valor al importar (solo informativo)

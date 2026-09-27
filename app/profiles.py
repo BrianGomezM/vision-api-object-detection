@@ -1,0 +1,22 @@
+"""
+app/profiles.py
+
+Perfil de ejecución (APP_PROFILE). Módulo de plataforma SIN dependencias de
+FastAPI, para que el núcleo (p. ej. la política de pesos de YOLO) pueda
+consultarlo sin arrastrar la capa HTTP.
+
+  development (defecto): comportamiento histórico, todos los endpoints montados.
+  study               : sesiones con participantes. Solo endpoints del investigador
+                        (detect, health, tts/models, study, catalog); exige API_KEYS.
+"""
+
+import os
+
+APP_PROFILES = ("development", "study")
+
+
+def app_profile() -> str:
+    profile = os.getenv("APP_PROFILE", "development").strip().lower() or "development"
+    if profile not in APP_PROFILES:
+        raise ValueError(f"APP_PROFILE inválido: {profile!r} (use uno de {APP_PROFILES})")
+    return profile

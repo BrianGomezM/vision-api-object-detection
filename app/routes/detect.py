@@ -66,6 +66,7 @@ from app.core.pipeline import (                      # noqa: F401  (re-export)
     DEFAULT_CONF as _DEFAULT_CONF, MAX_IMAGE_DIM as _MAX_IMAGE_DIM,
 )
 from app.storage import resolve_output
+from app import telemetry
 
 # Alias históricos
 build_final_narrative = build_narrative          # usado por app/experimental/batch.py
@@ -232,8 +233,7 @@ async def detect(
 
         # ── Registrar métricas de producción (NUEVO) ──────────
         try:
-            from app.routes.evaluation import log_metric
-            log_metric({
+            telemetry.log_metric({
                 "objetos":        len(result["detections"]),
                 "confianza_prom": avg_conf,
                 "deteccion_ms":   result["tiempos"].get("deteccion_ms", 0),
@@ -468,10 +468,7 @@ async def health_check():
     dataset_path = data_dir("dataset") / "metadata"
     dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
 
-    metrics_path = data_dir("metrics") / "production_metrics.jsonl"
-    metrics_count = 0
-    if metrics_path.exists():
-        metrics_count = sum(1 for l in metrics_path.read_text().strip().split("\n") if l.strip())
+    metrics_count = telemetry.count_metrics()
 
     from app.security import app_profile
     from app.storage import describe as storage_describe

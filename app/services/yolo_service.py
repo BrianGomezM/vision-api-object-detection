@@ -175,7 +175,7 @@ def check_weights(weights: str | None = None) -> dict:
 
     Lanza RuntimeError si la política no se cumple. Retorna un resumen no sensible.
     """
-    from app.security import app_profile
+    from app.profiles import app_profile
 
     weights = weights or YOLO_WEIGHTS
     default_allow = "false" if app_profile() == "study" else "true"
