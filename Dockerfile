@@ -1,52 +1,63 @@
-# Imagen para la Vision API — todo lo que Azure necesitaba instalar/descargar
-# en cada arranque (libs de sistema, torch, ultralytics) queda horneado aquí
-# UNA sola vez en build time, no en cada restart del contenedor.
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1.7
+# Imagen de PRODUCCIÓN de la Vision API. Todo se hornea en build time (libs de
+# sistema, torch CPU, ultralytics y los PESOS VERIFICADOS), nada se descarga al
+# arrancar. Ver docs/DEPLOYMENT.md.
+FROM python:3.13-slim
 
-# libxcb1/libsm6/libxext6/libglib2.0-0: opencv-python-headless no necesita
-# libGL, pero sí carga libxcb.so.1 en tiempo de import (ver startup.sh para
-# el historial de este problema en el despliegue anterior sin Docker).
+# libxcb1/libsm6/libxext6/libglib2.0-0: opencv-python-headless no necesita libGL,
+# pero sí carga libxcb.so.1 en tiempo de import.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libxcb1 libsm6 libxext6 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copiar solo requirements primero: mientras no cambie, Docker reutiliza
-# esta capa (torch/ultralytics) en cada build y evita horas de reinstalar.
-COPY requirements.txt .
-
-# torch/torchvision desde el índice CPU-only de PyTorch: el paquete normal
-# de PyPI trae por defecto el build con CUDA (~2GB de libs nvidia-* inútiles
-# en Azure App Service, que no tiene GPU) — esto reduce drásticamente el
-# tamaño de la imagen y el tiempo de build/push/pull.
-RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision
-
-# ultralytics declara opencv-python (GUI) como dependencia propia y lo
-# instala DESPUÉS de opencv-python-headless, sobrescribiendo sus binarios
-# nativos — el resultado es que `import cv2` termina cargando la versión
-# con GUI y falla por libGL.so.1 ausente, aunque requirements.txt pida
-# headless. Se desinstala la GUI y se reinstala headless al final para
-# que sea la que realmente quede activa.
-RUN pip install --no-cache-dir -r requirements.txt \
+# ── Dependencias FIJADAS (reproducibles) ─────────────────────────────────────
+# torch/torchvision CPU (el paquete de PyPI trae CUDA, ~2 GB inútiles sin GPU),
+# en la MISMA versión que el entorno experimental congelado (sin +cu126).
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
+    torch==2.13.0 torchvision==0.28.0
+# Resto de dependencias con versión exacta (requirements-docker.lock.txt, generado
+# desde una imagen construida). ultralytics arrastra opencv-python (con GUI, exige
+# libGL): se desinstala y se deja opencv-python-headless.
+COPY requirements-docker.lock.txt .
+RUN pip install --no-cache-dir -r requirements-docker.lock.txt \
     && pip uninstall -y opencv-python \
-    && pip install --no-cache-dir --force-reinstall --no-deps opencv-python-headless
+    && pip install --no-cache-dir --force-reinstall --no-deps \
+       "opencv-python-headless==$(grep -i '^opencv-python-headless==' requirements-docker.lock.txt | cut -d= -f3)"
+
+# ── PESOS DEL DETECTOR: exactamente los experimentales/de producción ─────────
+# Release fija v8.4.0 de ultralytics/assets. Su SHA-256 coincide byte a byte con el
+# congelado en experimental_config.yaml. ADD --checksum hace FALLAR el build si el
+# archivo cambia. Nunca "latest" sin hash.
+ARG YOLO_WEIGHTS_SHA256=646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
+ADD --checksum=sha256:${YOLO_WEIGHTS_SHA256} \
+    https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26s.pt /app/weights/yolo26s.pt
+# Verificación también en el ARRANQUE: si el archivo no coincide, la app no arranca
+# (app/services/yolo_service.check_weights) y no se descarga nada.
+ENV YOLO_WEIGHTS=/app/weights/yolo26s.pt \
+    YOLO_WEIGHTS_SHA256=${YOLO_WEIGHTS_SHA256} \
+    YOLO_ALLOW_DOWNLOAD=false
 
 COPY . .
 
-# Perfil EXPLÍCITO del despliegue: solo POST /api/detect y GET /api/health,
-# sin /docs ni endpoints internos (debug, dataset, fine-tuning, pruebas,
-# métricas, estudio). Para otro perfil, sobrescribir la variable en el
-# servicio (p. ej. APP_PROFILE=study). Ver app/profiles.py.
-ENV APP_PROFILE=production
-
-# Commit de la aplicación (trazabilidad: telemetría y /api/detect → X-Request-ID).
-# La imagen no incluye .git; CI lo pasa con --build-arg APP_COMMIT=<sha>.
+# ── Ejecución ────────────────────────────────────────────────────────────────
+# Perfil EXPLÍCITO del despliegue: solo POST /api/detect y GET /api/health.
+ENV APP_PROFILE=production \
+    DATA_ROOT=/tmp/visionnav \
+    PYTHONUNBUFFERED=1
+# Commit de la aplicación (trazabilidad). CI: --build-arg APP_COMMIT=<sha>.
 ARG APP_COMMIT=desconocido
 ENV APP_COMMIT=${APP_COMMIT}
 
-EXPOSE 8000
+# Usuario sin privilegios; solo DATA_ROOT (efímero) es escribible.
+RUN useradd --create-home --uid 10001 app && mkdir -p /tmp/visionnav && chown -R app /tmp/visionnav
+USER app
 
-# Mismo comando que usaba startup.sh — timeout alto porque YOLO26s + torch
-# cargan en el primer request tras arrancar el worker (warm-up en startup_event).
-CMD ["gunicorn", "--bind=0.0.0.0:8000", "--timeout", "600", "--workers", "1", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
+EXPOSE 8000
+# Salud del contenedor (Docker/Render). start-period: carga de YOLO + warm-up.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request,os; urllib.request.urlopen(f'http://127.0.0.1:{os.getenv(\"PORT\",\"8000\")}/api/health', timeout=4)"
+
+# PORT: Azure (WEBSITES_PORT=8000) y Render (PORT) · 1 worker (docs/CIERRE_HARDENING.md §2).
+CMD ["sh", "-c", "exec gunicorn --bind=0.0.0.0:${PORT:-8000} --timeout 600 --workers 1 -k uvicorn.workers.UvicornWorker app.main:app"]
