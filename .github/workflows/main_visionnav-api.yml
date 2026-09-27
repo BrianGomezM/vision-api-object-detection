@@ -9,8 +9,14 @@
 
 name: Build and deploy Python app to Azure Web App - visionnav-api
 
+# Solo un push a main (o un dispatch lanzado SOBRE main) construye y despliega.
+# Un pull request hacia main ejecuta ÚNICAMENTE las pruebas: así el CI se valida
+# antes de fusionar, sin publicar imagen ni desplegar.
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -23,15 +29,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # Mismas versiones EXACTAS que la imagen (Python 3.13, torch CPU 2.13.0,
+      # Mismas versiones EXACTAS que la imagen (Python 3.13.15, torch CPU 2.13.0,
       # requirements-docker.lock.txt): lo probado es lo que se despliega.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.13.15"
       - name: Instalar dependencias (idénticas al Dockerfile)
         run: |
           pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
-          pip install -r requirements-docker.lock.txt pytest==9.1.1
+          pip install -r requirements-docker.lock.txt -r requirements-test.txt
       - name: Pruebas
         env:
           EVALUATION_DISABLE_TTS: "true"
@@ -39,6 +45,7 @@ jobs:
 
   build:
     needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -82,6 +89,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout

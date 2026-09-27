@@ -1,46 +1,40 @@
-# Dependencias de PRODUCCIÓN — esto es lo que construye Azure/Railway/Render.
-# Solo lo que app/main.py importa en tiempo de ejecución (detect, evaluation,
-# metrics). Los modelos comparativos y el tooling de análisis viven en
-# requirements-dev.txt para que la imagen de despliegue sea liviana y rápida.
+# Dependencias DIRECTAS de producción (lo que importa app/ en ejecución), con la
+# versión EXACTA del entorno experimental de referencia (requirements.lock.txt:
+# Windows 11, Python 3.13.15). Las transitivas se fijan en los locks:
+#   requirements.lock.txt         instantánea completa del entorno experimental (Windows)
+#   requirements-docker.lock.txt  cierre completo de la imagen de producción (Linux)
+# Pruebas: requirements-test.txt · Scripts de evaluación: requirements-dev.txt
+# Guía: docs/REPRODUCIBILIDAD.md
+#
+# Python 3.13.15. Instalación de torch según la plataforma (misma versión 2.13.0):
+#   producción / Docker (CPU):  pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0 torchvision==0.28.0
+#   entorno experimental local: torch 2.13.0+cu126 (índice cu126); la inferencia del
+#   experimento se fuerza a CPU (CUDA_VISIBLE_DEVICES=-1).
 
-# ── API Framework ─────────────────────────────────────────────
-fastapi
-uvicorn[standard]
-gunicorn
-python-multipart
-python-dotenv
+# ── API ────────────────────────────────────────────────────────
+fastapi==0.141.1
+starlette==1.6.0
+pydantic==2.13.4
+uvicorn[standard]==0.52.4
+gunicorn==26.1.0
+python-multipart==0.0.32
+python-dotenv==1.2.3
 
-# ── Imagen / Visión ───────────────────────────────────────────
-pillow
-numpy
+# ── Imagen / detección ─────────────────────────────────────────
+pillow==12.3.0
+numpy==2.5.2
+# headless: la variante con GUI (opencv-python, que arrastra ultralytics) exige libGL.
+opencv-python-headless==5.0.0.93
+torch==2.13.0
+torchvision==0.28.0
+ultralytics==8.4.123
 
-# opencv-python-headless fijado a propósito: ultralytics depende de
-# cv2 internamente y, si no se fija, pip instala opencv-python (con
-# soporte de GUI) que requiere libGL.so.1 — ausente en el contenedor
-# de Azure App Service y provoca ImportError al arrancar el worker.
-opencv-python-headless
-
-# ── PyTorch + YOLO26s (Ultralytics) ───────────────────────────
-torch
-torchvision
-ultralytics
-
-# ── LLM (descripción egocéntrica y clasificación de escenario) ─
-groq
-
-# ── Traducción dinámica EN→ES ─────────────────────────────────
+# ── LLM, TTS y traducción ─────────────────────────────────────
+groq==1.6.0
+google-genai==2.24.0
+lameenc==1.8.4
 deep-translator==1.11.4
 
-# ── Text-to-Speech ──────────────────────────────────────────────
-# Gemini TTS (Google): requiere GOOGLE_API_KEY (nivel gratuito de
-# Google AI Studio, sin facturación). google-genai es el SDK oficial;
-# lameenc codifica el PCM devuelto por Gemini a MP3 (sin depender de
-# un binario externo como ffmpeg).
-google-genai
-lameenc
-
-# ── Catálogo de pruebas y manifiestos de estímulos (app/catalog) ──
-PyYAML
-
-# ── Cliente HTTP (usado por /api/test/* para pruebas de carga) ─
-httpx
+# ── Configuración y HTTP ──────────────────────────────────────
+PyYAML==6.0.3
+httpx==0.28.1

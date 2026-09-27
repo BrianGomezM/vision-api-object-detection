@@ -13,7 +13,10 @@ Diferencias TOLERADAS (explícitas; se publican en /api/health):
     SHA-256, que sí se exige);
   - sufijo de compilación de torch / torchvision (+cu126 en el entorno local de
     referencia ↔ +cpu en la imagen): misma versión; el experimento se ejecuta en
-    CPU (dispositivo congelado), donde ambas compilaciones usan los mismos kernels.
+    CPU (dispositivo congelado). Medido en Windows: +cpu y +cu126 dan cajas
+    idénticas bit a bit (41/41). Linux difiere en la confianza ≤ 6,4·10⁻⁵
+    (efecto de la plataforma, no de la compilación de torch;
+    evaluation/results/hardening/torch/).
 Cualquier otra diferencia → RuntimeError (el worker no arranca).
 
 IDENTIDAD_EXPERIMENTAL=omitir desactiva la verificación (despliegues que NO son la
