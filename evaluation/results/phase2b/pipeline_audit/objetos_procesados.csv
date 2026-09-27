@@ -1,0 +1,853 @@
+imagen,imgsz,regla,label,label_es,count,categoria,zona,confianza,pasos,en_prompt,texto_nombre,texto_posicion,pluralizacion_incorrecta,sin_pasos_motivo,contradiccion_profundidad_pasos,posicion_fuera_regla5
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,640,max,cat,gato,1,obstacle,cerca_right,0.597,5,True,gato,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,640,min,cat,gato,1,obstacle,cerca_right,0.597,5,True,gato,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,max,bench,banco,1,obstacle,muy_cerca_left,0.951,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,max,bicycle,bicicleta,1,obstacle,cerca_right,0.799,5,True,bicicleta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,max,umbrella,paraguas,1,other,medio_center,0.419,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,min,bench,banco,1,obstacle,muy_cerca_left,0.951,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,min,bicycle,bicicleta,1,obstacle,cerca_right,0.799,5,True,bicicleta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,640,min,umbrella,paraguas,1,other,medio_center,0.419,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,max,bench,banco,1,obstacle,muy_cerca_left,0.961,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,max,bench,banco,1,obstacle,cerca_center,0.876,6,True,banco,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,max,bicycle,bicicleta,1,obstacle,cerca_right,0.67,5,True,bicicleta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,min,bench,banco,1,obstacle,muy_cerca_left,0.961,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,min,bench,banco,1,obstacle,cerca_center,0.876,6,True,banco,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,1280,min,bicycle,bicicleta,1,obstacle,cerca_right,0.67,5,True,bicicleta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.689,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,max,chair,silla,1,obstacle,cerca_center,0.626,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,max,bench,banco,1,obstacle,muy_cerca_left,0.927,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.85,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,max,car,coche,4,obstacle,medio_left,0.942,5,True,4 coches,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,min,potted plant,planta en maceta,2,obstacle,cerca_center,0.689,6,True,2 planta en macetas,frente a ti a aproximadamente 6 pasos,True,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,min,chair,silla,1,obstacle,cerca_center,0.626,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,min,bench,banco,1,obstacle,muy_cerca_left,0.927,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.85,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,640,min,car,coche,4,obstacle,medio_left,0.942,5,True,4 coches,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,chair,silla,1,obstacle,cerca_center,0.862,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.787,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,bench,banco,1,obstacle,muy_cerca_left,0.955,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.82,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,person,persona,4,obstacle,medio_center,0.844,6,True,4 personas,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,car,coche,1,obstacle,medio_center,0.504,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,car,coche,5,obstacle,medio_left,0.932,,True,5 coches,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,max,car,coche,1,obstacle,medio_right,0.564,,False,coche,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,chair,silla,1,obstacle,cerca_center,0.862,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.787,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,bench,banco,1,obstacle,muy_cerca_left,0.955,3,True,banco,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.82,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,person,persona,4,obstacle,medio_center,0.844,6,True,4 personas,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,car,coche,1,obstacle,medio_center,0.504,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,car,coche,5,obstacle,medio_left,0.932,,True,5 coches,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,1280,min,car,coche,1,obstacle,medio_right,0.564,,False,coche,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.738,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,backpack,mochila,1,obstacle,muy_cerca_center,0.507,4,True,mochila,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,person,persona,1,obstacle,cerca_center,0.726,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.587,2,True,mesa de comedor,justo a tu izquierda a aproximadamente 2 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,chair,silla,1,obstacle,muy_cerca_right,0.5,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,person,persona,1,obstacle,cerca_left,0.849,5,True,persona,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.785,,True,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,chair,silla,1,obstacle,cerca_left,0.42,,False,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,person,persona,3,obstacle,medio_center,0.639,,False,3 personas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,potted plant,planta en maceta,2,obstacle,medio_center,0.613,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,laptop,portátil,1,informative,cerca_left,0.904,,False,portátil,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,bottle,botella,1,small_object,cerca_center,0.59,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,max,potted plant,planta en maceta,1,obstacle,lejos_right,0.412,,False,planta en maceta,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.738,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,backpack,mochila,1,obstacle,muy_cerca_center,0.507,4,True,mochila,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,person,persona,1,obstacle,cerca_center,0.726,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,dining table,mesa de comedor,2,obstacle,muy_cerca_left,0.587,2,True,2 mesa de comedores,justo a tu izquierda a aproximadamente 2 pasos,True,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,dining table,mesa de comedor,1,obstacle,cerca_center,0.197,5,True,mesa de comedor,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,chair,silla,1,obstacle,muy_cerca_right,0.5,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.188,,True,mesa de comedor,justo a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,person,persona,1,obstacle,cerca_left,0.849,,False,persona,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.785,,False,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,chair,silla,1,obstacle,cerca_left,0.42,,False,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,person,persona,4,obstacle,medio_center,0.639,,False,4 personas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,potted plant,planta en maceta,2,obstacle,medio_center,0.613,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,laptop,portátil,1,informative,cerca_left,0.904,,False,portátil,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,bottle,botella,1,small_object,cerca_center,0.59,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,potted plant,planta en maceta,1,obstacle,medio_left,0.34,,False,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,640,min,potted plant,planta en maceta,1,obstacle,lejos_right,0.412,,False,planta en maceta,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,chair,silla,1,obstacle,muy_cerca_center,0.836,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,dining table,mesa de comedor,2,obstacle,muy_cerca_left,0.643,2,True,2 mesa de comedores,justo a tu izquierda a aproximadamente 2 pasos,True,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,person,persona,1,obstacle,cerca_center,0.541,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.643,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.607,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,chair,silla,1,obstacle,muy_cerca_right,0.467,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,chair,silla,1,obstacle,cerca_left,0.753,,True,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.74,,False,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,laptop,portátil,1,informative,cerca_center,0.538,,False,portátil,frente a ti,False,categoria_sin_pasos:informative,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,person,persona,5,obstacle,medio_center,0.821,,False,5 personas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,potted plant,planta en maceta,3,obstacle,medio_center,0.579,,False,3 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,laptop,portátil,2,informative,cerca_left,0.941,,False,2 portátiles,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,bottle,botella,1,small_object,cerca_center,0.544,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,person,persona,1,obstacle,medio_left,0.884,,False,persona,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_left,0.618,,False,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,max,potted plant,planta en maceta,1,obstacle,lejos_right,0.402,,False,planta en maceta,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,chair,silla,1,obstacle,muy_cerca_center,0.836,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,dining table,mesa de comedor,2,obstacle,muy_cerca_left,0.643,2,True,2 mesa de comedores,justo a tu izquierda a aproximadamente 2 pasos,True,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,person,persona,1,obstacle,cerca_center,0.541,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,dining table,mesa de comedor,1,obstacle,cerca_center,0.232,5,True,mesa de comedor,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.643,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.607,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,chair,silla,1,obstacle,muy_cerca_right,0.467,,True,silla,justo a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,chair,silla,1,obstacle,cerca_left,0.753,,False,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.74,,False,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,laptop,portátil,1,informative,cerca_center,0.538,,False,portátil,frente a ti,False,categoria_sin_pasos:informative,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,person,persona,5,obstacle,medio_center,0.821,,False,5 personas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,potted plant,planta en maceta,4,obstacle,medio_center,0.579,,False,4 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,laptop,portátil,2,informative,cerca_left,0.941,,False,2 portátiles,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,bottle,botella,1,small_object,cerca_center,0.544,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,person,persona,1,obstacle,medio_left,0.884,,False,persona,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,potted plant,planta en maceta,2,obstacle,medio_left,0.618,,False,2 planta en macetas,"un poco más adelante, a tu izquierda",True,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,1280,min,potted plant,planta en maceta,1,obstacle,lejos_right,0.402,,False,planta en maceta,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,bus,autobús,1,obstacle,cerca_center,0.846,6,True,autobús,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,car,coche,5,obstacle,cerca_center,0.843,5,True,5 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,car,coche,2,obstacle,cerca_right,0.943,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,person,persona,2,obstacle,cerca_left,0.901,5,True,2 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,person,persona,1,obstacle,cerca_right,0.87,6,True,persona,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,max,dog,perro,1,obstacle,cerca_left,0.616,5,True,perro,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,bus,autobús,1,obstacle,cerca_center,0.846,6,True,autobús,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,car,coche,5,obstacle,cerca_center,0.843,5,True,5 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,car,coche,2,obstacle,cerca_right,0.943,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,person,persona,2,obstacle,cerca_left,0.901,5,True,2 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,person,persona,1,obstacle,cerca_right,0.87,6,True,persona,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,640,min,dog,perro,1,obstacle,cerca_left,0.616,5,True,perro,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,car,coche,5,obstacle,cerca_center,0.949,4,True,5 coches,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,person,persona,1,obstacle,cerca_center,0.928,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,bus,autobús,1,obstacle,cerca_center,0.906,6,True,autobús,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.393,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,car,coche,2,obstacle,cerca_right,0.94,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,person,persona,1,obstacle,cerca_right,0.9,6,True,persona,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,dog,perro,1,obstacle,cerca_left,0.877,,True,perro,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,person,persona,2,obstacle,cerca_left,0.779,,False,2 personas,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,max,backpack,mochila,1,obstacle,cerca_left,0.715,,False,mochila,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,car,coche,5,obstacle,cerca_center,0.949,4,True,5 coches,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,person,persona,1,obstacle,cerca_center,0.928,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,bus,autobús,1,obstacle,cerca_center,0.906,6,True,autobús,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,potted plant,planta en maceta,2,obstacle,cerca_center,0.393,5,True,2 planta en macetas,frente a ti a aproximadamente 5 pasos,True,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,car,coche,2,obstacle,cerca_right,0.94,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,person,persona,1,obstacle,cerca_right,0.9,6,True,persona,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,dog,perro,1,obstacle,cerca_left,0.877,,True,perro,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,person,persona,2,obstacle,cerca_left,0.779,,False,2 personas,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,1280,min,backpack,mochila,1,obstacle,cerca_left,0.715,,False,mochila,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,person,persona,5,obstacle,cerca_center,0.914,5,True,5 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,person,persona,1,obstacle,muy_cerca_left,0.912,4,True,persona,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.518,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,person,persona,2,obstacle,cerca_left,0.867,5,True,2 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,backpack,mochila,1,obstacle,cerca_left,0.788,5,True,mochila,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,person,persona,2,obstacle,cerca_right,0.754,6,True,2 personas,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,max,person,persona,2,obstacle,medio_left,0.802,,True,2 personas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,person,persona,5,obstacle,cerca_center,0.914,5,True,5 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,person,persona,1,obstacle,muy_cerca_left,0.912,4,True,persona,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.518,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,person,persona,2,obstacle,cerca_left,0.867,5,True,2 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,backpack,mochila,1,obstacle,cerca_left,0.788,5,True,mochila,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,person,persona,2,obstacle,cerca_right,0.754,6,True,2 personas,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,640,min,person,persona,3,obstacle,medio_left,0.802,,True,3 personas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,6,obstacle,cerca_center,0.943,5,True,6 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,backpack,mochila,1,obstacle,cerca_center,0.468,6,True,mochila,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,1,obstacle,muy_cerca_left,0.943,4,True,persona,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,3,obstacle,cerca_left,0.904,5,True,3 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,2,obstacle,cerca_right,0.898,6,True,2 personas,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,backpack,mochila,2,obstacle,cerca_left,0.546,5,True,2 mochilas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,3,obstacle,lejos_center,0.585,,True,3 personas,al fondo frente a ti,False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,max,person,persona,4,obstacle,medio_left,0.913,,False,4 personas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,6,obstacle,cerca_center,0.943,5,True,6 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,backpack,mochila,2,obstacle,cerca_center,0.468,6,True,2 mochilas,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,1,obstacle,muy_cerca_left,0.943,4,True,persona,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,bench,banco,1,obstacle,muy_cerca_left,0.338,5,True,banco,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,3,obstacle,cerca_left,0.904,5,True,3 personas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,2,obstacle,cerca_right,0.898,6,True,2 personas,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,backpack,mochila,2,obstacle,cerca_left,0.546,,True,2 mochilas,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,4,obstacle,lejos_center,0.585,,False,4 personas,al fondo frente a ti,False,profundidad_lejos,False,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,1280,min,person,persona,4,obstacle,medio_left,0.913,,False,4 personas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,truck,camión,1,obstacle,muy_cerca_right,0.882,3,True,camión,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,car,coche,1,obstacle,cerca_center,0.571,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,truck,camión,1,obstacle,cerca_center,0.534,5,True,camión,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,truck,camión,1,obstacle,muy_cerca_left,0.516,4,True,camión,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,umbrella,paraguas,1,other,cerca_center,0.55,,False,paraguas,frente a ti,False,categoria_sin_pasos:other,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,car,coche,1,obstacle,cerca_left,0.838,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,umbrella,paraguas,1,other,cerca_right,0.697,,False,paraguas,cerca a tu derecha,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,umbrella,paraguas,1,other,medio_center,0.771,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,max,umbrella,paraguas,2,other,medio_left,0.498,,False,2 paraguas,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,truck,camión,1,obstacle,muy_cerca_right,0.882,3,True,camión,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,car,coche,1,obstacle,cerca_center,0.571,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,truck,camión,1,obstacle,cerca_center,0.534,5,True,camión,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,truck,camión,1,obstacle,muy_cerca_left,0.516,4,True,camión,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,umbrella,paraguas,1,other,cerca_center,0.55,,False,paraguas,frente a ti,False,categoria_sin_pasos:other,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,car,coche,1,obstacle,cerca_left,0.838,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,umbrella,paraguas,1,other,cerca_right,0.697,,False,paraguas,cerca a tu derecha,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,umbrella,paraguas,1,other,medio_center,0.771,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,640,min,umbrella,paraguas,2,other,medio_left,0.498,,False,2 paraguas,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,truck,camión,2,obstacle,cerca_center,0.763,5,True,2 camiónes,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,umbrella,paraguas,1,other,cerca_center,0.923,,False,paraguas,frente a ti,False,categoria_sin_pasos:other,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,car,coche,1,obstacle,cerca_left,0.781,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,umbrella,paraguas,1,other,cerca_right,0.722,,False,paraguas,cerca a tu derecha,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,umbrella,paraguas,1,other,medio_center,0.8,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,max,umbrella,paraguas,2,other,medio_left,0.422,,False,2 paraguas,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,truck,camión,2,obstacle,cerca_center,0.763,5,True,2 camiónes,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,umbrella,paraguas,1,other,cerca_center,0.923,,False,paraguas,frente a ti,False,categoria_sin_pasos:other,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,car,coche,1,obstacle,cerca_left,0.781,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,umbrella,paraguas,1,other,cerca_right,0.722,,False,paraguas,cerca a tu derecha,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,umbrella,paraguas,1,other,medio_center,0.8,,False,paraguas,un poco más adelante frente a ti,False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,1280,min,umbrella,paraguas,2,other,medio_left,0.422,,False,2 paraguas,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:other,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,640,max,bench,banco,1,obstacle,muy_cerca_right,0.764,4,True,banco,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,640,max,car,coche,1,obstacle,medio_center,0.392,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,640,min,bench,banco,1,obstacle,muy_cerca_right,0.764,4,True,banco,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,640,min,car,coche,1,obstacle,medio_center,0.392,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,1280,max,bench,banco,1,obstacle,muy_cerca_right,0.796,4,True,banco,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,1280,min,bench,banco,1,obstacle,muy_cerca_right,0.796,4,True,banco,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,640,max,chair,silla,2,obstacle,cerca_center,0.852,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,640,max,chair,silla,2,obstacle,cerca_left,0.813,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,640,min,chair,silla,2,obstacle,cerca_center,0.852,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,640,min,chair,silla,2,obstacle,cerca_left,0.813,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,max,chair,silla,2,obstacle,cerca_center,0.903,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,max,chair,silla,1,obstacle,muy_cerca_left,0.409,3,True,silla,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,max,chair,silla,3,obstacle,cerca_left,0.911,5,True,3 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,max,couch,sofá,1,obstacle,cerca_left,0.432,5,True,sofá,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_center,0.692,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,chair,silla,2,obstacle,cerca_center,0.903,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,chair,silla,1,obstacle,muy_cerca_left,0.409,3,True,silla,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,chair,silla,3,obstacle,cerca_left,0.911,5,True,3 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,couch,sofá,2,obstacle,cerca_left,0.432,5,True,2 sofás,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_center,0.692,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,1280,min,bottle,botella,1,small_object,cerca_center,0.309,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.822,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,2,obstacle,cerca_center,0.787,6,True,2 sillas,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.515,2,True,mesa de comedor,justo a tu izquierda a aproximadamente 2 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,1,obstacle,muy_cerca_left,0.697,5,True,silla,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,2,obstacle,cerca_left,0.834,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,2,obstacle,cerca_right,0.53,4,True,2 sillas,cerca a tu derecha a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,1,obstacle,medio_center,0.479,,True,silla,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,tv,televisor,1,informative,cerca_left,0.761,,False,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,clock,reloj,1,small_object,lejos_center,0.909,,False,reloj,al fondo frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,3,obstacle,medio_left,0.521,,False,3 sillas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,max,chair,silla,1,obstacle,medio_right,0.499,,False,silla,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.822,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,2,obstacle,cerca_center,0.787,6,True,2 sillas,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.515,2,True,mesa de comedor,justo a tu izquierda a aproximadamente 2 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,dining table,mesa de comedor,2,obstacle,cerca_center,0.216,5,True,2 mesa de comedores,frente a ti a aproximadamente 5 pasos,True,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,1,obstacle,muy_cerca_left,0.697,5,True,silla,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,2,obstacle,cerca_left,0.834,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,2,obstacle,cerca_right,0.53,,True,2 sillas,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,dining table,mesa de comedor,2,obstacle,cerca_left,0.193,,False,2 mesa de comedores,cerca a tu izquierda,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,1,obstacle,medio_center,0.479,,False,silla,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,tv,televisor,1,informative,cerca_left,0.761,,False,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,clock,reloj,1,small_object,lejos_center,0.909,,False,reloj,al fondo frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,3,obstacle,medio_left,0.521,,False,3 sillas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,640,min,chair,silla,1,obstacle,medio_right,0.499,,False,silla,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,2,obstacle,muy_cerca_center,0.827,3,True,2 sillas,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,3,obstacle,cerca_center,0.812,6,True,3 sillas,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.402,2,True,mesa de comedor,justo a tu izquierda a aproximadamente 2 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,1,obstacle,muy_cerca_left,0.765,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,2,obstacle,cerca_left,0.835,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,3,obstacle,cerca_right,0.608,4,True,3 sillas,cerca a tu derecha a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,3,obstacle,medio_center,0.584,,True,3 sillas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,tv,televisor,1,informative,cerca_left,0.778,,False,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,clock,reloj,1,small_object,lejos_center,0.942,,False,reloj,al fondo frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,tv,televisor,1,informative,medio_right,0.719,,False,televisor,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,3,obstacle,medio_left,0.654,,False,3 sillas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,max,chair,silla,2,obstacle,medio_right,0.522,,False,2 sillas,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,2,obstacle,muy_cerca_center,0.827,3,True,2 sillas,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,3,obstacle,cerca_center,0.812,6,True,3 sillas,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,dining table,mesa de comedor,2,obstacle,muy_cerca_left,0.402,2,True,2 mesa de comedores,justo a tu izquierda a aproximadamente 2 pasos,True,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,dining table,mesa de comedor,3,obstacle,cerca_center,0.318,5,True,3 mesa de comedores,frente a ti a aproximadamente 5 pasos,True,,False,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,1,obstacle,muy_cerca_left,0.765,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,2,obstacle,cerca_left,0.835,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,3,obstacle,cerca_right,0.608,,True,3 sillas,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,dining table,mesa de comedor,2,obstacle,cerca_left,0.183,,False,2 mesa de comedores,cerca a tu izquierda,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,4,obstacle,medio_center,0.584,,False,4 sillas,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,tv,televisor,1,informative,cerca_left,0.778,,False,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,clock,reloj,1,small_object,lejos_center,0.942,,False,reloj,al fondo frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,tv,televisor,1,informative,medio_right,0.719,,False,televisor,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,3,obstacle,medio_left,0.654,,False,3 sillas,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,1280,min,chair,silla,2,obstacle,medio_right,0.522,,False,2 sillas,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,max,vase,jarrón,1,obstacle,cerca_center,0.738,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.664,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,max,sink,lavabo,1,informative,muy_cerca_center,0.404,,True,lavabo,justo frente a ti,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,min,vase,jarrón,1,obstacle,cerca_center,0.738,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.664,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,640,min,sink,lavabo,1,informative,muy_cerca_center,0.404,,True,lavabo,justo frente a ti,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,1280,max,vase,jarrón,1,obstacle,cerca_center,0.834,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.372,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,1280,min,vase,jarrón,1,obstacle,cerca_center,0.834,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.372,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,max,couch,sofá,1,obstacle,cerca_center,0.82,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,max,chair,silla,1,obstacle,cerca_center,0.819,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,min,couch,sofá,1,obstacle,cerca_center,0.82,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,min,chair,silla,1,obstacle,cerca_center,0.819,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,min,vase,jarrón,1,obstacle,cerca_right,0.29,6,True,jarrón,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,640,min,potted plant,planta en maceta,1,obstacle,medio_center,0.277,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,max,chair,silla,1,obstacle,cerca_center,0.924,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,max,couch,sofá,1,obstacle,cerca_center,0.89,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_right,0.445,5,True,planta en maceta,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,min,chair,silla,1,obstacle,cerca_center,0.924,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,min,couch,sofá,1,obstacle,cerca_center,0.89,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_right,0.445,5,True,planta en maceta,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.934,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,max,vase,jarrón,1,obstacle,cerca_center,0.683,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.934,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,640,min,vase,jarrón,1,obstacle,cerca_center,0.683,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,max,chair,silla,1,obstacle,muy_cerca_center,0.954,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,max,vase,jarrón,1,obstacle,cerca_center,0.776,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,min,chair,silla,1,obstacle,muy_cerca_center,0.954,3,True,silla,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,1280,min,vase,jarrón,1,obstacle,cerca_center,0.776,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,max,couch,sofá,1,obstacle,muy_cerca_center,0.95,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.957,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,max,chair,silla,1,obstacle,muy_cerca_right,0.461,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,max,chair,silla,1,obstacle,cerca_right,0.449,5,True,silla,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,max,tv,televisor,1,informative,medio_left,0.523,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,couch,sofá,1,obstacle,muy_cerca_center,0.95,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.957,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,chair,silla,1,obstacle,muy_cerca_right,0.461,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,chair,silla,1,obstacle,cerca_right,0.449,5,True,silla,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,couch,sofá,1,obstacle,cerca_right,0.325,5,True,sofá,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,640,min,tv,televisor,1,informative,medio_left,0.523,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,max,couch,sofá,1,obstacle,muy_cerca_center,0.932,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.956,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,max,couch,sofá,1,obstacle,cerca_right,0.709,5,True,sofá,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,min,couch,sofá,1,obstacle,muy_cerca_center,0.932,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.956,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,1280,min,couch,sofá,1,obstacle,cerca_right,0.709,5,True,sofá,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,chair,silla,5,obstacle,cerca_center,0.684,5,True,5 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,chair,silla,3,obstacle,muy_cerca_left,0.917,4,True,3 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,chair,silla,3,obstacle,muy_cerca_right,0.895,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,chair,silla,2,obstacle,cerca_right,0.82,5,True,2 sillas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,chair,silla,1,obstacle,cerca_left,0.715,5,True,silla,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,dining table,mesa de comedor,1,obstacle,cerca_left,0.584,5,True,mesa de comedor,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,max,clock,reloj,1,small_object,medio_right,0.409,,False,reloj,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,chair,silla,6,obstacle,cerca_center,0.684,5,True,6 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,chair,silla,3,obstacle,muy_cerca_left,0.917,4,True,3 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,chair,silla,3,obstacle,muy_cerca_right,0.895,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.307,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,chair,silla,2,obstacle,cerca_right,0.82,5,True,2 sillas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,chair,silla,1,obstacle,cerca_left,0.715,5,True,silla,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,dining table,mesa de comedor,1,obstacle,cerca_left,0.584,,True,mesa de comedor,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,dining table,mesa de comedor,1,obstacle,cerca_right,0.289,,False,mesa de comedor,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,640,min,clock,reloj,1,small_object,medio_right,0.409,,False,reloj,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,chair,silla,6,obstacle,cerca_center,0.837,5,True,6 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,chair,silla,3,obstacle,muy_cerca_left,0.922,4,True,3 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,chair,silla,4,obstacle,muy_cerca_right,0.911,4,True,4 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.699,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,chair,silla,4,obstacle,cerca_right,0.887,5,True,4 sillas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,chair,silla,2,obstacle,cerca_left,0.745,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,dining table,mesa de comedor,1,obstacle,cerca_left,0.636,,True,mesa de comedor,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,bottle,botella,1,small_object,medio_center,0.437,,False,botella,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,max,bottle,botella,1,small_object,medio_left,0.567,,False,botella,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,chair,silla,6,obstacle,cerca_center,0.837,5,True,6 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,chair,silla,3,obstacle,muy_cerca_left,0.922,4,True,3 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,chair,silla,4,obstacle,muy_cerca_right,0.911,4,True,4 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.699,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,chair,silla,4,obstacle,cerca_right,0.887,5,True,4 sillas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,chair,silla,2,obstacle,cerca_left,0.745,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,dining table,mesa de comedor,1,obstacle,cerca_left,0.636,,True,mesa de comedor,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,dining table,mesa de comedor,2,obstacle,cerca_right,0.323,,False,2 mesa de comedores,cerca a tu derecha,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,bottle,botella,4,small_object,medio_center,0.437,,False,4 botellas,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,1280,min,bottle,botella,1,small_object,medio_left,0.567,,False,botella,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.419,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,person,persona,2,obstacle,cerca_center,0.907,5,True,2 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,chair,silla,3,obstacle,muy_cerca_right,0.841,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,person,persona,2,obstacle,muy_cerca_right,0.655,4,True,2 personas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,person,persona,1,obstacle,cerca_right,0.541,5,True,persona,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,car,coche,1,obstacle,cerca_left,0.445,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,bus,autobús,1,obstacle,cerca_left,0.351,,True,autobús,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,max,person,persona,1,obstacle,medio_right,0.841,,False,persona,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.419,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,person,persona,2,obstacle,cerca_center,0.907,5,True,2 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,chair,silla,3,obstacle,muy_cerca_right,0.841,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,person,persona,2,obstacle,muy_cerca_right,0.655,4,True,2 personas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.151,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,person,persona,2,obstacle,cerca_right,0.541,5,True,2 personas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,car,coche,1,obstacle,cerca_left,0.445,,True,coche,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,bus,autobús,1,obstacle,cerca_left,0.351,,False,autobús,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,chair,silla,1,obstacle,cerca_right,0.308,,False,silla,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,640,min,person,persona,1,obstacle,medio_right,0.841,,False,persona,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,person,persona,2,obstacle,cerca_center,0.923,5,True,2 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,chair,silla,5,obstacle,muy_cerca_right,0.884,4,True,5 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,person,persona,2,obstacle,muy_cerca_right,0.785,4,True,2 personas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,bus,autobús,1,obstacle,cerca_left,0.748,5,True,autobús,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,person,persona,2,obstacle,cerca_right,0.527,5,True,2 personas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,max,person,persona,1,obstacle,medio_right,0.737,5,True,persona,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,person,persona,2,obstacle,cerca_center,0.923,5,True,2 personas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,chair,silla,5,obstacle,muy_cerca_right,0.884,4,True,5 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,person,persona,2,obstacle,muy_cerca_right,0.785,4,True,2 personas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.198,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,bus,autobús,1,obstacle,cerca_left,0.748,5,True,autobús,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,person,persona,2,obstacle,cerca_right,0.527,5,True,2 personas,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,1280,min,person,persona,1,obstacle,medio_right,0.737,,True,persona,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,640,max,bottle,botella,1,small_object,medio_right,0.589,,True,botella,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,640,min,potted plant,planta en maceta,1,obstacle,muy_cerca_left,0.336,4,True,planta en maceta,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,640,min,bottle,botella,1,small_object,medio_right,0.589,,True,botella,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,1280,max,vase,jarrón,1,obstacle,medio_right,0.449,6,True,jarrón,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,1280,max,bottle,botella,1,small_object,medio_right,0.382,,True,botella,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,1280,min,vase,jarrón,1,obstacle,medio_right,0.449,6,True,jarrón,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,1280,min,bottle,botella,1,small_object,medio_right,0.382,,True,botella,"un poco más adelante, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,chair,silla,3,obstacle,muy_cerca_center,0.886,4,True,3 sillas,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.699,3,True,mesa de comedor,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.61,3,True,mesa de comedor,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,chair,silla,1,obstacle,cerca_center,0.488,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,chair,silla,1,obstacle,muy_cerca_right,0.92,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,chair,silla,2,obstacle,muy_cerca_left,0.8,4,True,2 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,max,chair,silla,1,obstacle,cerca_left,0.563,,True,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,chair,silla,3,obstacle,muy_cerca_center,0.886,4,True,3 sillas,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,dining table,mesa de comedor,2,obstacle,muy_cerca_right,0.699,3,True,2 mesa de comedores,justo a tu derecha a aproximadamente 3 pasos,True,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.61,3,True,mesa de comedor,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,chair,silla,1,obstacle,cerca_center,0.488,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,chair,silla,1,obstacle,muy_cerca_right,0.92,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,chair,silla,2,obstacle,muy_cerca_left,0.8,4,True,2 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,640,min,chair,silla,1,obstacle,cerca_left,0.563,,True,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,chair,silla,2,obstacle,muy_cerca_center,0.781,4,True,2 sillas,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.603,3,True,mesa de comedor,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.521,3,True,mesa de comedor,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,chair,silla,2,obstacle,muy_cerca_left,0.921,4,True,2 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,chair,silla,3,obstacle,muy_cerca_right,0.91,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,max,chair,silla,2,obstacle,cerca_left,0.704,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,chair,silla,3,obstacle,muy_cerca_center,0.781,4,True,3 sillas,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,dining table,mesa de comedor,2,obstacle,muy_cerca_left,0.603,3,True,2 mesa de comedores,justo a tu izquierda a aproximadamente 3 pasos,True,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.521,3,True,mesa de comedor,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,chair,silla,2,obstacle,muy_cerca_left,0.921,4,True,2 sillas,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,chair,silla,3,obstacle,muy_cerca_right,0.91,4,True,3 sillas,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,chair,silla,2,obstacle,cerca_left,0.704,5,True,2 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.338,,True,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.362,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,max,couch,sofá,1,obstacle,cerca_center,0.402,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,max,chair,silla,1,obstacle,muy_cerca_left,0.771,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,max,couch,sofá,2,obstacle,cerca_right,0.774,5,True,2 sofás,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.352,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.362,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,couch,sofá,1,obstacle,muy_cerca_center,0.313,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,couch,sofá,1,obstacle,cerca_center,0.402,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,vase,jarrón,1,obstacle,cerca_center,0.27,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,chair,silla,1,obstacle,muy_cerca_left,0.771,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,couch,sofá,2,obstacle,cerca_right,0.774,5,True,2 sofás,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.352,,True,planta en maceta,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,640,min,vase,jarrón,1,obstacle,cerca_right,0.263,,False,jarrón,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,max,couch,sofá,1,obstacle,muy_cerca_center,0.526,4,True,sofá,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,max,couch,sofá,1,obstacle,cerca_center,0.463,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,max,chair,silla,1,obstacle,muy_cerca_left,0.634,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,max,couch,sofá,1,obstacle,cerca_right,0.873,5,True,sofá,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_right,0.483,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,couch,sofá,2,obstacle,muy_cerca_center,0.526,4,True,2 sofás,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.178,5,True,mesa de comedor,justo frente a ti a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,couch,sofá,1,obstacle,cerca_center,0.463,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,chair,silla,1,obstacle,muy_cerca_left,0.634,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,couch,sofá,2,obstacle,cerca_right,0.873,5,True,2 sofás,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_right,0.483,5,True,planta en maceta,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,1280,min,vase,jarrón,1,obstacle,cerca_right,0.267,,True,jarrón,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,max,chair,silla,2,obstacle,cerca_center,0.836,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,max,dining table,mesa de comedor,1,obstacle,cerca_center,0.361,4,True,mesa de comedor,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,min,chair,silla,2,obstacle,cerca_center,0.836,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,min,dining table,mesa de comedor,1,obstacle,cerca_center,0.361,4,True,mesa de comedor,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,min,vase,jarrón,2,obstacle,cerca_center,0.348,6,True,2 jarrónes,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,min,potted plant,planta en maceta,1,obstacle,medio_left,0.294,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,640,min,bottle,botella,1,small_object,medio_left,0.289,,False,botella,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,1280,max,vase,jarrón,1,obstacle,cerca_center,0.554,6,True,jarrón,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,1280,max,chair,silla,1,obstacle,cerca_center,0.362,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,1280,min,vase,jarrón,1,obstacle,cerca_center,0.554,6,True,jarrón,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,1280,min,chair,silla,1,obstacle,cerca_center,0.362,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,1280,min,dining table,mesa de comedor,1,obstacle,cerca_center,0.325,4,True,mesa de comedor,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,max,couch,sofá,1,obstacle,cerca_center,0.782,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.806,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.691,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,max,tv,televisor,1,informative,cerca_left,0.874,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.319,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,couch,sofá,1,obstacle,cerca_center,0.782,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.806,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.691,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,640,min,tv,televisor,1,informative,cerca_left,0.874,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,max,couch,sofá,1,obstacle,cerca_center,0.939,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.849,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.367,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,max,tv,televisor,1,informative,cerca_left,0.891,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.175,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,couch,sofá,1,obstacle,cerca_center,0.939,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.849,3,True,sofá,justo a tu derecha a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.367,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,tv,televisor,1,informative,cerca_left,0.891,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_left,0.304,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,max,truck,camión,2,obstacle,medio_center,0.791,5,True,2 camiónes,un poco más adelante frente a ti a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,max,car,coche,1,obstacle,medio_right,0.48,5,True,coche,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,max,truck,camión,1,obstacle,medio_right,0.447,5,True,camión,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,max,person,persona,1,obstacle,medio_right,0.397,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,min,truck,camión,2,obstacle,medio_center,0.791,5,True,2 camiónes,un poco más adelante frente a ti a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,min,car,coche,1,obstacle,medio_right,0.48,5,True,coche,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,min,truck,camión,1,obstacle,medio_right,0.447,5,True,camión,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,640,min,person,persona,1,obstacle,medio_right,0.397,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,max,truck,camión,2,obstacle,medio_center,0.506,6,True,2 camiónes,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,max,car,coche,1,obstacle,medio_right,0.409,5,True,coche,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,max,truck,camión,1,obstacle,medio_right,0.4,5,True,camión,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,min,truck,camión,2,obstacle,medio_center,0.506,6,True,2 camiónes,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,min,car,coche,1,obstacle,medio_right,0.409,5,True,coche,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,1280,min,truck,camión,1,obstacle,medio_right,0.4,5,True,camión,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,chair,silla,1,obstacle,muy_cerca_center,0.919,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,chair,silla,1,obstacle,cerca_center,0.543,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,laptop,portátil,1,informative,medio_center,0.714,,True,portátil,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,chair,silla,1,obstacle,medio_center,0.38,6,True,silla,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,tv,televisor,1,informative,cerca_right,0.882,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,max,potted plant,planta en maceta,1,obstacle,medio_left,0.852,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,chair,silla,1,obstacle,muy_cerca_center,0.919,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,chair,silla,1,obstacle,cerca_center,0.543,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,laptop,portátil,1,informative,medio_center,0.714,,True,portátil,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,chair,silla,1,obstacle,medio_center,0.38,6,True,silla,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,tv,televisor,1,informative,cerca_right,0.882,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,640,min,potted plant,planta en maceta,1,obstacle,medio_left,0.852,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,max,chair,silla,1,obstacle,muy_cerca_center,0.921,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,max,chair,silla,1,obstacle,cerca_center,0.896,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,max,tv,televisor,1,informative,cerca_right,0.829,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_left,0.887,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,min,chair,silla,1,obstacle,muy_cerca_center,0.921,4,True,silla,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,min,chair,silla,2,obstacle,cerca_center,0.896,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,min,tv,televisor,1,informative,cerca_right,0.829,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_left,0.887,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,couch,sofá,1,obstacle,cerca_center,0.937,4,True,sofá,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.737,4,True,planta en maceta,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,chair,silla,1,obstacle,cerca_center,0.598,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,couch,sofá,2,obstacle,cerca_left,0.737,5,True,2 sofás,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,vase,jarrón,1,obstacle,medio_center,0.575,6,True,jarrón,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,max,potted plant,planta en maceta,1,obstacle,medio_right,0.855,5,True,planta en maceta,"un poco más adelante, a tu derecha a aproximadamente 5 pasos",False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,couch,sofá,1,obstacle,cerca_center,0.937,4,True,sofá,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.737,4,True,planta en maceta,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,chair,silla,1,obstacle,cerca_center,0.598,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,vase,jarrón,1,obstacle,cerca_center,0.262,6,True,jarrón,frente a ti a aproximadamente 6 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,couch,sofá,2,obstacle,cerca_left,0.737,5,True,2 sofás,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,vase,jarrón,1,obstacle,medio_center,0.575,6,True,jarrón,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,potted plant,planta en maceta,1,obstacle,medio_center,0.345,,True,planta en maceta,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,640,min,potted plant,planta en maceta,1,obstacle,medio_right,0.855,,False,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,couch,sofá,1,obstacle,cerca_center,0.933,4,True,sofá,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,chair,silla,1,obstacle,cerca_center,0.794,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.723,4,True,planta en maceta,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,vase,jarrón,1,obstacle,cerca_center,0.44,5,True,jarrón,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,couch,sofá,2,obstacle,cerca_left,0.836,5,True,2 sofás,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,vase,jarrón,1,obstacle,cerca_right,0.419,6,True,jarrón,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_right,0.857,,True,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.166,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,couch,sofá,2,obstacle,cerca_center,0.933,4,True,2 sofás,frente a ti a aproximadamente 4 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,chair,silla,1,obstacle,cerca_center,0.794,5,True,silla,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,potted plant,planta en maceta,2,obstacle,cerca_center,0.723,4,True,2 planta en macetas,frente a ti a aproximadamente 4 pasos,True,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,vase,jarrón,2,obstacle,cerca_center,0.44,5,True,2 jarrónes,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,couch,sofá,2,obstacle,cerca_left,0.836,5,True,2 sofás,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,vase,jarrón,1,obstacle,cerca_right,0.419,,True,jarrón,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_right,0.857,,False,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,couch,sofá,1,obstacle,cerca_center,0.67,3,True,sofá,frente a ti a aproximadamente 3 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,chair,silla,1,obstacle,cerca_center,0.356,3,True,silla,frente a ti a aproximadamente 3 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.856,4,True,planta en maceta,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,chair,silla,1,obstacle,cerca_left,0.768,4,True,silla,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,potted plant,planta en maceta,1,obstacle,medio_center,0.724,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,max,clock,reloj,1,small_object,medio_left,0.655,,False,reloj,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,couch,sofá,1,obstacle,cerca_center,0.67,3,True,sofá,frente a ti a aproximadamente 3 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,chair,silla,1,obstacle,cerca_center,0.356,3,True,silla,frente a ti a aproximadamente 3 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.856,4,True,planta en maceta,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,chair,silla,1,obstacle,cerca_left,0.768,4,True,silla,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,couch,sofá,1,obstacle,cerca_left,0.318,4,True,sofá,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,potted plant,planta en maceta,1,obstacle,medio_center,0.724,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,vase,jarrón,1,obstacle,medio_center,0.323,,True,jarrón,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,640,min,clock,reloj,1,small_object,medio_left,0.655,,False,reloj,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,1280,max,vase,jarrón,1,obstacle,medio_center,0.621,6,True,jarrón,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_center,0.465,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,1280,min,vase,jarrón,1,obstacle,medio_center,0.621,6,True,jarrón,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_center,0.465,6,True,planta en maceta,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.196,3,True,mesa de comedor,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,chair,silla,3,obstacle,cerca_center,0.73,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.624,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,chair,silla,2,obstacle,muy_cerca_left,0.833,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.773,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,chair,silla,1,obstacle,muy_cerca_right,0.682,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,chair,silla,1,obstacle,cerca_left,0.768,5,True,silla,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.757,,True,planta en maceta,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,potted plant,planta en maceta,2,obstacle,medio_center,0.552,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,max,potted plant,planta en maceta,1,obstacle,medio_left,0.368,,False,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,chair,silla,3,obstacle,cerca_center,0.73,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.624,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,chair,silla,2,obstacle,muy_cerca_left,0.833,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.773,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,chair,silla,1,obstacle,muy_cerca_right,0.682,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,chair,silla,1,obstacle,cerca_left,0.768,5,True,silla,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.757,,True,planta en maceta,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,dining table,mesa de comedor,1,obstacle,cerca_right,0.234,,False,mesa de comedor,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,2,obstacle,medio_center,0.552,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,2,obstacle,medio_left,0.368,,False,2 planta en macetas,"un poco más adelante, a tu izquierda",True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,640,min,potted plant,planta en maceta,1,obstacle,medio_right,0.342,,False,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,4,obstacle,cerca_center,0.896,5,True,4 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.542,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,1,obstacle,muy_cerca_right,0.866,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.843,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,3,obstacle,muy_cerca_left,0.806,5,True,3 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,3,obstacle,cerca_left,0.866,5,True,3 sillas,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,1,obstacle,cerca_right,0.604,,True,silla,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.584,,False,planta en maceta,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,dining table,mesa de comedor,1,obstacle,cerca_right,0.551,,False,mesa de comedor,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,2,obstacle,medio_center,0.797,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,chair,silla,1,obstacle,medio_center,0.537,,False,silla,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,1,obstacle,medio_right,0.815,,False,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,max,potted plant,planta en maceta,2,obstacle,medio_left,0.782,,False,2 planta en macetas,"un poco más adelante, a tu izquierda",True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,4,obstacle,cerca_center,0.896,5,True,4 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.542,5,True,planta en maceta,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,1,obstacle,muy_cerca_right,0.866,4,True,silla,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,1,obstacle,muy_cerca_right,0.843,4,True,planta en maceta,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,3,obstacle,muy_cerca_left,0.806,5,True,3 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,1,obstacle,muy_cerca_left,0.349,4,True,planta en maceta,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,3,obstacle,cerca_left,0.866,,True,3 sillas,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,1,obstacle,cerca_right,0.604,,False,silla,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.584,,False,planta en maceta,cerca a tu izquierda,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,dining table,mesa de comedor,1,obstacle,cerca_right,0.551,,False,mesa de comedor,cerca a tu derecha,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,2,obstacle,medio_center,0.797,,False,2 planta en macetas,un poco más adelante frente a ti,True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,chair,silla,1,obstacle,medio_center,0.537,,False,silla,un poco más adelante frente a ti,False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,1,obstacle,medio_right,0.815,,False,planta en maceta,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,potted plant,planta en maceta,2,obstacle,medio_left,0.782,,False,2 planta en macetas,"un poco más adelante, a tu izquierda",True,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,1280,min,dining table,mesa de comedor,1,obstacle,medio_left,0.179,,False,mesa de comedor,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,640,max,couch,sofá,1,obstacle,cerca_center,0.862,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.76,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,640,min,couch,sofá,1,obstacle,cerca_center,0.862,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.76,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.26,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,1280,max,couch,sofá,1,obstacle,cerca_center,0.895,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.759,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,1280,min,couch,sofá,1,obstacle,cerca_center,0.895,5,True,sofá,frente a ti a aproximadamente 5 pasos,False,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.759,4,True,sofá,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.17,4,True,mesa de comedor,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+test_images/01_persona_bolso.jpg,640,max,person,persona,1,obstacle,muy_cerca_left,0.965,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/01_persona_bolso.jpg,640,min,person,persona,1,obstacle,muy_cerca_left,0.965,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/01_persona_bolso.jpg,1280,max,person,persona,1,obstacle,muy_cerca_center,0.612,1,True,persona,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/01_persona_bolso.jpg,1280,min,person,persona,1,obstacle,muy_cerca_center,0.612,1,True,persona,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/01_persona_bolso.jpg,1280,min,suitcase,maleta,1,obstacle,muy_cerca_center,0.305,3,True,maleta,justo frente a ti a aproximadamente 3 pasos,False,,False,True
+test_images/02_calle_carros.jpg,640,max,car,coche,1,obstacle,muy_cerca_center,0.915,4,True,coche,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,640,max,car,coche,3,obstacle,cerca_center,0.767,5,True,3 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,640,max,person,persona,1,obstacle,cerca_center,0.39,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,640,max,car,coche,1,obstacle,muy_cerca_right,0.941,4,True,coche,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,640,max,car,coche,1,obstacle,cerca_right,0.941,5,True,coche,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,640,max,car,coche,4,obstacle,cerca_left,0.746,5,True,4 coches,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,640,max,person,persona,1,obstacle,cerca_left,0.735,,True,persona,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,640,max,truck,camión,1,obstacle,cerca_left,0.565,,False,camión,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,640,min,car,coche,1,obstacle,muy_cerca_center,0.915,4,True,coche,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,640,min,car,coche,3,obstacle,cerca_center,0.767,5,True,3 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,640,min,person,persona,1,obstacle,cerca_center,0.39,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,640,min,car,coche,1,obstacle,muy_cerca_right,0.941,4,True,coche,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,640,min,car,coche,1,obstacle,cerca_right,0.941,5,True,coche,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,640,min,car,coche,4,obstacle,cerca_left,0.746,5,True,4 coches,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,640,min,person,persona,1,obstacle,cerca_left,0.735,,True,persona,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,640,min,truck,camión,1,obstacle,cerca_left,0.565,,False,camión,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,max,car,coche,1,obstacle,muy_cerca_center,0.943,4,True,coche,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,max,car,coche,4,obstacle,cerca_center,0.878,5,True,4 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,1280,max,person,persona,1,obstacle,cerca_center,0.401,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,1280,max,car,coche,1,obstacle,muy_cerca_right,0.933,4,True,coche,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,max,car,coche,1,obstacle,muy_cerca_left,0.826,5,True,coche,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,max,car,coche,2,obstacle,cerca_right,0.939,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,1280,max,car,coche,3,obstacle,cerca_left,0.905,,True,3 coches,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,max,person,persona,1,obstacle,cerca_left,0.726,,False,persona,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,max,truck,camión,1,obstacle,cerca_left,0.554,,False,camión,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,min,car,coche,1,obstacle,muy_cerca_center,0.943,4,True,coche,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,min,car,coche,4,obstacle,cerca_center,0.878,5,True,4 coches,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,1280,min,person,persona,1,obstacle,cerca_center,0.401,5,True,persona,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/02_calle_carros.jpg,1280,min,car,coche,1,obstacle,muy_cerca_right,0.933,4,True,coche,justo a tu derecha a aproximadamente 4 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,min,car,coche,1,obstacle,muy_cerca_left,0.826,5,True,coche,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/02_calle_carros.jpg,1280,min,car,coche,2,obstacle,cerca_right,0.939,5,True,2 coches,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/02_calle_carros.jpg,1280,min,car,coche,3,obstacle,cerca_left,0.905,,True,3 coches,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,min,person,persona,1,obstacle,cerca_left,0.726,,False,persona,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/02_calle_carros.jpg,1280,min,truck,camión,1,obstacle,cerca_left,0.554,,False,camión,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/03_escritorio_objetos.jpg,640,max,person,persona,1,obstacle,muy_cerca_left,0.955,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/03_escritorio_objetos.jpg,640,max,tv,televisor,1,informative,cerca_center,0.921,,True,televisor,frente a ti,False,categoria_sin_pasos:informative,False,False
+test_images/03_escritorio_objetos.jpg,640,max,laptop,portátil,1,informative,muy_cerca_right,0.376,,True,portátil,justo a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,max,tv,televisor,1,informative,cerca_right,0.629,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,max,laptop,portátil,1,informative,cerca_right,0.477,,True,portátil,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,max,bottle,botella,1,small_object,medio_center,0.803,,False,botella,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,640,max,cell phone,teléfono móvil,1,small_object,medio_left,0.493,,False,teléfono móvil,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,640,max,person,persona,1,obstacle,medio_left,0.44,5,True,persona,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+test_images/03_escritorio_objetos.jpg,640,max,person,persona,1,obstacle,lejos_right,0.654,,True,persona,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/03_escritorio_objetos.jpg,640,max,bottle,botella,1,small_object,lejos_right,0.369,,False,botella,"al fondo, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,640,min,person,persona,1,obstacle,muy_cerca_left,0.955,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/03_escritorio_objetos.jpg,640,min,tv,televisor,1,informative,cerca_center,0.921,,True,televisor,frente a ti,False,categoria_sin_pasos:informative,False,False
+test_images/03_escritorio_objetos.jpg,640,min,laptop,portátil,1,informative,muy_cerca_right,0.376,,True,portátil,justo a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,min,tv,televisor,1,informative,cerca_right,0.629,,True,televisor,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,min,laptop,portátil,1,informative,cerca_right,0.477,,True,portátil,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,640,min,bottle,botella,1,small_object,medio_center,0.803,,False,botella,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,640,min,cell phone,teléfono móvil,1,small_object,medio_left,0.493,,False,teléfono móvil,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,640,min,person,persona,1,obstacle,medio_left,0.44,5,True,persona,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+test_images/03_escritorio_objetos.jpg,640,min,person,persona,1,obstacle,lejos_right,0.654,,True,persona,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/03_escritorio_objetos.jpg,640,min,bottle,botella,1,small_object,lejos_right,0.369,,False,botella,"al fondo, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,person,persona,1,obstacle,muy_cerca_left,0.918,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,tv,televisor,1,informative,cerca_center,0.723,,True,televisor,frente a ti,False,categoria_sin_pasos:informative,False,False
+test_images/03_escritorio_objetos.jpg,1280,max,laptop,portátil,1,informative,muy_cerca_right,0.536,,True,portátil,justo a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,laptop,portátil,2,informative,cerca_right,0.73,,True,2 portátiles,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,bottle,botella,1,small_object,medio_center,0.769,,False,botella,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,person,persona,1,obstacle,medio_left,0.505,5,True,persona,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,cell phone,teléfono móvil,1,small_object,medio_left,0.415,,False,teléfono móvil,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,bottle,botella,1,small_object,lejos_right,0.512,,False,botella,"al fondo, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,person,persona,1,obstacle,lejos_right,0.464,,True,persona,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/03_escritorio_objetos.jpg,1280,max,bottle,botella,1,small_object,lejos_left,0.383,,False,botella,"al fondo, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,person,persona,1,obstacle,muy_cerca_left,0.918,1,True,persona,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,tv,televisor,1,informative,cerca_center,0.723,,True,televisor,frente a ti,False,categoria_sin_pasos:informative,False,False
+test_images/03_escritorio_objetos.jpg,1280,min,laptop,portátil,1,informative,muy_cerca_right,0.536,,True,portátil,justo a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,laptop,portátil,2,informative,cerca_right,0.73,,True,2 portátiles,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,bottle,botella,1,small_object,medio_center,0.769,,False,botella,un poco más adelante frente a ti,False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,person,persona,1,obstacle,medio_left,0.505,5,True,persona,"un poco más adelante, a tu izquierda a aproximadamente 5 pasos",False,,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,cell phone,teléfono móvil,1,small_object,medio_left,0.415,,False,teléfono móvil,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,bottle,botella,1,small_object,lejos_right,0.512,,False,botella,"al fondo, a tu derecha",False,categoria_sin_pasos:small_object,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,person,persona,1,obstacle,lejos_right,0.464,,True,persona,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/03_escritorio_objetos.jpg,1280,min,bottle,botella,1,small_object,lejos_left,0.383,,False,botella,"al fondo, a tu izquierda",False,categoria_sin_pasos:small_object,False,True
+test_images/04_cocina_utensilios.jpg,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.394,1,True,mesa de comedor,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/04_cocina_utensilios.jpg,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.394,1,True,mesa de comedor,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/04_cocina_utensilios.jpg,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.417,1,True,mesa de comedor,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/04_cocina_utensilios.jpg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.158,1,True,mesa de comedor,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/04_cocina_utensilios.jpg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.417,1,True,mesa de comedor,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/05_sala_muebles.jpg,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.956,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,640,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.7,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+test_images/05_sala_muebles.jpg,640,max,chair,silla,1,obstacle,muy_cerca_left,0.835,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,640,max,chair,silla,1,obstacle,cerca_left,0.9,4,True,silla,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,640,max,potted plant,planta en maceta,2,obstacle,cerca_left,0.566,5,True,2 planta en macetas,cerca a tu izquierda a aproximadamente 5 pasos,True,,False,True
+test_images/05_sala_muebles.jpg,640,max,tv,televisor,1,informative,medio_center,0.943,,True,televisor,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+test_images/05_sala_muebles.jpg,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.226,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.956,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,640,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.7,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+test_images/05_sala_muebles.jpg,640,min,chair,silla,1,obstacle,muy_cerca_left,0.835,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,640,min,couch,sofá,1,obstacle,muy_cerca_left,0.339,4,True,sofá,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,640,min,chair,silla,1,obstacle,cerca_left,0.9,4,True,silla,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,640,min,potted plant,planta en maceta,3,obstacle,cerca_left,0.566,,True,3 planta en macetas,cerca a tu izquierda,True,tope_6_objetos,False,True
+test_images/05_sala_muebles.jpg,640,min,tv,televisor,1,informative,medio_center,0.943,,False,televisor,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+test_images/05_sala_muebles.jpg,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.953,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,max,potted plant,planta en maceta,1,obstacle,cerca_center,0.779,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+test_images/05_sala_muebles.jpg,1280,max,couch,sofá,1,obstacle,muy_cerca_left,0.741,4,True,sofá,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,1280,max,chair,silla,1,obstacle,muy_cerca_left,0.511,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,1280,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.845,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,max,couch,sofá,1,obstacle,cerca_left,0.636,4,True,sofá,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,max,chair,silla,1,obstacle,cerca_left,0.602,,True,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/05_sala_muebles.jpg,1280,max,tv,televisor,1,informative,medio_center,0.903,,False,televisor,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+test_images/05_sala_muebles.jpg,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.953,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,min,potted plant,planta en maceta,1,obstacle,cerca_center,0.779,6,True,planta en maceta,frente a ti a aproximadamente 6 pasos,False,,False,False
+test_images/05_sala_muebles.jpg,1280,min,couch,sofá,1,obstacle,muy_cerca_left,0.741,4,True,sofá,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,1280,min,chair,silla,1,obstacle,muy_cerca_left,0.511,4,True,silla,justo a tu izquierda a aproximadamente 4 pasos,False,,True,True
+test_images/05_sala_muebles.jpg,1280,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.845,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,min,couch,sofá,1,obstacle,cerca_left,0.636,4,True,sofá,cerca a tu izquierda a aproximadamente 4 pasos,False,,False,True
+test_images/05_sala_muebles.jpg,1280,min,chair,silla,1,obstacle,cerca_left,0.602,,True,silla,cerca a tu izquierda,False,tope_6_objetos,False,True
+test_images/05_sala_muebles.jpg,1280,min,tv,televisor,1,informative,medio_center,0.903,,False,televisor,un poco más adelante frente a ti,False,categoria_sin_pasos:informative,False,True
+test_images/06_bicicleta_persona.jpg,640,max,bicycle,bicicleta,1,obstacle,muy_cerca_center,0.832,1,True,bicicleta,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/06_bicicleta_persona.jpg,640,max,person,persona,1,obstacle,muy_cerca_center,0.829,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/06_bicicleta_persona.jpg,640,min,bicycle,bicicleta,1,obstacle,muy_cerca_center,0.832,1,True,bicicleta,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/06_bicicleta_persona.jpg,640,min,person,persona,1,obstacle,muy_cerca_center,0.829,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,max,person,persona,1,obstacle,muy_cerca_center,0.475,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,max,bicycle,bicicleta,1,obstacle,muy_cerca_center,0.356,1,True,bicicleta,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,max,backpack,mochila,1,obstacle,lejos_left,0.504,,True,mochila,"al fondo, a tu izquierda",False,profundidad_lejos,False,True
+test_images/06_bicicleta_persona.jpg,1280,min,person,persona,1,obstacle,muy_cerca_center,0.475,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,min,bicycle,bicicleta,1,obstacle,muy_cerca_center,0.356,1,True,bicicleta,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,min,backpack,mochila,1,obstacle,medio_center,0.324,6,True,mochila,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+test_images/06_bicicleta_persona.jpg,1280,min,backpack,mochila,1,obstacle,lejos_left,0.504,,True,mochila,"al fondo, a tu izquierda",False,profundidad_lejos,False,True
+test_images/07_perro_parque.jpg,640,max,person,persona,1,obstacle,muy_cerca_center,0.671,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,640,max,dog,perro,1,obstacle,muy_cerca_center,0.891,2,True,perro,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,640,max,person,persona,1,obstacle,medio_right,0.771,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/07_perro_parque.jpg,640,min,person,persona,1,obstacle,muy_cerca_center,0.671,2,True,persona,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,640,min,dog,perro,1,obstacle,muy_cerca_center,0.891,2,True,perro,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,640,min,person,persona,1,obstacle,medio_right,0.771,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/07_perro_parque.jpg,1280,max,person,persona,2,obstacle,muy_cerca_center,0.735,2,True,2 personas,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,1280,max,dog,perro,1,obstacle,muy_cerca_center,0.754,2,True,perro,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,1280,max,person,persona,1,obstacle,medio_right,0.791,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/07_perro_parque.jpg,1280,min,person,persona,2,obstacle,muy_cerca_center,0.735,2,True,2 personas,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,1280,min,dog,perro,1,obstacle,muy_cerca_center,0.754,2,True,perro,justo frente a ti a aproximadamente 2 pasos,False,,False,True
+test_images/07_perro_parque.jpg,1280,min,person,persona,1,obstacle,medio_right,0.791,6,True,persona,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/08_mercado_productos.jpg,640,max,person,persona,1,obstacle,muy_cerca_center,0.957,1,True,persona,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/08_mercado_productos.jpg,640,min,person,persona,1,obstacle,muy_cerca_center,0.957,1,True,persona,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/08_mercado_productos.jpg,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.261,1,True,mesa de comedor,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/08_mercado_productos.jpg,1280,max,person,persona,2,obstacle,muy_cerca_center,0.544,1,True,2 personas,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/08_mercado_productos.jpg,1280,max,dining table,mesa de comedor,2,obstacle,muy_cerca_center,0.418,3,True,2 mesa de comedores,justo frente a ti a aproximadamente 3 pasos,True,,False,True
+test_images/08_mercado_productos.jpg,1280,max,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.353,3,True,mesa de comedor,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+test_images/08_mercado_productos.jpg,1280,min,person,persona,2,obstacle,muy_cerca_center,0.544,1,True,2 personas,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/08_mercado_productos.jpg,1280,min,dining table,mesa de comedor,3,obstacle,muy_cerca_center,0.418,3,True,3 mesa de comedores,justo frente a ti a aproximadamente 3 pasos,True,,False,True
+test_images/08_mercado_productos.jpg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.353,3,True,mesa de comedor,justo a tu izquierda a aproximadamente 3 pasos,False,,False,True
+test_images/09_objetos_pequenos.jpg,640,max,laptop,portátil,1,informative,cerca_right,0.515,,True,portátil,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/09_objetos_pequenos.jpg,640,max,cell phone,teléfono móvil,1,small_object,muy_cerca_right,0.666,,True,teléfono móvil,justo a tu derecha,False,categoria_sin_pasos:small_object,False,True
+test_images/09_objetos_pequenos.jpg,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.34,1,True,mesa de comedor,justo frente a ti a aproximadamente 1 paso,False,,False,True
+test_images/09_objetos_pequenos.jpg,640,min,laptop,portátil,1,informative,cerca_right,0.515,,True,portátil,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/09_objetos_pequenos.jpg,640,min,cell phone,teléfono móvil,1,small_object,muy_cerca_right,0.666,,True,teléfono móvil,justo a tu derecha,False,categoria_sin_pasos:small_object,False,True
+test_images/09_objetos_pequenos.jpg,1280,max,laptop,portátil,2,informative,cerca_right,0.701,,True,2 portátiles,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/09_objetos_pequenos.jpg,1280,max,cell phone,teléfono móvil,1,small_object,muy_cerca_right,0.698,,True,teléfono móvil,justo a tu derecha,False,categoria_sin_pasos:small_object,False,True
+test_images/09_objetos_pequenos.jpg,1280,min,dining table,mesa de comedor,2,obstacle,muy_cerca_center,0.276,1,True,2 mesa de comedores,justo frente a ti a aproximadamente 1 paso,True,,False,True
+test_images/09_objetos_pequenos.jpg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_right,0.238,1,True,mesa de comedor,justo a tu derecha a aproximadamente 1 paso,False,,False,True
+test_images/09_objetos_pequenos.jpg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_left,0.219,1,True,mesa de comedor,justo a tu izquierda a aproximadamente 1 paso,False,,False,True
+test_images/09_objetos_pequenos.jpg,1280,min,laptop,portátil,2,informative,cerca_right,0.701,,True,2 portátiles,cerca a tu derecha,False,categoria_sin_pasos:informative,False,True
+test_images/09_objetos_pequenos.jpg,1280,min,cell phone,teléfono móvil,1,small_object,muy_cerca_right,0.698,,False,teléfono móvil,justo a tu derecha,False,categoria_sin_pasos:small_object,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,cerca_center,0.383,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,cerca_right,0.528,6,True,coche,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,cerca_left,0.368,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,medio_center,0.396,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,4,obstacle,lejos_center,0.653,,True,4 coches,al fondo frente a ti,False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,medio_right,0.387,6,True,coche,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/10_escena_compleja.jpg,640,max,car,coche,1,obstacle,lejos_left,0.499,,True,coche,"al fondo, a tu izquierda",False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,cerca_center,0.383,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,cerca_right,0.528,6,True,coche,cerca a tu derecha a aproximadamente 6 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,cerca_left,0.368,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,medio_center,0.396,6,True,coche,un poco más adelante frente a ti a aproximadamente 6 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,4,obstacle,lejos_center,0.653,,True,4 coches,al fondo frente a ti,False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,medio_right,0.387,6,True,coche,"un poco más adelante, a tu derecha a aproximadamente 6 pasos",False,,False,True
+test_images/10_escena_compleja.jpg,640,min,car,coche,1,obstacle,lejos_left,0.499,,True,coche,"al fondo, a tu izquierda",False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,muy_cerca_center,0.568,5,True,coche,justo frente a ti a aproximadamente 5 pasos,False,,True,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,cerca_center,0.767,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/10_escena_compleja.jpg,1280,max,car,coche,2,obstacle,muy_cerca_left,0.765,5,True,2 coches,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,cerca_left,0.732,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,cerca_right,0.572,5,True,coche,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,4,obstacle,lejos_center,0.849,,True,4 coches,al fondo frente a ti,False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,medio_left,0.824,6,True,coche,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,medio_right,0.642,,False,coche,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+test_images/10_escena_compleja.jpg,1280,max,car,coche,1,obstacle,lejos_right,0.865,,False,coche,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,muy_cerca_center,0.568,5,True,coche,justo frente a ti a aproximadamente 5 pasos,False,,True,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,cerca_center,0.767,5,True,coche,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/10_escena_compleja.jpg,1280,min,car,coche,2,obstacle,muy_cerca_left,0.765,5,True,2 coches,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,cerca_left,0.732,5,True,coche,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,cerca_right,0.572,5,True,coche,cerca a tu derecha a aproximadamente 5 pasos,False,,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,4,obstacle,lejos_center,0.849,,True,4 coches,al fondo frente a ti,False,profundidad_lejos,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,medio_left,0.824,6,True,coche,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,medio_right,0.642,,False,coche,"un poco más adelante, a tu derecha",False,tope_6_objetos,False,True
+test_images/10_escena_compleja.jpg,1280,min,car,coche,1,obstacle,lejos_right,0.865,,False,coche,"al fondo, a tu derecha",False,profundidad_lejos,False,True
+test_images/11_escritorio.jpeg,640,max,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.44,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/11_escritorio.jpeg,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.952,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/11_escritorio.jpeg,640,max,chair,silla,2,obstacle,cerca_center,0.913,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/11_escritorio.jpeg,640,max,tv,televisor,1,informative,cerca_left,0.725,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+test_images/11_escritorio.jpeg,640,max,tv,televisor,1,informative,medio_left,0.726,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/11_escritorio.jpeg,640,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.44,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/11_escritorio.jpeg,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.952,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/11_escritorio.jpeg,640,min,chair,silla,2,obstacle,cerca_center,0.913,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/11_escritorio.jpeg,640,min,tv,televisor,1,informative,cerca_left,0.725,,True,televisor,cerca a tu izquierda,False,categoria_sin_pasos:informative,False,True
+test_images/11_escritorio.jpeg,640,min,tv,televisor,1,informative,medio_left,0.726,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/11_escritorio.jpeg,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.962,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/11_escritorio.jpeg,1280,max,chair,silla,2,obstacle,cerca_center,0.92,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/11_escritorio.jpeg,1280,max,tv,televisor,1,informative,medio_left,0.745,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/11_escritorio.jpeg,1280,min,dining table,mesa de comedor,1,obstacle,muy_cerca_center,0.272,4,True,mesa de comedor,justo frente a ti a aproximadamente 4 pasos,False,,True,True
+test_images/11_escritorio.jpeg,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.962,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/11_escritorio.jpeg,1280,min,chair,silla,2,obstacle,cerca_center,0.92,5,True,2 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/11_escritorio.jpeg,1280,min,tv,televisor,1,informative,medio_left,0.745,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/12_sala.jpg,640,max,couch,sofá,1,obstacle,muy_cerca_right,0.943,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/12_sala.jpg,640,max,chair,silla,3,obstacle,cerca_center,0.907,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/12_sala.jpg,640,max,potted plant,planta en maceta,2,obstacle,cerca_center,0.535,6,True,2 planta en macetas,frente a ti a aproximadamente 6 pasos,True,,False,False
+test_images/12_sala.jpg,640,max,chair,silla,2,obstacle,muy_cerca_left,0.93,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/12_sala.jpg,640,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.371,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,640,max,tv,televisor,1,informative,medio_left,0.912,,True,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/12_sala.jpg,640,max,bottle,botella,2,small_object,cerca_center,0.667,,False,2 botellas,frente a ti,False,categoria_sin_pasos:small_object,False,False
+test_images/12_sala.jpg,640,max,potted plant,planta en maceta,1,obstacle,medio_left,0.805,6,True,planta en maceta,"un poco más adelante, a tu izquierda a aproximadamente 6 pasos",False,,False,True
+test_images/12_sala.jpg,640,min,couch,sofá,1,obstacle,muy_cerca_right,0.943,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/12_sala.jpg,640,min,chair,silla,3,obstacle,cerca_center,0.907,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/12_sala.jpg,640,min,potted plant,planta en maceta,2,obstacle,cerca_center,0.535,6,True,2 planta en macetas,frente a ti a aproximadamente 6 pasos,True,,False,False
+test_images/12_sala.jpg,640,min,chair,silla,2,obstacle,muy_cerca_left,0.93,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/12_sala.jpg,640,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.371,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,640,min,vase,jarrón,1,obstacle,cerca_left,0.288,6,True,jarrón,cerca a tu izquierda a aproximadamente 6 pasos,False,,False,True
+test_images/12_sala.jpg,640,min,tv,televisor,1,informative,medio_left,0.912,,False,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/12_sala.jpg,640,min,bottle,botella,2,small_object,cerca_center,0.667,,False,2 botellas,frente a ti,False,categoria_sin_pasos:small_object,False,False
+test_images/12_sala.jpg,640,min,potted plant,planta en maceta,1,obstacle,medio_left,0.805,,True,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+test_images/12_sala.jpg,1280,max,couch,sofá,1,obstacle,muy_cerca_right,0.961,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/12_sala.jpg,1280,max,potted plant,planta en maceta,3,obstacle,cerca_center,0.944,6,True,3 planta en macetas,frente a ti a aproximadamente 6 pasos,True,,False,False
+test_images/12_sala.jpg,1280,max,chair,silla,3,obstacle,cerca_center,0.842,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/12_sala.jpg,1280,max,chair,silla,2,obstacle,muy_cerca_left,0.927,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/12_sala.jpg,1280,max,dining table,mesa de comedor,1,obstacle,cerca_left,0.607,5,True,mesa de comedor,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,1280,max,potted plant,planta en maceta,1,obstacle,cerca_left,0.602,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,1280,max,wine glass,copa de vino,3,small_object,cerca_left,0.852,,False,3 copa de vinos,cerca a tu izquierda,True,categoria_sin_pasos:small_object,False,True
+test_images/12_sala.jpg,1280,max,tv,televisor,1,informative,medio_left,0.712,,False,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/12_sala.jpg,1280,max,bottle,botella,1,small_object,cerca_center,0.483,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+test_images/12_sala.jpg,1280,max,potted plant,planta en maceta,1,obstacle,medio_left,0.84,,True,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True
+test_images/12_sala.jpg,1280,min,couch,sofá,1,obstacle,muy_cerca_right,0.961,2,True,sofá,justo a tu derecha a aproximadamente 2 pasos,False,,False,True
+test_images/12_sala.jpg,1280,min,potted plant,planta en maceta,3,obstacle,cerca_center,0.944,6,True,3 planta en macetas,frente a ti a aproximadamente 6 pasos,True,,False,False
+test_images/12_sala.jpg,1280,min,chair,silla,3,obstacle,cerca_center,0.842,5,True,3 sillas,frente a ti a aproximadamente 5 pasos,False,,False,False
+test_images/12_sala.jpg,1280,min,chair,silla,2,obstacle,muy_cerca_left,0.927,5,True,2 sillas,justo a tu izquierda a aproximadamente 5 pasos,False,,True,True
+test_images/12_sala.jpg,1280,min,dining table,mesa de comedor,1,obstacle,cerca_left,0.607,5,True,mesa de comedor,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,1280,min,potted plant,planta en maceta,1,obstacle,cerca_left,0.602,5,True,planta en maceta,cerca a tu izquierda a aproximadamente 5 pasos,False,,False,True
+test_images/12_sala.jpg,1280,min,wine glass,copa de vino,3,small_object,cerca_left,0.852,,False,3 copa de vinos,cerca a tu izquierda,True,categoria_sin_pasos:small_object,False,True
+test_images/12_sala.jpg,1280,min,tv,televisor,1,informative,medio_left,0.712,,False,televisor,"un poco más adelante, a tu izquierda",False,categoria_sin_pasos:informative,False,True
+test_images/12_sala.jpg,1280,min,bottle,botella,1,small_object,cerca_center,0.483,,False,botella,frente a ti,False,categoria_sin_pasos:small_object,False,False
+test_images/12_sala.jpg,1280,min,wine glass,copa de vino,1,small_object,cerca_center,0.334,,False,copa de vino,frente a ti,False,categoria_sin_pasos:small_object,False,False
+test_images/12_sala.jpg,1280,min,potted plant,planta en maceta,1,obstacle,medio_left,0.84,,True,planta en maceta,"un poco más adelante, a tu izquierda",False,tope_6_objetos,False,True

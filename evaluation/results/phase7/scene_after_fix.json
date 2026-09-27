@@ -1,0 +1,104 @@
+{
+  "modelo": "qwen/qwen3.8-27b",
+  "records": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 597.9,
+      "uso_llm": true,
+      "scene_type": "oficina",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en una oficina.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 328.5,
+      "uso_llm": true,
+      "scene_type": "comedor",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en un comedor.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 350.1,
+      "uso_llm": true,
+      "scene_type": "sala de estar",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en una sala de estar.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 362.6,
+      "uso_llm": true,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "scene_intro": "Parece que estás en un espacio interior.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 327.0,
+      "uso_llm": true,
+      "scene_type": "espacio interior",
+      "confidence": "baja",
+      "scene_intro": "Parece que estás en un espacio interior.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 337.3,
+      "uso_llm": true,
+      "scene_type": "baño",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en un baño.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 468.6,
+      "uso_llm": true,
+      "scene_type": "comedor",
+      "confidence": "media",
+      "scene_intro": "Parece que estás en un comedor.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 446.7,
+      "uso_llm": true,
+      "scene_type": "calle urbana",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en una calle urbana.",
+      "llm_error": null,
+      "cached": false
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "modelo_llm": "qwen/qwen3.8-27b",
+      "tiempo_ms": 328.8,
+      "uso_llm": true,
+      "scene_type": "sala de estar",
+      "confidence": "alta",
+      "scene_intro": "Parece que estás en una sala de estar.",
+      "llm_error": null,
+      "cached": false
+    }
+  ]
+}

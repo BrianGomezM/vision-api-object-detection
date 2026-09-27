@@ -1,0 +1,18 @@
+[
+ {
+  "escenario": "study: TTS real falla → 502 con ID; sin voz del navegador",
+  "resultado": "PASS",
+  "status": 502,
+  "mensaje": "No fue posible generar el audio. (ID de solicitud: 5801af24365e421690868114c5e2368b)",
+  "boton_navegador": 0,
+  "speechSynthesis_llamadas": 0
+ },
+ {
+  "escenario": "study: éxito real → audio del sistema; sin voz del navegador",
+  "resultado": "PASS",
+  "status": 200,
+  "request_id": "26eec955ec414a879df1f91817f74524",
+  "boton_navegador": 0,
+  "speechSynthesis_llamadas": 0
+ }
+]

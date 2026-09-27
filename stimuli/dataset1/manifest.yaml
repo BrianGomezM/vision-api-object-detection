@@ -1,0 +1,486 @@
+# GENERADO por scripts/import_dataset1.py — NO editar a mano.
+# Contiene condiciones de diseño y referencias al ground truth: uso interno del
+# servidor. La API solo expone stimulus_id, bloque e imagen (ver app/catalog).
+schema_version: 1
+dataset_id: dataset1
+name: Dataset 1 — escenas geométricas controladas A1–D3
+status: FROZEN_V1
+experimental_validation: 'PENDING: geometric criteria verified; YOLO/API evaluation
+  not performed'
+source:
+  repository: generador_escenas_experimentales
+  commit: ae85f90bafaa9f224684b9509c7f0d82e06b85e1
+  manifest_path: output/manifests/dataset_manifest.json
+  manifest_sha256: 0f9857554b5c4e2f93035efff71ea9e3fc564c26a7f065a7e468f2d2ca4af883
+  configs_sha256:
+    camera: 0959725ae67e96780548e46ca600f6dd8c2b57d402843aab80b88d4cb4e37f94
+    render: 9b4d94fb9b208cc46610528cc903cffb3e6ba87c7d2197d06ccf195ee08b568d
+    environment: 56d2d7af770191f653a69472e0872c3ae23dd06da8707164f86b15bf76bf828b
+    depth_conditions: 14dfc4b0461c5754f21c45a567743262b580add837a66943ced67474b0d22b7a
+    horizontal_criterion: fe6b777d8574a3fc7bfc572272c00d981521f58cdb9b7181f40752989eaf398e
+    framing_criterion: 545792ebce39f98f4d82c1bbc7e8e0e872e48372925a22dd8c616aeced25c319
+    occlusion_criterion: 6acddb540a2ddf1d39d953760cdd32940536cd324ef8fbcb81a46227e523874a
+    relations: c09c461cc644deb0aa42be883763d77ec41ba200beb74ca868c638e7112040f6
+image_format:
+  width: 800
+  height: 450
+  type: png
+stimuli:
+- stimulus_id: DS1-A1
+  scene_id: A1
+  block: A
+  file: A1.png
+  sha256: f5f90d47909d8a0f653ba2c1f0650bff81c066e8658e2d02cc06d61270548c8c
+  bytes: 27806
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: near
+      distance_m: 3.02
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A1.json
+    sha256: ca20233e6fba7701a9b83d0d1dfe398f79997e013da0e815a18d975761d0b598
+    scene_spec_sha256: d602f14ecc1a73ea1e7c5fdd627af4a3489db9e5fa118fa53fe160d17232d853
+- stimulus_id: DS1-A2
+  scene_id: A2
+  block: A
+  file: A2.png
+  sha256: 80f53fc8d7f7b1ac511a04d029d97e359ca29a94deeca0add4ac7674c098d5ff
+  bytes: 20364
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A2.json
+    sha256: 78c4e02f1d2e2a955654f3b15d0e613061ff0d9102abfd7240a96c2d908eeb3d
+    scene_spec_sha256: da07a837575cac0bf87ac905db8141f8eb9d10d539529850da267ebe35ed4f74
+- stimulus_id: DS1-A3
+  scene_id: A3
+  block: A
+  file: A3.png
+  sha256: 1ae66d9f9948ea7d409e1493fe13e5da04554466fb00e466b4046c594fd85d02
+  bytes: 16377
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: far
+      distance_m: 7.14
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A3.json
+    sha256: 289b49829b77cae86134be055e83603dd087f26c612bb41b03398471d529e6ab
+    scene_spec_sha256: 4db532f07b9ce3ccbc999884507a4abfc4f19ffe377ad0cb24b4d1926f870202
+- stimulus_id: DS1-A4
+  scene_id: A4
+  block: A
+  file: A4.png
+  sha256: 1fb9f31358464b8335d0ffbd0a2e6729c5c98d8f5127ddd073e0a86f96f48869
+  bytes: 23829
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: center
+      depth_condition: near
+      distance_m: 3.02
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A4.json
+    sha256: 3955ced58ab37a3d769000f95003faf5608bcf22d763ee37a880334e6b1a6d4f
+    scene_spec_sha256: 53bade1880eb8bc8dd111322fb64e16d3a1902e3385adbf63a7cc6accb1bf246
+- stimulus_id: DS1-A5
+  scene_id: A5
+  block: A
+  file: A5.png
+  sha256: 6afc352c307c52a9db028384de9e85e61547de9644f598c562e41b80c268ae5e
+  bytes: 18771
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A5.json
+    sha256: 4b518c040c7567129c27036ae1455448597574ea9f38892b49d96ebcfe61279e
+    scene_spec_sha256: c6e2200ebde41fafa7ee919ac3fb5c65208b721af4f888cf768cac021f8a3d3e
+- stimulus_id: DS1-A6
+  scene_id: A6
+  block: A
+  file: A6.png
+  sha256: 0edd6a8b955a565acd044ad87ae1298253208a6527be6c3266c72511718d8a35
+  bytes: 15924
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: center
+      depth_condition: far
+      distance_m: 7.14
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A6.json
+    sha256: eb78a45c01e857fc409ca2158705f19e70036600daa3fb6d87b06ddf6f1a3757
+    scene_spec_sha256: 214c8abf51d04f454c30c978465f152dcd63cd51eae8fc5784df88bc59a4a053
+- stimulus_id: DS1-A7
+  scene_id: A7
+  block: A
+  file: A7.png
+  sha256: e632fb376a2b6e762f91e733d18889dc5e8f010f4ddcee42364127f9c785c407
+  bytes: 28012
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: right
+      depth_condition: near
+      distance_m: 3.02
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A7.json
+    sha256: dafcba1f7fbbc07b5e1b255908208e6878ccdbbaca072d08c7ff2b2938efc98a
+    scene_spec_sha256: 9ed75abbc8759917af86d32a24908cf9d31ab8ac565548890a682802996d58c7
+- stimulus_id: DS1-A8
+  scene_id: A8
+  block: A
+  file: A8.png
+  sha256: 1e546d25ff8dc05d556996d4920e1bd8e0d38c07cd1b5daca12007660980b1fb
+  bytes: 20539
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A8.json
+    sha256: 92498274cb2207e7add4e3cf52055d1b9a8cbe1cae36b1b709ef96580074cf0f
+    scene_spec_sha256: edc3efbe16609ffd01a6299f06d4c8f36ea23c57495ba7a9efc1dd2c81f732b6
+- stimulus_id: DS1-A9
+  scene_id: A9
+  block: A
+  file: A9.png
+  sha256: 58885467297d62a020bb85c3e03b8b4a478a6ae3fe3b0dcf84b15cf7af322133
+  bytes: 16797
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: right
+      depth_condition: far
+      distance_m: 7.14
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/A9.json
+    sha256: c68095804fa99e660421a315cafe6f2a68bd19413ed0ef248e2ac51cff5954c6
+    scene_spec_sha256: 4f473516beec8ccb163111028437281e45a6e9ffb1ab10506105a12170538cc7
+- stimulus_id: DS1-B1
+  scene_id: B1
+  block: B
+  file: B1.png
+  sha256: c272543661cb90e3289958441c31566d9c092c5751f3b403f449d4855fc76d62
+  bytes: 28752
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: table_01
+      class: dining table
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/B1.json
+    sha256: 21d64edf36de8bb9f429cecd78aafd4cd53665996695c08d3cac66607329fe89
+    scene_spec_sha256: 58d194c7ed6c13db2e5bd6e1133cb5e796aeb28d88bb77938bd5f81ed4870356
+- stimulus_id: DS1-B2
+  scene_id: B2
+  block: B
+  file: B2.png
+  sha256: 69540400cc510ef9c939778e567a5a57615937f0b7f5fef29df0cddf40a9d3ce
+  bytes: 44866
+  design:
+    objects:
+    - id: sofa_01
+      class: couch
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: plant_01
+      class: potted plant
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/B2.json
+    sha256: d6bb2934670225efd3956e22245319f70b36099ae93f0ef4fa6eddfbe949b681
+    scene_spec_sha256: 83b2ea938272d9a57b35d2a0111d8187ef35c2a6daebe644d9ce684886661195
+- stimulus_id: DS1-B3
+  scene_id: B3
+  block: B
+  file: B3.png
+  sha256: 256c636d3258eb468dc898da89908de51c815cee49c6caa389090b8517980657
+  bytes: 25812
+  design:
+    objects:
+    - id: person_01
+      class: person
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: bottle_01
+      class: bottle
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/B3.json
+    sha256: c3cf587575eb4fb1b5a35b9ff41ef7d400fcd89432ddb99c41910a84f288411c
+    scene_spec_sha256: e1782d5f25baac224946b518e51828d4e58805873145c20a5cdbf68dcfa435ed
+- stimulus_id: DS1-C1
+  scene_id: C1
+  block: C
+  file: C1.png
+  sha256: 6b500095e119521010bdcf13721131a68a41068c16dc0b16a3477cb3f04b629a
+  bytes: 23640
+  design:
+    objects:
+    - id: table_01
+      class: dining table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.14
+      occlusion_O: 0.236041
+      relation: null
+    - id: chair_01
+      class: chair
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.14
+      occlusion_O: 0.0
+      relation:
+        type: in_front_of
+        target: table_01
+        side: null
+  ground_truth_ref:
+    path: output/ground_truth/C1.json
+    sha256: b7f03ad8ec9a3e1652b23f8e1140413d7b051ca20c8c30a5cd0071f452b4b30a
+    scene_spec_sha256: f2634536fc763cc6b3e5be8555ebd085a1de81df55ef3418a888f7a88bf05d88
+- stimulus_id: DS1-C2
+  scene_id: C2
+  block: C
+  file: C2.png
+  sha256: 88e9e402f9968700a6989700795c2db7b89ab93c7245b7ab314214f16fbb0034
+  bytes: 41498
+  design:
+    objects:
+    - id: plant_01
+      class: potted plant
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: sofa_01
+      class: couch
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.889075
+      occlusion_O: 0.0
+      relation:
+        type: beside
+        target: plant_01
+        side: left
+  ground_truth_ref:
+    path: output/ground_truth/C2.json
+    sha256: e0c0f36e564bc03059abf077297a154510ffea88d47bfdd597550698882d8186
+    scene_spec_sha256: cf419732d10bee7197f474836c1ae3576b55d9b20f8bd3186468c91c6bfc5ca4
+- stimulus_id: DS1-C3
+  scene_id: C3
+  block: C
+  file: C3.png
+  sha256: e0f90262f0d77f7d7e16daf0891fca1de0527fe68c44564aecf9decb42c1fdd0
+  bytes: 30528
+  design:
+    objects:
+    - id: table_01
+      class: dining table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.14
+      occlusion_O: 0.202623
+      relation: null
+    - id: person_01
+      class: person
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.14
+      occlusion_O: 0.0
+      relation:
+        type: in_front_of
+        target: table_01
+        side: null
+  ground_truth_ref:
+    path: output/ground_truth/C3.json
+    sha256: 5b1e331407fcfdf88d09448fb5992d63cbebcb993ae7248a4d10ca7052077be4
+    scene_spec_sha256: 39e4b3737c713d71b1043b5d28e7c8fecd144e3198fdefdfe7aabf4a5d982b3a
+- stimulus_id: DS1-D1
+  scene_id: D1
+  block: D
+  file: D1.png
+  sha256: 03d474b29ea21c3c9e4ba1a6b94b2359400bdfc9d099f9329251895cf9308db5
+  bytes: 40263
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: table_01
+      class: dining table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: plant_01
+      class: potted plant
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+  ground_truth_ref:
+    path: output/ground_truth/D1.json
+    sha256: 8e155c7479a9ac48ebe57309c30765b723a22dac6c2ab92427917c8924d14b49
+    scene_spec_sha256: 74b3924e69ca5d0873aab848983b0a14a847b77360a3f038a570424b0b34ed68
+- stimulus_id: DS1-D2
+  scene_id: D2
+  block: D
+  file: D2.png
+  sha256: e5459c1fb33a5fd050df4ddd563d3a7f6789a56d5b0059246ff5e3ddadb967b4
+  bytes: 29108
+  design:
+    objects:
+    - id: chair_01
+      class: chair
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: table_01
+      class: dining table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.131701
+      relation: null
+    - id: laptop_01
+      class: laptop
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.549716
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: table_01
+        side: null
+    - id: bottle_01
+      class: bottle
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.56592
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: table_01
+        side: null
+  ground_truth_ref:
+    path: output/ground_truth/D2.json
+    sha256: 30cb5b2406ca7cb87e25532592967ec6327820d7fb0ef195d70217c6d02c87b6
+    scene_spec_sha256: 6c637694d6b0aeb35d43a978737f309ff58daec85ec53fc14242572c06b009a0
+- stimulus_id: DS1-D3
+  scene_id: D3
+  block: D
+  file: D3.png
+  sha256: e8b0731952362491f733a0a45f8c38b30860794f5b520d5b2f7e16e6962542e6
+  bytes: 66921
+  design:
+    objects:
+    - id: sofa_01
+      class: couch
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: table_01
+      class: dining table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: person_01
+      class: person
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.64
+      occlusion_O: 0.0
+      relation: null
+    - id: plant_01
+      class: potted plant
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.784393
+      occlusion_O: 0.0
+      relation:
+        type: beside
+        target: person_01
+        side: right
+  ground_truth_ref:
+    path: output/ground_truth/D3.json
+    sha256: cec6d92825062a66238c119d1bff854efb2c5fb51a900f00dd861debba717f5f
+    scene_spec_sha256: 21efb93a6560e163e9b8fad5f975675fc7442a045a64d9043769628ef901a311

@@ -1,0 +1,6 @@
+Archivo: D:\University\T2\Programacion\vision-api-object-detection\evaluation\results\phase2a\llm\prueba_persistencia\llm_runs_prueba.jsonl
+config_hash: 275c442f7aae1dcb2d96eabfa70735f59f4cd5d7cb98ac33193016fbc118d0e7
+Plan: 144 | con algún registro: 3 | finalizadas (terminales): 3 | sin iniciar: 141
+Estados (último registro por run_id): {'ok': 3}
+Interrumpidas (último registro en_curso): 0 | con excepción del script: 0 | con más de un intento: 0 | líneas ilegibles ignoradas: []
+modelo=qwen/qwen3.8-27b | narrativa_finalizadas=2 | narrativa_ok=2/2 | narrativa_error_llm=0/2 | narrativa_sin_llamada=0/2 | narrativa_ok_pero_vacia=0/2 | finish_reason={'stop': 2} | latencia_narrativa_mediana_ms=510.9 | latencia_narrativa_max_ms=531.6 | tokens_salida_mediana=52.0 | palabras_mediana=36.0 | supera_60_palabras=0/2 | con_objetos_omitidos=0/2 | con_objetos_fuera_del_prompt=0/2 | con_pasos_inexistentes=0/2 | con_verbos_movimiento=0/2 | con_etiqueta_razonamiento=0/2 | imagenes_narrativa_identica_en_todas_las_reps=1/1 | similitud_media_entre_reps=1.0 | escenario_finalizadas=1 | escenario_ok=1/1 | escenario_error_llm=0/1 | escenario_estable_en_todas_las_reps=0/0 | escenario_coincide_gt=0/1 | latencia_escenario_mediana_ms=286.0

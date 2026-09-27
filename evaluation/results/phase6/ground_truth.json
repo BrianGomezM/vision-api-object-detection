@@ -1,0 +1,129 @@
+{
+  "metodologia": {
+    "descripcion": "Ground truth construido por inspeccion visual directa de cada imagen (no derivado de las predicciones de ningun modelo). Cubre dos niveles: (1) escenario esperado, para las 10 imagenes seleccionadas en la Fase 6; (2) objetos relevantes presentes, solo para las 5 imagenes priorizadas por el usuario, usado para calcular metricas de deteccion a nivel de presencia de clase (no a nivel de bounding box / IoU por instancia, ver limitaciones en README.md).",
+    "vocabularios": "Los nombres de clase de objetos se registran tal como existen en CADA vocabulario (COCO-80 y Objects365) por separado. No se convierte artificialmente 'tv' en 'monitor': si el objeto real es un monitor de computador pero ningun vocabulario tiene esa clase, se registra como 'tv' (la unica clase real disponible en ambos modelos), documentando en 'notes' que se trata de un monitor."
+  },
+  "escenarios": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "expected_scene": "oficina",
+      "certainty": "alta",
+      "notes": "Oficina tipo call-center con cubiculos, monitores de computador (etiquetados 'tv' por ambos modelos, ningun vocabulario distingue monitor), teclados, mouse, sillas, un mueble/estanteria de madera."
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "expected_scene": "biblioteca",
+      "certainty": "alta",
+      "notes": "Biblioteca moderna de dos niveles: personas en mesas de lectura con laptops, lamparas de mesa, estanterias de libros, un carrito de libros, una escalera. NINGUNA categoria del heuristico actual (_CONTEXT_GROUPS en scene_classifier.py) representa 'biblioteca'."
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "expected_scene": "sala de estar",
+      "certainty": "alta",
+      "notes": "TV de pared real, dos sofas, mesa de centro, alfombra, lampara de pie, cuadro enmarcado. Escena inequivoca."
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "expected_scene": "ambiguo (rincon de lectura / estudio pequeno con librero)",
+      "certainty": "media",
+      "notes": "Escritorio pequeno con jarron y flores, silla, librero lleno de libros, ventana, cajas apiladas. Tiene elementos tanto de 'oficina' (escritorio, silla) como de 'biblioteca' (librero denso). No se fuerza una unica categoria; es un caso genuinamente hibrido."
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "expected_scene": "exterior / campus universitario",
+      "certainty": "alta",
+      "notes": "Campus universitario al aire libre: estudiantes caminando/sentados, mochilas, un cartel de senalizacion que dice literalmente 'Aulas / Biblioteca / Laboratorios / Cafeteria / Auditorio / Banos', banderines 'UNIVERSIDAD'. Ninguna categoria del heuristico actual representa 'campus/universidad exterior'."
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "expected_scene": "baño",
+      "certainty": "alta",
+      "notes": "Bañera, lavabo con espejo, ducha, toalla colgada. Escena inequivoca."
+    },
+    {
+      "image": "internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "expected_scene": "no aplica (imagen promocional de un asset pack, no es una escena navegable unica)",
+      "certainty": "alta",
+      "notes": "Es la imagen de portada del pack de assets 'KayKit Restaurant Bits': combina una cocina en vista isometrica con dos mesas de comedor separadas y logos superpuestos. No representa una unica escena egocentrica coherente. Se excluye del calculo de aciertos/errores de escenario por no ser un caso valido; se deja documentado como hallazgo de curaduria del dataset, no como error del clasificador."
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "expected_scene": "sala de espera",
+      "certainty": "alta",
+      "notes": "Dos sofas grises tipo institucional, mesas de centro, lamparas, un cartel de horario ('Hours') y un cartel de 'Welcome'. Ninguna categoria del heuristico actual representa 'sala de espera'; es distinta de 'sala de estar' residencial por el mobiliario institucional y los carteles."
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "expected_scene": "exterior / calle",
+      "certainty": "alta",
+      "notes": "Calle urbana low-poly: autos, taxi, camion, semaforos, boca de incendios, casas. Escena inequivoca."
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "expected_scene": "sala de estar",
+      "certainty": "alta",
+      "notes": "A pesar del nombre de archivo ('sofa'), es una sala de estar residencial completa: dos sofas, cojines, puerta de madera, pared de piedra, ventanas con cortinas, mesa auxiliar con libros."
+    }
+  ],
+  "objetos_relevantes": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "relevant_objects_present": [
+        {"class_coco": "chair",        "class_objects365": "chair",         "present": true},
+        {"class_coco": "keyboard",     "class_objects365": "keyboard",      "present": true, "note": "keyboard no esta en COCO-80 estandar; se incluye igual y se marca 'no_en_vocabulario' para COCO al calcular metricas"},
+        {"class_coco": "mouse",        "class_objects365": "mouse",         "present": true, "note": "mouse no esta en COCO-80 estandar"},
+        {"class_coco": "tv",           "class_objects365": "tv",            "present": true, "note": "son monitores de computador reales; ningun vocabulario distingue monitor de tv"},
+        {"class_coco": null,           "class_objects365": "desk",          "present": true, "note": "escritorios de los cubiculos; no existe clase equivalente en COCO-80"},
+        {"class_coco": "potted plant", "class_objects365": "potted plant",  "present": true},
+        {"class_coco": null,           "class_objects365": "cabinet/shelf", "present": true, "note": "mueble/estanteria de madera visible al fondo izquierdo"}
+      ]
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "relevant_objects_present": [
+        {"class_coco": "person",       "class_objects365": "person",        "present": true},
+        {"class_coco": "chair",        "class_objects365": "chair",         "present": true},
+        {"class_coco": "laptop",       "class_objects365": "laptop",        "present": true},
+        {"class_coco": "book",         "class_objects365": "book",          "present": true},
+        {"class_coco": "potted plant", "class_objects365": "potted plant",  "present": true},
+        {"class_coco": "dining table", "class_objects365": "dining table",  "present": true, "note": "mesas de lectura de biblioteca, la clase mas cercana disponible en ambos vocabularios es 'mesa de comedor'"},
+        {"class_coco": null,           "class_objects365": "lamp",          "present": true, "note": "lamparas de mesa; no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": "cabinet/shelf", "present": true, "note": "estanterias de libros; no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": null,            "present": true, "note": "escalera visible en la imagen; NO existe clase 'stairs' en ningun vocabulario (H38, ya documentado en Fase 3) - falso negativo estructural garantizado para ambos modelos"}
+      ]
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "relevant_objects_present": [
+        {"class_coco": "tv",           "class_objects365": "tv",            "present": true},
+        {"class_coco": "couch",        "class_objects365": "couch",         "present": true},
+        {"class_coco": "potted plant", "class_objects365": "potted plant",  "present": true},
+        {"class_coco": null,           "class_objects365": "coffee table",  "present": true, "note": "no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": "picture/frame", "present": true, "note": "cuadro en la pared derecha; no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": "lamp",          "present": true, "note": "lampara de pie; no existe clase equivalente en COCO-80"}
+      ]
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "relevant_objects_present": [
+        {"class_coco": "book",         "class_objects365": "book",          "present": true},
+        {"class_coco": "chair",        "class_objects365": "chair",         "present": true},
+        {"class_coco": "vase",         "class_objects365": null,            "present": true, "note": "Objects365 la detecto como parte de una region distinta ('flower'); se deja el par COCO=vase, Objects365=flower como equivalentes aproximados, no clase identica"},
+        {"class_coco": null,           "class_objects365": "desk",          "present": true, "note": "escritorio pequeno bajo la ventana; no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": "cabinet/shelf", "present": true, "note": "el librero como mueble; no existe clase equivalente en COCO-80"},
+        {"class_coco": null,           "class_objects365": null,            "present": true, "note": "ventana visible; NO existe clase 'window' en ningun vocabulario - falso negativo estructural garantizado"}
+      ]
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "relevant_objects_present": [
+        {"class_coco": "person",       "class_objects365": "person",        "present": true},
+        {"class_coco": "backpack",     "class_objects365": "backpack",      "present": true},
+        {"class_coco": "bench",        "class_objects365": null,            "present": true, "note": "bancas de concreto visibles; Objects365 no las detecto en esta ejecucion (posible falso negativo del modelo, no del vocabulario, ya que Objects365 no tiene clase 'bench' propia distinta tampoco)"},
+        {"class_coco": "book",         "class_objects365": "book",          "present": true},
+        {"class_coco": "laptop",       "class_objects365": "laptop",        "present": true},
+        {"class_coco": null,           "class_objects365": null,            "present": true, "note": "escalinatas de concreto visibles al fondo izquierdo; NO existe clase 'stairs' en ningun vocabulario - falso negativo estructural garantizado"}
+      ]
+    }
+  ]
+}

@@ -17,13 +17,17 @@ CONFIGURACIÓN (variables de entorno en .env):
                        del filtro por clase          (default: 0.15)
 
 ESTRATEGIA DE UMBRAL:
-  Cada clase tiene un umbral mínimo propio (_CLASS_MIN_CONF), usado como
-  PISO de seguridad — nunca se baja de ahí aunque el endpoint pida un
-  umbral más permisivo, evitando perder obstáculos críticos que YOLO
-  detecta con baja confianza (p.ej. mesas en perspectiva frontal,
-  puertas blancas). El umbral efectivo = max(class_min, confidence_threshold
-  _del_endpoint), así que el umbral del endpoint SÍ puede exigir más
-  confianza que el mínimo de la clase cuando el usuario pide algo estricto.
+  Cada clase tiene un umbral mínimo propio (_CLASS_MIN_CONF).
+  El umbral efectivo = min(class_min, confidence_threshold_del_endpoint):
+  el mínimo de la clase REBAJA el umbral para no perder obstáculos críticos
+  que YOLO detecta con baja confianza (p.ej. mesas en perspectiva frontal,
+  puertas blancas). Es la regla documentada en la tesis (Tabla 9 y tabla de
+  run_yolo) y la usada en las evidencias (fases 9 y 10) y en la versión
+  desplegada (origin/main). Regla OFICIAL del experimento (experimental_config.yaml).
+  Limitación conocida: el umbral del endpoint no puede endurecer las clases
+  con mínimo propio, y clases con mínimo > umbral (tv 0.40) quedan en el umbral.
+  (Entre el 21-09-2026 y el 27-09-2026 el código usó max() por una razón de
+  interfaz no validada; ver docs/AUDITORIA_REGLA_UMBRAL_FASE10.md.)
 
 WARM-UP:
   Al cargar el modelo se ejecuta una inferencia con imagen negra para
@@ -36,6 +40,7 @@ Referencias:
 
 import os
 import io
+import hashlib
 import numpy as np
 from PIL import Image
 from ultralytics import YOLO
@@ -153,6 +158,60 @@ _NAV_CLASSES: set[str] = set(_CLASS_MIN_CONF.keys()) | {
 _model: YOLO | None = None
 
 
+class ModelUnavailableError(RuntimeError):
+    """El modelo no pudo cargarse (pesos ausentes, hash distinto, descarga prohibida…)."""
+
+
+def _sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def check_weights(weights: str | None = None) -> dict:
+    """
+    Política de pesos (reproducibilidad):
+
+      YOLO_WEIGHTS_SHA256  → si se define, el archivo local DEBE tener ese hash.
+      YOLO_ALLOW_DOWNLOAD  → si los pesos no existen localmente, ¿se permite que
+                             Ultralytics los descargue? Por defecto "true" en el
+                             perfil development (comportamiento histórico) y
+                             "false" en el perfil study (no se descarga "la última
+                             versión disponible" durante una sesión experimental).
+
+    Lanza RuntimeError si la política no se cumple. Retorna un resumen no sensible.
+    """
+    from app.profiles import app_profile
+
+    weights = weights or YOLO_WEIGHTS
+    default_allow = "false" if app_profile() == "study" else "true"
+    allow_download = os.getenv("YOLO_ALLOW_DOWNLOAD", default_allow).strip().lower() == "true"
+    expected = os.getenv("YOLO_WEIGHTS_SHA256", "").strip().lower()
+
+    if not os.path.exists(weights):
+        if not allow_download:
+            raise RuntimeError(
+                f"[YOLO] '{weights}' no existe localmente y YOLO_ALLOW_DOWNLOAD=false: "
+                "coloque el archivo de pesos verificado antes de arrancar."
+            )
+        if expected:
+            raise RuntimeError(
+                f"[YOLO] '{weights}' no existe localmente y YOLO_WEIGHTS_SHA256 está "
+                "definido: no se descargan pesos sin verificar."
+            )
+        return {"weights": weights, "local": False, "sha256": None, "verificado": False}
+
+    actual = _sha256(weights)
+    if expected and actual != expected:
+        raise RuntimeError(
+            f"[YOLO] Hash de '{weights}' no coincide con YOLO_WEIGHTS_SHA256 "
+            f"(esperado {expected[:12]}…, obtenido {actual[:12]}…)."
+        )
+    return {"weights": weights, "local": True, "sha256": actual, "verificado": bool(expected)}
+
+
 def _get_model() -> YOLO:
     """
     Carga YOLO26 una sola vez (patrón singleton).
@@ -165,6 +224,7 @@ def _get_model() -> YOLO:
     if _model is not None:
         return _model
 
+    check_weights()
     if not os.path.exists(YOLO_WEIGHTS):
         print(
             f"[YOLO] '{YOLO_WEIGHTS}' no encontrado localmente. "
@@ -203,7 +263,7 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
       1. YOLO recibe conf=_INTERNAL_CONF (bajo) para capturar todos los
          candidatos sin descartar prematuramente.
       2. Para cada detección se calcula:
-         effective = max(_CLASS_MIN_CONF.get(label, threshold), threshold)
+         effective = min(_CLASS_MIN_CONF.get(label, threshold), threshold)
       3. Solo pasan clases en _NAV_CLASSES con conf >= effective.
       4. Resultado ordenado por confianza descendente.
 
@@ -228,7 +288,10 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
           ]
         }
     """
-    model = _get_model()
+    try:
+        model = _get_model()
+    except Exception as exc:
+        raise ModelUnavailableError(f"{type(exc).__name__}: {exc}") from exc
 
     # Decodificar imagen
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -260,17 +323,12 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
                 continue
 
             # Filtro 2: umbral efectivo por clase
-            # class_min es un PISO de seguridad, no un techo: el máximo entre
-            # el mínimo de la clase y el umbral del endpoint garantiza que
-            # nunca se baje de ese mínimo (no se pierden obstáculos críticos
-            # aunque el usuario pida un umbral muy bajo), pero el umbral del
-            # endpoint SÍ puede subir la exigencia por encima del mínimo si
-            # el usuario pide algo más estricto.
-            # (Antes se usaba min(), que hacía lo opuesto: class_min actuaba
-            # como techo que el umbral del usuario nunca podía superar —
-            # subir el slider no filtraba estas ~30 clases con mínimo propio.)
+            # REGLA OFICIAL (tesis, fases 9-10, origin/main): el mínimo entre
+            # el umbral de la clase y el del endpoint, para no perder obstáculos
+            # críticos detectados con baja confianza. Ver la cabecera del módulo
+            # y docs/AUDITORIA_REGLA_UMBRAL_FASE10.md antes de cambiarla.
             class_min = _CLASS_MIN_CONF.get(label, confidence_threshold)
-            effective = max(class_min, confidence_threshold)
+            effective = min(class_min, confidence_threshold)
 
             if conf < effective:
                 continue

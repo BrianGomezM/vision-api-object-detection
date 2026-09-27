@@ -1,22 +1,19 @@
-# Dependencias adicionales SOLO para desarrollo/investigación local.
-# No se instalan en producción (no las usa app/main.py).
-# Instalar con: pip install -r requirements.txt -r requirements-dev.txt
--r requirements.txt
+# Herramientas de desarrollo y scripts de evaluación/hardening (NO producción).
+# Versiones del entorno experimental de referencia (requirements.lock.txt).
+# pip install -r requirements.txt -r requirements-test.txt -r requirements-dev.txt
+-r requirements-test.txt
 
-# ── Modelos comparativos (rama comparativa/multi-modelo) ──────
-# app/experimental/ssd_service.py
-tensorflow
-tensorflow-hub
+# scripts/evaluation/phase2a_tts.py (voz comparativa de la fase 2A)
+edge-tts==7.2.8
+# scripts/evaluation/validate_h40_e2e.py
+requests==2.34.2
+# scripts/evaluation/phase2a_detection.py, scripts/hardening/concurrency_bench.py
+psutil==7.2.2
+# análisis estático
+pyflakes==4.0.0
+vulture==2.16
 
-# Faster R-CNN y Mask R-CNN (experimental) — instalación especial,
-# no disponible en PyPI estándar:
-# pip install 'git+https://github.com/facebookresearch/detectron2.git'
-
-# ── Batch / Análisis / Evaluación comparativa ─────────────────
-# (opencv-python-headless ya viene de requirements.txt y cubre cv2;
-# no instalar opencv-python aquí para evitar conflictos de binarios)
-pandas
-matplotlib
-psutil
-openpyxl
-requests
+# Fuera del entorno reproducible (se instalan aparte, no forman parte del experimento):
+#   scripts/hardening/ui_e2e.py → playwright==1.63.0 en un entorno virtual aislado
+#   app/experimental/ (rama comparativa SSD / Faster R-CNN / Mask R-CNN) → tensorflow,
+#   tensorflow-hub, detectron2: no instalados en el entorno de referencia.

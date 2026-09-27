@@ -143,6 +143,26 @@ TTS_STYLE_INSTRUCTIONS: str = os.getenv(
 # entre 100 y 300 caracteres.
 _MAX_CHARS: int = int(os.getenv("TTS_MAX_CHARS", "4500"))
 
+# Timeout de la llamada al proveedor (segundos). Antes no había timeout: una
+# llamada colgada podía bloquear el único worker hasta el timeout de gunicorn.
+TTS_TIMEOUT_S: float = float(os.getenv("TTS_TIMEOUT_S", "60"))
+TTS_TIMEOUT_STATUS: str = "TIMEOUT"
+
+# ──────────────────────────────────────────────────────────────
+# BLOQUEO DE TTS PARA EVALUACIÓN
+# ──────────────────────────────────────────────────────────────
+# EVALUATION_DISABLE_TTS=true impide cualquier llamada al proveedor de
+# síntesis (p. ej. durante experimentos del LLM). La narrativa se sigue
+# generando y devolviendo; el audio se reporta como omitido intencionalmente.
+# Se lee en cada llamada (no al importar) para poder activarlo por proceso.
+# Por defecto (false) el comportamiento de producción no cambia.
+TTS_SKIPPED_STATUS: str = "TTS_OMITIDO_EVALUACION"
+
+
+def is_tts_disabled_for_evaluation() -> bool:
+    return os.getenv("EVALUATION_DISABLE_TTS", "false").strip().lower() == "true"
+
+
 # Parámetros fijos del audio devuelto por Gemini TTS (documentados por
 # Google; no configurables por la API).
 _SAMPLE_RATE_HZ: int = 24000
@@ -185,7 +205,8 @@ def _get_gemini_client():
         logger.warning("[TTS] GOOGLE_API_KEY no definida en .env. TTS desactivado.")
         return None
 
-    _client = genai.Client(api_key=api_key)
+    _client = genai.Client(api_key=api_key,
+                           http_options=genai_types.HttpOptions(timeout=int(TTS_TIMEOUT_S * 1000)))
     logger.info("[TTS] Cliente Gemini inicializado. Modelo: %s  Voz: %s", TTS_MODEL, TTS_VOICE)
     return _client
 
@@ -208,6 +229,9 @@ def _pcm_to_mp3(pcm_bytes: bytes) -> bytes:
 
 def _synthesize_gemini_tts(text: str, model: str = None) -> bytes:
     """Genera audio con Gemini TTS y lo retorna ya codificado en MP3."""
+    if is_tts_disabled_for_evaluation():
+        # Bloqueo duro: ninguna ruta de código puede llegar al proveedor.
+        raise RuntimeError(f"{TTS_SKIPPED_STATUS}: EVALUATION_DISABLE_TTS=true")
     client = _get_gemini_client()
     if client is None:
         raise RuntimeError("Cliente Gemini no disponible (sin API key o sin paquete instalado).")
@@ -256,12 +280,27 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         if audio:
             return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
     """
+    global _last_error
+    _last_error = None          # el motivo de fallo es de ESTA solicitud, nunca de una anterior
+
+    if is_tts_disabled_for_evaluation():
+        logger.warning("[TTS] Omitido intencionalmente: EVALUATION_DISABLE_TTS=true (no se llama al proveedor).")
+        _last_error = {"code": None, "status": TTS_SKIPPED_STATUS,
+                       "message": "TTS omitido intencionalmente por EVALUATION_DISABLE_TTS=true."}
+        return None
+
     if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
         logger.warning("[TTS] Dependencias de Gemini TTS no disponibles. Retornando None.")
+        _last_error = {"code": None, "status": "DEPENDENCIAS_NO_DISPONIBLES", "message": "Paquetes de TTS no instalados."}
+        return None
+
+    if _get_gemini_client() is None:
+        _last_error = {"code": None, "status": "NO_CONFIGURADO", "message": "Cliente Gemini no disponible (sin API key)."}
         return None
 
     if not text or not text.strip():
         logger.warning("[TTS] Texto vacío recibido. No se genera audio.")
+        _last_error = {"code": None, "status": "TEXTO_VACIO", "message": "Texto vacío."}
         return None
 
     if len(text) > _MAX_CHARS:
@@ -275,7 +314,6 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
     # defecto en vez de dejarlo pasar sin más a la API de Gemini.
     effective_model = model if model in _ALLOWED_TTS_MODEL_IDS else None
 
-    global _last_error
     _last_error = None
 
     try:
@@ -301,15 +339,22 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         # incluye la API key (el SDK la envía por header, no en la URL/cuerpo),
         # así que es seguro registrarlo — a diferencia del texto de la excepción
         # completa, que sí podría incluir detalles de transporte no deseados.
+        info = describe_genai_error(exc)
         if isinstance(exc, genai_errors.APIError):
             _last_error = {"code": exc.code, "status": exc.status, "message": exc.message}
             logger.error(
                 "[TTS] Error durante la síntesis: %s %s — %s",
                 exc.code, exc.status, exc.message,
             )
+        elif info["kind"] == "timeout":
+            _last_error = {"code": None, "status": TTS_TIMEOUT_STATUS, "message": type(exc).__name__}
+            logger.error("[TTS] Timeout del proveedor tras %.0f s (%s)", TTS_TIMEOUT_S, type(exc).__name__)
         else:
             _last_error = {"code": None, "status": type(exc).__name__, "message": str(exc)}
             logger.error("[TTS] Error durante la síntesis (%s): %s", type(exc).__name__, exc)
+        # Categoría y tiempo de reintento (SOLO si el proveedor lo informa)
+        _last_error["kind"] = info["kind"]
+        _last_error["retry_after_s"] = info["retry_after_s"]
         return None
 
 
@@ -317,7 +362,11 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
 # DIRECTORIO DE SALIDA DE AUDIO
 # ──────────────────────────────────────────────────────────────
 
-AUDIO_OUTPUT_DIR: Path = Path(__file__).parent.parent.parent / "audio_output"
+from app.storage import data_dir, unique_stamp, rotate
+from app.utils.provider_errors import describe_genai_error
+
+# Audio generado EN VIVO (no congelado). Sin DATA_ROOT: audio_output/ del repositorio.
+AUDIO_OUTPUT_DIR: Path = data_dir("audio_live")
 
 _MAX_AUDIO_FILES: int = int(os.getenv("TTS_MAX_SAVED_FILES", "5"))
 
@@ -343,28 +392,20 @@ def synthesize_and_save(text: str, filename: str = None, model: str = None) -> O
     AUDIO_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     if filename is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"narrativa_{timestamp}.mp3"
+        filename = f"narrativa_{unique_stamp()}.mp3"
 
     file_path = AUDIO_OUTPUT_DIR / filename
     file_path.write_bytes(audio_bytes)
 
-    relative_path = f"audio_output/{filename}"
+    relative_path = f"{AUDIO_OUTPUT_DIR.name}/{filename}"
     logger.info(
         "[TTS] Audio guardado: %s (%d bytes)",
         relative_path, len(audio_bytes),
     )
 
-    existing = sorted(
-        AUDIO_OUTPUT_DIR.glob("narrativa_*.mp3"),
-        key=lambda f: f.stat().st_mtime,
-    )
-    for old_file in existing[:-_MAX_AUDIO_FILES]:
-        try:
-            old_file.unlink()
-            logger.info("[TTS] Archivo antiguo eliminado: %s", old_file.name)
-        except OSError as e:
-            logger.warning("[TTS] No se pudo eliminar %s: %s", old_file.name, e)
+    # Rotación segura ante solicitudes simultáneas (no borra archivos recientes; storage.rotate)
+    for name in rotate(AUDIO_OUTPUT_DIR, "narrativa_*.mp3", _MAX_AUDIO_FILES):
+        logger.info("[TTS] Archivo antiguo eliminado: %s", name)
 
     return relative_path
 

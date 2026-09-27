@@ -1,0 +1,55 @@
+modelo,imagen,tarea,clasificacion,rep1,rep2,rep3
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,narrativa,idénticas,"Silla justo frente a ti a aproximadamente 4 pasos. Silla frente a ti a aproximadamente 5 pasos. Planta en maceta un poco más adelante, a tu izquierda a aproximadamente 6 pasos. Televisor cerca a tu derecha.","Silla justo frente a ti a aproximadamente 4 pasos. Silla frente a ti a aproximadamente 5 pasos. Planta en maceta un poco más adelante, a tu izquierda a aproximadamente 6 pasos. Televisor cerca a tu derecha.","Silla justo frente a ti a aproximadamente 4 pasos. Silla frente a ti a aproximadamente 5 pasos. Planta en maceta un poco más adelante, a tu izquierda a aproximadamente 6 pasos. Televisor cerca a tu derecha."
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,escenario,idénticas,sala de estar,sala de estar,sala de estar
+qwen/qwen3.8-27b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,narrativa,variación lingüística,"2 mesas de comedor a tu izquierda a aproximadamente 2 pasos.
+Silla frente a ti a aproximadamente 3 pasos.
+Sofá, mesa de comedor y silla a tu derecha a aproximadamente 4 pasos.","2 mesas de comedor a tu izquierda a aproximadamente 2 pasos.
+1 silla frente a ti a aproximadamente 3 pasos.
+1 sofá, 1 mesa de comedor y 1 silla a tu derecha a aproximadamente 4 pasos.","2 mesas de comedor a tu izquierda a aproximadamente 2 pasos.
+Silla frente a ti a aproximadamente 3 pasos.
+Sofá, mesa de comedor y silla a tu derecha a aproximadamente 4 pasos."
+qwen/qwen3.8-27b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,escenario,idénticas,comedor,comedor,comedor
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,narrativa,idénticas,Sofá a tu derecha a aproximadamente 3 pasos. Sofá frente a ti a aproximadamente 5 pasos. Planta en maceta a tu izquierda a aproximadamente 5 pasos.,Sofá a tu derecha a aproximadamente 3 pasos. Sofá frente a ti a aproximadamente 5 pasos. Planta en maceta a tu izquierda a aproximadamente 5 pasos.,Sofá a tu derecha a aproximadamente 3 pasos. Sofá frente a ti a aproximadamente 5 pasos. Planta en maceta a tu izquierda a aproximadamente 5 pasos.
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,escenario,idénticas,sala de estar,sala de estar,sala de estar
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,narrativa,idénticas,Silla justo frente a ti a aproximadamente 3 pasos. Jarrón frente a ti a aproximadamente 5 pasos.,Silla justo frente a ti a aproximadamente 3 pasos. Jarrón frente a ti a aproximadamente 5 pasos.,Silla justo frente a ti a aproximadamente 3 pasos. Jarrón frente a ti a aproximadamente 5 pasos.
+qwen/qwen3.8-27b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,escenario,idénticas,espacio interior,espacio interior,espacio interior
+qwen/qwen3.8-27b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,narrativa,variación lingüística,Una persona está justo a tu izquierda a aproximadamente 4 pasos. Seis personas están frente a ti a aproximadamente 5 pasos. Tres personas y dos mochilas están cerca a tu izquierda a aproximadamente 5 pasos.,Una persona está justo a tu izquierda a aproximadamente 4 pasos. Seis personas están frente a ti a aproximadamente 5 pasos. Tres personas y dos mochilas están cerca a tu izquierda a aproximadamente 5 pasos.,Una persona está a tu izquierda a aproximadamente 4 pasos. Seis personas están frente a ti a aproximadamente 5 pasos. Tres personas y dos mochilas están cerca a tu izquierda a aproximadamente 5 pasos.
+qwen/qwen3.8-27b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,escenario,idénticas,espacio interior,espacio interior,espacio interior
+qwen/qwen3.8-27b,test_images/02_calle_carros.jpg,narrativa,idénticas,Coche justo frente a ti a aproximadamente 4 pasos. Coche justo a tu derecha a aproximadamente 4 pasos. Cuatro coches frente a ti a aproximadamente 5 pasos.,Coche justo frente a ti a aproximadamente 4 pasos. Coche justo a tu derecha a aproximadamente 4 pasos. Cuatro coches frente a ti a aproximadamente 5 pasos.,Coche justo frente a ti a aproximadamente 4 pasos. Coche justo a tu derecha a aproximadamente 4 pasos. Cuatro coches frente a ti a aproximadamente 5 pasos.
+qwen/qwen3.8-27b,test_images/02_calle_carros.jpg,escenario,idénticas,espacio exterior,espacio exterior,espacio exterior
+qwen/qwen3.8-27b,test_images/03_escritorio_objetos.jpg,narrativa,variación lingüística,persona a tu izquierda a aproximadamente 1 paso. portátil a tu derecha. 2 portátiles cerca a tu derecha.,Persona a tu izquierda a aproximadamente 1 paso. Portátil a tu derecha. 2 portátiles cerca a tu derecha.,Persona a tu izquierda a aproximadamente 1 paso. Portátil a tu derecha. 2 portátiles cerca a tu derecha.
+qwen/qwen3.8-27b,test_images/03_escritorio_objetos.jpg,escenario,idénticas,sala de estar,sala de estar,sala de estar
+qwen/qwen3.8-27b,test_images/05_sala_muebles.jpg,narrativa,cambio de orientación; cambio de información (pasos),Sofá a tu derecha a aproximadamente 2 pasos. 2 sofás y 1 silla a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta y 1 silla cerca a tu izquierda y frente a ti a aproximadamente 5 y 6 pasos.,Sofá a tu derecha a aproximadamente 2 pasos. 2 sofás y 1 silla a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta y 1 silla cerca a tu izquierda.,Sofá a tu derecha a aproximadamente 2 pasos. 2 sofás y 1 silla a tu izquierda a aproximadamente 4 pasos. 2 plantas en maceta y 1 silla cerca a tu izquierda.
+qwen/qwen3.8-27b,test_images/05_sala_muebles.jpg,escenario,idénticas,sala de estar,sala de estar,sala de estar
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,escenario,error en alguna repetición,sala de estar,sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,escenario,error en alguna repetición,espacio interior,tienda [ERR],tienda [ERR]
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,test_images/02_calle_carros.jpg,escenario,error en las 3 (heurística),exterior [ERR],exterior [ERR],exterior [ERR]
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,test_images/03_escritorio_objetos.jpg,escenario,error en las 3 (heurística),tienda [ERR],tienda [ERR],tienda [ERR]
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-120b,test_images/05_sala_muebles.jpg,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,escenario,error en las 3 (heurística),sala de estar [ERR],sala de estar [ERR],sala de estar [ERR]
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,escenario,idénticas,sala de estar,sala de estar,sala de estar
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,escenario,error en alguna repetición,sala de estar [ERR],sala de estar [ERR],espacio interior
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,escenario,error en alguna repetición,espacio interior,tienda [ERR],tienda [ERR]
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,test_images/02_calle_carros.jpg,escenario,error en las 3 (heurística),exterior [ERR],exterior [ERR],exterior [ERR]
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,test_images/03_escritorio_objetos.jpg,escenario,error en las 3 (heurística),tienda [ERR],tienda [ERR],tienda [ERR]
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,narrativa,error (narrativa vacía),,,
+openai/gpt-oss-20b,test_images/05_sala_muebles.jpg,escenario,error en alguna repetición,sala de estar [ERR],sala de estar [ERR],sala de estar

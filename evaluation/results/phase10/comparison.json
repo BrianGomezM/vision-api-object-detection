@@ -1,0 +1,146 @@
+{
+  "filas": [
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "ground_truth": "biblioteca",
+      "A_baseline_pred": "comedor",
+      "A_baseline_match": false,
+      "B_tactico_pred": "comedor",
+      "B_tactico_match": false,
+      "C_tactico_ampliado_pred": "comedor",
+      "C_tactico_ampliado_match": false,
+      "D_estructural_escena_pred": "comedor",
+      "D_estructural_escena_match": false
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "ground_truth": "exterior / campus universitario",
+      "A_baseline_pred": "espacio interior",
+      "A_baseline_match": false,
+      "B_tactico_pred": "espacio interior",
+      "B_tactico_match": false,
+      "C_tactico_ampliado_pred": "espacio interior",
+      "C_tactico_ampliado_match": false,
+      "D_estructural_escena_pred": "espacio interior",
+      "D_estructural_escena_match": false
+    },
+    {
+      "image": "internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "ground_truth": "no aplica (imagen promocional de un asset pack, no es una escena navegable unica)",
+      "A_baseline_pred": "espacio interior",
+      "A_baseline_match": "no_evaluable",
+      "B_tactico_pred": "espacio interior",
+      "B_tactico_match": "no_evaluable",
+      "C_tactico_ampliado_pred": "espacio interior",
+      "C_tactico_ampliado_match": "no_evaluable",
+      "D_estructural_escena_pred": "espacio interior",
+      "D_estructural_escena_match": "no_evaluable"
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "ground_truth": "baño",
+      "A_baseline_pred": "espacio interior",
+      "A_baseline_match": false,
+      "B_tactico_pred": "espacio interior",
+      "B_tactico_match": false,
+      "C_tactico_ampliado_pred": "espacio interior",
+      "C_tactico_ampliado_match": false,
+      "D_estructural_escena_pred": "espacio interior",
+      "D_estructural_escena_match": false
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "ground_truth": "ambiguo (rincon de lectura / estudio pequeno con librero)",
+      "A_baseline_pred": "espacio interior",
+      "A_baseline_match": "no_evaluable_ambiguo",
+      "B_tactico_pred": "espacio interior",
+      "B_tactico_match": "no_evaluable_ambiguo",
+      "C_tactico_ampliado_pred": "espacio interior",
+      "C_tactico_ampliado_match": "no_evaluable_ambiguo",
+      "D_estructural_escena_pred": "espacio interior",
+      "D_estructural_escena_match": "no_evaluable_ambiguo"
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "ground_truth": "sala de estar",
+      "A_baseline_pred": "sala de estar",
+      "A_baseline_match": true,
+      "B_tactico_pred": "sala de estar",
+      "B_tactico_match": true,
+      "C_tactico_ampliado_pred": "sala de estar",
+      "C_tactico_ampliado_match": true,
+      "D_estructural_escena_pred": "sala de estar",
+      "D_estructural_escena_match": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "ground_truth": "sala de estar",
+      "A_baseline_pred": "sala de estar",
+      "A_baseline_match": true,
+      "B_tactico_pred": "sala de estar",
+      "B_tactico_match": true,
+      "C_tactico_ampliado_pred": "sala de estar",
+      "C_tactico_ampliado_match": true,
+      "D_estructural_escena_pred": "sala de estar",
+      "D_estructural_escena_match": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "ground_truth": "exterior / calle",
+      "A_baseline_pred": "espacio interior",
+      "A_baseline_match": false,
+      "B_tactico_pred": "espacio interior",
+      "B_tactico_match": false,
+      "C_tactico_ampliado_pred": "espacio interior",
+      "C_tactico_ampliado_match": false,
+      "D_estructural_escena_pred": "espacio interior",
+      "D_estructural_escena_match": false
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "ground_truth": "oficina",
+      "A_baseline_pred": "sala de estar",
+      "A_baseline_match": false,
+      "B_tactico_pred": "oficina",
+      "B_tactico_match": true,
+      "C_tactico_ampliado_pred": "oficina",
+      "C_tactico_ampliado_match": true,
+      "D_estructural_escena_pred": "oficina",
+      "D_estructural_escena_match": true
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "ground_truth": "sala de espera",
+      "A_baseline_pred": "comedor",
+      "A_baseline_match": false,
+      "B_tactico_pred": "comedor",
+      "B_tactico_match": false,
+      "C_tactico_ampliado_pred": "comedor",
+      "C_tactico_ampliado_match": false,
+      "D_estructural_escena_pred": "comedor",
+      "D_estructural_escena_match": false
+    }
+  ],
+  "conteos": {
+    "A_baseline": {
+      "correct": 2,
+      "incorrect": 6,
+      "no_eval": 2
+    },
+    "B_tactico": {
+      "correct": 3,
+      "incorrect": 5,
+      "no_eval": 2
+    },
+    "C_tactico_ampliado": {
+      "correct": 3,
+      "incorrect": 5,
+      "no_eval": 2
+    },
+    "D_estructural_escena": {
+      "correct": 3,
+      "incorrect": 5,
+      "no_eval": 2
+    }
+  }
+}

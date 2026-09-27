@@ -1,0 +1,2245 @@
+{
+  "generated_at": "2026-09-20T07:04:53.610297+00:00",
+  "config": {
+    "imgsz": 1280,
+    "conf": 0.15,
+    "iou": 0.45,
+    "device": "cpu",
+    "augment": false
+  },
+  "num_images": 12,
+  "timing_summary_ms": {
+    "yolo26s": {
+      "promedio": 764.42,
+      "minimo": 506.66,
+      "maximo": 1009.28
+    },
+    "yolo26s-objv1-150": {
+      "promedio": 802.59,
+      "minimo": 488.7,
+      "maximo": 1022.42
+    }
+  },
+  "comparacion_por_imagen": [
+    {
+      "image": "01_persona_bolso.jpg",
+      "coco_num_detections": 3,
+      "objects365_num_detections": 8,
+      "clases_nuevas_en_objects365": [
+        "bracelet",
+        "glasses",
+        "slippers",
+        "sneakers",
+        "watch"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 923.64,
+      "objects365_inference_ms": 868.1
+    },
+    {
+      "image": "02_calle_carros.jpg",
+      "coco_num_detections": 31,
+      "objects365_num_detections": 49,
+      "clases_nuevas_en_objects365": [
+        "chair",
+        "luggage",
+        "street lights",
+        "suv",
+        "trash bin/can",
+        "van"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "suitcase"
+      ],
+      "coco_inference_ms": 771.5,
+      "objects365_inference_ms": 1022.42
+    },
+    {
+      "image": "03_escritorio_objetos.jpg",
+      "coco_num_detections": 18,
+      "objects365_num_detections": 25,
+      "clases_nuevas_en_objects365": [
+        "desk",
+        "handbag",
+        "head phone"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 806.58,
+      "objects365_inference_ms": 856.89
+    },
+    {
+      "image": "04_cocina_utensilios.jpg",
+      "coco_num_detections": 25,
+      "objects365_num_detections": 34,
+      "clases_nuevas_en_objects365": [
+        "cookies",
+        "fork",
+        "nuts",
+        "plate",
+        "tangerine"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "dining table"
+      ],
+      "coco_inference_ms": 849.77,
+      "objects365_inference_ms": 847.65
+    },
+    {
+      "image": "05_sala_muebles.jpg",
+      "coco_num_detections": 15,
+      "objects365_num_detections": 29,
+      "clases_nuevas_en_objects365": [
+        "cabinet/shelf",
+        "carpet",
+        "coffee table",
+        "desk",
+        "flower",
+        "picture/frame",
+        "pillow",
+        "wine glass"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 1009.28,
+      "objects365_inference_ms": 915.76
+    },
+    {
+      "image": "06_bicicleta_persona.jpg",
+      "coco_num_detections": 4,
+      "objects365_num_detections": 9,
+      "clases_nuevas_en_objects365": [
+        "glasses",
+        "hat",
+        "helmet"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 931.86,
+      "objects365_inference_ms": 1003.15
+    },
+    {
+      "image": "07_perro_parque.jpg",
+      "coco_num_detections": 4,
+      "objects365_num_detections": 16,
+      "clases_nuevas_en_objects365": [
+        "bracelet",
+        "glasses",
+        "hat",
+        "leather shoes",
+        "necklace",
+        "sandals",
+        "sheep",
+        "slippers",
+        "sneakers"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 506.66,
+      "objects365_inference_ms": 488.7
+    },
+    {
+      "image": "08_mercado_productos.jpg",
+      "coco_num_detections": 18,
+      "objects365_num_detections": 33,
+      "clases_nuevas_en_objects365": [
+        "bottle",
+        "carrot",
+        "lemon",
+        "peach",
+        "pepper",
+        "tangerine",
+        "tomato"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "cup",
+        "dining table",
+        "person"
+      ],
+      "coco_inference_ms": 581.13,
+      "objects365_inference_ms": 642.34
+    },
+    {
+      "image": "09_objetos_pequenos.jpg",
+      "coco_num_detections": 15,
+      "objects365_num_detections": 15,
+      "clases_nuevas_en_objects365": [
+        "desk",
+        "pen/pencil"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "cup",
+        "dining table",
+        "remote"
+      ],
+      "coco_inference_ms": 835.82,
+      "objects365_inference_ms": 864.41
+    },
+    {
+      "image": "10_escena_compleja.jpg",
+      "coco_num_detections": 29,
+      "objects365_num_detections": 15,
+      "clases_nuevas_en_objects365": [
+        "clock",
+        "toy",
+        "van"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "cake",
+        "truck"
+      ],
+      "coco_inference_ms": 888.32,
+      "objects365_inference_ms": 883.48
+    },
+    {
+      "image": "11_escritorio.jpeg",
+      "coco_num_detections": 6,
+      "objects365_num_detections": 11,
+      "clases_nuevas_en_objects365": [
+        "coffee table",
+        "desk",
+        "lamp",
+        "picture/frame"
+      ],
+      "clases_perdidas_respecto_a_coco": [
+        "dining table"
+      ],
+      "coco_inference_ms": 545.26,
+      "objects365_inference_ms": 691.69
+    },
+    {
+      "image": "12_sala.jpg",
+      "coco_num_detections": 18,
+      "objects365_num_detections": 38,
+      "clases_nuevas_en_objects365": [
+        "cabinet/shelf",
+        "candle",
+        "carpet",
+        "coffee table",
+        "cup",
+        "desk",
+        "lamp",
+        "picture/frame",
+        "pillow",
+        "stool"
+      ],
+      "clases_perdidas_respecto_a_coco": [],
+      "coco_inference_ms": 523.17,
+      "objects365_inference_ms": 546.45
+    }
+  ],
+  "detalle_completo": {
+    "01_persona_bolso.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "suitcase",
+            "confidence": 0.841
+          },
+          {
+            "class": "person",
+            "confidence": 0.5659
+          },
+          {
+            "class": "person",
+            "confidence": 0.2871
+          }
+        ],
+        "inference_time_ms": 923.64
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "glasses",
+            "confidence": 0.9283
+          },
+          {
+            "class": "watch",
+            "confidence": 0.8045
+          },
+          {
+            "class": "person",
+            "confidence": 0.5393
+          },
+          {
+            "class": "suitcase",
+            "confidence": 0.4768
+          },
+          {
+            "class": "slippers",
+            "confidence": 0.3813
+          },
+          {
+            "class": "sneakers",
+            "confidence": 0.2933
+          },
+          {
+            "class": "bracelet",
+            "confidence": 0.2017
+          },
+          {
+            "class": "person",
+            "confidence": 0.1804
+          }
+        ],
+        "inference_time_ms": 868.1
+      }
+    },
+    "02_calle_carros.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "car",
+            "confidence": 0.951
+          },
+          {
+            "class": "car",
+            "confidence": 0.9431
+          },
+          {
+            "class": "car",
+            "confidence": 0.9375
+          },
+          {
+            "class": "car",
+            "confidence": 0.91
+          },
+          {
+            "class": "car",
+            "confidence": 0.9021
+          },
+          {
+            "class": "car",
+            "confidence": 0.8965
+          },
+          {
+            "class": "car",
+            "confidence": 0.8877
+          },
+          {
+            "class": "car",
+            "confidence": 0.8672
+          },
+          {
+            "class": "person",
+            "confidence": 0.8442
+          },
+          {
+            "class": "car",
+            "confidence": 0.8198
+          },
+          {
+            "class": "car",
+            "confidence": 0.7708
+          },
+          {
+            "class": "car",
+            "confidence": 0.7082
+          },
+          {
+            "class": "person",
+            "confidence": 0.6462
+          },
+          {
+            "class": "truck",
+            "confidence": 0.5409
+          },
+          {
+            "class": "car",
+            "confidence": 0.4962
+          },
+          {
+            "class": "car",
+            "confidence": 0.4849
+          },
+          {
+            "class": "person",
+            "confidence": 0.4749
+          },
+          {
+            "class": "car",
+            "confidence": 0.4709
+          },
+          {
+            "class": "car",
+            "confidence": 0.4076
+          },
+          {
+            "class": "car",
+            "confidence": 0.3871
+          },
+          {
+            "class": "person",
+            "confidence": 0.3693
+          },
+          {
+            "class": "car",
+            "confidence": 0.3345
+          },
+          {
+            "class": "person",
+            "confidence": 0.306
+          },
+          {
+            "class": "car",
+            "confidence": 0.2741
+          },
+          {
+            "class": "person",
+            "confidence": 0.2465
+          },
+          {
+            "class": "car",
+            "confidence": 0.2459
+          },
+          {
+            "class": "person",
+            "confidence": 0.2223
+          },
+          {
+            "class": "suitcase",
+            "confidence": 0.1808
+          },
+          {
+            "class": "person",
+            "confidence": 0.1751
+          },
+          {
+            "class": "person",
+            "confidence": 0.1668
+          },
+          {
+            "class": "person",
+            "confidence": 0.1617
+          }
+        ],
+        "inference_time_ms": 771.5
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "car",
+            "confidence": 0.9285
+          },
+          {
+            "class": "person",
+            "confidence": 0.8656
+          },
+          {
+            "class": "car",
+            "confidence": 0.8507
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.769
+          },
+          {
+            "class": "car",
+            "confidence": 0.7545
+          },
+          {
+            "class": "car",
+            "confidence": 0.7383
+          },
+          {
+            "class": "car",
+            "confidence": 0.7231
+          },
+          {
+            "class": "trash bin/can",
+            "confidence": 0.7216
+          },
+          {
+            "class": "car",
+            "confidence": 0.7135
+          },
+          {
+            "class": "car",
+            "confidence": 0.7131
+          },
+          {
+            "class": "car",
+            "confidence": 0.6852
+          },
+          {
+            "class": "person",
+            "confidence": 0.6142
+          },
+          {
+            "class": "person",
+            "confidence": 0.6082
+          },
+          {
+            "class": "suv",
+            "confidence": 0.5455
+          },
+          {
+            "class": "car",
+            "confidence": 0.535
+          },
+          {
+            "class": "truck",
+            "confidence": 0.5013
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.4641
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.4608
+          },
+          {
+            "class": "car",
+            "confidence": 0.4595
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.4484
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.4117
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.3856
+          },
+          {
+            "class": "person",
+            "confidence": 0.3723
+          },
+          {
+            "class": "person",
+            "confidence": 0.365
+          },
+          {
+            "class": "suv",
+            "confidence": 0.3487
+          },
+          {
+            "class": "car",
+            "confidence": 0.3202
+          },
+          {
+            "class": "van",
+            "confidence": 0.2992
+          },
+          {
+            "class": "car",
+            "confidence": 0.287
+          },
+          {
+            "class": "suv",
+            "confidence": 0.2835
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.2827
+          },
+          {
+            "class": "car",
+            "confidence": 0.2798
+          },
+          {
+            "class": "van",
+            "confidence": 0.2792
+          },
+          {
+            "class": "chair",
+            "confidence": 0.2725
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.267
+          },
+          {
+            "class": "car",
+            "confidence": 0.2519
+          },
+          {
+            "class": "car",
+            "confidence": 0.2381
+          },
+          {
+            "class": "suv",
+            "confidence": 0.2302
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.2163
+          },
+          {
+            "class": "car",
+            "confidence": 0.2154
+          },
+          {
+            "class": "suv",
+            "confidence": 0.2141
+          },
+          {
+            "class": "person",
+            "confidence": 0.2113
+          },
+          {
+            "class": "car",
+            "confidence": 0.2049
+          },
+          {
+            "class": "street lights",
+            "confidence": 0.1898
+          },
+          {
+            "class": "suv",
+            "confidence": 0.1892
+          },
+          {
+            "class": "person",
+            "confidence": 0.189
+          },
+          {
+            "class": "car",
+            "confidence": 0.1833
+          },
+          {
+            "class": "person",
+            "confidence": 0.1821
+          },
+          {
+            "class": "person",
+            "confidence": 0.1809
+          },
+          {
+            "class": "luggage",
+            "confidence": 0.1513
+          }
+        ],
+        "inference_time_ms": 1022.42
+      }
+    },
+    "03_escritorio_objetos.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "cup",
+            "confidence": 0.9243
+          },
+          {
+            "class": "person",
+            "confidence": 0.9035
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.8911
+          },
+          {
+            "class": "cell phone",
+            "confidence": 0.8242
+          },
+          {
+            "class": "keyboard",
+            "confidence": 0.8096
+          },
+          {
+            "class": "mouse",
+            "confidence": 0.7188
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.7138
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.6325
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.573
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.5284
+          },
+          {
+            "class": "cup",
+            "confidence": 0.4468
+          },
+          {
+            "class": "person",
+            "confidence": 0.3996
+          },
+          {
+            "class": "person",
+            "confidence": 0.3091
+          },
+          {
+            "class": "book",
+            "confidence": 0.299
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.2586
+          },
+          {
+            "class": "tv",
+            "confidence": 0.2473
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.2395
+          },
+          {
+            "class": "person",
+            "confidence": 0.198
+          }
+        ],
+        "inference_time_ms": 806.58
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "cup",
+            "confidence": 0.9582
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.9308
+          },
+          {
+            "class": "person",
+            "confidence": 0.9064
+          },
+          {
+            "class": "keyboard",
+            "confidence": 0.9012
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.8037
+          },
+          {
+            "class": "cell phone",
+            "confidence": 0.6932
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.6811
+          },
+          {
+            "class": "person",
+            "confidence": 0.5713
+          },
+          {
+            "class": "head phone",
+            "confidence": 0.554
+          },
+          {
+            "class": "cup",
+            "confidence": 0.527
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.5075
+          },
+          {
+            "class": "desk",
+            "confidence": 0.4667
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.4666
+          },
+          {
+            "class": "laptop",
+            "confidence": 0.4663
+          },
+          {
+            "class": "desk",
+            "confidence": 0.356
+          },
+          {
+            "class": "mouse",
+            "confidence": 0.2626
+          },
+          {
+            "class": "tv",
+            "confidence": 0.2319
+          },
+          {
+            "class": "person",
+            "confidence": 0.2298
+          },
+          {
+            "class": "person",
+            "confidence": 0.204
+          },
+          {
+            "class": "person",
+            "confidence": 0.1812
+          },
+          {
+            "class": "book",
+            "confidence": 0.1766
+          },
+          {
+            "class": "desk",
+            "confidence": 0.1699
+          },
+          {
+            "class": "desk",
+            "confidence": 0.1656
+          },
+          {
+            "class": "desk",
+            "confidence": 0.1592
+          },
+          {
+            "class": "handbag",
+            "confidence": 0.1562
+          }
+        ],
+        "inference_time_ms": 856.89
+      }
+    },
+    "04_cocina_utensilios.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "orange",
+            "confidence": 0.9538
+          },
+          {
+            "class": "spoon",
+            "confidence": 0.916
+          },
+          {
+            "class": "orange",
+            "confidence": 0.9146
+          },
+          {
+            "class": "orange",
+            "confidence": 0.833
+          },
+          {
+            "class": "orange",
+            "confidence": 0.7525
+          },
+          {
+            "class": "spoon",
+            "confidence": 0.7423
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5945
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5809
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5587
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.5519
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5422
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5213
+          },
+          {
+            "class": "orange",
+            "confidence": 0.4141
+          },
+          {
+            "class": "orange",
+            "confidence": 0.4007
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.3857
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.3684
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3078
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.3034
+          },
+          {
+            "class": "orange",
+            "confidence": 0.2951
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.2752
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.2439
+          },
+          {
+            "class": "cup",
+            "confidence": 0.2155
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.2112
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.1563
+          },
+          {
+            "class": "cup",
+            "confidence": 0.1542
+          }
+        ],
+        "inference_time_ms": 849.77
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "orange",
+            "confidence": 0.8453
+          },
+          {
+            "class": "orange",
+            "confidence": 0.8323
+          },
+          {
+            "class": "orange",
+            "confidence": 0.7395
+          },
+          {
+            "class": "orange",
+            "confidence": 0.6159
+          },
+          {
+            "class": "spoon",
+            "confidence": 0.5877
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5405
+          },
+          {
+            "class": "orange",
+            "confidence": 0.5268
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.5161
+          },
+          {
+            "class": "orange",
+            "confidence": 0.4998
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.4967
+          },
+          {
+            "class": "orange",
+            "confidence": 0.4859
+          },
+          {
+            "class": "orange",
+            "confidence": 0.4319
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.4095
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.3955
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3746
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3699
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.3684
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.3482
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.3301
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.3253
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.318
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3086
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3008
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.2829
+          },
+          {
+            "class": "plate",
+            "confidence": 0.2767
+          },
+          {
+            "class": "orange",
+            "confidence": 0.268
+          },
+          {
+            "class": "fork",
+            "confidence": 0.2279
+          },
+          {
+            "class": "orange",
+            "confidence": 0.2275
+          },
+          {
+            "class": "plate",
+            "confidence": 0.2182
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.2091
+          },
+          {
+            "class": "cup",
+            "confidence": 0.2014
+          },
+          {
+            "class": "cookies",
+            "confidence": 0.1881
+          },
+          {
+            "class": "orange",
+            "confidence": 0.1761
+          },
+          {
+            "class": "nuts",
+            "confidence": 0.1582
+          }
+        ],
+        "inference_time_ms": 847.65
+      }
+    },
+    "05_sala_muebles.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "couch",
+            "confidence": 0.9563
+          },
+          {
+            "class": "tv",
+            "confidence": 0.9118
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.8511
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.8372
+          },
+          {
+            "class": "couch",
+            "confidence": 0.8274
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.777
+          },
+          {
+            "class": "chair",
+            "confidence": 0.6985
+          },
+          {
+            "class": "couch",
+            "confidence": 0.5656
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.4869
+          },
+          {
+            "class": "apple",
+            "confidence": 0.3671
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.2419
+          },
+          {
+            "class": "chair",
+            "confidence": 0.2116
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.2032
+          },
+          {
+            "class": "apple",
+            "confidence": 0.1644
+          },
+          {
+            "class": "apple",
+            "confidence": 0.1565
+          }
+        ],
+        "inference_time_ms": 1009.28
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "tv",
+            "confidence": 0.9574
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.9478
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.9238
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.8956
+          },
+          {
+            "class": "couch",
+            "confidence": 0.8504
+          },
+          {
+            "class": "couch",
+            "confidence": 0.8294
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.798
+          },
+          {
+            "class": "coffee table",
+            "confidence": 0.7302
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.7287
+          },
+          {
+            "class": "couch",
+            "confidence": 0.6838
+          },
+          {
+            "class": "flower",
+            "confidence": 0.6685
+          },
+          {
+            "class": "cabinet/shelf",
+            "confidence": 0.5393
+          },
+          {
+            "class": "carpet",
+            "confidence": 0.513
+          },
+          {
+            "class": "cabinet/shelf",
+            "confidence": 0.5047
+          },
+          {
+            "class": "apple",
+            "confidence": 0.4997
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.4936
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.4729
+          },
+          {
+            "class": "carpet",
+            "confidence": 0.4705
+          },
+          {
+            "class": "apple",
+            "confidence": 0.4542
+          },
+          {
+            "class": "coffee table",
+            "confidence": 0.4027
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.3268
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.2621
+          },
+          {
+            "class": "carpet",
+            "confidence": 0.2545
+          },
+          {
+            "class": "chair",
+            "confidence": 0.2523
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.2315
+          },
+          {
+            "class": "desk",
+            "confidence": 0.2105
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.1951
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.1949
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.1632
+          }
+        ],
+        "inference_time_ms": 915.76
+      }
+    },
+    "06_bicicleta_persona.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "person",
+            "confidence": 0.5221
+          },
+          {
+            "class": "backpack",
+            "confidence": 0.3658
+          },
+          {
+            "class": "backpack",
+            "confidence": 0.3481
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.345
+          }
+        ],
+        "inference_time_ms": 931.86
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "helmet",
+            "confidence": 0.6968
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.6209
+          },
+          {
+            "class": "backpack",
+            "confidence": 0.4149
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.3914
+          },
+          {
+            "class": "backpack",
+            "confidence": 0.3826
+          },
+          {
+            "class": "hat",
+            "confidence": 0.3266
+          },
+          {
+            "class": "person",
+            "confidence": 0.2445
+          },
+          {
+            "class": "person",
+            "confidence": 0.1849
+          },
+          {
+            "class": "glasses",
+            "confidence": 0.1773
+          }
+        ],
+        "inference_time_ms": 1003.15
+      }
+    },
+    "07_perro_parque.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "person",
+            "confidence": 0.8048
+          },
+          {
+            "class": "person",
+            "confidence": 0.7063
+          },
+          {
+            "class": "person",
+            "confidence": 0.6007
+          },
+          {
+            "class": "dog",
+            "confidence": 0.5819
+          }
+        ],
+        "inference_time_ms": 506.66
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "hat",
+            "confidence": 0.9412
+          },
+          {
+            "class": "person",
+            "confidence": 0.8631
+          },
+          {
+            "class": "glasses",
+            "confidence": 0.7912
+          },
+          {
+            "class": "bracelet",
+            "confidence": 0.6176
+          },
+          {
+            "class": "person",
+            "confidence": 0.5276
+          },
+          {
+            "class": "necklace",
+            "confidence": 0.5208
+          },
+          {
+            "class": "dog",
+            "confidence": 0.4601
+          },
+          {
+            "class": "sneakers",
+            "confidence": 0.3926
+          },
+          {
+            "class": "sheep",
+            "confidence": 0.3303
+          },
+          {
+            "class": "bracelet",
+            "confidence": 0.3075
+          },
+          {
+            "class": "person",
+            "confidence": 0.2324
+          },
+          {
+            "class": "sandals",
+            "confidence": 0.2245
+          },
+          {
+            "class": "slippers",
+            "confidence": 0.2163
+          },
+          {
+            "class": "person",
+            "confidence": 0.205
+          },
+          {
+            "class": "leather shoes",
+            "confidence": 0.1733
+          },
+          {
+            "class": "person",
+            "confidence": 0.1505
+          }
+        ],
+        "inference_time_ms": 488.7
+      }
+    },
+    "08_mercado_productos.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "apple",
+            "confidence": 0.9293
+          },
+          {
+            "class": "apple",
+            "confidence": 0.729
+          },
+          {
+            "class": "apple",
+            "confidence": 0.715
+          },
+          {
+            "class": "orange",
+            "confidence": 0.7094
+          },
+          {
+            "class": "orange",
+            "confidence": 0.6891
+          },
+          {
+            "class": "orange",
+            "confidence": 0.6371
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.6138
+          },
+          {
+            "class": "person",
+            "confidence": 0.5587
+          },
+          {
+            "class": "apple",
+            "confidence": 0.4551
+          },
+          {
+            "class": "person",
+            "confidence": 0.3979
+          },
+          {
+            "class": "cup",
+            "confidence": 0.3897
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.386
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.3796
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.3401
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3261
+          },
+          {
+            "class": "apple",
+            "confidence": 0.2849
+          },
+          {
+            "class": "apple",
+            "confidence": 0.2519
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.182
+          }
+        ],
+        "inference_time_ms": 581.13
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "apple",
+            "confidence": 0.91
+          },
+          {
+            "class": "bowl",
+            "confidence": 0.69
+          },
+          {
+            "class": "apple",
+            "confidence": 0.662
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.6568
+          },
+          {
+            "class": "lemon",
+            "confidence": 0.6477
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.6045
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.5438
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.5052
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.4981
+          },
+          {
+            "class": "apple",
+            "confidence": 0.4508
+          },
+          {
+            "class": "orange",
+            "confidence": 0.449
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.3773
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.3766
+          },
+          {
+            "class": "orange",
+            "confidence": 0.3647
+          },
+          {
+            "class": "lemon",
+            "confidence": 0.3558
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.3382
+          },
+          {
+            "class": "carrot",
+            "confidence": 0.3319
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.3221
+          },
+          {
+            "class": "apple",
+            "confidence": 0.3104
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.291
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.2299
+          },
+          {
+            "class": "tangerine",
+            "confidence": 0.2199
+          },
+          {
+            "class": "pepper",
+            "confidence": 0.1996
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.1981
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.1891
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.1818
+          },
+          {
+            "class": "orange",
+            "confidence": 0.1794
+          },
+          {
+            "class": "apple",
+            "confidence": 0.1789
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.1745
+          },
+          {
+            "class": "tomato",
+            "confidence": 0.1658
+          },
+          {
+            "class": "pepper",
+            "confidence": 0.1638
+          },
+          {
+            "class": "apple",
+            "confidence": 0.1608
+          },
+          {
+            "class": "peach",
+            "confidence": 0.159
+          }
+        ],
+        "inference_time_ms": 642.34
+      }
+    },
+    "09_objetos_pequenos.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "book",
+            "confidence": 0.7711
+          },
+          {
+            "class": "cell phone",
+            "confidence": 0.7181
+          },
+          {
+            "class": "cup",
+            "confidence": 0.5787
+          },
+          {
+            "class": "book",
+            "confidence": 0.5634
+          },
+          {
+            "class": "book",
+            "confidence": 0.5154
+          },
+          {
+            "class": "mouse",
+            "confidence": 0.439
+          },
+          {
+            "class": "keyboard",
+            "confidence": 0.3986
+          },
+          {
+            "class": "book",
+            "confidence": 0.3929
+          },
+          {
+            "class": "book",
+            "confidence": 0.3382
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.2241
+          },
+          {
+            "class": "book",
+            "confidence": 0.2215
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.2096
+          },
+          {
+            "class": "book",
+            "confidence": 0.2012
+          },
+          {
+            "class": "cup",
+            "confidence": 0.1777
+          },
+          {
+            "class": "remote",
+            "confidence": 0.1601
+          }
+        ],
+        "inference_time_ms": 835.82
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "pen/pencil",
+            "confidence": 0.8859
+          },
+          {
+            "class": "pen/pencil",
+            "confidence": 0.8415
+          },
+          {
+            "class": "pen/pencil",
+            "confidence": 0.695
+          },
+          {
+            "class": "mouse",
+            "confidence": 0.5323
+          },
+          {
+            "class": "book",
+            "confidence": 0.4229
+          },
+          {
+            "class": "book",
+            "confidence": 0.4186
+          },
+          {
+            "class": "book",
+            "confidence": 0.3906
+          },
+          {
+            "class": "mouse",
+            "confidence": 0.3896
+          },
+          {
+            "class": "keyboard",
+            "confidence": 0.3231
+          },
+          {
+            "class": "book",
+            "confidence": 0.2411
+          },
+          {
+            "class": "book",
+            "confidence": 0.2272
+          },
+          {
+            "class": "book",
+            "confidence": 0.2122
+          },
+          {
+            "class": "desk",
+            "confidence": 0.1884
+          },
+          {
+            "class": "book",
+            "confidence": 0.1713
+          },
+          {
+            "class": "cell phone",
+            "confidence": 0.1588
+          }
+        ],
+        "inference_time_ms": 864.41
+      }
+    },
+    "10_escena_compleja.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "car",
+            "confidence": 0.8692
+          },
+          {
+            "class": "car",
+            "confidence": 0.8443
+          },
+          {
+            "class": "car",
+            "confidence": 0.842
+          },
+          {
+            "class": "car",
+            "confidence": 0.8407
+          },
+          {
+            "class": "car",
+            "confidence": 0.8178
+          },
+          {
+            "class": "car",
+            "confidence": 0.7931
+          },
+          {
+            "class": "car",
+            "confidence": 0.787
+          },
+          {
+            "class": "car",
+            "confidence": 0.7863
+          },
+          {
+            "class": "car",
+            "confidence": 0.7629
+          },
+          {
+            "class": "car",
+            "confidence": 0.6695
+          },
+          {
+            "class": "car",
+            "confidence": 0.6575
+          },
+          {
+            "class": "car",
+            "confidence": 0.6351
+          },
+          {
+            "class": "car",
+            "confidence": 0.5603
+          },
+          {
+            "class": "car",
+            "confidence": 0.5368
+          },
+          {
+            "class": "car",
+            "confidence": 0.5304
+          },
+          {
+            "class": "car",
+            "confidence": 0.4976
+          },
+          {
+            "class": "car",
+            "confidence": 0.4245
+          },
+          {
+            "class": "car",
+            "confidence": 0.4096
+          },
+          {
+            "class": "car",
+            "confidence": 0.3347
+          },
+          {
+            "class": "cake",
+            "confidence": 0.3238
+          },
+          {
+            "class": "car",
+            "confidence": 0.2929
+          },
+          {
+            "class": "car",
+            "confidence": 0.2641
+          },
+          {
+            "class": "cake",
+            "confidence": 0.2281
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.2179
+          },
+          {
+            "class": "truck",
+            "confidence": 0.2028
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.1802
+          },
+          {
+            "class": "car",
+            "confidence": 0.1739
+          },
+          {
+            "class": "car",
+            "confidence": 0.1623
+          },
+          {
+            "class": "car",
+            "confidence": 0.1593
+          }
+        ],
+        "inference_time_ms": 888.32
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "car",
+            "confidence": 0.4603
+          },
+          {
+            "class": "car",
+            "confidence": 0.3889
+          },
+          {
+            "class": "car",
+            "confidence": 0.377
+          },
+          {
+            "class": "toy",
+            "confidence": 0.3435
+          },
+          {
+            "class": "car",
+            "confidence": 0.281
+          },
+          {
+            "class": "toy",
+            "confidence": 0.2291
+          },
+          {
+            "class": "clock",
+            "confidence": 0.2281
+          },
+          {
+            "class": "toy",
+            "confidence": 0.2237
+          },
+          {
+            "class": "van",
+            "confidence": 0.2152
+          },
+          {
+            "class": "van",
+            "confidence": 0.2034
+          },
+          {
+            "class": "car",
+            "confidence": 0.2017
+          },
+          {
+            "class": "toy",
+            "confidence": 0.1956
+          },
+          {
+            "class": "toy",
+            "confidence": 0.1713
+          },
+          {
+            "class": "bicycle",
+            "confidence": 0.159
+          },
+          {
+            "class": "car",
+            "confidence": 0.153
+          }
+        ],
+        "inference_time_ms": 883.48
+      }
+    },
+    "11_escritorio.jpeg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "couch",
+            "confidence": 0.961
+          },
+          {
+            "class": "chair",
+            "confidence": 0.9419
+          },
+          {
+            "class": "chair",
+            "confidence": 0.9246
+          },
+          {
+            "class": "tv",
+            "confidence": 0.8423
+          },
+          {
+            "class": "tv",
+            "confidence": 0.4328
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.2184
+          }
+        ],
+        "inference_time_ms": 545.26
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "picture/frame",
+            "confidence": 0.962
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.9518
+          },
+          {
+            "class": "chair",
+            "confidence": 0.9488
+          },
+          {
+            "class": "couch",
+            "confidence": 0.9471
+          },
+          {
+            "class": "tv",
+            "confidence": 0.9193
+          },
+          {
+            "class": "chair",
+            "confidence": 0.9176
+          },
+          {
+            "class": "coffee table",
+            "confidence": 0.8606
+          },
+          {
+            "class": "desk",
+            "confidence": 0.8042
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.7284
+          },
+          {
+            "class": "lamp",
+            "confidence": 0.6351
+          },
+          {
+            "class": "tv",
+            "confidence": 0.157
+          }
+        ],
+        "inference_time_ms": 691.69
+      }
+    },
+    "12_sala.jpg": {
+      "yolo26s": {
+        "detections": [
+          {
+            "class": "couch",
+            "confidence": 0.961
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.9435
+          },
+          {
+            "class": "chair",
+            "confidence": 0.9271
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.8517
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.8469
+          },
+          {
+            "class": "chair",
+            "confidence": 0.8416
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.8402
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.8291
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.8183
+          },
+          {
+            "class": "chair",
+            "confidence": 0.77
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.7691
+          },
+          {
+            "class": "tv",
+            "confidence": 0.7123
+          },
+          {
+            "class": "chair",
+            "confidence": 0.6895
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.6071
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.6019
+          },
+          {
+            "class": "chair",
+            "confidence": 0.5857
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.4834
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.3344
+          }
+        ],
+        "inference_time_ms": 523.17
+      },
+      "yolo26s-objv1-150": {
+        "detections": [
+          {
+            "class": "couch",
+            "confidence": 0.9677
+          },
+          {
+            "class": "lamp",
+            "confidence": 0.9175
+          },
+          {
+            "class": "tv",
+            "confidence": 0.8933
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.8761
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.8558
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.7963
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.7475
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.7247
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.7156
+          },
+          {
+            "class": "chair",
+            "confidence": 0.689
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.6872
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.677
+          },
+          {
+            "class": "coffee table",
+            "confidence": 0.6763
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.6471
+          },
+          {
+            "class": "pillow",
+            "confidence": 0.6299
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.5862
+          },
+          {
+            "class": "carpet",
+            "confidence": 0.5783
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.5421
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.5401
+          },
+          {
+            "class": "chair",
+            "confidence": 0.5323
+          },
+          {
+            "class": "chair",
+            "confidence": 0.5297
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.518
+          },
+          {
+            "class": "cabinet/shelf",
+            "confidence": 0.5009
+          },
+          {
+            "class": "potted plant",
+            "confidence": 0.4992
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.4983
+          },
+          {
+            "class": "chair",
+            "confidence": 0.4952
+          },
+          {
+            "class": "cup",
+            "confidence": 0.4647
+          },
+          {
+            "class": "wine glass",
+            "confidence": 0.3955
+          },
+          {
+            "class": "lamp",
+            "confidence": 0.3782
+          },
+          {
+            "class": "chair",
+            "confidence": 0.3626
+          },
+          {
+            "class": "lamp",
+            "confidence": 0.362
+          },
+          {
+            "class": "candle",
+            "confidence": 0.3177
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.3126
+          },
+          {
+            "class": "dining table",
+            "confidence": 0.2425
+          },
+          {
+            "class": "picture/frame",
+            "confidence": 0.2251
+          },
+          {
+            "class": "bottle",
+            "confidence": 0.17
+          },
+          {
+            "class": "desk",
+            "confidence": 0.168
+          },
+          {
+            "class": "stool",
+            "confidence": 0.1677
+          }
+        ],
+        "inference_time_ms": 546.45
+      }
+    }
+  }
+}

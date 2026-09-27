@@ -1,0 +1,83 @@
+imagen,regla,n_640,n_1280,conf_media_640,conf_media_1280,clases_solo_640,clases_solo_1280,prompt_cambia,instruccion_cambia
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,max,1,0,0.597,,cat,,True,False
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,max,3,3,0.723,0.836,umbrella,bench,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,max,8,15,0.804,0.731,,car; car; car; person; person; person; person,True,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,max,16,24,0.602,0.645,backpack,couch; dining table; dining table; laptop; laptop; person; person; potted plant; potted plant,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,max,12,15,0.7,0.772,,backpack; person; potted plant,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,max,14,22,0.751,0.703,potted plant,backpack; backpack; person; person; person; person; person; person; person,True,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,max,10,8,0.635,0.676,car; truck,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,max,2,1,0.578,0.796,car,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,max,4,8,0.706,0.701,,chair; chair; couch; potted plant,True,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,max,16,23,0.635,0.604,,chair; chair; chair; chair; chair; chair; tv,True,True
+evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png,max,0,0,,,,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,max,3,2,0.602,0.603,sink,,True,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,max,2,3,0.819,0.753,,potted plant,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,max,2,2,0.808,0.865,,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,max,5,3,0.668,0.866,chair; chair; tv,couch,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,max,16,23,0.672,0.705,clock,bottle; bottle; chair; chair; chair; chair; chair; dining table,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,max,12,13,0.665,0.709,car,chair; person,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,max,1,2,0.589,0.415,,vase,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,max,10,11,0.653,0.649,,chair,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,max,6,5,0.557,0.596,chair,,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,max,3,2,0.582,0.458,chair; dining table,vase,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,max,4,4,0.788,0.761,,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,max,5,4,0.535,0.423,person,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,max,6,4,0.715,0.883,chair; laptop,,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,max,7,8,0.706,0.726,,vase,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,max,6,2,0.671,0.543,chair; chair; clock; couch; potted plant,vase,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,max,0,0,,,,,False,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,max,13,22,0.641,0.691,,chair; chair; chair; chair; chair; chair; dining table; potted plant; potted plant,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,max,2,2,0.811,0.827,,,False,False
+test_images/01_persona_bolso.jpg,max,1,1,0.965,0.612,,,True,False
+test_images/02_calle_carros.jpg,max,13,15,0.688,0.777,,car; car,True,True
+test_images/03_escritorio_objetos.jpg,max,10,11,0.612,0.589,tv,bottle; laptop,True,False
+test_images/04_cocina_utensilios.jpg,max,1,1,0.394,0.417,,,True,True
+test_images/05_sala_muebles.jpg,max,7,8,0.753,0.746,potted plant,couch; couch,True,False
+test_images/06_bicicleta_persona.jpg,max,2,3,0.831,0.445,,backpack,True,True
+test_images/07_perro_parque.jpg,max,3,4,0.778,0.692,,person,True,False
+test_images/08_mercado_productos.jpg,max,1,5,0.957,0.416,,dining table; dining table; dining table; person,True,True
+test_images/09_objetos_pequenos.jpg,max,2,3,0.591,0.606,,laptop,True,False
+test_images/10_escena_compleja.jpg,max,10,13,0.455,0.719,,car; car; car,True,True
+test_images/11_escritorio.jpeg,max,6,4,0.721,0.881,dining table; tv,,True,False
+test_images/12_sala.jpg,max,13,17,0.723,0.769,bottle,dining table; potted plant; wine glass; wine glass; wine glass,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,min,1,0,0.597,,cat,,True,False
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,min,3,3,0.723,0.836,umbrella,bench,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,min,9,15,0.744,0.731,potted plant,car; car; car; person; person; person; person,True,False
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,min,21,27,0.518,0.602,backpack,couch; laptop; laptop; person; potted plant; potted plant; potted plant,True,False
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,min,12,16,0.7,0.742,,backpack; person; potted plant; potted plant,True,True
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,min,15,25,0.722,0.658,potted plant,backpack; backpack; backpack; bench; person; person; person; person; person; person; person,True,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,min,10,8,0.635,0.676,car; truck,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,min,2,1,0.578,0.796,car,,True,True
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,min,4,10,0.706,0.624,,bottle; chair; chair; couch; couch; potted plant,True,False
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,min,20,30,0.546,0.517,,chair; chair; chair; chair; chair; chair; chair; dining table; dining table; tv,True,False
+evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png,min,0,0,,,,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,min,3,2,0.602,0.603,sink,,True,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,min,4,3,0.551,0.753,vase,,True,True
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,min,2,2,0.808,0.865,,,False,False
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,min,6,3,0.611,0.866,chair; chair; tv,,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,min,19,28,0.615,0.632,clock,bottle; bottle; bottle; bottle; bottle; chair; chair; chair; chair; dining table,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,min,15,14,0.584,0.673,car,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,min,2,2,0.463,0.415,potted plant,vase,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,min,11,14,0.607,0.572,,chair; chair; potted plant,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,min,9,9,0.466,0.453,chair; vase,couch; dining table,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,min,7,3,0.428,0.414,bottle; chair; potted plant; vase,,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,min,5,6,0.694,0.588,,potted plant,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,min,5,4,0.535,0.423,person,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,min,6,5,0.715,0.77,laptop,,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,min,9,12,0.617,0.571,,couch; dining table; vase,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,min,8,2,0.584,0.543,chair; chair; clock; couch; couch; potted plant,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,min,1,0,0.196,,dining table,,True,True
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,min,16,24,0.576,0.655,,chair; chair; chair; chair; chair; chair; dining table; potted plant,True,False
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,min,3,3,0.627,0.608,,,False,False
+test_images/01_persona_bolso.jpg,min,1,2,0.965,0.459,,suitcase,True,False
+test_images/02_calle_carros.jpg,min,13,15,0.688,0.777,,car; car,True,True
+test_images/03_escritorio_objetos.jpg,min,10,11,0.612,0.589,tv,bottle; laptop,True,False
+test_images/04_cocina_utensilios.jpg,min,1,2,0.394,0.287,,dining table,True,True
+test_images/05_sala_muebles.jpg,min,10,8,0.609,0.746,dining table; potted plant; potted plant,couch,True,True
+test_images/06_bicicleta_persona.jpg,min,2,4,0.831,0.415,,backpack; backpack,True,True
+test_images/07_perro_parque.jpg,min,3,4,0.778,0.692,,person,True,False
+test_images/08_mercado_productos.jpg,min,2,6,0.609,0.373,,dining table; dining table; dining table; person,True,True
+test_images/09_objetos_pequenos.jpg,min,3,7,0.507,0.39,,dining table; dining table; dining table; laptop,True,True
+test_images/10_escena_compleja.jpg,min,10,13,0.455,0.719,,car; car; car,True,True
+test_images/11_escritorio.jpeg,min,6,5,0.721,0.759,tv,,True,False
+test_images/12_sala.jpg,min,14,18,0.692,0.745,bottle; vase,dining table; potted plant; wine glass; wine glass; wine glass; wine glass,True,True

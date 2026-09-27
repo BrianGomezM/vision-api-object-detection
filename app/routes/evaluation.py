@@ -16,7 +16,7 @@ ENDPOINTS:
   GET  /api/finetune/status    — estado del dataset preparado para fine-tuning
 
 FUNCIÓN PÚBLICA:
-  log_metric(data)  — registrar métricas desde detect.py tras cada detección exitosa
+  log_metric(data)  — re-exportado desde app/telemetry.py (compatibilidad)
 
 ALMACENAMIENTO EN DISCO:
   dataset/images/     imágenes subidas por usuarios
@@ -38,7 +38,6 @@ import asyncio
 import hashlib
 import shutil
 import random
-import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from collections import defaultdict
@@ -46,8 +45,11 @@ from typing import Optional, List
 
 import httpx
 import numpy as np
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from PIL import Image
+
+from app.security import require_api_key
+from app.utils.uploads import read_upload_limited
 
 router = APIRouter()
 
@@ -55,54 +57,29 @@ router = APIRouter()
 # DIRECTORIOS DE ALMACENAMIENTO
 # ──────────────────────────────────────────────────────────────
 
-_BASE            = Path(".")
-DATASET_DIR      = _BASE / "dataset"
-METRICS_DIR      = _BASE / "metrics"
-TEST_DIR         = _BASE / "test_results"
+from app.storage import data_dir
+
+_BASE            = Path(".")                       # solo para test_images/ (entrada, no datos)
+DATASET_DIR      = data_dir("dataset")              # sin DATA_ROOT: ./dataset
+TEST_DIR         = data_dir("api_tests")            # sin DATA_ROOT: ./test_results
 DATASET_IMAGES   = DATASET_DIR / "images"
 DATASET_LABELS   = DATASET_DIR / "labels"
 DATASET_METADATA = DATASET_DIR / "metadata"
-METRICS_LOG      = METRICS_DIR / "production_metrics.jsonl"
 TEST_RESULTS_LOG = TEST_DIR    / "test_history.jsonl"
 
-for _d in [DATASET_IMAGES, DATASET_LABELS, DATASET_METADATA, METRICS_DIR, TEST_DIR]:
-    _d.mkdir(parents=True, exist_ok=True)
+
+def _ensure_dir(*dirs: Path) -> None:
+    """Crea los directorios solo cuando se va a escribir (antes se creaban al importar el módulo)."""
+    for d in dirs:
+        d.mkdir(parents=True, exist_ok=True)
 
 
 # ──────────────────────────────────────────────────────────────
-# FUNCIÓN PÚBLICA: REGISTRO DE MÉTRICAS
-# Llamar desde detect.py tras cada solicitud exitosa a /api/detect
+# TELEMETRÍA: el registro vive en app/telemetry.py (lo usa /api/detect).
+# Este router solo la LEE para /metrics/summary y /metrics/latency.
 # ──────────────────────────────────────────────────────────────
 
-_metrics_lock = threading.Lock()
-
-
-def log_metric(data: dict) -> None:
-    """
-    Registra una entrada de métrica en el log JSONL de producción.
-    Thread-safe mediante lock.
-
-    Uso desde detect.py (al final de _run_full_pipeline o del endpoint):
-        from app.routes.evaluation import log_metric
-        log_metric({
-            "objetos":        len(detections),
-            "confianza_prom": avg_conf,
-            "deteccion_ms":   tiempos["deteccion_ms"],
-            "total_ms":       tiempos["total_ms"],
-            "escenario":      scene_type,
-        })
-    """
-    entry = {"ts": datetime.now(timezone.utc).isoformat(), **data}
-    with _metrics_lock:
-        with open(METRICS_LOG, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-
-
-def _read_metrics(limit: int = 1000) -> list:
-    if not METRICS_LOG.exists():
-        return []
-    lines = [l for l in METRICS_LOG.read_text(encoding="utf-8").strip().split("\n") if l.strip()]
-    return [json.loads(l) for l in lines[-limit:]]
+from app.telemetry import log_metric, read_metrics as _read_metrics   # noqa: F401  (re-export)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -115,6 +92,7 @@ async def upload_to_dataset(
     scene_type: str        = Form("unknown", description="Tipo de escena (sala, cocina, exterior…)"),
     source:     str        = Form("web3d",   description="Origen de la imagen (web3d, test, manual)"),
     auto_label: bool       = Form(True,      description="Ejecutar YOLO y guardar etiquetas en formato YOLO txt"),
+    _key:       str        = Depends(require_api_key),
 ):
     """
     Almacena una imagen en el dataset acumulativo y la etiqueta automáticamente
@@ -126,7 +104,7 @@ async def upload_to_dataset(
     Uso: enviar desde el cliente Web 3D cada vez que el usuario interactúa con
     una escena, para acumular datos del dominio específico del proyecto.
     """
-    image_bytes = await file.read()
+    image_bytes = await read_upload_limited(file)
     if not image_bytes:
         raise HTTPException(status_code=400, detail="Archivo vacío.")
 
@@ -153,6 +131,7 @@ async def upload_to_dataset(
         }
 
     # Guardar imagen
+    _ensure_dir(DATASET_IMAGES, DATASET_LABELS, DATASET_METADATA)
     img_path = DATASET_IMAGES / f"{stem}.jpg"
     img.save(img_path, format="JPEG", quality=90)
 
@@ -447,20 +426,65 @@ _FUNCTIONAL_CASES = [
 ]
 
 
+# ──────────────────────────────────────────────────────────────
+# RESTRICCIONES DE SEGURIDAD DE /test/*
+# ──────────────────────────────────────────────────────────────
+# Antes, /test/functional y /test/load aceptaban `base_url` e `image_path`
+# del cliente: el servidor leía cualquier archivo local (p. ej.
+# /proc/self/environ, con las API keys) y lo enviaba por POST a cualquier
+# URL (SSRF + exfiltración). Ahora:
+#   - Las pruebas SIEMPRE se ejecutan contra esta misma instancia, vía
+#     loopback (SELF_TEST_BASE_URL, configurable solo por variable de
+#     entorno del servidor). El campo `base_url` del formulario se ignora.
+#   - `image_path` solo puede apuntar a un archivo de imagen dentro de
+#     test_images/.
+#   - n_requests y concurrency tienen tope (cada solicitud consume LLM y TTS).
+
+_SELF_TEST_BASE_URL: str = os.getenv(
+    "SELF_TEST_BASE_URL", f"http://127.0.0.1:{os.getenv('PORT', '8000')}"
+)
+_TEST_IMAGES_DIR: Path = (_BASE / "test_images").resolve()
+_ALLOWED_TEST_IMAGE_EXT = {".jpg", ".jpeg", ".png"}
+_LOAD_MAX_REQUESTS: int = int(os.getenv("LOAD_TEST_MAX_REQUESTS", "20"))
+_LOAD_MAX_CONCURRENCY: int = int(os.getenv("LOAD_TEST_MAX_CONCURRENCY", "5"))
+
+
+def _resolve_test_image(image_path: str) -> Path:
+    """
+    Resuelve `image_path` y verifica que quede dentro de test_images/ y
+    tenga extensión de imagen. Acepta "05_sala.jpg" o "test_images/05_sala.jpg".
+    Lanza HTTP 400 si la ruta sale del directorio permitido.
+    """
+    raw = Path(image_path)
+    if raw.parts and raw.parts[0] == "test_images":
+        raw = Path(*raw.parts[1:]) if len(raw.parts) > 1 else Path()
+    candidate = (_TEST_IMAGES_DIR / raw).resolve()
+    if (
+        _TEST_IMAGES_DIR not in candidate.parents
+        or candidate.suffix.lower() not in _ALLOWED_TEST_IMAGE_EXT
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="image_path debe ser una imagen .jpg/.jpeg/.png dentro de test_images/.",
+        )
+    return candidate
+
+
 @router.post("/test/functional", tags=["Pruebas"])
 async def run_functional_tests(
-    base_url: str = Form(
-        "http://127.0.0.1:8000",
-        description="URL base del servidor FastAPI en ejecución",
+    base_url: Optional[str] = Form(
+        None,
+        description="IGNORADO por seguridad: la suite siempre se ejecuta contra esta misma instancia.",
     ),
+    _key: str = Depends(require_api_key),
 ):
     """
-    Ejecuta la suite completa de pruebas funcionales automáticas contra el
-    servidor en ejecución y retorna el resultado PASS/FAIL de cada caso.
+    Ejecuta la suite completa de pruebas funcionales automáticas contra esta
+    misma instancia (loopback) y retorna el resultado PASS/FAIL de cada caso.
 
-    Requiere que el servidor esté corriendo (python run.py) antes de llamar
-    este endpoint. Los resultados se persisten en test_results/test_history.jsonl.
+    Los resultados se persisten en test_results/test_history.jsonl.
     """
+    base_url = _SELF_TEST_BASE_URL
     results  = []
     t_suite  = time.time()
 
@@ -633,6 +657,7 @@ async def run_functional_tests(
     }
 
     # Persistir en disco
+    _ensure_dir(TEST_DIR)
     with open(TEST_RESULTS_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(summary, ensure_ascii=False) + "\n")
 
@@ -645,23 +670,28 @@ async def run_functional_tests(
 
 @router.post("/test/load", tags=["Pruebas"])
 async def run_load_test(
-    n_requests:  int  = Form(10,                      description="Total de solicitudes a enviar"),
-    concurrency: int  = Form(3,                       description="Solicitudes paralelas simultáneas"),
-    base_url:    str  = Form("http://127.0.0.1:8000", description="URL base del servidor"),
-    image_path:  str  = Form("test_images/05_sala_muebles.jpg",  description="Imagen de prueba (ruta relativa)"),
+    n_requests:  int  = Form(10, ge=1, le=_LOAD_MAX_REQUESTS,    description="Total de solicitudes a enviar"),
+    concurrency: int  = Form(3,  ge=1, le=_LOAD_MAX_CONCURRENCY, description="Solicitudes paralelas simultáneas"),
+    base_url:    Optional[str] = Form(
+        None,
+        description="IGNORADO por seguridad: la prueba siempre se ejecuta contra esta misma instancia.",
+    ),
+    image_path:  str  = Form("test_images/05_sala_muebles.jpg",  description="Imagen dentro de test_images/"),
+    _key:        str  = Depends(require_api_key),
 ):
     """
-    Ejecuta una prueba de carga enviando N solicitudes a /api/detect con hasta
-    `concurrency` solicitudes simultáneas usando asyncio + httpx.
+    Ejecuta una prueba de carga enviando N solicitudes a /api/detect de esta
+    misma instancia (loopback) con hasta `concurrency` solicitudes simultáneas.
 
-    Si la imagen especificada no existe, usa una imagen negra de 200×200 px
-    como fallback para que la prueba siempre pueda ejecutarse.
+    `image_path` debe estar dentro de test_images/. Si el archivo no existe,
+    usa una imagen negra de 200×200 px como fallback.
 
     Mide: tasa de éxito, latencia p50/p90/p95/p99, throughput y errores bajo carga.
     Los resultados se persisten en test_results/test_history.jsonl.
     """
-    img_p = Path(image_path)
-    if img_p.exists():
+    base_url = _SELF_TEST_BASE_URL
+    img_p    = _resolve_test_image(image_path)
+    if img_p.is_file():
         img_bytes = img_p.read_bytes()
     else:
         buf = io.BytesIO()
@@ -713,7 +743,10 @@ async def run_load_test(
             "n_requests":  n_requests,
             "concurrency": concurrency,
             "imagen":      image_path,
-            "imagen_usada": str(img_p) if img_p.exists() else "fallback_negra_200x200",
+            "imagen_usada": (
+                f"test_images/{img_p.relative_to(_TEST_IMAGES_DIR).as_posix()}"
+                if img_p.is_file() else "fallback_negra_200x200"
+            ),
         },
         "resultados": {
             "exitosas":        ok,
@@ -734,6 +767,7 @@ async def run_load_test(
         "errores": errors[:10],
     }
 
+    _ensure_dir(TEST_DIR)
     with open(TEST_RESULTS_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(result, ensure_ascii=False) + "\n")
 
@@ -767,6 +801,7 @@ def get_test_results(limit: int = 20):
 def prepare_finetune_dataset(
     train_split: float = Form(0.8, description="Fracción de imágenes para entrenamiento (0.0-1.0)"),
     min_images:  int   = Form(10,  description="Mínimo de imágenes etiquetadas requeridas"),
+    _key:        str   = Depends(require_api_key),
 ):
     """
     Organiza el dataset acumulado en la estructura de directorios que espera

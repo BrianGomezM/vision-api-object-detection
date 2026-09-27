@@ -1,0 +1,427 @@
+{
+  "records": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "model": "yolo26s",
+      "num_raw_detections": 14,
+      "num_analyzed_objects": 9,
+      "object_names_used_for_scene": [
+        "planta en maceta",
+        "ratón",
+        "silla",
+        "teclado",
+        "televisor"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 23,
+      "num_analyzed_objects": 15,
+      "object_names_used_for_scene": [
+        "cabinet/shelf",
+        "escritorio",
+        "libro",
+        "planta en maceta",
+        "portátil",
+        "printer",
+        "ratón",
+        "silla",
+        "teclado",
+        "televisor"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "model": "yolo26s",
+      "num_raw_detections": 64,
+      "num_analyzed_objects": 29,
+      "object_names_used_for_scene": [
+        "botella",
+        "jarrón",
+        "libro",
+        "mesa de comedor",
+        "mochila",
+        "persona",
+        "planta en maceta",
+        "portátil",
+        "silla",
+        "sofá"
+      ],
+      "scene_result": {
+        "scene_type": "tienda",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una tienda.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 84,
+      "num_analyzed_objects": 46,
+      "object_names_used_for_scene": [
+        "bolso",
+        "botella",
+        "cabinet/shelf",
+        "carpet",
+        "coffee table",
+        "escritorio",
+        "head phone",
+        "lamp",
+        "libro",
+        "mesa de comedor",
+        "mochila",
+        "persona",
+        "planta en maceta",
+        "portátil",
+        "silla",
+        "sofá",
+        "televisor",
+        "trolley"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "model": "yolo26s",
+      "num_raw_detections": 5,
+      "num_analyzed_objects": 5,
+      "object_names_used_for_scene": [
+        "cuenco",
+        "planta en maceta",
+        "sofá",
+        "televisor"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 16,
+      "num_analyzed_objects": 15,
+      "object_names_used_for_scene": [
+        "carpet",
+        "coffee table",
+        "cuenco",
+        "escritorio",
+        "lamp",
+        "picture/frame",
+        "planta en maceta",
+        "sofá",
+        "taburete",
+        "televisor"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "model": "yolo26s",
+      "num_raw_detections": 28,
+      "num_analyzed_objects": 6,
+      "object_names_used_for_scene": [
+        "jarrón",
+        "libro",
+        "planta en maceta",
+        "silla"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 16,
+      "num_analyzed_objects": 14,
+      "object_names_used_for_scene": [
+        "banco",
+        "cabinet/shelf",
+        "escritorio",
+        "flower",
+        "jarrón",
+        "libro",
+        "mirror",
+        "pillow",
+        "planta en maceta",
+        "silla",
+        "storage box",
+        "taburete",
+        "taza"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "model": "yolo26s",
+      "num_raw_detections": 46,
+      "num_analyzed_objects": 16,
+      "object_names_used_for_scene": [
+        "banco",
+        "bolso",
+        "libro",
+        "mochila",
+        "persona",
+        "planta en maceta",
+        "portátil",
+        "taza"
+      ],
+      "scene_result": {
+        "scene_type": "tienda",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una tienda.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 68,
+      "num_analyzed_objects": 21,
+      "object_names_used_for_scene": [
+        "bolso",
+        "lamp",
+        "libro",
+        "mochila",
+        "persona",
+        "portátil",
+        "sneakers",
+        "street lights",
+        "taza",
+        "trash bin/can"
+      ],
+      "scene_result": {
+        "scene_type": "tienda",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una tienda.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "model": "yolo26s",
+      "num_raw_detections": 3,
+      "num_analyzed_objects": 3,
+      "object_names_used_for_scene": [
+        "jarrón",
+        "lavabo",
+        "planta en maceta"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 12,
+      "num_analyzed_objects": 11,
+      "object_names_used_for_scene": [
+        "bathtub",
+        "cabinet/shelf",
+        "faucet",
+        "flower",
+        "jarrón",
+        "lamp",
+        "lavabo",
+        "mirror",
+        "planta en maceta",
+        "towel/napkin"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "model": "yolo26s",
+      "num_raw_detections": 14,
+      "num_analyzed_objects": 10,
+      "object_names_used_for_scene": [
+        "barco",
+        "cuenco",
+        "naranja",
+        "pastel",
+        "silla"
+      ],
+      "scene_result": {
+        "scene_type": "comedor",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en un comedor.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 2,
+      "num_analyzed_objects": 2,
+      "object_names_used_for_scene": [
+        "plate",
+        "plátano"
+      ],
+      "scene_result": {
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "scene_intro": "Parece que estás en un espacio interior.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "model": "yolo26s",
+      "num_raw_detections": 6,
+      "num_analyzed_objects": 5,
+      "object_names_used_for_scene": [
+        "libro",
+        "mesa de comedor",
+        "sofá"
+      ],
+      "scene_result": {
+        "scene_type": "sala de estar",
+        "confidence": "baja",
+        "scene_intro": "Parece que estás en una sala de estar.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 18,
+      "num_analyzed_objects": 16,
+      "object_names_used_for_scene": [
+        "coffee table",
+        "escritorio",
+        "lamp",
+        "libro",
+        "mirror",
+        "picture/frame",
+        "power outlet",
+        "sofá"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "model": "yolo26s",
+      "num_raw_detections": 11,
+      "num_analyzed_objects": 8,
+      "object_names_used_for_scene": [
+        "boca de incendios",
+        "camión",
+        "coche",
+        "paraguas",
+        "semáforo"
+      ],
+      "scene_result": {
+        "scene_type": "exterior",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en un exterior.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 6,
+      "num_analyzed_objects": 4,
+      "object_names_used_for_scene": [
+        "boca de incendios",
+        "paraguas",
+        "semáforo",
+        "street lights"
+      ],
+      "scene_result": {
+        "scene_type": "espacio interior",
+        "confidence": "baja",
+        "scene_intro": "Parece que estás en un espacio interior.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "model": "yolo26s",
+      "num_raw_detections": 7,
+      "num_analyzed_objects": 6,
+      "object_names_used_for_scene": [
+        "libro",
+        "silla",
+        "sofá"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "media",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "model": "yolo26s-objv1-150",
+      "num_raw_detections": 19,
+      "num_analyzed_objects": 13,
+      "object_names_used_for_scene": [
+        "coffee table",
+        "escritorio",
+        "lamp",
+        "libro",
+        "picture/frame",
+        "pillow",
+        "silla",
+        "sofá"
+      ],
+      "scene_result": {
+        "scene_type": "oficina",
+        "confidence": "alta",
+        "scene_intro": "Parece que estás en una oficina.",
+        "llm_error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Pruebas automáticas (tests/). Versiones del entorno experimental de referencia.
+# Local: pip install -r requirements.txt -r requirements-test.txt
+# CI / Docker: torch CPU + requirements-docker.lock.txt + este archivo (ver el workflow).
+pytest==9.1.1
+pytest-cov==7.1.0

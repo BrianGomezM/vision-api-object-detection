@@ -1,0 +1,247 @@
+{
+  "nota_metodologica": "Metricas a nivel de PRESENCIA DE CLASE por imagen (no bounding box / IoU por instancia). TP = clase relevante presente en el ground truth y detectada al menos una vez por el modelo. FN = presente en ground truth y no detectada. FP = detectada por el modelo entre las clases relevantes del subconjunto pero no marcada como presente en esa imagen especifica. No se calcula IoU en esta fase (ver limitaciones en README.md).",
+  "por_imagen": [
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-09-office.png",
+      "modelos": {
+        "yolo26s": {
+          "TP": [
+            "chair",
+            "keyboard",
+            "mouse",
+            "potted plant",
+            "tv"
+          ],
+          "FP": [],
+          "FN": [],
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fuera_de_vocabulario": [
+            "escritorios de los cubiculos; no existe clase equivalente en COCO-80",
+            "mueble/estanteria de madera visible al fondo izquierdo"
+          ]
+        },
+        "yolo26s-objv1-150": {
+          "TP": [
+            "cabinet/shelf",
+            "chair",
+            "desk",
+            "keyboard",
+            "mouse",
+            "potted plant",
+            "tv"
+          ],
+          "FP": [
+            "book",
+            "laptop"
+          ],
+          "FN": [],
+          "precision": 0.778,
+          "recall": 1.0,
+          "f1": 0.875,
+          "fuera_de_vocabulario": []
+        }
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-04-Biblioteca.png",
+      "modelos": {
+        "yolo26s": {
+          "TP": [
+            "book",
+            "chair",
+            "dining table",
+            "laptop",
+            "person",
+            "potted plant"
+          ],
+          "FP": [
+            "backpack",
+            "couch",
+            "vase"
+          ],
+          "FN": [],
+          "precision": 0.667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "fuera_de_vocabulario": [
+            "lamparas de mesa; no existe clase equivalente en COCO-80",
+            "estanterias de libros; no existe clase equivalente en COCO-80",
+            "escalera visible en la imagen; NO existe clase 'stairs' en ningun vocabulario (H38, ya documentado en Fase 3) - falso negativo estructural garantizado para ambos modelos"
+          ]
+        },
+        "yolo26s-objv1-150": {
+          "TP": [
+            "book",
+            "cabinet/shelf",
+            "chair",
+            "dining table",
+            "lamp",
+            "laptop",
+            "person",
+            "potted plant"
+          ],
+          "FP": [
+            "backpack",
+            "coffee table",
+            "couch",
+            "desk",
+            "tv"
+          ],
+          "FN": [],
+          "precision": 0.615,
+          "recall": 1.0,
+          "f1": 0.762,
+          "fuera_de_vocabulario": [
+            "escalera visible en la imagen; NO existe clase 'stairs' en ningun vocabulario (H38, ya documentado en Fase 3) - falso negativo estructural garantizado para ambos modelos"
+          ]
+        }
+      }
+    },
+    {
+      "image": "internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "modelos": {
+        "yolo26s": {
+          "TP": [
+            "couch",
+            "potted plant",
+            "tv"
+          ],
+          "FP": [],
+          "FN": [],
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fuera_de_vocabulario": [
+            "no existe clase equivalente en COCO-80",
+            "cuadro en la pared derecha; no existe clase equivalente en COCO-80",
+            "lampara de pie; no existe clase equivalente en COCO-80"
+          ]
+        },
+        "yolo26s-objv1-150": {
+          "TP": [
+            "coffee table",
+            "couch",
+            "lamp",
+            "picture/frame",
+            "potted plant",
+            "tv"
+          ],
+          "FP": [
+            "desk"
+          ],
+          "FN": [],
+          "precision": 0.857,
+          "recall": 1.0,
+          "f1": 0.923,
+          "fuera_de_vocabulario": []
+        }
+      }
+    },
+    {
+      "image": "internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "modelos": {
+        "yolo26s": {
+          "TP": [
+            "book",
+            "chair",
+            "vase"
+          ],
+          "FP": [
+            "potted plant"
+          ],
+          "FN": [],
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.857,
+          "fuera_de_vocabulario": [
+            "escritorio pequeno bajo la ventana; no existe clase equivalente en COCO-80",
+            "el librero como mueble; no existe clase equivalente en COCO-80",
+            "ventana visible; NO existe clase 'window' en ningun vocabulario - falso negativo estructural garantizado"
+          ]
+        },
+        "yolo26s-objv1-150": {
+          "TP": [
+            "book",
+            "cabinet/shelf",
+            "chair",
+            "desk"
+          ],
+          "FP": [
+            "potted plant"
+          ],
+          "FN": [],
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.889,
+          "fuera_de_vocabulario": [
+            "Objects365 la detecto como parte de una region distinta ('flower'); se deja el par COCO=vase, Objects365=flower como equivalentes aproximados, no clase identica",
+            "ventana visible; NO existe clase 'window' en ningun vocabulario - falso negativo estructural garantizado"
+          ]
+        }
+      }
+    },
+    {
+      "image": "generated/synthetic/W3D-G-06-Universidad.png",
+      "modelos": {
+        "yolo26s": {
+          "TP": [
+            "backpack",
+            "bench",
+            "book",
+            "laptop",
+            "person"
+          ],
+          "FP": [
+            "potted plant"
+          ],
+          "FN": [],
+          "precision": 0.833,
+          "recall": 1.0,
+          "f1": 0.909,
+          "fuera_de_vocabulario": [
+            "escalinatas de concreto visibles al fondo izquierdo; NO existe clase 'stairs' en ningun vocabulario - falso negativo estructural garantizado"
+          ]
+        },
+        "yolo26s-objv1-150": {
+          "TP": [
+            "backpack",
+            "book",
+            "laptop",
+            "person"
+          ],
+          "FP": [
+            "lamp"
+          ],
+          "FN": [],
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.889,
+          "fuera_de_vocabulario": [
+            "bancas de concreto visibles; Objects365 no las detecto en esta ejecucion (posible falso negativo del modelo, no del vocabulario, ya que Objects365 no tiene clase 'bench' propia distinta tampoco)",
+            "escalinatas de concreto visibles al fondo izquierdo; NO existe clase 'stairs' en ningun vocabulario - falso negativo estructural garantizado"
+          ]
+        }
+      }
+    }
+  ],
+  "resumen_agregado": {
+    "yolo26s": {
+      "TP_total": 22,
+      "FP_total": 5,
+      "FN_total": 0,
+      "precision": 0.815,
+      "recall": 1.0,
+      "f1": 0.898
+    },
+    "yolo26s-objv1-150": {
+      "TP_total": 29,
+      "FP_total": 10,
+      "FN_total": 0,
+      "precision": 0.744,
+      "recall": 1.0,
+      "f1": 0.853
+    }
+  }
+}
