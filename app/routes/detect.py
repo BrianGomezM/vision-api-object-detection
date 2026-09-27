@@ -37,7 +37,7 @@ import io
 import base64
 from pathlib import Path
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Response
 from fastapi.responses import StreamingResponse
 from PIL import Image
 
@@ -67,6 +67,8 @@ from app.core.pipeline import (                      # noqa: F401  (re-export)
 )
 from app.storage import resolve_output
 from app import telemetry
+from app import experiment
+from app.profiles import app_profile
 
 # Alias históricos
 build_final_narrative = build_narrative          # usado por app/experimental/batch.py
@@ -104,6 +106,16 @@ def _build_annotated_info(annotated_path: str | None) -> dict:
         pass  # No debe romper la respuesta si la lectura del archivo falla
 
     return info
+
+
+def _discard_outputs(annotated_path: str | None, audio_path: str | None) -> None:
+    """Borra los archivos que el pipeline escribió para esta solicitud (perfil production)."""
+    for kind, rel in (("annotated", annotated_path), ("audio_live", audio_path)):
+        if rel:
+            try:
+                resolve_output(kind, rel).unlink(missing_ok=True)
+            except OSError:
+                pass  # nunca debe romper la respuesta
 
 
 def _tts_unavailable_reason() -> str:
@@ -157,6 +169,7 @@ async def detect(
         ),
     ),
     _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
+    response: Response = None,               # inyectado por FastAPI (cabecera X-Request-ID)
 ):
     """
     Procesa una imagen y retorna la narrativa egocéntrica completa.
@@ -170,6 +183,10 @@ async def detect(
     Las métricas de cada solicitud exitosa se registran automáticamente en
     metrics/production_metrics.jsonl para consumo desde GET /api/metrics/summary.
     """
+    # Trazabilidad: identificador por solicitud (cabecera X-Request-ID y telemetría).
+    request_id = experiment.new_request_id()
+    if response is not None:
+        response.headers["X-Request-ID"] = request_id
     try:
         image_bytes = await read_upload_limited(file)
         if not image_bytes:
@@ -231,9 +248,21 @@ async def detect(
             "imagen":             result["imagen"],
         }
 
-        # ── Registrar métricas de producción (NUEVO) ──────────
+        # ── Perfil production: no conservar derivados de la imagen del usuario ──
+        # La imagen anotada y el audio ya están en memoria (base64 / stream); en
+        # producción no se guardan en disco (docs/DATOS_PERSISTENCIA.md).
+        if app_profile() == "production":
+            _discard_outputs(result.get("annotated_path"), audio_path)
+            annotated_info["archivo"] = annotated_info["url"] = None
+            audio_info["archivo"] = None
+            audio_path = ""
+
+        # ── Registrar métricas de producción (sin imagen ni texto del usuario) ──
         try:
             telemetry.log_metric({
+                "request_id":     request_id,
+                "app_commit":     experiment.app_commit()["commit"],
+                "pesos_sha256":   experiment.weights_identity()["sha256"],
                 "objetos":        len(result["detections"]),
                 "confianza_prom": avg_conf,
                 "deteccion_ms":   result["tiempos"].get("deteccion_ms", 0),
@@ -251,6 +280,7 @@ async def detect(
                     "X-Escenario":          result["escenario"].get("scene_type", ""),
                     "X-Objetos-Detectados": str(len(result["detections"])),
                     "X-Audio-File":         audio_path,
+                    "X-Request-ID":         request_id,
                 }
                 return StreamingResponse(
                     io.BytesIO(raw_bytes),

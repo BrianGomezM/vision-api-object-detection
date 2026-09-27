@@ -4,23 +4,30 @@ app/storage.py
 Ubicación ÚNICA de todos los datos que la aplicación escribe en disco.
 
 DATA_ROOT (variable de entorno):
-  - Sin definir → rutas históricas del repositorio, EXACTAMENTE como antes
-    (audio_output/, detections_output/, study_data/sessions/, feedback_data/,
-    metrics/, test_results/, dataset/, /tmp/translation_cache.json).
-    El comportamiento no cambia respecto a versiones anteriores.
-  - Definida    → todos los datos dinámicos van FUERA del código, bajo DATA_ROOT:
+  - Sin definir → rutas históricas del repositorio (todas en .gitignore), como antes:
+    audio_output/, detections_output/, study_data/sessions/, feedback_data/,
+    metrics/, test_results/, dataset/, ~/.cache/vision-api/.
+  - Definida    → todos los datos dinámicos van FUERA del código, SEPARADOS POR
+    DOMINIO para no mezclar datos de participantes con los del producto:
 
       DATA_ROOT/
-        study/sessions/          sesiones de estudio con usuarios
-        responses/feedback/      valoraciones /api/feedback
-        responses/annotated/     imágenes anotadas por /api/detect
-        audio/live/              audio TTS generado en vivo (NO congelado)
-        metrics/                 production_metrics.jsonl
-        evaluations/api_tests/   historial de /api/test/functional y /test/load
-        dataset_finetune/        imágenes/etiquetas subidas para fine-tuning
-        cache/                   caché de traducción EN→ES
+        product/                 PRODUCTO (cualquier perfil)
+          annotated/             imagen anotada de /api/detect  (production: se borra tras responder)
+          audio/                 audio TTS de /api/detect       (production: se borra tras responder)
+          telemetry/             production_metrics.jsonl (sin imagen ni texto del usuario)
+        study/                   ESTUDIO CON PARTICIPANTES (perfiles study/development)
+          sessions/              participant.json + responses.jsonl
+          feedback/              valoraciones Likert de /api/feedback
+        evaluation/              EVALUACIÓN (F4 y herramientas de desarrollo)
+          runs/                  ejecuciones oficiales del protocolo (requiere DATA_ROOT)
+          stimuli_frozen/        paquetes de estímulo congelado (requiere DATA_ROOT)
+          api_tests/             historial de /api/test/*
+        development/
+          dataset_finetune/      imágenes/etiquetas subidas para fine-tuning
+        cache/                   caché de traducción (solo etiquetas fuera del diccionario fijo)
 
     Las carpetas se crean solo cuando la aplicación escribe en ellas.
+    Detalle de qué se persiste y qué no: docs/DATOS_PERSISTENCIA.md.
 
 Los estímulos congelados de entrada (stimuli/ en el repositorio) NO son datos
 dinámicos y no dependen de DATA_ROOT.
@@ -37,15 +44,20 @@ REPO_ROOT: Path = Path(__file__).resolve().parent.parent
 
 # Subcarpeta relativa a DATA_ROOT para cada tipo de dato.
 _LAYOUT: dict[str, str] = {
+    "annotated":      "product/annotated",
+    "audio_live":     "product/audio",
+    "metrics":        "product/telemetry",
     "study_sessions": "study/sessions",
-    "feedback":       "responses/feedback",
-    "annotated":      "responses/annotated",
-    "audio_live":     "audio/live",
-    "metrics":        "metrics",
-    "api_tests":      "evaluations/api_tests",
-    "dataset":        "dataset_finetune",
+    "feedback":       "study/feedback",
+    "eval_runs":      "evaluation/runs",
+    "stimuli_frozen": "evaluation/stimuli_frozen",
+    "api_tests":      "evaluation/api_tests",
+    "dataset":        "development/dataset_finetune",
     "cache":          "cache",
 }
+
+# Tipos que SOLO pueden escribirse con DATA_ROOT definido (nunca dentro del repositorio).
+_REQUIRES_DATA_ROOT: frozenset[str] = frozenset({"eval_runs", "stimuli_frozen"})
 
 # Rutas históricas (sin DATA_ROOT). Se conservan las mismas bases que usaba
 # cada módulo: algunas relativas al repositorio y otras al directorio de trabajo.
@@ -71,7 +83,12 @@ def data_dir(kind: str) -> Path:
     if kind not in _LAYOUT:
         raise KeyError(f"tipo de dato desconocido: {kind}")
     root = data_root()
-    return root / _LAYOUT[kind] if root else _LEGACY[kind]
+    if root:
+        return root / _LAYOUT[kind]
+    if kind in _REQUIRES_DATA_ROOT:
+        raise RuntimeError(f"'{kind}' requiere DATA_ROOT: los artefactos de evaluación nunca se "
+                           "escriben dentro del repositorio.")
+    return _LEGACY[kind]
 
 
 def resolve_output(kind: str, relative: str) -> Path:

@@ -45,6 +45,9 @@ pytest.ini
 requirements-dev.txt
 requirements.lock.txt
 
+# Configuración de F4 (la usa el runner local, no el contenedor de producción)
+experimental_config.yaml
+
 # Código experimental no montado por app/main.py
 app/experimental/
 
