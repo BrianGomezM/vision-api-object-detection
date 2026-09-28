@@ -11,7 +11,7 @@
 | PRODUCTO | Imagen anotada (copia procesada de la imagen del usuario, con cajas) | `product/annotated/` | `detections_output/` | todos | **production: se borra al responder.** development/study: rotación, últimas 10 (`DETECTION_MAX_SAVED`) |
 | PRODUCTO | Audio TTS de la narrativa | `product/audio/` | `audio_output/` | todos | **production: se borra al responder.** development/study: rotación, últimos 5 (`TTS_MAX_SAVED_FILES`) |
 | PRODUCTO | Telemetría: `request_id`, commit, hash de pesos, número de objetos, confianza media, tiempos, escenario. **Sin imagen ni texto** | `product/telemetry/production_metrics.jsonl` | `./metrics/` | todos | sin límite |
-| ESTUDIO | Sesiones: `participant.json` (**datos personales**) y `responses.jsonl` | `study/sessions/<id>/` | `study_data/sessions/` | study, development | permanentes |
+| ESTUDIO | Sesiones v2: `sesion.json` (ficha mínima **sin nombre**, código P0X), `responses.jsonl`, `respuestas/<R001>/audio_narrativa_api.*` y, solo con autorización, `respuesta_participante.*` | `study/sessions/<id>/` | `study_data/sessions/` **solo códigos PTEST** (los reales exigen almacenamiento fuera del repositorio) | todos | permanentes |
 | ESTUDIO | Valoraciones Likert (`/feedback`) | `study/feedback/` | `feedback_data/` | development | permanentes |
 | EVALUACIÓN | Ejecuciones oficiales del protocolo (F4) | `evaluation/runs/` | **no permitido** (exige `DATA_ROOT`) | runner F4 | permanentes |
 | EVALUACIÓN | Paquetes de estímulo congelado (F4) | `evaluation/stimuli_frozen/` | **no permitido** (exige `DATA_ROOT`) | runner F4 | permanentes |
@@ -48,4 +48,4 @@
 ## 5. Pendiente
 
 - **`DATA_ROOT`:** sigue sin estar definido en el `.env` local. El runner de F4 **lo exige**, y el preflight falla sin él.
-- **Seudonimización del `session_id`** del estudio: el identificador actual contiene el nombre del participante.
+- ~~Seudonimización del `session_id`~~ **Resuelto (2026-09-28):** el `session_id` es `<fecha>_<código>`; la API no recibe nombres. Ver `docs/EVALUACION_USUARIOS.md`. Las 2 sesiones antiguas no se listan ni se sirven.

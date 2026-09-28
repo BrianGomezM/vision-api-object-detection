@@ -17,6 +17,7 @@ import pytest
 
 from app.routes import study
 from conftest import png_bytes
+from test_study_sessions import session_body
 
 RK = "clave-investigador-prueba"
 H = {"X-API-Key": RK}
@@ -28,9 +29,12 @@ PRODUCTION_ROUTES = {
     ("GET", "/api/study/sessions"), ("POST", "/api/study/sessions"),
     ("GET", "/api/study/sessions/{session_id}"), ("DELETE", "/api/study/sessions/{session_id}"),
     ("POST", "/api/study/sessions/{session_id}/responses"),
+    ("POST", "/api/study/sessions/{session_id}/responses/{response_id}/grabacion"),
+    ("GET", "/api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}"),
+    ("POST", "/api/study/sessions/{session_id}/cierre"), ("GET", "/api/study/consolidado"),
     ("GET", "/api/metrics/summary"), ("GET", "/api/metrics/latency"),
 }
-RESEARCHER_GETS = ("/api/study/sessions", "/api/catalog", "/api/metrics/summary", "/api/metrics/latency")
+RESEARCHER_GETS = ("/api/study/sessions", "/api/study/consolidado", "/api/catalog", "/api/metrics/summary", "/api/metrics/latency")
 
 
 def _routes(app) -> set[tuple[str, str]]:
@@ -83,8 +87,7 @@ def test_rutas_del_investigador_sin_claves_en_servidor_fallo_cerrado(make_client
 
 def test_crear_sesion_sin_claves_en_servidor_no_escribe(make_client, monkeypatch, tmp_path):
     monkeypatch.setattr(study, "_STUDY_DIR", tmp_path / "s")
-    r = make_client("production").post("/api/study/sessions", json={
-        "nombre": "PTEST01", "tipo_participante": "piloto", "consentimiento": True})
+    r = make_client("production").post("/api/study/sessions", json=session_body())
     assert r.status_code == 401 and not (tmp_path / "s").exists()
 
 
@@ -111,26 +114,25 @@ def test_flujo_completo_de_sesion_en_production(prod, tmp_path):
     legacy = REPO_ROOT / "study_data" / "sessions"
     legacy_before = sorted(p.name for p in legacy.iterdir()) if legacy.exists() else []
 
-    r = prod.post("/api/study/sessions", headers=H, json={
-        "nombre": "PTEST01", "tipo_participante": "piloto", "consentimiento": True})
+    r = prod.post("/api/study/sessions", headers=H, json=session_body())
     assert r.status_code == 201, r.text
     sid = r.json()["session_id"]
     assert sid.endswith("_ptest01")
 
     r = prod.post(f"/api/study/sessions/{sid}/responses", headers=H,
-                  json={"prueba_id": "PRUEBA-PTEST", "respuesta": "ok", "correcto": True})
+                  json={"prueba_id": "PIL-02", "modo": "formal", "respuesta_transcrita": "adecuada"})
     assert r.status_code == 201, r.text
 
     detail = prod.get(f"/api/study/sessions/{sid}", headers=H)
     assert detail.status_code == 200
-    assert detail.json()["participant"]["tipo_participante"] == "piloto"
-    assert [x["prueba_id"] for x in detail.json()["respuestas"]] == ["PRUEBA-PTEST"]
+    assert detail.json()["sesion"]["tipo_participante"] == "piloto"
+    assert [x["prueba"]["id"] for x in detail.json()["respuestas"]] == ["PIL-02"]
 
     listed = prod.get("/api/study/sessions", headers=H).json()
     assert [s["num_respuestas"] for s in listed["sesiones"] if s["session_id"] == sid] == [1]
 
     session_dir = tmp_path / "study" / "sessions" / sid
-    assert json.loads((session_dir / "participant.json").read_text(encoding="utf-8"))["nombre"] == "PTEST01"
+    assert json.loads((session_dir / "sesion.json").read_text(encoding="utf-8"))["codigo"] == "PTEST01"
     assert len((session_dir / "responses.jsonl").read_text(encoding="utf-8").splitlines()) == 1
 
     assert prod.delete(f"/api/study/sessions/{sid}", headers=H).status_code == 200
@@ -141,15 +143,15 @@ def test_flujo_completo_de_sesion_en_production(prod, tmp_path):
 
 
 def test_consentimiento_obligatorio_en_production(prod, tmp_path):
-    r = prod.post("/api/study/sessions", headers=H, json={
-        "nombre": "PTEST01", "tipo_participante": "piloto", "consentimiento": False})
+    body = session_body()
+    body["consentimiento"]["comprende_y_acepta"] = False
+    r = prod.post("/api/study/sessions", headers=H, json=body)
     assert r.status_code == 400
     assert not (tmp_path / "study" / "sessions").exists()
 
 
 def test_borrar_sesion_exige_clave(prod):
-    r = prod.post("/api/study/sessions", headers=H, json={
-        "nombre": "PTEST01", "tipo_participante": "piloto", "consentimiento": True})
+    r = prod.post("/api/study/sessions", headers=H, json=session_body())
     sid = r.json()["session_id"]
     assert prod.delete(f"/api/study/sessions/{sid}").status_code == 401
     assert prod.get(f"/api/study/sessions/{sid}", headers=H).status_code == 200

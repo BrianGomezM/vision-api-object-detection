@@ -26,6 +26,10 @@ CONFIGURACIÓN (.env):
                               Ejemplo: API_KEYS=clave-tesis-2026,clave-evaluador
   RATE_LIMIT_REQUESTS       → peticiones máximas por ventana  (default: 10)
   RATE_LIMIT_WINDOW_SECONDS → duración de la ventana en segundos (default: 60)
+  RESEARCHER_RATE_LIMIT_REQUESTS → peticiones máximas por ventana en las rutas del
+                              investigador (default: 120). Es un límite PROPIO: una
+                              sesión con un participante hace varias lecturas por
+                              estímulo y no debe recibir 429 a mitad de la sesión.
 
 USO EN ENDPOINTS:
   from app.security import require_api_key
@@ -89,6 +93,9 @@ _MAX_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "10"))
 # Duración de la ventana deslizante en segundos.
 _WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 
+# Límite propio de las rutas del investigador (misma ventana, contador separado).
+_RESEARCHER_MAX_REQUESTS: int = int(os.getenv("RESEARCHER_RATE_LIMIT_REQUESTS", "120"))
+
 if DEV_MODE:
     print("[Security] ADVERTENCIA: API_KEYS no configurado. Modo desarrollo activo — sin autenticación.")
 else:
@@ -106,7 +113,7 @@ _windows: dict[str, deque] = defaultdict(deque)
 _lock    = threading.Lock()
 
 
-def _check_rate(key: str) -> tuple[bool, int, int]:
+def _check_rate(key: str, max_requests: int | None = None) -> tuple[bool, int, int]:
     """
     Verifica si la clave puede hacer una petición más ahora.
 
@@ -122,6 +129,7 @@ def _check_rate(key: str) -> tuple[bool, int, int]:
     Retorna:
         (permitido, peticiones_restantes, segundos_para_reintentar)
     """
+    limit        = _MAX_REQUESTS if max_requests is None else max_requests
     now          = time.monotonic()
     window_start = now - _WINDOW_SECONDS
 
@@ -133,9 +141,9 @@ def _check_rate(key: str) -> tuple[bool, int, int]:
             q.popleft()
 
         count     = len(q)
-        remaining = max(0, _MAX_REQUESTS - count - 1)
+        remaining = max(0, limit - count - 1)
 
-        if count >= _MAX_REQUESTS:
+        if count >= limit:
             # El más antiguo dentro de la ventana determina cuándo hay espacio
             reset_in = int(q[0] + _WINDOW_SECONDS - now) + 1
             return False, 0, reset_in
@@ -197,10 +205,10 @@ async def require_researcher_key(
             )
         response.headers["X-Auth-Mode"] = "dev-no-auth"
         return "dev"
-    return _validate_key(response, x_api_key, keys)
+    return _validate_key(response, x_api_key, keys, researcher=True)
 
 
-def _validate_key(response: Response, x_api_key: Optional[str], keys: set[str]) -> str:
+def _validate_key(response: Response, x_api_key: Optional[str], keys: set[str], researcher: bool = False) -> str:
     # ── Validar presencia del header ──────────────────────────
     if not x_api_key:
         raise HTTPException(
@@ -221,10 +229,12 @@ def _validate_key(response: Response, x_api_key: Optional[str], keys: set[str]) 
         )
 
     # ── Aplicar rate limiting ─────────────────────────────────
-    allowed, remaining, retry_after = _check_rate(x_api_key)
+    # Las rutas del investigador cuentan en una ventana separada ("r:<clave>").
+    limit = _RESEARCHER_MAX_REQUESTS if researcher else _MAX_REQUESTS
+    allowed, remaining, retry_after = _check_rate(("r:" if researcher else "") + x_api_key, limit)
 
     # Incluir headers de rate limit en TODA respuesta (éxito y error)
-    response.headers["X-RateLimit-Limit"]     = str(_MAX_REQUESTS)
+    response.headers["X-RateLimit-Limit"]     = str(limit)
     response.headers["X-RateLimit-Remaining"] = str(remaining)
     response.headers["X-RateLimit-Window"]    = f"{_WINDOW_SECONDS}s"
 
@@ -232,12 +242,12 @@ def _validate_key(response: Response, x_api_key: Optional[str], keys: set[str]) 
         raise HTTPException(
             status_code=429,
             detail=(
-                f"Límite de {_MAX_REQUESTS} peticiones por {_WINDOW_SECONDS} segundos alcanzado. "
+                f"Límite de {limit} peticiones por {_WINDOW_SECONDS} segundos alcanzado. "
                 f"Intenta de nuevo en {retry_after} segundos."
             ),
             headers={
                 "Retry-After":            str(retry_after),
-                "X-RateLimit-Limit":      str(_MAX_REQUESTS),
+                "X-RateLimit-Limit":      str(limit),
                 "X-RateLimit-Remaining":  "0",
                 "X-RateLimit-Window":     f"{_WINDOW_SECONDS}s",
             },

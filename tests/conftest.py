@@ -19,6 +19,7 @@ def _clean_env(monkeypatch):
                 "YOLO_ALLOW_DOWNLOAD"):
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setattr(security, "_MAX_REQUESTS", 10_000)
+    monkeypatch.setattr(security, "_RESEARCHER_MAX_REQUESTS", 10_000)
     security._windows.clear()
 
 

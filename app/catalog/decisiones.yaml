@@ -1,0 +1,49 @@
+# Tareas de DECISIÓN (tipo C) del estudio con usuarios — Objetivo Específico 3.
+#
+# Qué evalúan: el participante escucha la narrativa de la API y elige entre
+# alternativas. Es una decisión HIPOTÉTICA basada en información espacial auditiva:
+# nadie camina, se desplaza ni controla un personaje (doc. 27, §H).
+#
+# Por qué está fuera de catalog.yaml: catalog.yaml está congelado (sha256 en
+# experimental_config.yaml). Este archivo no cambia la detección, la narrativa ni el
+# TTS; solo define cómo se registra y se compara la decisión.
+#
+# La alternativa ESPERADA vive solo aquí, en el servidor. GET /api/catalog publica la
+# pregunta y las alternativas, nunca la respuesta esperada, para no sesgar al
+# investigador. El servidor la aplica al guardar la respuesta: el cliente no la decide.
+#
+# pregunta / alternativas: tomadas literalmente del guion del catálogo (OBJ-03 indica
+# "izquierda/derecha/frente"). No se añaden alternativas nuevas.
+# esperada_por_estimulo: {stimulus_id: alternativa}. POR_DEFINIR mientras los
+# estímulos de OBJ-03/OBJ-04 estén POR_DEFINIR en el catálogo (CP3B).
+
+schema_version: 1
+
+tareas:
+  - prueba_id: OBJ-03
+    pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría?"
+    alternativas:
+      - {id: izquierda, texto: "Izquierda"}
+      - {id: frente, texto: "Frente"}
+      - {id: derecha, texto: "Derecha"}
+    esperada_por_estimulo: POR_DEFINIR
+  - prueba_id: OBJ-04
+    pregunta: "¿Cambió algo respecto a lo anterior? ¿Hacia dónde avanzaría ahora?"
+    alternativas:
+      - {id: izquierda, texto: "Izquierda"}
+      - {id: frente, texto: "Frente"}
+      - {id: derecha, texto: "Derecha"}
+    esperada_por_estimulo: POR_DEFINIR
+
+# Fixtures TÉCNICOS: solo verifican el mecanismo (seleccionada / esperada / correcto)
+# en sesiones de prueba técnica (PTEST…) y en modo ENSAYO. No son estímulos del
+# estudio, no son evidencia y nunca se aplican a participantes (P0X).
+fixtures_tecnicos:
+  - id: FIX-DEC-01
+    prueba_id: OBJ-03
+    stimulus_id: DS1-B3
+    esperada: izquierda
+    fundamento: >-
+      Condición geométrica del diseño de DS1-B3 (stimuli/dataset1/manifest.yaml):
+      persona al centro y botella a la derecha, sin objetos a la izquierda. Sirve solo
+      para probar el registro; no es una respuesta metodológica de OBJ-03.

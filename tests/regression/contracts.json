@@ -41,6 +41,8 @@
    "GET /api/health",
    "GET /api/metrics/latency",
    "GET /api/metrics/summary",
+   "GET /api/study/consolidado",
+   "GET /api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}",
    "GET /api/test/results",
    "GET /api/tts/models",
    "GET,POST /api/feedback",
@@ -50,7 +52,9 @@
    "POST /api/debug-detect",
    "POST /api/detect",
    "POST /api/finetune/prepare",
+   "POST /api/study/sessions/{session_id}/cierre",
    "POST /api/study/sessions/{session_id}/responses",
+   "POST /api/study/sessions/{session_id}/responses/{response_id}/grabacion",
    "POST /api/test/functional",
    "POST /api/test/load"
   ],
@@ -61,10 +65,14 @@
    "GET /api/health",
    "GET /api/metrics/latency",
    "GET /api/metrics/summary",
+   "GET /api/study/consolidado",
+   "GET /api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}",
    "GET /api/tts/models",
    "GET,POST /api/study/sessions",
    "POST /api/detect",
-   "POST /api/study/sessions/{session_id}/responses"
+   "POST /api/study/sessions/{session_id}/cierre",
+   "POST /api/study/sessions/{session_id}/responses",
+   "POST /api/study/sessions/{session_id}/responses/{response_id}/grabacion"
   ],
   "study": [
    "DELETE,GET /api/study/sessions/{session_id}",
@@ -75,10 +83,14 @@
    "GET /api/catalog",
    "GET /api/catalog/stimuli/{stimulus_id}/image",
    "GET /api/health",
+   "GET /api/study/consolidado",
+   "GET /api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}",
    "GET /api/tts/models",
    "GET,POST /api/study/sessions",
    "POST /api/detect",
-   "POST /api/study/sessions/{session_id}/responses"
+   "POST /api/study/sessions/{session_id}/cierre",
+   "POST /api/study/sessions/{session_id}/responses",
+   "POST /api/study/sessions/{session_id}/responses/{response_id}/grabacion"
   ]
  }
 }

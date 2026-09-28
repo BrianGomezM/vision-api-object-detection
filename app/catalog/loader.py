@@ -71,8 +71,28 @@ class PruebaUsuario(_Model):
     metricas: list[str]
     metricas_texto: list[str]
     tipo_evaluacion: str
-    estimulos: str | list[str] | None
+    # "POR_DEFINIR" (pendiente), null (la tarea no usa estímulo) o lista de stimulus_id.
+    estimulos: Literal["POR_DEFINIR"] | list[str] | None
     disponibilidad: Disponibilidad
+
+    @property
+    def estado_estimulos(self) -> Literal["por_definir", "no_requiere", "definido"]:
+        if self.estimulos == "POR_DEFINIR":
+            return "por_definir"
+        return "no_requiere" if self.estimulos is None else "definido"
+
+    @property
+    def requiere_estimulo(self) -> bool:
+        """Tareas de imagen/ruta presentan un estímulo y ejecutan /api/detect."""
+        return self.tipo in ("imagen", "ruta")
+
+    @property
+    def ejecutable_formal(self) -> bool:
+        """Solo se registra como prueba FORMAL si su estímulo está definido (o no lo necesita).
+        Una tarea de imagen/ruta con estímulos null tampoco es formal: no tendría estímulo."""
+        if self.estado_estimulos == "por_definir":
+            return False
+        return not (self.requiere_estimulo and self.estado_estimulos == "no_requiere")
 
 
 class CatalogFile(_Model):
@@ -129,7 +149,9 @@ class Catalog(BaseModel):
             "estimulos": [_public_stimulus(s, image_url) for s in self.stimuli.values()],
             "pruebas_tecnicas": self.technical_tests(),
             "pruebas_usuario": [
-                p.model_dump() | {"test_id": p.id}
+                p.model_dump() | {"test_id": p.id, "estado_estimulos": p.estado_estimulos,
+                                  "requiere_estimulo": p.requiere_estimulo,
+                                  "ejecutable_formal": p.ejecutable_formal}
                 for p in self.source.pruebas_usuario if p.disponibilidad.investigador
             ],
         }
@@ -210,7 +232,17 @@ def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT) -> C
     for d in source.datasets:
         if d.manifest:
             stimuli.update(_load_manifest(d.id, root / d.manifest))
+    for p in source.pruebas_usuario:
+        if isinstance(p.estimulos, list):
+            unknown = [s for s in p.estimulos if s not in stimuli]
+            if unknown or not p.estimulos:
+                raise ValueError(f"{p.id}: estímulos no declarados en ningún manifest {unknown}")
     return Catalog(source=source, stimuli=stimuli)
+
+
+def user_test(test_id: str) -> PruebaUsuario | None:
+    """Prueba de usuario del catálogo cargado, o None."""
+    return next((p for p in get_catalog().source.pruebas_usuario if p.id == test_id), None)
 
 
 @lru_cache(maxsize=1)
