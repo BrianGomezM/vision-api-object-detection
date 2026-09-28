@@ -8,7 +8,9 @@ GET /api/catalog/stimuli/{stimulus_id}/image → imagen del estímulo, buscada S
                                             (nunca por ruta) y solo si su hash es válido.
 
 Ambos requieren la clave del investigador (X-API-Key) cuando API_KEYS está configurado.
-Ninguna respuesta incluye ground truth ni condiciones de diseño.
+Ninguna respuesta incluye ground truth ni condiciones de diseño. En la vista del
+investigador, cada prueba de usuario lleva "decision": pregunta y alternativas de
+las tareas de decisión (app/catalog/decisiones.yaml), nunca la alternativa esperada.
 """
 
 from typing import Literal
@@ -16,6 +18,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
+from app.catalog.decisions import get_decisions
 from app.catalog.loader import get_catalog
 from app.security import require_researcher_key
 
@@ -28,7 +31,13 @@ def read_catalog(
     _key: str = Depends(require_researcher_key),
 ):
     catalog = get_catalog()
-    return catalog.participant_view() if vista == "participante" else catalog.researcher_view()
+    if vista == "participante":
+        return catalog.participant_view()
+    view = catalog.researcher_view()
+    decisions = get_decisions()
+    for p in view["pruebas_usuario"]:
+        p["decision"] = decisions.public_definition(p["id"])
+    return view
 
 
 @router.get("/catalog/stimuli/{stimulus_id}/image")
