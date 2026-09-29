@@ -23,6 +23,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.storage import REPO_ROOT
 
 CATALOG_PATH = Path(__file__).resolve().parent / "catalog.yaml"
+# Resuelve los estímulos POR_DEFINIR sin modificar catalog.yaml (congelado).
+ASSIGNMENTS_PATH = Path(__file__).resolve().parent / "asignaciones.yaml"
 
 
 class _Model(BaseModel):
@@ -83,8 +85,9 @@ class PruebaUsuario(_Model):
 
     @property
     def requiere_estimulo(self) -> bool:
-        """Tareas de imagen/ruta presentan un estímulo y ejecutan /api/detect."""
-        return self.tipo in ("imagen", "ruta")
+        """Tareas de imagen/ruta, o con estímulos asignados (p. ej. la escala de la voz,
+        que necesita escuchar un audio), presentan un estímulo y ejecutan /api/detect."""
+        return self.tipo in ("imagen", "ruta") or isinstance(self.estimulos, list)
 
     @property
     def ejecutable_formal(self) -> bool:
@@ -117,9 +120,22 @@ class Stimulus(BaseModel):
     ground_truth_ref: dict = Field(default_factory=dict, repr=False)
 
 
+class Asignacion(_Model):
+    prueba_id: str
+    estimulos: list[str] | None
+
+
+class AsignacionesFile(_Model):
+    schema_version: int
+    asignaciones: list[Asignacion]
+
+
 class Catalog(BaseModel):
     source: CatalogFile
     stimuli: dict[str, Stimulus]
+    # sha256 de asignaciones.yaml si resolvió alguna prueba POR_DEFINIR (trazabilidad).
+    asignaciones_sha256: str | None = None
+    asignadas: list[str] = Field(default_factory=list)
 
     # ── Pruebas técnicas derivadas: una por (plantilla de bloque × estímulo) ──
     def technical_tests(self) -> list[dict]:
@@ -147,6 +163,8 @@ class Catalog(BaseModel):
             "metricas": [m.model_dump() for m in self.source.metricas],
             "datasets": [d.model_dump(exclude={"manifest"}) for d in self.source.datasets],
             "estimulos": [_public_stimulus(s, image_url) for s in self.stimuli.values()],
+            "asignaciones": {"archivo": "app/catalog/asignaciones.yaml", "sha256": self.asignaciones_sha256,
+                             "pruebas": self.asignadas},
             "pruebas_tecnicas": self.technical_tests(),
             "pruebas_usuario": [
                 p.model_dump() | {"test_id": p.id, "estado_estimulos": p.estado_estimulos,
@@ -212,8 +230,30 @@ def _load_manifest(dataset_id: str, manifest_path: Path) -> dict[str, Stimulus]:
     return out
 
 
-def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT) -> Catalog:
+def _apply_assignments(source: CatalogFile, path: Path | None) -> tuple[str | None, list[str]]:
+    """Asigna estímulos a las pruebas que el catálogo deja en POR_DEFINIR. Lo que el
+    catálogo ya define no se toca."""
+    if path is None or not path.is_file():
+        return None, []
+    data = AsignacionesFile.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+    tests = {p.id: p for p in source.pruebas_usuario}
+    ids = [a.prueba_id for a in data.asignaciones]
+    if len(ids) != len(set(ids)):
+        raise ValueError("asignaciones.yaml: pruebas repetidas")
+    applied = []
+    for a in data.asignaciones:
+        if a.prueba_id not in tests:
+            raise ValueError(f"asignaciones.yaml: la prueba {a.prueba_id} no existe en el catálogo")
+        if tests[a.prueba_id].estimulos == "POR_DEFINIR":
+            tests[a.prueba_id].estimulos = a.estimulos
+            applied.append(a.prueba_id)
+    return (_sha256(path) if applied else None), applied
+
+
+def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT,
+                 assignments_path: Path | None = ASSIGNMENTS_PATH) -> Catalog:
     source = CatalogFile.model_validate(yaml.safe_load(catalog_path.read_text(encoding="utf-8")))
+    asignaciones_sha256, asignadas = _apply_assignments(source, assignments_path)
 
     metric_ids = {m.id for m in source.metricas}
     dataset_ids = {d.id for d in source.datasets}
@@ -237,7 +277,7 @@ def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT) -> C
             unknown = [s for s in p.estimulos if s not in stimuli]
             if unknown or not p.estimulos:
                 raise ValueError(f"{p.id}: estímulos no declarados en ningún manifest {unknown}")
-    return Catalog(source=source, stimuli=stimuli)
+    return Catalog(source=source, stimuli=stimuli, asignaciones_sha256=asignaciones_sha256, asignadas=asignadas)
 
 
 def user_test(test_id: str) -> PruebaUsuario | None:

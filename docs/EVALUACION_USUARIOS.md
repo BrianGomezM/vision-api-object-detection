@@ -107,7 +107,7 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
   - Fundamento: el diseño geométrico de DS1-B3 en el manifest pone una persona al centro y una botella a la derecha, sin objetos a la izquierda.
   - **No es** una respuesta metodológica de OBJ-03.
 
-## 5 ter. Consentimiento informado (v3, documentos del investigador v0.3)
+## 5 ter. Consentimiento informado (v3; texto v0.4 desde el 2026-09-29)
 
 - **Dos documentos, uno por tipo de participante:** `Consentimiento_informado_VisionNav_Personas_Piloto_v0.3` y `…_Personas_Objetivo_v0.3`.
   - El cliente descarga los archivos reales (PDF y Word) desde `visionnav-client/public/consentimientos/`.
@@ -121,10 +121,38 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
   - Sin `DATA_ROOT` (solo PTEST) se guarda únicamente la huella: sha256, tamaño y duración.
 - **Trazabilidad:** `consentimiento.version` (validada contra `CONSENT_VERSIONS` en `app/routes/study.py`), `documento`, `modalidad = "verbal"` y `grabacion`.
 - **Compatibilidad:** las sesiones v2 existentes (por ejemplo, PTEST10 en Azure) se siguen leyendo; sus campos v2 se conservan.
-- **Pendiente en los documentos:**
-  - El §9 dice que las grabaciones se guardan "en el computador del investigador", pero el sistema las guarda en el servidor, por decisión del investigador del 2026-09-28.
-  - Falta el "Periodo de conservación de las grabaciones".
-  - La app marca ambos puntos como `[PENDIENTE]`.
+- **v0.4 (2026-09-29):** el §9 dice que la información se guarda en el servidor del proyecto (Microsoft Azure), con acceso restringido por clave, y que las grabaciones se conservan un año.
+  - `CONSENT_VERSIONS` solo acepta v0.4 para sesiones nuevas.
+  - Las sesiones creadas con v0.3 conservan su versión.
+  - Los .docx v0.3 del investigador siguen disponibles como "original".
+- **Acta (§13):** el asistente pide nombre, lugar y fecha, e imprime en el navegador el documento completo con la tabla diligenciada.
+  - Los Sí/No salen de las afirmaciones 1, 3 y 4.
+  - El nombre **no** se envía al servidor.
+- **Conservación de un año:** el sistema no borra las grabaciones automáticamente. Hay que eliminarlas a mano (`DELETE /api/study/sessions/{id}`) cuando se cumpla el plazo.
+
+## 5 quater. Asignación de estímulos (`app/catalog/asignaciones.yaml`, 2026-09-29)
+
+- `catalog.yaml` sigue congelado (su sha256 está en `experimental_config.yaml`).
+- `asignaciones.yaml` solo resuelve las pruebas que el catálogo deja en `POR_DEFINIR`.
+- Es una decisión del investigador, pendiente de revisión de los directores. Cada prueba tiene una escena, la misma para objetivo y piloto:
+
+| Prueba | Escena | Motivo |
+|---|---|---|
+| OBJ-01 Identificación | DS1-C1 | Silla delante de mesa: dos objetos y una relación. Es la única escena donde YOLO detecta la mesa. |
+| OBJ-02 Relación simple | DS1-A8 | Una silla a la derecha, a distancia media. |
+| OBJ-03 Decisión | DS1-C2 | Sofá al centro y planta a la derecha. Esperada: **izquierda**. |
+| OBJ-04 Actualización | DS1-B2 | Misma escena que C2 con el sofá movido a la izquierda. Esperada: **frente**. |
+| OBJ-05 Voz | DS1-A5 | Narrativa corta y neutra (una silla al centro). |
+| OBJ-06 / OBJ-07 | — | Preguntas sobre lo escuchado en la sesión. |
+
+- Las esperadas de `decisiones.yaml` salen del diseño geométrico del manifest (no hay objetos en esa dirección), nunca de lo que dijo el sistema.
+- Cada respuesta guarda `asignaciones_sha256`.
+
+**Criterio de selección.** Se corrió YOLO26s en local con los umbrales congelados sobre las 18 escenas:
+- La mesa ("dining table") **no se detecta** en B1, C3, D1, D2 ni D3; en D3 su confianza es de 0,064, frente a un umbral efectivo de 0,15. Solo se detecta en C1.
+- Es un falso negativo sistemático del modelo con ese objeto 3D, no un error del pipeline.
+- Esas escenas se excluyen de las pruebas con participantes, para no medir la comprensión sobre una narrativa incompleta. La omisión se reporta como resultado técnico.
+- B3 se excluye porque la botella se detecta dos veces.
 
 ## 6. Audio: dos archivos distintos
 
@@ -154,7 +182,7 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
    - Falta alinear el §9 con el almacenamiento en el servidor.
 2. **Aprobación ética institucional:** no está verificado si se requiere (doc. 27 §L, §W-1).
 3. **Grabación del participante:** no se sabe si forma parte del protocolo aprobado, quién accede a ella ni por cuánto tiempo se conserva (§W-2, §W-7). El mecanismo existe, pero solo funciona con la autorización registrada.
-4. **Estímulos de OBJ-01…OBJ-07:** están `POR_DEFINIR` en el catálogo.
+4. **Estímulos de OBJ-01…OBJ-07:** asignados en `asignaciones.yaml` (§5 quater). Falta la revisión de los directores. Antes de esa asignación estaban `POR_DEFINIR` en el catálogo:
    - El doc. 27 §G propone ESC-01…ESC-07 (oficina, biblioteca…), que **no** son las escenas del Dataset 1.
    - Mientras no se definan, ninguna prueba objetivo puede registrarse como formal.
    - Además, OBJ-03/OBJ-04 ("elección de ruta") se implementan como decisión hipotética sin desplazamiento (§5 bis).
