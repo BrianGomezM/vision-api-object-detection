@@ -67,7 +67,13 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Puedes avanzar hacia el frente con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -224,7 +230,35 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "bench",
+        "confianza": 0.961,
+        "minimo_clase": 0.3,
+        "objeto": "banco",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bench",
+        "confianza": 0.876,
+        "minimo_clase": 0.3,
+        "objeto": "banco",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bicycle",
+        "confianza": 0.67,
+        "minimo_clase": null,
+        "objeto": "bicicleta",
+        "umbral_efectivo": 0.35
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -566,7 +600,119 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "bench",
+        "confianza": 0.955,
+        "minimo_clase": 0.3,
+        "objeto": "banco",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.932,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.927,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.9,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.862,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.844,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.82,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "car",
+        "confianza": 0.792,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.787,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "person",
+        "confianza": 0.582,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.57,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.568,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.564,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.504,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.365,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -1167,7 +1313,203 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "laptop",
+        "confianza": 0.941,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.884,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.836,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.821,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.785,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.773,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.765,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.753,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.749,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.74,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.643,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.643,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.618,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.607,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.579,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.563,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.544,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "person",
+        "confianza": 0.541,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.538,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.467,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.44,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.439,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "person",
+        "confianza": 0.41,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.402,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.267,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.263,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.232,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -2078,7 +2420,126 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Gira con cuidado hacia la izquierda y avanza despacio. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "car",
+        "confianza": 0.949,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.94,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.928,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bus",
+        "confianza": 0.906,
+        "minimo_clase": null,
+        "objeto": "autobús",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.9,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.897,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "dog",
+        "confianza": 0.877,
+        "minimo_clase": 0.3,
+        "objeto": "perro",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.86,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.796,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.788,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.779,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.715,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.45,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.409,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.393,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.282,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -2700,7 +3161,189 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.943,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.943,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.913,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.904,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.9,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.898,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.89,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.886,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.877,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.862,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.688,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.639,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.61,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.585,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.568,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.555,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.546,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.495,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.49,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.468,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.433,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.373,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bench",
+        "confianza": 0.338,
+        "minimo_clase": 0.3,
+        "objeto": "banco",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.324,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.311,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -3388,7 +4031,70 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "umbrella",
+        "confianza": 0.923,
+        "minimo_clase": null,
+        "objeto": "paraguas",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "umbrella",
+        "confianza": 0.8,
+        "minimo_clase": null,
+        "objeto": "paraguas",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.781,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "truck",
+        "confianza": 0.763,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "umbrella",
+        "confianza": 0.722,
+        "minimo_clase": null,
+        "objeto": "paraguas",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "truck",
+        "confianza": 0.59,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "umbrella",
+        "confianza": 0.422,
+        "minimo_clase": null,
+        "objeto": "paraguas",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "umbrella",
+        "confianza": 0.406,
+        "minimo_clase": null,
+        "objeto": "paraguas",
+        "umbral_efectivo": 0.35
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -3771,7 +4477,21 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "bench",
+        "confianza": 0.796,
+        "minimo_clase": 0.3,
+        "objeto": "banco",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -4027,7 +4747,84 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.911,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.903,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.896,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.698,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.692,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.663,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.432,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.409,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.328,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.309,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -4531,7 +5328,224 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "clock",
+        "confianza": 0.942,
+        "minimo_clase": 0.3,
+        "objeto": "reloj",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.835,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.827,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.821,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.812,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.778,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.765,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.719,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.654,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.608,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.6,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.584,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.524,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.522,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.501,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.497,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.488,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.473,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.416,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.402,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.39,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.369,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.36,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.318,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.304,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.274,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.189,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.186,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.183,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.157,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -5312,7 +6326,13 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Puedes avanzar hacia el frente con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -5458,7 +6478,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "vase",
+        "confianza": 0.834,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.372,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -5713,7 +6754,35 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la derecha. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.924,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.89,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.445,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -5989,7 +7058,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.954,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "vase",
+        "confianza": 0.776,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -6244,7 +7334,35 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Gira con cuidado hacia la izquierda y avanza despacio. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.956,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.932,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.709,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -6608,7 +7726,210 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.922,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.911,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.905,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.899,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.887,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.886,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.86,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.859,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.837,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.807,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.745,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.744,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.699,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.648,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.636,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.631,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.615,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.567,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.553,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.437,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.425,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.391,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.351,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.344,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.333,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.323,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.278,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.209,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -7361,7 +8682,112 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.923,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.884,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.877,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.865,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.785,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bus",
+        "confianza": 0.748,
+        "minimo_clase": null,
+        "objeto": "autobús",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.743,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.737,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.649,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.637,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.527,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.432,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.411,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.198,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -7842,7 +9268,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "vase",
+        "confianza": 0.449,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.382,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -8141,7 +9588,112 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia el frente. Puedes avanzar hacia el frente. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.921,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.91,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.812,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.781,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.704,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.603,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.534,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.533,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.521,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.426,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.397,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.338,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.335,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.199,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -8677,7 +10229,77 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.873,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.634,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.526,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.483,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.463,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.34,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.31,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "vase",
+        "confianza": 0.267,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.178,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -9114,7 +10736,35 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "vase",
+        "confianza": 0.554,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.362,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.325,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -9434,7 +11084,56 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Gira con cuidado hacia la izquierda y avanza despacio. Puedes avanzar hacia la izquierda. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.939,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.891,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.849,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.367,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.304,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.175,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -9817,7 +11516,42 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "truck",
+        "confianza": 0.506,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.409,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "truck",
+        "confianza": 0.4,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "truck",
+        "confianza": 0.379,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -10126,7 +11860,49 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.921,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.896,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.887,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.829,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.317,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -10511,7 +12287,98 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.933,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.857,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.836,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.802,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.794,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.723,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "vase",
+        "confianza": 0.44,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "vase",
+        "confianza": 0.419,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.328,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "vase",
+        "confianza": 0.302,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.257,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.166,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -10991,7 +12858,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "vase",
+        "confianza": 0.621,
+        "minimo_clase": 0.25,
+        "objeto": "jarrón",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.465,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -11212,7 +13100,13 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Puedes avanzar hacia el frente con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -11446,7 +13340,182 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "chair",
+        "confianza": 0.896,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.866,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.866,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.843,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.837,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.815,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.808,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.806,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.804,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.797,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.782,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.76,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.68,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.655,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.604,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.584,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.551,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.542,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.537,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.413,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.394,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.351,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.349,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.179,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -12216,7 +14285,35 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.895,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.759,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.17,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -12492,7 +14589,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.612,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "suitcase",
+        "confianza": 0.305,
+        "minimo_clase": 0.3,
+        "objeto": "maleta",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -12813,7 +14931,119 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "car",
+        "confianza": 0.943,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.939,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.933,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.905,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.878,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.83,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.826,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.809,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.803,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.801,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.726,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "car",
+        "confianza": 0.658,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.648,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "truck",
+        "confianza": 0.554,
+        "minimo_clase": null,
+        "objeto": "camión",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "person",
+        "confianza": 0.401,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -13435,7 +15665,91 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Gira con cuidado hacia la derecha y avanza despacio. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.918,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.769,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.73,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.723,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.536,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.525,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.512,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "person",
+        "confianza": 0.505,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.464,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "cell phone",
+        "confianza": 0.415,
+        "minimo_clase": 0.35,
+        "objeto": "teléfono móvil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.383,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -13946,7 +16260,28 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "dining table",
+        "confianza": 0.417,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.158,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -14256,7 +16591,70 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.953,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.903,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.845,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.779,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.741,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "couch",
+        "confianza": 0.636,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.602,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.511,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -14714,7 +17112,42 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "backpack",
+        "confianza": 0.504,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.475,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bicycle",
+        "confianza": 0.356,
+        "minimo_clase": null,
+        "objeto": "bicicleta",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "backpack",
+        "confianza": 0.324,
+        "minimo_clase": 0.3,
+        "objeto": "mochila",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -15033,7 +17466,42 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la izquierda. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.791,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dog",
+        "confianza": 0.754,
+        "minimo_clase": 0.3,
+        "objeto": "perro",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.735,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "person",
+        "confianza": 0.489,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -15331,7 +17799,56 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "person",
+        "confianza": 0.544,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.418,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "person",
+        "confianza": 0.402,
+        "minimo_clase": 0.3,
+        "objeto": "persona",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.365,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.353,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.159,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -15673,7 +18190,63 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la izquierda. Avanza con mucho cuidado hacia la izquierda. Hay un obstáculo a solo 1 paso.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "laptop",
+        "confianza": 0.701,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "cell phone",
+        "confianza": 0.698,
+        "minimo_clase": 0.35,
+        "objeto": "teléfono móvil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "laptop",
+        "confianza": 0.419,
+        "minimo_clase": 0.35,
+        "objeto": "portátil",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.276,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.238,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.219,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.179,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -16112,7 +18685,105 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "car",
+        "confianza": 0.865,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.849,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.824,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.818,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.775,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.767,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.765,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.732,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.664,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.642,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.572,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.568,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "car",
+        "confianza": 0.508,
+        "minimo_clase": null,
+        "objeto": "coche",
+        "umbral_efectivo": 0.35
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -16646,7 +19317,49 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. El paso al frente está bloqueado. Gira con cuidado hacia la izquierda y avanza despacio. Puedes avanzar hacia la izquierda con cuidado.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.962,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.92,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.895,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.745,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.272,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
@@ -17053,7 +19766,140 @@
       "visualizer_ms": "<ms>"
      },
      "narrativa_final": "Parece que estás en un espacio interior. DESCRIPCION_SIMULADA. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia el frente. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
-     "status": "success"
+     "status": "success",
+     "umbral": {
+      "objetos": [
+       {
+        "clase": "couch",
+        "confianza": 0.961,
+        "minimo_clase": 0.3,
+        "objeto": "sofá",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.944,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.927,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "wine glass",
+        "confianza": 0.852,
+        "minimo_clase": 0.15,
+        "objeto": "copa de vino",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "wine glass",
+        "confianza": 0.847,
+        "minimo_clase": 0.15,
+        "objeto": "copa de vino",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.842,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.84,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.829,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.818,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.77,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "wine glass",
+        "confianza": 0.769,
+        "minimo_clase": 0.15,
+        "objeto": "copa de vino",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "tv",
+        "confianza": 0.712,
+        "minimo_clase": 0.4,
+        "objeto": "televisor",
+        "umbral_efectivo": 0.35
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.69,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "dining table",
+        "confianza": 0.607,
+        "minimo_clase": 0.1,
+        "objeto": "mesa de comedor",
+        "umbral_efectivo": 0.15
+       },
+       {
+        "clase": "potted plant",
+        "confianza": 0.602,
+        "minimo_clase": 0.25,
+        "objeto": "planta en maceta",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "chair",
+        "confianza": 0.586,
+        "minimo_clase": 0.3,
+        "objeto": "silla",
+        "umbral_efectivo": 0.3
+       },
+       {
+        "clase": "bottle",
+        "confianza": 0.483,
+        "minimo_clase": 0.25,
+        "objeto": "botella",
+        "umbral_efectivo": 0.25
+       },
+       {
+        "clase": "wine glass",
+        "confianza": 0.334,
+        "minimo_clase": 0.15,
+        "objeto": "copa de vino",
+        "umbral_efectivo": 0.15
+       }
+      ],
+      "piso": 0.15,
+      "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso 0.15). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+      "umbral_ajustes": 0.35
+     }
     },
     "status_code": 200
    },
