@@ -110,11 +110,26 @@ TTS_VOICE: str = os.getenv("TTS_VOICE", "Sulafat")
 # así que exponer alternativas deja seguir haciendo pruebas con cuota
 # fresca en vez de esperar a que se libere la del modelo por defecto.
 # IDs verificados contra client.models.list() de la API de Gemini.
+# Orden: el modelo por defecto (el evaluado) y después las alternativas, de la más
+# rápida a la más lenta. Tiempos medidos el 2026-09-29 con la misma narrativa de
+# ~245 caracteres (llamada completa, sin streaming): 3.1 Flash 12–14 s; 3.8 Flash Lite
+# 5,8–9,1 s; 3.8 Flash 9,9–11,7 s; 2.5 Flash 11–16 s. Las alternativas no forman
+# parte de la configuración evaluada (el estudio usa siempre el modelo por defecto).
 AVAILABLE_TTS_MODELS: list[dict] = [
     {
         "id": "models/gemini-3.1-flash-tts-preview",
         "label": "Gemini 3.1 Flash TTS (por defecto)",
-        "descripcion": "El configurado en .env. $1.00 / $20.00 por 1M tokens (texto/audio).",
+        "descripcion": "El configurado en .env y el evaluado. $1.00 / $20.00 por 1M tokens (texto/audio). ~12–14 s por narrativa.",
+    },
+    {
+        "id": "models/gemini-3.8-flash-lite-tts",
+        "label": "Gemini 3.8 Flash Lite TTS (alterna, la más rápida)",
+        "descripcion": "Cuota de RPM independiente. ~6–9 s por narrativa medidos; el audio puede salir más largo.",
+    },
+    {
+        "id": "models/gemini-3.8-flash-tts",
+        "label": "Gemini 3.8 Flash TTS (alterna)",
+        "descripcion": "Cuota de RPM independiente. ~10–12 s por narrativa medidos.",
     },
     {
         "id": "models/gemini-2.5-flash-preview-tts",
