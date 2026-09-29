@@ -206,9 +206,10 @@ class ContextoSesion(_M):
 # Documentos de consentimiento vigentes por tipo de participante. El texto que se lee
 # vive en el cliente (visionnav-client/lib/consent.ts); aquí solo se valida que la
 # versión registrada corresponda al tipo de participante.
+# v0.4 (2026-09-29): §9 con el almacenamiento en el servidor (Azure) y conservación de un año.
 CONSENT_VERSIONS: dict[str, tuple[str, ...]] = {
-    "piloto": ("CI-VisionNav-Piloto v0.3",),
-    "objetivo": ("CI-VisionNav-Objetivo v0.3",),
+    "piloto": ("CI-VisionNav-Piloto v0.4",),
+    "objetivo": ("CI-VisionNav-Objetivo v0.4",),
 }
 MAX_CONSENT_RECORDING_BYTES = 20 * 1024 * 1024
 
@@ -757,6 +758,7 @@ def add_response(session_id: str, body: ResponseIn):
             "observaciones": body.observaciones,
             "metricas": metricas,
             "catalogo_schema_version": loader.get_catalog().source.schema_version,
+            "asignaciones_sha256": loader.get_catalog().asignaciones_sha256,
             "backend_commit": _backend_commit(),
         }
         with (d / "responses.jsonl").open("a", encoding="utf-8") as f:

@@ -28,7 +28,7 @@ FICHA = {
                     "frecuencia_uso": "diaria"},
     "experiencia_descripcion_audio": "no",
 }
-CONSENT_VERSION = {"piloto": "CI-VisionNav-Piloto v0.3", "objetivo": "CI-VisionNav-Objetivo v0.3"}
+CONSENT_VERSION = {"piloto": "CI-VisionNav-Piloto v0.4", "objetivo": "CI-VisionNav-Objetivo v0.4"}
 AFIRMACIONES = ("acepta_participar", "puede_detenerse", "autoriza_grabacion", "autoriza_uso_academico")
 CONSENT_AUDIO = b"WEBM-CONSENTIMIENTO-TEST"
 CONTEXTO = {"dispositivo": "computador", "reproduccion_audio": "audifonos",
@@ -101,6 +101,14 @@ def defined_catalog(monkeypatch, tmp_path):
     p = tmp_path / "catalog.yaml"
     p.write_text(head + rest, encoding="utf-8")
     cat = loader.load_catalog(catalog_path=p)
+    monkeypatch.setattr(loader, "get_catalog", lambda: cat)
+    return cat
+
+
+@pytest.fixture
+def pending_catalog(monkeypatch):
+    """Catálogo SIN asignaciones.yaml: las pruebas OBJ quedan POR_DEFINIR (catalog.yaml congelado)."""
+    cat = loader.load_catalog(assignments_path=None)
     monkeypatch.setattr(loader, "get_catalog", lambda: cat)
     return cat
 
@@ -197,7 +205,7 @@ def test_consentimiento_se_registra_con_su_grabacion(client, sdir):
     c = s["consentimiento"]
     assert s["schema_version"] == 3
     assert c["otorgado"] is True and c["modalidad"] == "verbal" and c["registrado_en"]
-    assert c["version"] == "CI-VisionNav-Piloto v0.3" and c["documento"] == "piloto"
+    assert c["version"] == "CI-VisionNav-Piloto v0.4" and c["documento"] == "piloto"
     assert all(c[k] is True for k in AFIRMACIONES)
     g = c["grabacion"]
     assert g["almacenada"] and g["archivo"] == "grabacion_consentimiento.webm" and g["duracion_s"] == 312.5
@@ -262,16 +270,41 @@ def test_un_codigo_una_sesion(client):
 
 def test_catalogo_declara_estado_de_estimulos(client):
     pruebas = {p["id"]: p for p in client.get("/api/catalog").json()["pruebas_usuario"]}
-    for i in range(1, 8):
-        p = pruebas[f"OBJ-0{i}"]
-        assert p["estado_estimulos"] == "por_definir" and p["ejecutable_formal"] is False
+    # OBJ-01…05: un estímulo asignado en asignaciones.yaml; OBJ-06/07 no usan estímulo.
+    esperado = {"OBJ-01": ["DS1-C1"], "OBJ-02": ["DS1-A8"], "OBJ-03": ["DS1-C2"], "OBJ-04": ["DS1-B2"],
+                "OBJ-05": ["DS1-A5"], "OBJ-06": None, "OBJ-07": None}
+    for tid, est in esperado.items():
+        p = pruebas[tid]
+        assert p["estimulos"] == est and p["ejecutable_formal"] is True, tid
+        assert p["estado_estimulos"] == ("definido" if est else "no_requiere")
+        assert p["requiere_estimulo"] is bool(est)
     for i in range(1, 6):
         p = pruebas[f"PIL-0{i}"]
         assert p["estado_estimulos"] == "no_requiere" and p["ejecutable_formal"] is True
         assert p["requiere_estimulo"] is False
 
 
-def test_por_definir_no_se_registra_como_formal(client):
+def test_asignaciones_solo_resuelven_lo_pendiente_sin_tocar_el_catalogo():
+    from app import experiment
+    sin = loader.load_catalog(assignments_path=None)
+    assert all(p.estimulos == "POR_DEFINIR" for p in sin.source.pruebas_usuario if p.id.startswith("OBJ"))
+    con = loader.load_catalog()
+    assert con.asignadas == [f"OBJ-0{i}" for i in range(1, 8)] and len(con.asignaciones_sha256) == 64
+    # catalog.yaml sigue siendo el congelado en experimental_config.yaml
+    frozen = experiment.load_config()["experimento"]["catalogo"]["sha256"]
+    assert experiment.sha256_text_file(loader.CATALOG_PATH) == frozen
+
+
+def test_estimulos_asignados_se_detectan_completos_segun_el_diseno():
+    """Las escenas asignadas no contienen la mesa (falso negativo sistemático de YOLO26s)."""
+    cat = loader.load_catalog()
+    for p in cat.source.pruebas_usuario:
+        for sid in p.estimulos or []:
+            clases = [o["class"] for o in cat.stimuli[sid].design["objects"]]
+            assert sid != "DS1-B3" and ("dining table" not in clases or sid == "DS1-C1"), (p.id, sid)
+
+
+def test_por_definir_no_se_registra_como_formal(client, pending_catalog):
     sid = create(client, tipo="objetivo", codigo="PTEST04")
     r = client.post(f"/api/study/sessions/{sid}/responses", json={
         "prueba_id": "OBJ-01", "modo": "formal", "estimulo": {"origen": "catalogo", "stimulus_id": "DS1-A1"},
@@ -382,7 +415,7 @@ def defined_decisions(monkeypatch, tmp_path, defined_catalog):
     """Esperada de PRUEBA para OBJ-03 × DS1-C1 (la real está POR_DEFINIR)."""
     from app.catalog import decisions
     text = decisions.DECISIONS_PATH.read_text(encoding="utf-8").replace(
-        "esperada_por_estimulo: POR_DEFINIR", "esperada_por_estimulo: {DS1-C1: derecha}", 1)
+        "esperada_por_estimulo: {DS1-C2: izquierda}", "esperada_por_estimulo: {DS1-C1: derecha}", 1)
     p = tmp_path / "decisiones.yaml"
     p.write_text(text, encoding="utf-8")
     defs = decisions.load_decisions(p, catalog=defined_catalog)
@@ -398,7 +431,13 @@ def test_decisiones_yaml_valido_y_sin_contenido_inventado():
         assert test.tipo == "ruta"
         norm = lambda s: s.replace("¿", "").lower()                                  # noqa: E731
         assert norm(t.pregunta) in norm(test.guion_investigador)                     # literal del guion
-        assert t.esperada_por_estimulo == "POR_DEFINIR"            # no hay esperadas reales inventadas
+        # La esperada sale del DISEÑO del manifest: no hay ningún objeto en esa dirección.
+        zona = {"izquierda": "left", "frente": "center", "derecha": "right"}
+        assert isinstance(t.esperada_por_estimulo, dict)
+        for sid, alt in t.esperada_por_estimulo.items():
+            assert sid in (test.estimulos or []), (t.prueba_id, sid)                # estímulo asignado a la prueba
+            ocupadas = {o["horizontal"] for o in loader.get_catalog().stimuli[sid].design["objects"]}
+            assert zona[alt] not in ocupadas, (t.prueba_id, sid, alt, ocupadas)
     for f in defs.source.fixtures_tecnicos:
         assert f.stimulus_id in loader.get_catalog().stimuli
 
@@ -408,7 +447,8 @@ def test_catalogo_publica_pregunta_y_alternativas_pero_no_la_esperada(client):
     tests = {p["id"]: p for p in r.json()["pruebas_usuario"]}
     d = tests["OBJ-03"]["decision"]
     assert [a["id"] for a in d["alternativas"]] == ["izquierda", "frente", "derecha"]
-    assert d["estado_esperadas"] == "por_definir" and d["fixtures_tecnicos"] == [{"id": "FIX-DEC-01", "stimulus_id": "DS1-B3"}]
+    assert d["estado_esperadas"] == "definido" and d["esperada_definida_para"] == ["DS1-C2"]
+    assert d["fixtures_tecnicos"] == [{"id": "FIX-DEC-01", "stimulus_id": "DS1-B3"}]
     assert "esperada\"" not in r.text and "fundamento" not in r.text
     assert tests["OBJ-01"]["decision"] is None
 

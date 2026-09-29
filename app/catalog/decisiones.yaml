@@ -14,8 +14,12 @@
 #
 # pregunta / alternativas: tomadas literalmente del guion del catálogo (OBJ-03 indica
 # "izquierda/derecha/frente"). No se añaden alternativas nuevas.
-# esperada_por_estimulo: {stimulus_id: alternativa}. POR_DEFINIR mientras los
-# estímulos de OBJ-03/OBJ-04 estén POR_DEFINIR en el catálogo (CP3B).
+# esperada_por_estimulo: {stimulus_id: alternativa}. Los estímulos de OBJ-03/OBJ-04 se
+# asignan en asignaciones.yaml (decisión del investigador del 2026-09-29, pendiente de
+# revisión de los directores). La esperada sale del DISEÑO geométrico del manifest,
+# no de lo que dijo el sistema:
+#   DS1-C2: sofá al centro, planta a la derecha, nada a la izquierda → izquierda.
+#   DS1-B2: sofá a la izquierda, planta a la derecha, centro despejado → frente.
 
 schema_version: 1
 
@@ -26,14 +30,14 @@ tareas:
       - {id: izquierda, texto: "Izquierda"}
       - {id: frente, texto: "Frente"}
       - {id: derecha, texto: "Derecha"}
-    esperada_por_estimulo: POR_DEFINIR
+    esperada_por_estimulo: {DS1-C2: izquierda}
   - prueba_id: OBJ-04
     pregunta: "¿Cambió algo respecto a lo anterior? ¿Hacia dónde avanzaría ahora?"
     alternativas:
       - {id: izquierda, texto: "Izquierda"}
       - {id: frente, texto: "Frente"}
       - {id: derecha, texto: "Derecha"}
-    esperada_por_estimulo: POR_DEFINIR
+    esperada_por_estimulo: {DS1-B2: frente}
 
 # Fixtures TÉCNICOS: solo verifican el mecanismo (seleccionada / esperada / correcto)
 # en sesiones de prueba técnica (PTEST…) y en modo ENSAYO. No son estímulos del

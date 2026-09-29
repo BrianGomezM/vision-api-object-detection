@@ -1,0 +1,41 @@
+# Asignación de ESTÍMULOS a las pruebas de usuario (Objetivo Específico 3).
+#
+# Por qué está fuera de catalog.yaml: catalog.yaml está congelado (sha256 en
+# experimental_config.yaml). Este archivo solo resuelve las pruebas que el catálogo
+# deja en POR_DEFINIR; si el catálogo ya define los estímulos de una prueba, manda el
+# catálogo. No cambia la detección, la narrativa ni el TTS.
+#
+# Decisión del investigador del 2026-09-29, PENDIENTE de revisión de los directores.
+# Un estímulo por prueba: todos los participantes (objetivo y piloto) escuchan la
+# misma escena en la misma prueba, para que sus respuestas sean comparables.
+#
+# Criterio de selección (corrida local de YOLO26s con los umbrales congelados sobre las
+# 18 escenas del Dataset 1, 2026-09-29):
+#   - Solo escenas en las que el detector encuentra TODOS los objetos del diseño y
+#     nada más. Se excluyen B1, C3, D1, D2 y D3: la mesa ("dining table") no se detecta
+#     (confianza 0,06 en D3) y la narrativa la omite. Esa omisión se reporta como
+#     resultado técnico, no se mide sobre los participantes.
+#   - Se excluye B3 del estudio: la botella se detecta dos veces (queda como fixture
+#     técnico de decisiones.yaml, solo PTEST).
+#   - Distancia media, sin oclusión relevante, y escenas distintas en cada prueba.
+#
+# estimulos: lista de stimulus_id (del manifest) o null (la prueba no usa estímulo:
+# se pregunta sobre lo escuchado en la sesión).
+
+schema_version: 1
+
+asignaciones:
+  - prueba_id: OBJ-01            # identificación de objetos: dos objetos y una relación
+    estimulos: [DS1-C1]          # silla delante de mesa (centro, media). Ambos detectados.
+  - prueba_id: OBJ-02            # un objeto respecto al participante
+    estimulos: [DS1-A8]          # silla a la derecha, distancia media
+  - prueba_id: OBJ-03            # decisión: obstáculos al centro y a un lado
+    estimulos: [DS1-C2]          # sofá al centro y planta a la derecha → libre a la izquierda
+  - prueba_id: OBJ-04            # actualización de contexto: misma escena, objetos reubicados
+    estimulos: [DS1-B2]          # tras C2 el sofá pasa a la izquierda → libre al frente
+  - prueba_id: OBJ-05            # calidad de la voz: narrativa corta y neutra
+    estimulos: [DS1-A5]          # una silla al centro, distancia media
+  - prueba_id: OBJ-06            # suficiencia de la información (sobre lo escuchado)
+    estimulos: null
+  - prueba_id: OBJ-07            # utilidad percibida (cierre)
+    estimulos: null
