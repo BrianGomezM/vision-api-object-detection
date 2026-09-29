@@ -28,16 +28,19 @@ FICHA = {
                     "frecuencia_uso": "diaria"},
     "experiencia_descripcion_audio": "no",
 }
-CONSENT = {"modalidad": "verbal", "comprende_y_acepta": True, "puede_retirarse": True, "uso_anonimo": True,
-           "formato_referencia": "Formatos/Consentimiento informado.docx (pendiente de confirmación)"}
+CONSENT_VERSION = {"piloto": "CI-VisionNav-Piloto v0.3", "objetivo": "CI-VisionNav-Objetivo v0.3"}
+AFIRMACIONES = ("acepta_participar", "puede_detenerse", "autoriza_grabacion", "autoriza_uso_academico")
+CONSENT_AUDIO = b"WEBM-CONSENTIMIENTO-TEST"
 CONTEXTO = {"dispositivo": "computador", "reproduccion_audio": "audifonos",
             "entorno_tecnico": {"navegador": "Chrome 140", "sistema_operativo": "Windows",
                                 "tipo_dispositivo": "escritorio", "user_agent": "Mozilla/5.0 (TEST)"}}
 
 
-def session_body(codigo="PTEST01", tipo="piloto", graba=False, **over):
+def session_body(codigo="PTEST01", tipo="piloto", **over):
     body = {"codigo": codigo, "tipo_participante": tipo, "ficha": json.loads(json.dumps(FICHA)),
-            "consentimiento": dict(CONSENT), "grabacion": {"autoriza_grabacion_audio": graba},
+            "consentimiento": {"version": CONSENT_VERSION[tipo], **{k: True for k in AFIRMACIONES}},
+            "grabacion_consentimiento": {"content_type": "audio/webm;codecs=opus", "duracion_s": 312.5,
+                                         "data_base64": base64.b64encode(CONSENT_AUDIO).decode()},
             "contexto": json.loads(json.dumps(CONTEXTO))}
     body.update(over)
     return body
@@ -118,7 +121,7 @@ def test_crear_sesion_con_codigo_y_sin_nombre(client, sdir):
     s = json.loads((sdir / sid / "sesion.json").read_text(encoding="utf-8"))
     assert s["codigo"] == "PTEST01" and s["es_prueba_tecnica"] and s["estado"] == "en_curso"
     assert "nombre" not in json.dumps(s)
-    assert s["schema_version"] == 2 and s["catalogo_schema_version"] == 1
+    assert s["schema_version"] == 3 and s["catalogo_schema_version"] == 1
 
 
 def test_no_acepta_nombre_ni_codigo_con_nombre(client):
@@ -180,7 +183,7 @@ def test_registra_dispositivo_audio_y_entorno(client):
     assert ctx["entorno_tecnico"]["navegador"] == "Chrome 140"
 
 
-@pytest.mark.parametrize("campo", ["comprende_y_acepta", "puede_retirarse", "uso_anonimo"])
+@pytest.mark.parametrize("campo", AFIRMACIONES)
 def test_consentimiento_incompleto_no_crea_sesion(client, sdir, campo):
     body = session_body()
     body["consentimiento"][campo] = False
@@ -188,19 +191,63 @@ def test_consentimiento_incompleto_no_crea_sesion(client, sdir, campo):
     assert not sdir.exists() or not any(sdir.iterdir())
 
 
-def test_consentimiento_se_registra(client):
+def test_consentimiento_se_registra_con_su_grabacion(client, sdir):
     sid = create(client)
-    c = client.get(f"/api/study/sessions/{sid}").json()["sesion"]["consentimiento"]
+    s = client.get(f"/api/study/sessions/{sid}").json()["sesion"]
+    c = s["consentimiento"]
+    assert s["schema_version"] == 3
     assert c["otorgado"] is True and c["modalidad"] == "verbal" and c["registrado_en"]
+    assert c["version"] == "CI-VisionNav-Piloto v0.3" and c["documento"] == "piloto"
+    assert all(c[k] is True for k in AFIRMACIONES)
+    g = c["grabacion"]
+    assert g["almacenada"] and g["archivo"] == "grabacion_consentimiento.webm" and g["duracion_s"] == 312.5
+    assert g["sha256"] == hashlib.sha256(CONSENT_AUDIO).hexdigest() and g["tamano_bytes"] == len(CONSENT_AUDIO)
+    assert (sdir / sid / "grabacion_consentimiento.webm").read_bytes() == CONSENT_AUDIO
+    audio = client.get(f"/api/study/sessions/{sid}/consentimiento/audio")
+    assert audio.status_code == 200 and audio.content == CONSENT_AUDIO
+    # la afirmación 3 autoriza grabar las respuestas durante la sesión
+    assert s["grabacion"]["autoriza_grabacion_audio"] is True
 
 
-def test_autorizacion_de_grabacion_separada(client):
-    sid = create(client, graba=True)
-    g = client.get(f"/api/study/sessions/{sid}").json()["sesion"]["grabacion"]
-    assert g["autoriza_grabacion_audio"] is True and g["registrado_en"]
-    body = session_body(codigo="PTEST03")
-    del body["grabacion"]
+def test_consentimiento_exige_grabacion_valida(client, sdir):
+    body = session_body()
+    del body["grabacion_consentimiento"]
     assert client.post("/api/study/sessions", json=body).status_code == 400
+    for ctype, data, status in (("text/plain", "V0VCTQ==", 415), ("audio/webm", "no-es-base64!", 400)):
+        body = session_body()
+        body["grabacion_consentimiento"].update(content_type=ctype, data_base64=data)
+        assert client.post("/api/study/sessions", json=body).status_code == status
+    assert not sdir.exists() or not any(sdir.iterdir())
+
+
+def test_documento_de_consentimiento_segun_tipo_de_participante(client, sdir):
+    body = session_body(tipo="objetivo")
+    body["consentimiento"]["version"] = CONSENT_VERSION["piloto"]
+    assert client.post("/api/study/sessions", json=body).status_code == 400
+    assert create(client, tipo="objetivo", codigo="PTEST02")
+
+
+def test_ya_no_acepta_modalidad_investigador_ni_notas(client):
+    for extra in ({"investigador": "INV"}, {"notas": "x"}, {"grabacion": {"autoriza_grabacion_audio": True}}):
+        assert client.post("/api/study/sessions", json=session_body(**extra)).status_code == 400
+    body = session_body()
+    body["consentimiento"]["modalidad"] = "escrito"
+    assert client.post("/api/study/sessions", json=body).status_code == 400
+
+
+def test_ptest_sin_data_root_guarda_solo_la_huella_de_la_grabacion(make_client, monkeypatch):
+    repo_dir = REPO_ROOT / "study_data" / "sessions"
+    monkeypatch.setattr(study, "_STUDY_DIR", repo_dir)                  # ruta histórica (sin DATA_ROOT)
+    c = make_client("development")
+    sid = create(c, codigo="PTEST98")
+    try:
+        g = c.get(f"/api/study/sessions/{sid}").json()["sesion"]["consentimiento"]["grabacion"]
+        assert g["almacenada"] is False and g["archivo"] is None
+        assert g["sha256"] == hashlib.sha256(CONSENT_AUDIO).hexdigest()
+        assert not list((repo_dir / sid).glob("grabacion_consentimiento.*"))
+        assert c.get(f"/api/study/sessions/{sid}/consentimiento/audio").status_code == 404
+    finally:
+        assert c.delete(f"/api/study/sessions/{sid}").status_code == 200
 
 
 def test_un_codigo_una_sesion(client):
@@ -467,8 +514,13 @@ def _upload(client, sid, rid="R001", data=b"WEBM-TEST", ctype="audio/webm"):
                        files={"file": ("respuesta.webm", io.BytesIO(data), ctype)})
 
 
-def test_sin_autorizacion_no_se_guarda_audio_del_participante(client, sdir):
-    sid = create(client, graba=False)
+def test_sesion_v2_sin_autorizacion_no_guarda_audio_del_participante(client, sdir):
+    """Sesiones v2 (anteriores) registraban la grabación aparte y podían no autorizarla."""
+    sid = create(client)
+    f = sdir / sid / "sesion.json"
+    rec = json.loads(f.read_text(encoding="utf-8"))
+    rec["grabacion"]["autoriza_grabacion_audio"] = False
+    f.write_text(json.dumps(rec), encoding="utf-8")
     client.post(f"/api/study/sessions/{sid}/responses", json={"prueba_id": "PIL-02", "modo": "formal",
                                                                "respuesta_transcrita": "adecuada"})
     r = _upload(client, sid)
@@ -477,7 +529,7 @@ def test_sin_autorizacion_no_se_guarda_audio_del_participante(client, sdir):
 
 
 def test_con_autorizacion_se_guarda_separado_del_audio_de_la_api(client, sdir):
-    sid = create(client, graba=True)
+    sid = create(client)
     client.post(f"/api/study/sessions/{sid}/responses", json={"prueba_id": "PIL-02", "modo": "formal"})
     r = _upload(client, sid)
     assert r.status_code == 201, r.text
@@ -511,7 +563,7 @@ def test_cierre_de_sesion(client):
 def test_persistencia_despues_de_reinicio(make_client, sdir, defined_catalog):
     """crear sesión → participante → respuesta → nueva instancia del backend → recuperar → integridad."""
     c1 = make_client("development")
-    sid = create(c1, tipo="objetivo", codigo="PTEST13", graba=True)
+    sid = create(c1, tipo="objetivo", codigo="PTEST13")
     rec = c1.post(f"/api/study/sessions/{sid}/responses", json=formal_obj01()).json()["respuesta"]
     before = c1.get(f"/api/study/sessions/{sid}").json()
     del c1
@@ -619,7 +671,7 @@ def test_logs_no_contienen_datos_del_participante(client, caplog):
     logger.addHandler(caplog.handler)
     try:
         with caplog.at_level(logging.INFO, logger="visionnav.request"):
-            sid = create(client, notas="Nota de prueba: Juan Pérez", investigador="INV-TEST")
+            sid = create(client)
             client.post(f"/api/study/sessions/{sid}/responses", json={
                 "prueba_id": "PIL-02", "modo": "formal", "respuesta_transcrita": "Juan dijo algo"})
             client.get(f"/api/study/sessions/{sid}")
@@ -627,7 +679,7 @@ def test_logs_no_contienen_datos_del_participante(client, caplog):
         logger.removeHandler(caplog.handler)
     text = caplog.text
     assert sid in text                                  # el path se registra (solo código)
-    for secret in ("Juan", "Pérez", "talkback", "adquirida", "INV-TEST", "Chrome 140"):
+    for secret in ("Juan", "talkback", "adquirida", "Chrome 140", "CI-VisionNav"):
         assert secret not in text, secret
 
 
@@ -646,7 +698,7 @@ def test_grabacion_exige_almacenamiento_fuera_del_repositorio(make_client, monke
     repo_dir = REPO_ROOT / "study_data" / "sessions"
     monkeypatch.setattr(study, "_STUDY_DIR", tmp_path / "s")
     c = make_client("development")
-    sid = create(c, graba=True, codigo="PTEST16")
+    sid = create(c, codigo="PTEST16")
     c.post(f"/api/study/sessions/{sid}/responses", json={"prueba_id": "PIL-02", "modo": "formal"})
     monkeypatch.setattr(study, "_STUDY_DIR", repo_dir)
     monkeypatch.setattr(study, "_session_dir", lambda _sid: tmp_path / "s" / sid)

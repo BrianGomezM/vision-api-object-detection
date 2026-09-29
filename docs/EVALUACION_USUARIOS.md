@@ -29,11 +29,12 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
                              └ ESCALAS / OBSERVACIONES / COMENTARIOS
 ```
 
-## 3. Contrato (v2) — todas las rutas exigen `X-API-Key` del investigador
+## 3. Contrato (v3) — todas las rutas exigen `X-API-Key` del investigador
 
 | Ruta | Cambio | Notas |
 |---|---|---|
-| `POST /api/study/sessions` | **Rompe el contrato anterior** | Recibe `codigo`, `tipo_participante`, `ficha`, `consentimiento`, `grabacion`, `contexto`, `investigador?` y `notas?`. Ya **no** acepta `nombre`, `edad` ni `genero` (400 si se envían). Respuestas: 409 si el código está repetido o si un código real se guardaría dentro del repositorio; 400 si el consentimiento está incompleto. |
+| `POST /api/study/sessions` | **Rompe el contrato v2** (2026-09-28, v3) | Recibe `codigo`, `tipo_participante`, `ficha`, `contexto`, `consentimiento` (`version` + 4 afirmaciones) y `grabacion_consentimiento` (`content_type`, `data_base64`, `duracion_s`). Ya **no** acepta `grabacion`, `investigador`, `notas`, `modalidad` ni `formato_referencia` (400). No acepta `nombre`, `edad` ni `genero`. Respuestas: 409 si el código está repetido o si un código real se guardaría dentro del repositorio; 400 si falta una afirmación, la grabación o la versión no corresponde al tipo de participante; 415 si el formato de audio no se admite. |
+| `GET /api/study/sessions/{id}/consentimiento/audio` | Nueva (v3) | Grabación de la lectura del consentimiento. 404 si no se almacenó (PTEST sin `DATA_ROOT`). |
 | `GET /api/study/sessions` | Cambia | Devuelve `sesiones[]` (código, tipo, estado, `num_formales`) y `sesiones_heredadas_omitidas`. |
 | `GET /api/study/sessions/{id}` | Cambia | Devuelve `{sesion, respuestas, resumen}` (antes `{participant, respuestas}`). |
 | `POST /api/study/sessions/{id}/responses` | **Rompe el contrato anterior** | Ver §5. |
@@ -106,17 +107,24 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
   - Fundamento: el diseño geométrico de DS1-B3 en el manifest pone una persona al centro y una botella a la derecha, sin objetos a la izquierda.
   - **No es** una respuesta metodológica de OBJ-03.
 
-## 5 ter. Consentimiento informado (borrador)
+## 5 ter. Consentimiento informado (v3, documentos del investigador v0.3)
 
-- **Fuente única:** `visionnav-client/lib/consent.ts`.
-  - El asistente de sesión muestra ese texto para leerlo en voz alta y toma de ahí las tres afirmaciones obligatorias y la afirmación 4 (grabación, opcional).
-  - El botón **"Descargar consentimiento informado"** genera un `.docx` (`lib/docx.ts`, sin dependencias) para la revisión de los directores.
-- **Adaptación:** se adapta el formato de otro estudio.
-  - Se conserva: participación voluntaria, confidencialidad y lectura en voz alta con consentimiento verbal.
-  - Se reescribe: propósito (§F), procedimiento sin tareas físicas (§H), riesgos, y grabación solo de audio y opcional (sin video).
-- **Marcado como `[PENDIENTE]`** (resaltado en el `.docx`): aprobación ética, almacenamiento, acceso y conservación de la información y de las grabaciones, duración, título, institución y contacto.
-  - El documento declara que **no está aprobado**.
-- **Trazabilidad:** la versión del texto (`TG2-OE3-CI v0.1…`) se guarda en `consentimiento.formato_referencia` de cada sesión.
+- **Dos documentos, uno por tipo de participante:** `Consentimiento_informado_VisionNav_Personas_Piloto_v0.3` y `…_Personas_Objetivo_v0.3`.
+  - El cliente descarga los archivos reales (PDF y Word) desde `visionnav-client/public/consentimientos/`.
+  - El texto que se lee en voz alta está en `visionnav-client/lib/consent.ts`, con las erratas gramaticales corregidas.
+  - El asistente muestra el documento que corresponde al tipo de participante elegido.
+- **Cuatro afirmaciones obligatorias (§12):** `acepta_participar`, `puede_detenerse`, `autoriza_grabacion` y `autoriza_uso_academico`.
+  - La 3 es la autorización de grabar las respuestas: según el §5 del documento, la grabación es condición para participar.
+  - `sesion.grabacion.autoriza_grabacion_audio` se deriva de ella, así que la subida de grabaciones de respuestas no cambia.
+- **Grabación de la lectura del consentimiento:** es obligatoria y se envía junto con la creación de la sesión, que queda atómica: sin grabación no se guarda nada.
+  - Con `DATA_ROOT` se guarda como `grabacion_consentimiento.<ext>`.
+  - Sin `DATA_ROOT` (solo PTEST) se guarda únicamente la huella: sha256, tamaño y duración.
+- **Trazabilidad:** `consentimiento.version` (validada contra `CONSENT_VERSIONS` en `app/routes/study.py`), `documento`, `modalidad = "verbal"` y `grabacion`.
+- **Compatibilidad:** las sesiones v2 existentes (por ejemplo, PTEST10 en Azure) se siguen leyendo; sus campos v2 se conservan.
+- **Pendiente en los documentos:**
+  - El §9 dice que las grabaciones se guardan "en el computador del investigador", pero el sistema las guarda en el servidor, por decisión del investigador del 2026-09-28.
+  - Falta el "Periodo de conservación de las grabaciones".
+  - La app marca ambos puntos como `[PENDIENTE]`.
 
 ## 6. Audio: dos archivos distintos
 
@@ -124,6 +132,7 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
 |---|---|---|
 | `audio_narrativa_api.mp3` | Audio TTS que devolvió `/api/detect` y que escuchó el participante (es el estímulo) | Siempre que la prueba usa estímulo; con su sha256 |
 | `respuesta_participante.<webm/ogg/m4a>` | Voz del participante | **Solo** si `grabacion.autoriza_grabacion_audio = true` **y** el almacenamiento está fuera del repositorio. En otro caso, 403/409 y no se escribe nada. |
+| `grabacion_consentimiento.<webm/ogg/m4a>` | Lectura del consentimiento y respuestas del participante (v3) | Al crear la sesión, solo fuera del repositorio; sin `DATA_ROOT` se guarda únicamente su huella. |
 
 ## 7. Correspondencia con la estructura prevista (doc. 27 §Q)
 
@@ -140,9 +149,9 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
 
 ## 8. Pendiente de confirmar (no inventado; depende de los directores)
 
-1. **Consentimiento:** el formato disponible (`Formatos/Consentimiento informado.docx`) pertenece a **otro estudio** (doctorado; tareas físicas; grabación de audio **y video**).
-   - No describe este protocolo.
-   - El sistema registra las tres afirmaciones de ese formato, pero **no afirma** que exista un consentimiento aprobado para el Objetivo 3.
+1. **Consentimiento:** ya existen los documentos propios v0.3 (piloto y objetivo; ver §5 ter).
+   - Falta el periodo de conservación.
+   - Falta alinear el §9 con el almacenamiento en el servidor.
 2. **Aprobación ética institucional:** no está verificado si se requiere (doc. 27 §L, §W-1).
 3. **Grabación del participante:** no se sabe si forma parte del protocolo aprobado, quién accede a ella ni por cuánto tiempo se conserva (§W-2, §W-7). El mecanismo existe, pero solo funciona con la autorización registrada.
 4. **Estímulos de OBJ-01…OBJ-07:** están `POR_DEFINIR` en el catálogo.
@@ -151,12 +160,12 @@ PARTICIPANTE (código P0X, ficha)            sesion.json
    - Además, OBJ-03/OBJ-04 ("elección de ruta") se implementan como decisión hipotética sin desplazamiento (§5 bis).
    - El guion conserva el verbo "avanzaría"; conviene que los directores confirmen esa redacción y definan la alternativa esperada por estímulo.
 5. **Anclas de las escalas 1–5**, y si se registran por estímulo, solo en el cuestionario posterior o en ambos.
-6. **Consentimiento:** revisar el borrador descargable (§5 ter) y completar los `[PENDIENTE]`.
+6. **Consentimiento:** publicar una v0.4 de ambos documentos con el §9 corregido y el periodo de conservación, y actualizar `CONSENT_VERSIONS` y `lib/consent.ts`.
 7. **Despliegue:** en Azure, `DATA_ROOT` debe ser persistente (`/home`). Sin él, el servidor solo acepta códigos PTEST.
 
 ## 9. Pruebas
 
-- **Backend:** `tests/test_study_sessions.py`. Todas usan proveedores simulados y directorios temporales. Incluye las tareas de decisión y el fixture técnico. El total de la suite es 397 correctas y 4 omitidas.
-- **Cliente:** `node scripts/check-study.mjs` (21 verificaciones, incluidas la decisión, el consentimiento y el `.docx`), `tsc --noEmit` y `next build`.
+- **Backend:** `tests/test_study_sessions.py`. Todas usan proveedores simulados y directorios temporales. Incluye las tareas de decisión y el fixture técnico. Incluye el consentimiento v3: 4 afirmaciones, grabación obligatoria, versión según el tipo de participante y huella sin `DATA_ROOT`.
+- **Cliente:** `node scripts/check-study.mjs` (21 verificaciones, incluidos la decisión y los dos consentimientos), `tsc --noEmit` y `next build`.
 - **E2E en Chromium con axe-core:** contra el backend local con proveedores simulados, fuera del repositorio. Resultado: fase 1 10/10, fase 2 3/3 (incluye un reinicio del backend).
 - **E2E del 2026-09-28** (cliente compilado y backend en perfil production local, con la identidad verificada, YOLO26s real y LLM/TTS simulados; fuera del repositorio): PTEST01 y PTEST02 recorren la interfaz de principio a fin. Resultado: 47/47 comprobaciones, más 8/8 tras reiniciar el backend; axe WCAG 2.1 A/AA sin violaciones en 19 pantallas, más 1 tras el reinicio; matriz 401/401/2xx en todas las rutas del investigador. Los scripts y registros de esta E2E no están versionados en el repositorio. Es una prueba técnica simulada: **no es evaluación con usuarios**.

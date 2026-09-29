@@ -31,6 +31,7 @@ PRODUCTION_ROUTES = {
     ("POST", "/api/study/sessions/{session_id}/responses"),
     ("POST", "/api/study/sessions/{session_id}/responses/{response_id}/grabacion"),
     ("GET", "/api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}"),
+    ("GET", "/api/study/sessions/{session_id}/consentimiento/audio"),
     ("POST", "/api/study/sessions/{session_id}/cierre"), ("GET", "/api/study/consolidado"),
     ("GET", "/api/metrics/summary"), ("GET", "/api/metrics/latency"),
 }
@@ -144,7 +145,7 @@ def test_flujo_completo_de_sesion_en_production(prod, tmp_path):
 
 def test_consentimiento_obligatorio_en_production(prod, tmp_path):
     body = session_body()
-    body["consentimiento"]["comprende_y_acepta"] = False
+    body["consentimiento"]["autoriza_grabacion"] = False
     r = prod.post("/api/study/sessions", headers=H, json=body)
     assert r.status_code == 400
     assert not (tmp_path / "study" / "sessions").exists()
