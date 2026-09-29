@@ -3,6 +3,12 @@
 Registro de cada regeneración **intencional** de `baseline_phase2a.json`. La línea base
 solo se regenera tras una decisión metodológica aprobada, y el diff queda documentado aquí.
 
+## 2026-09-29 — clave informativa `umbral` en la respuesta de `/api/detect`
+
+**Motivo:** mostrar en Detectar el umbral efectivo de cada objeto (decisión del investigador: mantener la regla `min()` y explicarla en la interfaz).
+
+**Resultado:** las 41 imágenes solo añaden `endpoint.json.umbral` (umbral de Ajustes, piso, regla y, por objeto, confianza, mínimo de la clase y umbral efectivo). Todo lo demás es **idéntico**: detecciones, confianzas, cajas, análisis espacial, espacio libre, decisión, prompts y narrativa. Verificado quitando la clave nueva y comparando con la línea base anterior. La regla del umbral no cambia.
+
 ## 2026-09-27 — regla del umbral por clase `max()` → `min()` (checkpoint final pre-F4)
 
 **Motivo:** `docs/AUDITORIA_REGLA_UMBRAL_FASE10.md` §5 (decisión) y `experimental_config.yaml`.
