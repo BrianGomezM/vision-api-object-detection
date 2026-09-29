@@ -3,6 +3,10 @@
 Registro de cada regeneración **intencional** de `baseline_phase2a.json`. La línea base
 solo se regenera tras una decisión metodológica aprobada, y el diff queda documentado aquí.
 
+## 2026-09-29 — `metricas.tts_modelo` en la respuesta de `/api/detect`
+
+**Motivo:** registrar qué voz generó el audio (el estudio con usuarios pasa a usar Azure Speech, Salomé). Las 41 imágenes solo añaden `endpoint.json.metricas.tts_modelo` (en la regresión, la voz por defecto); todo lo demás es **idéntico** (verificado quitando la clave y comparando).
+
 ## 2026-09-29 — clave informativa `umbral` en la respuesta de `/api/detect`
 
 **Motivo:** mostrar en Detectar el umbral efectivo de cada objeto (decisión del investigador: mantener la regla `min()` y explicarla en la interfaz).

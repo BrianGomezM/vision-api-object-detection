@@ -2,7 +2,7 @@
 # No editar a mano: regenerar y revisar el diff. `verificado` = valores efectivos en ejecución.
 schema_version: 1
 descripcion: Configuración OFICIAL de F4 (congelada). preflight() exige coincidencia exacta de `verificado`.
-generado_desde_commit: fa5368d8b5bf9376f9af0c3b13ad8786b5326d4a
+generado_desde_commit: 27bb8c3fd4de09c462050b58429661dbfbd11e96
 estado_decisiones:
   regla_umbral_por_clase: APROBADA (min) — docs/AUDITORIA_REGLA_UMBRAL_FASE10.md §5
   preprocesamiento: 'APROBADO (ruta de producción: core.pipeline.resize_image)'
@@ -42,7 +42,7 @@ verificado:
     app/services/risk_engine.py: 66102418803510d9212259fa4a0f6f1dff835a2c459c521496ec10e2eea6cf08
     app/services/scene_classifier.py: ca48d7a7eed670d9b5cd0f572c548ba8a7b1044edcdb8ccef11f483ccfef7ed9
     app/services/llm_enhancer.py: 0ace4af89fa0b21a732b5446e671a5f023b17432e1dc9a6be5169990fcd14f76
-    app/services/tts_service.py: f0abd72d19ad28d50b323672d9a8828a8c093b465133c9e692c778276cf9c207
+    app/services/tts_service.py: 153bfd018686b4431483cd7a03d80deeb1515db38a053bf3a6516c00f4c06e4d
     app/services/detection_visualizer.py: 802e4100a99ccd6381196f67b7d309ef970168f9b7f502966806089031bc55b4
     app/utils/groq_client.py: 63b1a48f315f9fac6647d776dee5fbacbecfdf3fc86ffb4d8d603589f7447c28
     app/utils/translator.py: 50745f2d301b40008b1743af8f80a54970c0e5390a5d9fde5c4d5fb45e76e9c1
@@ -280,6 +280,6 @@ experimento:
   c2_espejo: PENDIENTE (CP3B D6)
   catalogo:
     archivo: app/catalog/catalog.yaml
-    sha256: 50709da6d581c1b959b79c745fb1f9f54380f7903e4fe4af313d6d12f91e922b
+    sha256: ff0404979a0493c78b855aa480f125561a08009a2870c6fb29cfa7fdae11070f
   metricas_version: PENDIENTE (CP3B)
   latencia: NO forma parte de las métricas del CP3B; si se reporta, por separado (CPU local ≠ despliegue)

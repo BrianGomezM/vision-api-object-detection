@@ -421,6 +421,8 @@ async def detect(
         metricas = {
             **result["tiempos"],
             "tts_ms":             tts_ms,
+            # Voz que generó el audio: la pedida si está permitida, si no la voz por defecto.
+            "tts_modelo":         tts_model if tts_model in {m["id"] for m in get_available_tts_models()} else TTS_MODEL,
             "objetos_detectados": len(result["detections"]),
             "confianza_prom":     avg_conf,
             "umbral_confianza":   threshold,
