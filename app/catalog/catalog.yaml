@@ -155,7 +155,7 @@ pruebas_usuario:
   - id: OBJ-05
     pista: objetivo
     nombre: "Calidad de la voz (independiente del contenido)"
-    objetivo: "Medir la calidad percibida del audio en sí (Gemini TTS, voz Sulafat), separada de la comprensión del contenido."
+    objetivo: "Medir la calidad percibida del audio en sí (la voz sintética de la sesión), separada de la comprensión del contenido."
     guion_investigador: 'Reproduce un audio de referencia neutro (no una narrativa de navegación). Pregunta, para cada criterio: "¿Qué tan clara/rápida/natural/cómoda en volumen te pareció la voz?" en escala de 1 a 5.'
     tipo: escala
     criterios: [claridad, velocidad, naturalidad, volumen]

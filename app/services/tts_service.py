@@ -163,7 +163,7 @@ AZURE_OUTPUT_FORMAT: str = "audio-24khz-48kbitrate-mono-mp3"   # 24 kHz como Gem
 AZURE_TTS_VOICES: list[dict] = [
     {
         "id": "azure:es-CO-SalomeNeural",
-        "label": "Azure Speech · Salomé, español de Colombia (propuesta, la más rápida)",
+        "label": "Azure Speech · Salomé, español de Colombia (recomendada, la más rápida; voz del estudio)",
         "descripcion": "Voz neuronal femenina y cálida, la más parecida a Sulafat. ~0,3–1 s por narrativa (TTS no generativo).",
     },
     {

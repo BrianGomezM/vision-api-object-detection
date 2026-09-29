@@ -276,6 +276,8 @@ class Ejecucion(_M):
     escenario: Optional[str] = Field(None, max_length=100)
     degradaciones: list[str] = Field(default_factory=list, max_length=20)
     umbral_confianza: Optional[float] = Field(None, ge=0, le=1)
+    # Voz TTS que generó el audio (desde 2026-09-29 el estudio usa azure:es-CO-SalomeNeural).
+    tts_modelo: Optional[str] = Field(None, max_length=100)
     audio: AudioEjecucion
 
 
