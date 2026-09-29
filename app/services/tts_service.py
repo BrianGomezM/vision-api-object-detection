@@ -142,6 +142,45 @@ AVAILABLE_TTS_MODELS: list[dict] = [
         "descripcion": "Cuota de RPM independiente. Mayor calidad, mismo precio que el 3.1: $1.00 / $20.00 por 1M tokens.",
     },
 ]
+
+# ──────────────────────────────────────────────────────────────
+# AZURE AI SPEECH — voces alternativas SOLO para el módulo Detectar
+# ──────────────────────────────────────────────────────────────
+# TTS neuronal (no generativo): sintetiza la narrativa completa en ~0,3–1 s frente a los
+# ~12 s de Gemini, y devuelve MP3 directamente (no pasa por lameenc). Solo se usa cuando
+# el cliente elige una de estas voces en Ajustes; el estudio con usuarios y la evaluación
+# usan siempre TTS_MODEL (Gemini). Las voces aparecen en el selector únicamente si
+# AZURE_SPEECH_KEY y AZURE_SPEECH_REGION están configuradas.
+AZURE_MODEL_PREFIX: str = "azure:"
+AZURE_SPEECH_KEY: str = os.getenv("AZURE_SPEECH_KEY", "").strip()
+AZURE_SPEECH_REGION: str = os.getenv("AZURE_SPEECH_REGION", "").strip()
+# Ritmo ligeramente pausado para acercarse al "ritmo moderado" de la instrucción de Gemini.
+AZURE_TTS_RATE: str = os.getenv("AZURE_TTS_RATE", "-5%").strip()
+AZURE_OUTPUT_FORMAT: str = "audio-24khz-48kbitrate-mono-mp3"   # 24 kHz como Gemini
+
+# Voz femenina y cálida de español de Colombia como propuesta (la más parecida a Sulafat);
+# una masculina como alternativa.
+AZURE_TTS_VOICES: list[dict] = [
+    {
+        "id": "azure:es-CO-SalomeNeural",
+        "label": "Azure Speech · Salomé, español de Colombia (propuesta, la más rápida)",
+        "descripcion": "Voz neuronal femenina y cálida, la más parecida a Sulafat. ~0,3–1 s por narrativa (TTS no generativo).",
+    },
+    {
+        "id": "azure:es-CO-GonzaloNeural",
+        "label": "Azure Speech · Gonzalo, español de Colombia",
+        "descripcion": "Voz neuronal masculina. ~0,3–1 s por narrativa (TTS no generativo).",
+    },
+]
+
+
+def is_azure_tts_configured() -> bool:
+    return bool(AZURE_SPEECH_KEY and AZURE_SPEECH_REGION)
+
+
+if is_azure_tts_configured():
+    AVAILABLE_TTS_MODELS.extend(AZURE_TTS_VOICES)
+
 _ALLOWED_TTS_MODEL_IDS: set[str] = {m["id"] for m in AVAILABLE_TTS_MODELS}
 
 
@@ -269,6 +308,57 @@ def _synthesize_gemini_tts(text: str, model: str = None) -> bytes:
     return _pcm_to_mp3(pcm_bytes)
 
 
+class AzureTTSError(Exception):
+    """Error HTTP de Azure AI Speech (sin incluir la clave)."""
+
+    def __init__(self, code: int, message: str, retry_after_s: Optional[float] = None):
+        super().__init__(f"{code} {message}")
+        self.code, self.message, self.retry_after_s = code, message, retry_after_s
+
+
+def _azure_ssml(text: str, voice: str) -> str:
+    from xml.sax.saxutils import escape
+    lang = voice[:5]                                   # "es-CO-SalomeNeural" → "es-CO"
+    return (f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="{lang}">'
+            f'<voice name="{escape(voice)}"><prosody rate="{escape(AZURE_TTS_RATE)}">{escape(text)}</prosody>'
+            f"</voice></speak>")
+
+
+def _synthesize_azure_tts(text: str, voice: str) -> bytes:
+    """Sintetiza con Azure AI Speech (REST) y devuelve MP3. La clave va solo en la cabecera."""
+    if is_tts_disabled_for_evaluation():
+        raise RuntimeError(f"{TTS_SKIPPED_STATUS}: EVALUATION_DISABLE_TTS=true")
+    import httpx
+    url = f"https://{AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1"
+    r = httpx.post(url, content=_azure_ssml(text, voice).encode("utf-8"), timeout=TTS_TIMEOUT_S, headers={
+        "Ocp-Apim-Subscription-Key": AZURE_SPEECH_KEY,
+        "Content-Type": "application/ssml+xml",
+        "X-Microsoft-OutputFormat": AZURE_OUTPUT_FORMAT,
+        "User-Agent": "visionnav-api",
+    })
+    if r.status_code != 200:
+        retry = r.headers.get("Retry-After")
+        raise AzureTTSError(r.status_code, (r.text or r.reason_phrase or "")[:200],
+                            float(retry) if retry and retry.isdigit() else None)
+    return r.content
+
+
+def _describe_azure_error(exc: BaseException) -> dict:
+    if isinstance(exc, AzureTTSError):
+        msg = exc.message.lower()
+        if exc.code == 429:
+            kind = "rate_limited"
+        elif exc.code == 403 and "quota" in msg:
+            kind = "quota_exhausted"                   # cuota mensual del nivel gratuito
+        elif exc.code >= 500:
+            kind = "unavailable"
+        else:
+            kind = "provider_error"                    # 400 SSML, 401/403 clave o región
+        return {"kind": kind, "retry_after_s": exc.retry_after_s}
+    timeout = isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower()
+    return {"kind": "timeout" if timeout else "provider_error", "retry_after_s": None}
+
+
 # ──────────────────────────────────────────────────────────────
 # FUNCIÓN PÚBLICA DE SÍNTESIS
 # ──────────────────────────────────────────────────────────────
@@ -303,6 +393,10 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         _last_error = {"code": None, "status": TTS_SKIPPED_STATUS,
                        "message": "TTS omitido intencionalmente por EVALUATION_DISABLE_TTS=true."}
         return None
+
+    # Voz de Azure elegida en Ajustes (solo si está en la lista blanca, es decir, configurada).
+    if model and model.startswith(AZURE_MODEL_PREFIX) and model in _ALLOWED_TTS_MODEL_IDS:
+        return _synthesize_with_azure(text, model[len(AZURE_MODEL_PREFIX):])
 
     if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
         logger.warning("[TTS] Dependencias de Gemini TTS no disponibles. Retornando None.")
@@ -370,6 +464,31 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         # Categoría y tiempo de reintento (SOLO si el proveedor lo informa)
         _last_error["kind"] = info["kind"]
         _last_error["retry_after_s"] = info["retry_after_s"]
+        return None
+
+
+def _synthesize_with_azure(text: str, voice: str) -> Optional[bytes]:
+    """Rama de Azure de synthesize_speech: mismo contrato (bytes MP3 o None + _last_error)."""
+    global _last_error
+    if not text or not text.strip():
+        _last_error = {"code": None, "status": "TEXTO_VACIO", "message": "Texto vacío."}
+        return None
+    text = text[:_MAX_CHARS]
+    try:
+        audio_bytes = _synthesize_azure_tts(text, voice)
+        if not audio_bytes:
+            _last_error = {"code": None, "status": "SIN_AUDIO", "message": "Azure Speech no devolvió audio."}
+            return None
+        logger.info("[TTS] Audio sintetizado con Azure Speech (voz=%s). Tamaño: %d bytes | Caracteres: %d",
+                    voice, len(audio_bytes), len(text))
+        return audio_bytes
+    except Exception as exc:
+        info = _describe_azure_error(exc)
+        code = getattr(exc, "code", None)
+        _last_error = {"code": code, "status": "AZURE_SPEECH_ERROR" if code else type(exc).__name__,
+                       "message": getattr(exc, "message", type(exc).__name__),
+                       "kind": info["kind"], "retry_after_s": info["retry_after_s"]}
+        logger.error("[TTS] Error de Azure Speech (%s): %s", info["kind"], _last_error["message"])
         return None
 
 
