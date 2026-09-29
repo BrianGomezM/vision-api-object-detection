@@ -77,6 +77,30 @@ from app.profiles import app_profile
 from app.errors import ApiError
 from app.core.pipeline import PipelineStageError
 from app.services.yolo_service import ModelUnavailableError
+from app.services.yolo_service import _CLASS_MIN_CONF, _INTERNAL_CONF
+
+
+def _threshold_explanation(result: dict, threshold: float) -> dict:
+    """Umbral efectivo de cada objeto detectado, SOLO para mostrarlo en el cliente.
+    Replica (sin cambiarla) la regla de yolo_service: min(mínimo de la clase, umbral),
+    con piso en la confianza interna de YOLO. No afecta la detección."""
+    es = {o["label"]: o.get("label_es", o["label"]) for o in result.get("analyzed", [])}
+    objetos = []
+    for d in result["detections"]:
+        clase = d["label"]
+        minimo = _CLASS_MIN_CONF.get(clase)
+        objetos.append({
+            "objeto": es.get(clase, clase), "clase": clase, "confianza": d["confidence"],
+            "minimo_clase": minimo,
+            "umbral_efectivo": round(max(min(minimo if minimo is not None else threshold, threshold), _INTERNAL_CONF), 3),
+        })
+    return {
+        "umbral_ajustes": threshold,
+        "piso": _INTERNAL_CONF,
+        "regla": "umbral efectivo = menor entre el mínimo de la clase y el umbral de Ajustes (piso "
+                 f"{_INTERNAL_CONF}). El umbral de Ajustes puede bajar el de una clase, nunca subirlo.",
+        "objetos": sorted(objetos, key=lambda o: -o["confianza"]),
+    }
 from app.utils.groq_client import is_llm_active
 
 # Alias históricos
@@ -459,6 +483,7 @@ async def detect(
                 "intro":     result["escenario"].get("scene_intro", ""),
             },
             "metricas": metricas,
+            "umbral": _threshold_explanation(result, threshold),
         }
 
         if debug:
