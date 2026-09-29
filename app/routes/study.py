@@ -26,9 +26,10 @@ PRIVACIDAD:
 
 ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions):
   <session_id>/
-    sesion.json                       ficha, consentimiento, autorización de grabación,
-                                      contexto técnico, estado y cierre (cuestionario
-                                      posterior, entrevista, registro técnico)
+    sesion.json                       ficha, contexto técnico, consentimiento (4 afirmaciones
+                                      y huella de su grabación), estado y cierre
+                                      (cuestionario posterior, entrevista, registro técnico)
+    grabacion_consentimiento.<ext>    lectura del consentimiento y respuestas (solo DATA_ROOT)
     responses.jsonl                   una línea por respuesta (append-only)
     respuestas/<R001>/
       audio_narrativa_api.<ext>       audio TTS que escuchó el participante (API)
@@ -36,7 +37,8 @@ ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions):
       grabacion.json                  metadatos de esa grabación
 
 ENDPOINTS (todos con clave del investigador, X-API-Key):
-  POST   /api/study/sessions                                   crear sesión (ficha + consentimiento)
+  POST   /api/study/sessions                                   crear sesión (ficha + consentimiento + grabación)
+  GET    /api/study/sessions/{id}/consentimiento/audio         grabación de la lectura del consentimiento
   GET    /api/study/sessions                                   listar sesiones
   GET    /api/study/sessions/{id}                              sesión + respuestas + resumen
   POST   /api/study/sessions/{id}/responses                    registrar una respuesta
@@ -81,7 +83,7 @@ router = APIRouter(dependencies=[Depends(require_researcher_key)], tags=["Evalua
 _STUDY_DIR = data_dir("study_sessions")       # sin DATA_ROOT: study_data/sessions/ (solo códigos PTEST)
 _lock = threading.Lock()
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3   # v3: consentimiento de 4 afirmaciones + grabación de su lectura
 SESSION_FILE = "sesion.json"
 LEGACY_FILE = "participant.json"
 
@@ -201,29 +203,41 @@ class ContextoSesion(_M):
     entorno_tecnico: Optional[EntornoTecnico] = None
 
 
+# Documentos de consentimiento vigentes por tipo de participante. El texto que se lee
+# vive en el cliente (visionnav-client/lib/consent.ts); aquí solo se valida que la
+# versión registrada corresponda al tipo de participante.
+CONSENT_VERSIONS: dict[str, tuple[str, ...]] = {
+    "piloto": ("CI-VisionNav-Piloto v0.3",),
+    "objetivo": ("CI-VisionNav-Objetivo v0.3",),
+}
+MAX_CONSENT_RECORDING_BYTES = 20 * 1024 * 1024
+
+
 class Consentimiento(_M):
-    """Afirmaciones del formato de consentimiento (lectura en voz alta + respuesta sí/no).
-    La grabación se registra aparte (Grabacion)."""
-    modalidad: Literal["verbal", "escrito"]
-    comprende_y_acepta: bool
-    puede_retirarse: bool
-    uso_anonimo: bool
-    formato_referencia: Optional[str] = Field(None, max_length=300)
+    """Consentimiento verbal (documento leído en voz alta, §12): respuesta sí/no a las
+    cuatro afirmaciones. Las cuatro son obligatorias para participar; la 3 es la
+    autorización de grabar las respuestas verbales (§5 del documento)."""
+    version: str = Field(..., max_length=100, description="Versión del documento leído (CONSENT_VERSIONS)")
+    acepta_participar: bool
+    puede_detenerse: bool
+    autoriza_grabacion: bool
+    autoriza_uso_academico: bool
 
 
-class Grabacion(_M):
-    autoriza_grabacion_audio: bool
+class GrabacionConsentimiento(_M):
+    """Grabación de la lectura del consentimiento y de las respuestas del participante."""
+    content_type: str = Field(..., max_length=50)
+    data_base64: str = Field(..., min_length=1, max_length=(MAX_CONSENT_RECORDING_BYTES * 4) // 3 + 8)
+    duracion_s: Optional[float] = Field(None, ge=0, le=7200)
 
 
 class SessionCreate(_M):
     codigo: str = Field(..., description="Código anonimizado: P01, P02… (PTEST01… para pruebas técnicas)")
     tipo_participante: Literal["objetivo", "piloto"]
     ficha: Ficha
-    consentimiento: Consentimiento
-    grabacion: Grabacion
     contexto: ContextoSesion
-    investigador: Optional[str] = Field(None, max_length=50, description="Iniciales o código del investigador")
-    notas: Optional[str] = Field(None, max_length=2000)
+    consentimiento: Consentimiento
+    grabacion_consentimiento: GrabacionConsentimiento
 
     @model_validator(mode="after")
     def _coherente(self):
@@ -231,6 +245,9 @@ class SessionCreate(_M):
             raise ValueError("codigo debe tener el formato P01…P999 (o PTEST01… para pruebas); nunca un nombre")
         if self.tipo_participante == "objetivo" and self.ficha.condicion_visual.tipo_ceguera == "no_aplica":
             raise ValueError("un participante objetivo debe tener ceguera congénita o adquirida")
+        if self.consentimiento.version not in CONSENT_VERSIONS[self.tipo_participante]:
+            raise ValueError(f"el consentimiento de un participante {self.tipo_participante} debe ser "
+                             f"{' / '.join(CONSENT_VERSIONS[self.tipo_participante])}")
         return self
 
 
@@ -469,17 +486,34 @@ def summarize(respuestas: list[dict]) -> dict:
 # POST /api/study/sessions
 # ──────────────────────────────────────────────────────────────
 
+def _decode_consent_recording(g: GrabacionConsentimiento) -> tuple[bytes, str]:
+    content_type = g.content_type.split(";")[0].strip()
+    if content_type not in _AUDIO_EXT:
+        raise HTTPException(status_code=415, detail="Formato de audio de la grabación del consentimiento no soportado.")
+    try:
+        raw = base64.b64decode(g.data_base64, validate=True)
+    except (binascii.Error, ValueError):
+        raise HTTPException(status_code=400, detail="La grabación del consentimiento no es base64 válido.")
+    if not raw:
+        raise HTTPException(status_code=400, detail="La grabación del consentimiento está vacía.")
+    if len(raw) > MAX_CONSENT_RECORDING_BYTES:
+        raise HTTPException(status_code=413, detail="La grabación del consentimiento supera el tamaño máximo.")
+    return raw, content_type
+
+
 @router.post("/study/sessions", status_code=201)
 def create_session(body: SessionCreate):
-    """Crea la sesión DESPUÉS de registrar ficha, consentimiento, autorización de
-    grabación y contexto. Sin consentimiento completo no se guarda nada."""
+    """Crea la sesión DESPUÉS de registrar ficha, contexto, consentimiento y la grabación
+    de su lectura. Sin las cuatro afirmaciones o sin grabación no se guarda nada."""
     c = body.consentimiento
-    if not (c.comprende_y_acepta and c.puede_retirarse and c.uso_anonimo):
+    if not (c.acepta_participar and c.puede_detenerse and c.autoriza_grabacion and c.autoriza_uso_academico):
         raise HTTPException(status_code=400,
-                            detail="No se puede iniciar una sesión sin el consentimiento completo del participante.")
+                            detail="No se puede iniciar una sesión sin el consentimiento completo del participante "
+                                   "(las cuatro afirmaciones, incluida la grabación de audio).")
     if not _outside_repo() and not TEST_CODE_RE.match(body.codigo):
         raise _conflict("Los participantes reales exigen DATA_ROOT (los datos nunca se guardan en el "
                         "repositorio). Sin DATA_ROOT solo se aceptan códigos de prueba PTEST01…")
+    raw, content_type = _decode_consent_recording(body.grabacion_consentimiento)
 
     ts = datetime.now(timezone.utc)
     session_id = f"{ts.strftime('%Y%m%d_%H%M%S')}_{body.codigo.lower()}"
@@ -490,6 +524,15 @@ def create_session(body: SessionCreate):
                                 "Recupérela desde la lista: el protocolo prevé una sesión por participante.")
         session_path = _STUDY_DIR / session_id
         session_path.mkdir(parents=True, exist_ok=False)
+        # La voz del participante nunca se escribe en el repositorio: sin DATA_ROOT (solo
+        # PTEST) se conserva únicamente la huella de la grabación.
+        archivo = None
+        if _outside_repo():
+            archivo = f"grabacion_consentimiento.{_AUDIO_EXT[content_type]}"
+            (session_path / archivo).write_bytes(raw)
+        grabacion = {"archivo": archivo, "almacenada": archivo is not None, "content_type": content_type,
+                     "tamano_bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+                     "duracion_s": body.grabacion_consentimiento.duracion_s}
         record = {
             "schema_version": SCHEMA_VERSION,
             "session_id": session_id,
@@ -499,11 +542,12 @@ def create_session(body: SessionCreate):
             "creado": ts.isoformat(),
             "estado": "en_curso",
             "ficha": body.ficha.model_dump(),
-            "consentimiento": {**c.model_dump(), "otorgado": True, "registrado_en": ts.isoformat()},
-            "grabacion": {**body.grabacion.model_dump(), "registrado_en": ts.isoformat()},
+            "consentimiento": {**c.model_dump(), "documento": body.tipo_participante, "modalidad": "verbal",
+                               "otorgado": True, "registrado_en": ts.isoformat(), "grabacion": grabacion},
+            # Afirmación 3: autoriza grabar las respuestas verbales durante la sesión.
+            "grabacion": {"autoriza_grabacion_audio": c.autoriza_grabacion, "registrado_en": ts.isoformat(),
+                          "fuente": "consentimiento.autoriza_grabacion"},
             "contexto": body.contexto.model_dump(),
-            "investigador": body.investigador,
-            "notas": body.notas,
             "almacenamiento": "externo (DATA_ROOT)" if _outside_repo() else "repositorio (solo códigos de prueba)",
             "catalogo_schema_version": loader.get_catalog().source.schema_version,
             "backend_commit": _backend_commit(),
@@ -772,6 +816,18 @@ def get_audio(session_id: str, response_id: str, tipo: Literal["narrativa", "par
     ext = files[0].suffix.lstrip(".")
     media = next((k for k, v in _AUDIO_EXT.items() if v == ext), "application/octet-stream")
     return FileResponse(files[0], media_type=media, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/study/sessions/{session_id}/consentimiento/audio")
+def get_consent_audio(session_id: str):
+    """Grabación de la lectura del consentimiento (sesiones v3 con DATA_ROOT)."""
+    d = _session_dir(session_id)
+    g = (_read_session(d).get("consentimiento") or {}).get("grabacion") or {}
+    f = d / g["archivo"] if g.get("archivo") else None
+    if f is None or not f.is_file():
+        raise HTTPException(status_code=404, detail="La grabación del consentimiento no está almacenada en el servidor.")
+    return FileResponse(f, media_type=g.get("content_type") or "application/octet-stream",
+                        headers={"Cache-Control": "no-store"})
 
 
 # ──────────────────────────────────────────────────────────────
