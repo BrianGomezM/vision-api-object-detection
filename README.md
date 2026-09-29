@@ -55,6 +55,21 @@ GROQ_API_KEY=...
 GOOGLE_API_KEY=...
 APP_PROFILE=development
 
+Opcional — voces de Azure AI Speech (solo para el módulo Detectar):
+
+AZURE_SPEECH_KEY=...           (Clave 1 del recurso Speech "visionnavSpeech", plan F0)
+AZURE_SPEECH_REGION=canadacentral
+AZURE_TTS_RATE=-5%             (opcional; ritmo de la voz)
+
+- Con ambas variables, el selector "Voz de la narrativa (TTS)" de Ajustes ofrece Salomé
+  (es-CO, propuesta) y Gonzalo (es-CO). Sin ellas, esas voces no aparecen.
+- Son TTS neuronal: ~1–2 s por narrativa frente a ~12 s de Gemini.
+- El estudio con usuarios y la evaluación usan siempre la voz por defecto (Gemini 3.1 Flash TTS, Sulafat).
+- En Azure van en App Service visionnav-api → Variables de entorno → Configuración de la aplicación.
+- La clave se obtiene en el recurso Speech → Keys and Endpoint (o con
+  `az cognitiveservices account keys list -g rg-visionnav -n visionnavSpeech`).
+- Nivel gratuito F0: 500.000 caracteres al mes (~2.000 narrativas).
+
 No se debe publicar ni versionar el archivo .env.
 
 4. Ejecución local

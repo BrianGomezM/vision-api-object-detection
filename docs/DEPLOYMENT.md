@@ -124,6 +124,7 @@ Ningún valor secreto aparece en este documento. "Congelado" significa que la ve
 |---|---|---|---|---|---|---|
 | `GROQ_API_KEY` | Prod: recomendada. Study: sí | Definir (app setting) | Definir | Alta (cuota y coste) | **Sí** | Prod: 200 con `X-Degradacion: LLM_UNAVAILABLE` (narrativa por reglas). Study: error 503 |
 | `GOOGLE_API_KEY` | Prod: recomendada. Study: sí | Definir | Definir | Alta (cuota ≈ 15.000 COP) | **Sí** | Prod: 200 sin audio (`TTS_UNAVAILABLE`); con `audio=true`, 503. Study: error |
+| `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Opcionales | Definir si se quieren las voces de Azure en Detectar | No | Baja (nivel gratuito F0: 500.000 caracteres/mes) | `AZURE_SPEECH_KEY` sí | Sin ellas las voces de Azure no aparecen; el TTS por defecto (Gemini) no cambia |
 | `API_KEYS` | Study: sí | **Vacía** (endpoint público, `POLITICA_API_DETECT.md`) | Definir | Alta | **Sí** | Prod: sin autenticación (previsto). Study: **no arranca** |
 | `RESEARCHER_API_KEYS` | Prod: sí, para el estudio | Definir (clave del investigador; se escribe en el cliente en tiempo de ejecución, nunca en Vercel) | Opcional (se suma a `API_KEYS`) | Alta (datos de participantes) | **Sí** | Prod: `/api/study/*`, `/api/catalog*` y `/api/metrics/*` responden 401 (fallo cerrado). **No** afecta a `/api/detect` |
 | `APP_PROFILE` | Sí | `production` (imagen) | `study` | Baja | No | Sin definir: `development`, que expone todos los endpoints. La imagen fija `production` |
