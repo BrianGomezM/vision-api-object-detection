@@ -25,6 +25,11 @@ from app.storage import REPO_ROOT
 CATALOG_PATH = Path(__file__).resolve().parent / "catalog.yaml"
 # Resuelve los estímulos POR_DEFINIR sin modificar catalog.yaml (congelado).
 ASSIGNMENTS_PATH = Path(__file__).resolve().parent / "asignaciones.yaml"
+# Audios CONGELADOS del estudio con usuarios (scripts/study/freeze_study_audio.py): en las
+# sesiones formales solo se reproducen estos archivos; nunca se regenera la narrativa.
+FROZEN_AUDIO_PATH = REPO_ROOT / "stimuli" / "dataset1" / "estudio" / "congelados.yaml"
+
+Codificacion = Literal["objetos", "relaciones", "ubicacion", "distancia", "cambio"]
 
 
 class _Model(BaseModel):
@@ -70,6 +75,8 @@ class PruebaUsuario(_Model):
     guion_investigador: str
     tipo: Literal["imagen", "escala", "ruta", "texto"]
     criterios: list[str] | None = None
+    # Qué se codifica de la respuesta verbal (siempre frente a la narrativa escuchada).
+    codificacion: list[Codificacion] = Field(default_factory=list)
     metricas: list[str]
     metricas_texto: list[str]
     tipo_evaluacion: str
@@ -128,6 +135,36 @@ class Asignacion(_Model):
 class AsignacionesFile(_Model):
     schema_version: int
     asignaciones: list[Asignacion]
+    # Escenas de práctica (familiarización): fuera del conjunto evaluado; solo modo ensayo.
+    practica: list[str] = Field(default_factory=list)
+
+
+class AudioCongelado(_Model):
+    """Audio y narrativa generados UNA vez para un estímulo del estudio."""
+    stimulus_id: str
+    archivo: str
+    sha256: str
+    content_type: str = "audio/mpeg"
+    tamano_bytes: int
+    duracion_s: float | None = None
+    narrativa_final: str
+    instruccion_movimiento: str | None = None
+    tts_modelo: str
+    llm_modelo: str | None = None
+    origen_descripcion: str | None = None
+    generado_en: str
+    intento: int
+    backend_commit: str | None = None
+    detecciones: list[dict] = Field(default_factory=list)
+
+
+class CongeladosFile(_Model):
+    schema_version: int
+    conjunto: str
+    generado_en: str
+    configuracion: dict = Field(default_factory=dict)
+    verificacion_fidelidad: dict | None = None
+    estimulos: list[AudioCongelado]
 
 
 class Catalog(BaseModel):
@@ -136,6 +173,16 @@ class Catalog(BaseModel):
     # sha256 de asignaciones.yaml si resolvió alguna prueba POR_DEFINIR (trazabilidad).
     asignaciones_sha256: str | None = None
     asignadas: list[str] = Field(default_factory=list)
+    practica: list[str] = Field(default_factory=list)
+    # Audios congelados válidos (hash verificado al cargar), por stimulus_id.
+    congelados: dict[str, AudioCongelado] = Field(default_factory=dict)
+    congelados_dir: Path | None = None
+    congelados_sha256: str | None = None
+    congelados_invalidos: dict[str, str] = Field(default_factory=dict)
+
+    def frozen_audio_path(self, stimulus_id: str) -> Path | None:
+        a = self.congelados.get(stimulus_id)
+        return (self.congelados_dir / a.archivo) if a and self.congelados_dir else None
 
     # ── Pruebas técnicas derivadas: una por (plantilla de bloque × estímulo) ──
     def technical_tests(self) -> list[dict]:
@@ -162,9 +209,13 @@ class Catalog(BaseModel):
             "schema_version": self.source.schema_version,
             "metricas": [m.model_dump() for m in self.source.metricas],
             "datasets": [d.model_dump(exclude={"manifest"}) for d in self.source.datasets],
-            "estimulos": [_public_stimulus(s, image_url) for s in self.stimuli.values()],
+            "estimulos": [_public_stimulus(s, image_url, self.congelados.get(s.stimulus_id),
+                                           s.stimulus_id in self.practica)
+                          for s in self.stimuli.values()],
             "asignaciones": {"archivo": "app/catalog/asignaciones.yaml", "sha256": self.asignaciones_sha256,
-                             "pruebas": self.asignadas},
+                             "pruebas": self.asignadas, "practica": self.practica},
+            "audios_congelados": {"sha256": self.congelados_sha256, "estimulos": sorted(self.congelados),
+                                  "invalidos": self.congelados_invalidos},
             "pruebas_tecnicas": self.technical_tests(),
             "pruebas_usuario": [
                 p.model_dump() | {"test_id": p.id, "estado_estimulos": p.estado_estimulos,
@@ -189,7 +240,8 @@ class Catalog(BaseModel):
         }
 
 
-def _public_stimulus(s: Stimulus, image_url: str) -> dict:
+def _public_stimulus(s: Stimulus, image_url: str, frozen: "AudioCongelado | None" = None,
+                     practica: bool = False) -> dict:
     return {
         "stimulus_id": s.stimulus_id,
         "dataset": s.dataset,
@@ -197,6 +249,13 @@ def _public_stimulus(s: Stimulus, image_url: str) -> dict:
         "sha256": s.sha256,
         "valido": s.valid,
         "imagen_url": image_url.format(id=s.stimulus_id) if s.valid else None,
+        "practica": practica,
+        # Narrativa y hash del audio congelado (lo que escucha el participante). Sin diseño ni GT.
+        "audio_congelado": None if frozen is None else {
+            "sha256": frozen.sha256, "content_type": frozen.content_type, "tamano_bytes": frozen.tamano_bytes,
+            "duracion_s": frozen.duracion_s, "narrativa_final": frozen.narrativa_final,
+            "tts_modelo": frozen.tts_modelo, "audio_url": f"/api/study/stimuli/{s.stimulus_id}/audio",
+        },
     }
 
 
@@ -230,11 +289,11 @@ def _load_manifest(dataset_id: str, manifest_path: Path) -> dict[str, Stimulus]:
     return out
 
 
-def _apply_assignments(source: CatalogFile, path: Path | None) -> tuple[str | None, list[str]]:
+def _apply_assignments(source: CatalogFile, path: Path | None) -> tuple[str | None, list[str], list[str]]:
     """Asigna estímulos a las pruebas que el catálogo deja en POR_DEFINIR. Lo que el
-    catálogo ya define no se toca."""
+    catálogo ya define no se toca. Devuelve también las escenas de práctica."""
     if path is None or not path.is_file():
-        return None, []
+        return None, [], []
     data = AsignacionesFile.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
     tests = {p.id: p for p in source.pruebas_usuario}
     ids = [a.prueba_id for a in data.asignaciones]
@@ -247,13 +306,37 @@ def _apply_assignments(source: CatalogFile, path: Path | None) -> tuple[str | No
         if tests[a.prueba_id].estimulos == "POR_DEFINIR":
             tests[a.prueba_id].estimulos = a.estimulos
             applied.append(a.prueba_id)
-    return (_sha256(path) if applied else None), applied
+    return (_sha256(path) if applied else None), applied, list(data.practica)
+
+
+def _load_frozen(path: Path | None, stimuli: dict[str, Stimulus]):
+    """Audios congelados con su hash verificado. Un archivo ausente o alterado deja ese
+    estímulo SIN audio congelado (no puede usarse en una prueba formal)."""
+    if path is None or not path.is_file():
+        return {}, None, None, {}
+    data = CongeladosFile.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+    base = path.parent
+    ok, bad = {}, {}
+    for a in data.estimulos:
+        f = (base / a.archivo).resolve()
+        if a.stimulus_id not in stimuli:
+            raise ValueError(f"congelados.yaml: estímulo no declarado {a.stimulus_id}")
+        if base.resolve() not in f.parents:
+            raise ValueError(f"congelados.yaml: ruta fuera de su directorio ({a.stimulus_id})")
+        if not f.is_file():
+            bad[a.stimulus_id] = "archivo ausente"
+        elif _sha256(f) != a.sha256:
+            bad[a.stimulus_id] = "sha256 no coincide"
+        else:
+            ok[a.stimulus_id] = a
+    return ok, base, _sha256(path), bad
 
 
 def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT,
-                 assignments_path: Path | None = ASSIGNMENTS_PATH) -> Catalog:
+                 assignments_path: Path | None = ASSIGNMENTS_PATH,
+                 frozen_path: Path | None = FROZEN_AUDIO_PATH) -> Catalog:
     source = CatalogFile.model_validate(yaml.safe_load(catalog_path.read_text(encoding="utf-8")))
-    asignaciones_sha256, asignadas = _apply_assignments(source, assignments_path)
+    asignaciones_sha256, asignadas, practica = _apply_assignments(source, assignments_path)
 
     metric_ids = {m.id for m in source.metricas}
     dataset_ids = {d.id for d in source.datasets}
@@ -277,7 +360,15 @@ def load_catalog(catalog_path: Path = CATALOG_PATH, root: Path = REPO_ROOT,
             unknown = [s for s in p.estimulos if s not in stimuli]
             if unknown or not p.estimulos:
                 raise ValueError(f"{p.id}: estímulos no declarados en ningún manifest {unknown}")
-    return Catalog(source=source, stimuli=stimuli, asignaciones_sha256=asignaciones_sha256, asignadas=asignadas)
+    if [s for s in practica if s not in stimuli]:
+        raise ValueError(f"asignaciones.yaml: escenas de práctica no declaradas {practica}")
+    assigned = {s for p in source.pruebas_usuario if isinstance(p.estimulos, list) for s in p.estimulos}
+    if assigned & set(practica):
+        raise ValueError(f"asignaciones.yaml: la práctica no puede usar una escena evaluada {sorted(assigned & set(practica))}")
+    congelados, cdir, csha, cbad = _load_frozen(frozen_path, stimuli)
+    return Catalog(source=source, stimuli=stimuli, asignaciones_sha256=asignaciones_sha256, asignadas=asignadas,
+                   practica=practica, congelados=congelados, congelados_dir=cdir, congelados_sha256=csha,
+                   congelados_invalidos=cbad)
 
 
 def user_test(test_id: str) -> PruebaUsuario | None:

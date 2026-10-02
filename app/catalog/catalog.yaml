@@ -27,11 +27,11 @@ metricas:
   - {id: M-PROF,   nombre: "Profundidad (cerca/medio/lejos)",                estado: POR_DEFINIR_CP3B}
   - {id: M-REL,    nombre: "Relaciones espaciales entre objetos",            estado: POR_DEFINIR_CP3B}
   - {id: M-NAR,    nombre: "Fidelidad de la narrativa respecto a la detección", estado: POR_DEFINIR_CP3B}
-  - {id: M-USR-ID, nombre: "Identificación de objetos por el participante",  estado: POR_DEFINIR_CP3B}
-  - {id: M-USR-ESP, nombre: "Relación espacial reportada por el participante", estado: POR_DEFINIR_CP3B}
-  - {id: M-USR-RUTA, nombre: "Elección de ruta por el participante",         estado: POR_DEFINIR_CP3B}
-  - {id: M-USR-SUBJ, nombre: "Valoraciones subjetivas (escala 1–5)",         estado: POR_DEFINIR_CP3B}
-  - {id: M-PIL,    nombre: "Validación del instrumento (piloto)",            estado: POR_DEFINIR_CP3B}
+  - {id: M-USR-ID, nombre: "Identificación de objetos por el participante",  estado: DEFINIDA_EVALUACION_USUARIOS}
+  - {id: M-USR-ESP, nombre: "Relación espacial reportada por el participante", estado: DEFINIDA_EVALUACION_USUARIOS}
+  - {id: M-USR-RUTA, nombre: "Elección de ruta por el participante",         estado: DEFINIDA_EVALUACION_USUARIOS}
+  - {id: M-USR-SUBJ, nombre: "Valoraciones subjetivas (escala 1–5)",         estado: DEFINIDA_EVALUACION_USUARIOS}
+  - {id: M-PIL,    nombre: "Validación del instrumento (piloto)",            estado: DEFINIDA_EVALUACION_USUARIOS}
 
 datasets:
   - id: dataset1
@@ -103,74 +103,87 @@ pruebas_tecnicas:
     tipo_evaluacion: tecnica_automatica
     disponibilidad: {investigador: true, participante: false}
 
-# Tareas del estudio con usuarios. Migradas sin cambios de contenido desde
-# visionnav-client/lib/study-tests.ts. "metricas_texto" conserva los textos originales;
-# "metricas" las vincula con los identificadores de arriba.
-# estimulos: qué estímulo congelado usa cada tarea → POR DEFINIR (CP3B / F4).
+# Tareas del estudio con usuarios (Objetivo Específico 3).
+# Revisadas el 2026-10-01 (doc. 34 de la carpeta claude), antes de cualquier sesión con
+# participantes reales: guiones literales, una pregunta por constructo y el campo
+# "codificacion" (qué se codifica de la respuesta). Ver docs/EVALUACION_USUARIOS.md §0.
+#   codificacion: objetos    → ¿nombró cada objeto de la narrativa? (omisiones, invenciones)
+#                 relaciones → ¿comprendió las relaciones entre objetos de la narrativa?
+#                 ubicacion  → ¿el lado que dijo coincide con el de la narrativa?
+#                 distancia  → ¿la distancia que dijo coincide con la de la narrativa?
+#                 cambio     → ¿percibió el cambio entre dos escenas consecutivas?
+# La referencia de toda la codificación es la NARRATIVA escuchada (Ref-N), no la imagen.
+# Los estímulos quedan pendientes aquí y se asignan en asignaciones.yaml.
 pruebas_usuario:
   - id: OBJ-01
     pista: objetivo
-    nombre: "Identificación de objetos"
-    objetivo: "Medir qué porcentaje de los objetos relevantes de la escena el participante logra identificar a partir del audio."
-    guion_investigador: 'Reproduce el audio generado para la imagen seleccionada. Cuando termine, pregunta: "¿Qué objetos identificaste en la descripción?". Anota la respuesta tal cual la diga, sin corregirlo ni darle pistas.'
+    nombre: "Identificación de objetos y relación entre ellos"
+    objetivo: "Medir qué proporción de los objetos mencionados en la narrativa recuerda el participante, si menciona objetos que la narrativa no dijo y si comprende la relación espacial entre ellos."
+    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "¿Qué objetos mencionó la descripción?". Anota la respuesta tal cual, sin corregir ni dar pistas. Después pregunta: "¿Cómo están ubicados esos objetos entre sí?". Repite el audio solo si el participante lo pide y registra cada aclaración que solicite.'
     tipo: imagen
-    metricas: [M-USR-ID]
-    metricas_texto: ["% identificación correcta", "% omisión", "% objetos inventados"]
+    codificacion: [objetos, relaciones]
+    metricas: [M-USR-ID, M-USR-ESP]
+    metricas_texto: ["% de objetos de la narrativa identificados", "objetos omitidos", "objetos inventados", "% de relaciones comprendidas"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-02
     pista: objetivo
-    nombre: "Relación espacial simple"
-    objetivo: "Medir si el participante ubica correctamente un objeto respecto a sí mismo (izquierda/derecha/frente/detrás) a partir del audio."
-    guion_investigador: 'Tras reproducir el audio, pregunta: "¿Dónde se encuentra [objeto] respecto a usted?". No repitas el audio salvo que el participante lo pida explícitamente; si lo repite, anótalo.'
+    nombre: "Ubicación egocéntrica de un objeto"
+    objetivo: "Medir si el participante ubica un objeto respecto a sí mismo (izquierda, frente o derecha) y a qué distancia, tal como lo indicó la narrativa."
+    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "¿Dónde se encuentra la silla respecto a usted: a su izquierda, al frente o a su derecha?". Después pregunta: "¿Aproximadamente a qué distancia está?". Repite el audio solo si el participante lo pide.'
     tipo: imagen
+    codificacion: [ubicacion, distancia]
     metricas: [M-USR-ESP]
-    metricas_texto: ["% relaciones espaciales correctas", "repeticiones de audio"]
+    metricas_texto: ["ubicación coincidente con la narrativa", "distancia coincidente con la narrativa", "repeticiones de audio"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-03
     pista: objetivo
-    nombre: "Elección de ruta libre"
-    objetivo: "Evaluar si, a partir de la narrativa, el participante identifica correctamente la dirección despejada para avanzar en una escena con obstáculos al centro y a un lado."
-    guion_investigador: 'Reproduce el audio de una escena diseñada con objetos al centro y a un lado, y el paso libre hacia el lado contrario. Pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría?". Registra la dirección que indique (izquierda/derecha/frente) y compárala con la dirección real que reportó el sistema.'
+    nombre: "Decisión de dirección"
+    objetivo: "Evaluar si el participante comprende la indicación de movimiento de la narrativa y elige la dirección que esta indica. Como capa aparte se compara su elección con la dirección libre según el diseño de la escena."
+    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?". Registra la opción que elija; si no elige ninguna, registra "No responde". Repite el audio solo si el participante lo pide.'
     tipo: ruta
+    codificacion: []
     metricas: [M-USR-RUTA]
-    metricas_texto: ["precisión de elección de ruta", "tiempo de respuesta", "comprensión de la instrucción de movimiento"]
+    metricas_texto: ["elección coincidente con la instrucción narrada", "elección coincidente con el diseño de la escena", "repeticiones de audio"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-04
     pista: objetivo
-    nombre: "Actualización de contexto (secuencia)"
-    objetivo: "Evaluar si el participante nota un cambio en la disposición de los objetos entre dos imágenes de la misma escena y ajusta su respuesta."
-    guion_investigador: 'Reproduce el audio de la segunda imagen de una secuencia (misma escena, objetos reubicados) inmediatamente después de OBJ-03. Pregunta: "¿Cambió algo respecto a lo anterior? ¿Hacia dónde avanzaría ahora?". No indiques que hubo un cambio si no lo menciona primero.'
+    nombre: "Actualización de contexto"
+    objetivo: "Evaluar si el participante percibe que la disposición de los objetos cambió respecto a la escena anterior y qué dirección elige con la nueva descripción."
+    guion_investigador: 'Inmediatamente después de OBJ-03, reproduce el audio de la segunda escena sin anunciar que hubo un cambio. Primero pregunta: "¿Notó algo distinto respecto a la descripción anterior?" y registra la respuesta. Después pregunta: "Según lo que escuchó ahora, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?".'
     tipo: ruta
+    codificacion: [cambio]
     metricas: [M-USR-RUTA]
-    metricas_texto: ["sensibilidad a la actualización de contexto", "consistencia narrativa"]
+    metricas_texto: ["percepción del cambio", "elección coincidente con la instrucción narrada", "elección coincidente con el diseño de la escena"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-05
     pista: objetivo
     nombre: "Calidad de la voz (independiente del contenido)"
-    objetivo: "Medir la calidad percibida del audio en sí (la voz sintética de la sesión), separada de la comprensión del contenido."
-    guion_investigador: 'Reproduce un audio de referencia neutro (no una narrativa de navegación). Pregunta, para cada criterio: "¿Qué tan clara/rápida/natural/cómoda en volumen te pareció la voz?" en escala de 1 a 5.'
+    objetivo: "Medir la calidad percibida de la voz sintética del estudio, separada de la comprensión del contenido. Se usa una narrativa corta del propio sistema, porque la voz evaluada es la del sistema."
+    guion_investigador: 'Reproduce el audio una vez. Indica: "Ahora no le preguntaré por lo que dijo la voz, sino por cómo sonó". Para cada criterio lee la pregunta y las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy) y registra el número.'
     tipo: escala
-    criterios: [claridad, velocidad, naturalidad, volumen]
+    criterios: [inteligibilidad, velocidad, naturalidad, volumen]
+    codificacion: []
     metricas: [M-USR-SUBJ]
-    metricas_texto: ["inteligibilidad", "velocidad percibida", "naturalidad", "volumen"]
+    metricas_texto: ["inteligibilidad", "velocidad percibida", "naturalidad", "comodidad del volumen"]
     tipo_evaluacion: usuario_subjetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-06
     pista: objetivo
     nombre: "Suficiencia de la información"
-    objetivo: "Determinar si el participante percibe la cantidad de información narrada como adecuada, insuficiente o excesiva."
-    guion_investigador: 'Pregunta: "¿Sentiste que la descripción te dio la información que necesitabas? ¿Faltó algo? ¿Sobró algo?". Registra la respuesta abierta y, si es posible, una calificación de suficiencia de 1 a 5.'
+    objetivo: "Determinar si el participante percibe la cantidad de información de las descripciones como suficiente y si le parecieron repetitivas."
+    guion_investigador: 'Pregunta, pensando en todas las descripciones que escuchó: "¿Qué tan suficiente fue la información para hacerse una idea del lugar?" y "¿Qué tan repetitivas le parecieron?". Lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Faltó algo? ¿Sobró algo?" y anota la respuesta en los comentarios.'
     tipo: escala
     criterios: [suficiencia, redundancia]
+    codificacion: []
     metricas: [M-USR-SUBJ]
     metricas_texto: ["suficiencia de información", "redundancia percibida"]
     tipo_evaluacion: usuario_subjetiva
@@ -178,23 +191,25 @@ pruebas_usuario:
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-07
     pista: objetivo
-    nombre: "Utilidad percibida (cierre)"
-    objetivo: "Cerrar la sesión con una valoración global de utilidad y comentarios espontáneos."
-    guion_investigador: 'Pregunta: "En general, ¿qué tan útil te parece este sistema para orientarte en un espacio que no conoces?" (escala 1-5) y deja espacio para comentarios libres.'
+    nombre: "Utilidad percibida"
+    objetivo: "Obtener una valoración global de la utilidad de las descripciones y comentarios espontáneos."
+    guion_investigador: 'Pregunta: "En general, ¿qué tan útiles le parecen estas descripciones para orientarse en un espacio que no conoce?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Por qué?" y anota la respuesta en los comentarios.'
     tipo: escala
     criterios: [utilidad_general]
+    codificacion: []
     metricas: [M-USR-SUBJ]
-    metricas_texto: ["utilidad percibida", "satisfacción"]
+    metricas_texto: ["utilidad percibida"]
     tipo_evaluacion: usuario_subjetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: PIL-01
     pista: piloto
     nombre: "Comprensión de las instrucciones"
-    objetivo: "Verificar que las instrucciones del estudio se entienden sin ambigüedad antes de iniciar con la población objetivo."
-    guion_investigador: 'Antes de comenzar las pruebas, pregunta: "¿Quedó claro lo que se te va a pedir en esta sesión?".'
+    objetivo: "Verificar que las instrucciones del estudio se entienden sin ambigüedad antes de aplicarlas a la población objetivo."
+    guion_investigador: 'Al terminar las actividades, pregunta: "Desde el inicio, ¿qué tan claro le quedó lo que se le iba a pedir en cada actividad?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Anota en los comentarios qué instrucción no quedó clara, si la hubo.'
     tipo: escala
     criterios: [claridad_instrucciones]
+    codificacion: []
     metricas: [M-PIL]
     metricas_texto: ["validación de instrucciones (no es evidencia de accesibilidad)"]
     tipo_evaluacion: piloto_instrumento
@@ -202,23 +217,26 @@ pruebas_usuario:
     disponibilidad: {investigador: true, participante: false}
   - id: PIL-02
     pista: piloto
-    nombre: "Duración percibida de la sesión"
-    objetivo: "Estimar si la duración total de la sesión es razonable antes de aplicarla a la población objetivo."
-    guion_investigador: 'Al finalizar, pregunta: "¿Te pareció larga, corta o adecuada la duración de la sesión?".'
+    nombre: "Duración de la sesión"
+    objetivo: "Comparar la duración percibida con la duración real de la sesión (registrada por el sistema) y con los 30 minutos que indica el consentimiento."
+    guion_investigador: 'Pregunta: "¿La duración de la sesión le pareció corta, adecuada o larga?". Anota la opción y el motivo. La duración real la calcula el sistema al finalizar la sesión.'
     tipo: texto
+    codificacion: []
     metricas: [M-PIL]
-    metricas_texto: ["validación de duración"]
+    metricas_texto: ["duración percibida", "duración real"]
     tipo_evaluacion: piloto_instrumento
     estimulos: null
     disponibilidad: {investigador: true, participante: false}
   - id: PIL-03
     pista: piloto
-    nombre: "Funcionamiento técnico"
-    objetivo: "Detectar fallas técnicas (audio que no carga, demoras excesivas, errores visibles) antes de la sesión real."
-    guion_investigador: "Registra cualquier falla técnica observada durante la sesión, aunque el participante no la mencione explícitamente."
-    tipo: texto
+    nombre: "Comprensión de las escalas y las preguntas"
+    objetivo: "Verificar que el participante entiende las escalas de 1 a 5 leídas en voz alta y las preguntas de cada actividad."
+    guion_investigador: 'Pregunta: "¿Qué tan fácil le resultó responder con números del 1 al 5?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Alguna pregunta de las actividades le pareció confusa? ¿Cuál?" y anota la respuesta en los comentarios.'
+    tipo: escala
+    criterios: [comprension_escalas]
+    codificacion: []
     metricas: [M-PIL]
-    metricas_texto: ["validación técnica del instrumento"]
+    metricas_texto: ["comprensión de las escalas", "preguntas confusas"]
     tipo_evaluacion: piloto_instrumento
     estimulos: null
     disponibilidad: {investigador: true, participante: false}
@@ -226,8 +244,9 @@ pruebas_usuario:
     pista: piloto
     nombre: "Claridad del formulario y el consentimiento"
     objetivo: "Confirmar que el formulario de registro y el texto de consentimiento se entienden sin apoyo adicional."
-    guion_investigador: 'Pregunta: "¿Hubo alguna parte del formulario o del consentimiento que no te quedara clara?".'
+    guion_investigador: 'Pregunta: "¿Hubo alguna parte del formulario o del consentimiento que no le quedara clara?". Anota la respuesta tal cual.'
     tipo: texto
+    codificacion: []
     metricas: [M-PIL]
     metricas_texto: ["validación de instrumentos de consentimiento"]
     tipo_evaluacion: piloto_instrumento
@@ -236,9 +255,10 @@ pruebas_usuario:
   - id: PIL-05
     pista: piloto
     nombre: "Comentario general"
-    objetivo: "Recoger observaciones libres sobre la logística de la sesión."
-    guion_investigador: 'Pregunta abierta de cierre: "¿Algo que deberíamos ajustar antes de hacer esto con los usuarios reales?".'
+    objetivo: "Recoger observaciones libres sobre la sesión antes de aplicarla a la población objetivo."
+    guion_investigador: 'Pregunta abierta de cierre: "¿Hay algo que deberíamos ajustar antes de hacer esta actividad con las personas participantes?". Anota la respuesta tal cual.'
     tipo: texto
+    codificacion: []
     metricas: [M-PIL]
     metricas_texto: ["mejora del instrumento"]
     tipo_evaluacion: piloto_instrumento

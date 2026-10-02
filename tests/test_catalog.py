@@ -31,9 +31,13 @@ def test_catalogo_real_carga_y_verifica_dataset1():
     assert {p.id for p in cat.source.pruebas_usuario} == {f"OBJ-0{i}" for i in range(1, 8)} | {f"PIL-0{i}" for i in range(1, 6)}
 
 
-def test_metricas_quedan_por_definir_en_cp3b():
+def test_metricas_tecnicas_por_definir_y_de_usuario_definidas():
+    # Las métricas de usuario se definieron el 2026-10-01 (docs/EVALUACION_USUARIOS.md §0);
+    # las técnicas siguen pendientes del CP3B.
     cat = loader.load_catalog()
-    assert all(m.estado == "POR_DEFINIR_CP3B" for m in cat.source.metricas)
+    for m in cat.source.metricas:
+        esperado = "DEFINIDA_EVALUACION_USUARIOS" if m.id.startswith(("M-USR", "M-PIL")) else "POR_DEFINIR_CP3B"
+        assert m.estado == esperado, m.id
 
 
 def test_vistas_no_exponen_ground_truth_ni_diseno():
@@ -71,7 +75,7 @@ def test_imagen_alterada_queda_invalida(tmp_path):
 
 
 def test_metrica_no_declarada_falla(tmp_path):
-    text = loader.CATALOG_PATH.read_text(encoding="utf-8").replace("metricas: [M-USR-ID]", "metricas: [M-INVENTADA]")
+    text = loader.CATALOG_PATH.read_text(encoding="utf-8").replace("metricas: [M-USR-ID, M-USR-ESP]", "metricas: [M-INVENTADA]")
     p = tmp_path / "catalog.yaml"
     p.write_text(text, encoding="utf-8")
     with pytest.raises(ValueError, match="M-INVENTADA"):

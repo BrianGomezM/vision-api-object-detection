@@ -4,6 +4,49 @@
 - **Fuente metodológica:** "27 - Preparación evaluación final Objetivo 3" (diseño exploratorio, una sesión por participante, sin navegación 3D; el participante escucha el audio de la API y responde verbalmente).
 - **Estado:** el instrumento está implementado y probado solo con datos técnicos (PTEST01, PTEST02). **La evaluación con usuarios objetivo NO se ha ejecutado.**
 - **Código:** backend `app/routes/study.py`, `app/catalog/loader.py`; cliente `components/study/*`, `lib/study-protocol.ts`, `hooks/use-study.ts`.
+- **Revisión del 2026-10-01:** ver §0. Prevalece sobre lo que digan las secciones siguientes.
+
+## 0. Revisión del diseño de pruebas (2026-10-01, doc. 34 de la carpeta `claude`)
+
+Se hizo antes de cualquier sesión con participantes reales. La detección, el pipeline, la narrativa, el TTS y el contrato de `POST /api/detect` **no cambian**; solo cambia el instrumento de evaluación.
+
+| # | Problema | Cambio |
+|---|---|---|
+| 1 | Cada participante podía escuchar una narrativa distinta (el LLM se llamaba en vivo; "Volver a generar") | **Audio congelado**: `scripts/study/freeze_study_audio.py` genera una vez narrativa y audio de cada escena asignada y de la práctica, con sha256, en `stimuli/dataset1/estudio/` (`congelados.yaml`, `intentos.jsonl`). Una respuesta formal solo se acepta si su sha256 y su narrativa coinciden con las congeladas (409 en otro caso). Nueva ruta `GET /api/study/stimuli/{id}/audio`. La generación en vivo queda solo para ensayos. |
+| 2 | El % de objetos identificados se calculaba también en OBJ-03/04, donde no se pregunta por objetos | Campo `codificacion` en `catalog.yaml`: OBJ-01 `[objetos, relaciones]`, OBJ-02 `[ubicacion, distancia]`, OBJ-04 `[cambio]`, el resto `[]`. El servidor solo cuenta lo que la prueba codifica y rechaza codificación en pruebas que no la usan. Resumen **por prueba** (`resumen.por_prueba`). |
+| 3 | La relación de OBJ-01 no se preguntaba | Guion de OBJ-01 con la segunda pregunta "¿Cómo están ubicados esos objetos entre sí?". |
+| 4 | El mismo clic iniciaba la grabación y marcaba el tiempo de respuesta | Botón propio "Respuesta iniciada"; la grabación ya no marca el tiempo. |
+| 5 | El participante objetivo no tenía práctica | `asignaciones.yaml → practica: [DS1-A2]`. En sesiones objetivo, el modo ensayo solo se admite con esa escena. |
+| 6 | El piloto no dejaba datos consolidados | El piloto registra como **formales** las actividades OBJ; van al grupo `piloto` del consolidado, nunca al de objetivo. |
+| 7 | OBJ-03: en DS1-C2 la narrativa congelada indica **"frente"** (el sofá está a ~5 pasos y no bloquea el espacio inmediato) y el diseño de la escena espera **"izquierda"** | La decisión registra **tres capas**: `coincide_con_narrativa` (comprensión; métrica principal), `correcto` (frente al diseño de la escena) y `narrativa_coincide_con_diseno` (resultado técnico del sistema). La dirección narrada la extrae el servidor (`decisions.narrated_direction`). Se elimina el juicio manual del investigador como métrica (queda como `juicio_investigador`). |
+| 8 | OBJ-04 juntaba dos preguntas y el cambio no tenía campo | Dos preguntas separadas y campo `percepcion_cambio` (`menciona_cambio_real`, `no_menciona_cambio`, `menciona_cambio_inexistente`, `no_responde`), obligatorio en formales. |
+| 9 | Escalas repetidas en el cierre; anclas provisionales | Anclas únicas **1 nada · 2 poco · 3 moderadamente · 4 bastante · 5 muy**, leídas completas. El cuestionario de cierre solo pregunta claridad de las descripciones y esfuerzo (lo demás ya se pregunta en OBJ-05/06/07). En OBJ-05 `claridad` pasa a `inteligibilidad` (ITU-T P.85). |
+| 10 | Aclaraciones sin registrar | `aclaraciones[]` (pregunta / escala / otra) y métrica `aclaraciones`. |
+| 11 | OBJ-02 no evaluaba la distancia narrada | Segunda pregunta de distancia; `distancia_reportada` y `distancia_correcta` frente a los pasos que dijo la narrativa. |
+| 12 | PIL-01 decía "antes de comenzar" y se hacía al final; PIL-03 duplicaba el registro técnico; faltaba validar las escalas | PIL-01 en retrospectiva; PIL-02 compara con la duración real (`resumen.duracion_sesion_min`); **PIL-03 ahora es "Comprensión de las escalas y las preguntas"** (el registro técnico va en el cierre). |
+| 13 | Ficha sin rango de edad ni audición | `ficha.rango_edad` (rangos, nunca la edad exacta) y `ficha.audicion_autodeclarada`; obligatorios en el cliente, opcionales en el servidor por compatibilidad. |
+
+**Carpetas separadas (2026-10-02).** Las sesiones se guardan por grupo y, dentro de cada sesión, las respuestas por modo. Las sesiones anteriores, que están en la raíz, se siguen leyendo:
+
+```
+DATA_ROOT/study/sessions/
+  objetivo/<session_id>/          participantes reales (evidencia del OE3)
+  piloto/<session_id>/            validación del instrumento
+  pruebas_tecnicas/<session_id>/  códigos PTEST (nunca evidencia)
+    sesion.json · responses.jsonl · grabacion_consentimiento.<ext>
+    respuestas/formales/R00N/     audio_narrativa_api.mp3, respuesta_participante.<ext>
+    respuestas/ensayos/R00N/      práctica y ensayos
+```
+
+**Usabilidad para el investigador (2026-10-02).**
+- El audio congelado se carga solo al abrir la prueba.
+- La codificación se precarga desde la narrativa.
+- El reproductor está arriba, antes de la narrativa, y la imagen va plegada.
+- Al elegir una prueba, la pantalla se desplaza hasta ella.
+
+**Hash del catálogo.** `catalog.yaml` cambió solo en `pruebas_usuario` y en el estado de las métricas de usuario (`DEFINIDA_EVALUACION_USUARIOS`). Su nuevo sha256 está en `experimental_config.yaml` (anterior: `ff0404979a04…`). Las pruebas técnicas, los datasets y las métricas técnicas no cambiaron.
+
+**Conjunto congelado (2026-10-01).** Seis audios (DS1-A2 práctica, C1, A8, C2, B2, A5), voz `azure:es-CO-SalomeNeural`, LLM `qwen/qwen3.8-27b`, umbral 0,35; todos aceptados en el primer intento. **Pendiente antes de la primera sesión real:** que una segunda persona escuche cada audio y confirme que dice literalmente la narrativa (`verificacion_fidelidad` en `congelados.yaml`).
 
 ## 1. Qué NO cambia
 

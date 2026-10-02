@@ -24,14 +24,16 @@ PRIVACIDAD:
   - Las sesiones del formato anterior (participant.json, session_id con nombre) no
     se sirven ni se modifican; solo se informa cuántas hay.
 
-ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions):
-  <session_id>/
+ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions), separado por tipo:
+  objetivo/ · piloto/ · pruebas_tecnicas/ (PTEST)     una carpeta por grupo (desde 2026-10-02)
+  <grupo>/<session_id>/
     sesion.json                       ficha, contexto técnico, consentimiento (4 afirmaciones
                                       y huella de su grabación), estado y cierre
                                       (cuestionario posterior, entrevista, registro técnico)
     grabacion_consentimiento.<ext>    lectura del consentimiento y respuestas (solo DATA_ROOT)
     responses.jsonl                   una línea por respuesta (append-only)
-    respuestas/<R001>/
+    respuestas/formales/<R001>/       respuestas formales (evidencia o grupo piloto)
+    respuestas/ensayos/<R001>/        práctica y ensayos (nunca evidencia)
       audio_narrativa_api.<ext>       audio TTS que escuchó el participante (API)
       respuesta_participante.<ext>    grabación del participante (solo con autorización)
       grabacion.json                  metadatos de esa grabación
@@ -39,6 +41,7 @@ ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions):
 ENDPOINTS (todos con clave del investigador, X-API-Key):
   POST   /api/study/sessions                                   crear sesión (ficha + consentimiento + grabación)
   GET    /api/study/sessions/{id}/consentimiento/audio         grabación de la lectura del consentimiento
+  GET    /api/study/stimuli/{stimulus_id}/audio                audio CONGELADO del estímulo (pruebas formales)
   GET    /api/study/sessions                                   listar sesiones
   GET    /api/study/sessions/{id}                              sesión + respuestas + resumen
   POST   /api/study/sessions/{id}/responses                    registrar una respuesta
@@ -185,6 +188,11 @@ class Ficha(_M):
     condicion_visual: CondicionVisual
     tecnologias: TecnologiasAsistivas
     experiencia_descripcion_audio: Literal["si", "no", "no_informa"]
+    # Desde el 2026-10-01 (doc. 34): rango (nunca la edad exacta) para describir la muestra,
+    # y audición autodeclarada (el estudio es auditivo). Opcionales por compatibilidad con
+    # sesiones anteriores; el cliente los exige en sesiones nuevas.
+    rango_edad: Optional[Literal["18_29", "30_44", "45_59", "60_mas", "no_informa"]] = None
+    audicion_autodeclarada: Optional[Literal["sin_dificultad", "con_dificultad", "no_informa"]] = None
 
 
 class EntornoTecnico(_M):
@@ -288,9 +296,12 @@ class Reproduccion(_M):
 
 class ObjetoCodificado(_M):
     objeto: str = Field(..., min_length=1, max_length=100, description="Objeto mencionado en la narrativa")
-    identificado: bool
+    identificado: bool = False
     ubicacion_reportada: Optional[str] = Field(None, max_length=300)
     ubicacion_correcta: Literal["si", "no", "no_reportada"] = "no_reportada"
+    # OBJ-02: distancia que dijo el participante frente a la que dijo la narrativa.
+    distancia_reportada: Optional[str] = Field(None, max_length=300)
+    distancia_correcta: Literal["si", "no", "no_reportada"] = "no_reportada"
 
 
 class RelacionCodificada(_M):
@@ -310,8 +321,18 @@ class DecisionIn(_M):
     la narrativa. Decisión hipotética, sin desplazamiento (doc. 27, §H). La esperada
     NO la envía el cliente: el servidor la toma de app/catalog/decisiones.yaml."""
     seleccionada: str = Field(..., min_length=1, max_length=40)
-    # Codificación aparte del investigador: ¿la elección sigue lo que dijo la narrativa?
+    # Juicio opcional del investigador. Desde el 2026-10-01 el servidor calcula la
+    # coincidencia con la narrativa a partir de la instrucción narrada.
     coincide_con_narrativa: Optional[bool] = None
+
+
+class Aclaracion(_M):
+    """Solicitud de aclaración del participante (doc. 33 §13): indicador de claridad del guion."""
+    instante: datetime
+    tipo: Literal["pregunta", "escala", "otra"]
+
+
+PercepcionCambio = Literal["menciona_cambio_real", "no_menciona_cambio", "menciona_cambio_inexistente", "no_responde"]
 
 
 _Likert = Optional[int]
@@ -343,6 +364,9 @@ class ResponseIn(_M):
     respuesta_transcrita: Optional[str] = Field(None, max_length=5000)
     comprension: Optional[Comprension] = None
     decision: Optional[DecisionIn] = None
+    # OBJ-04 (codificación "cambio"): ¿percibió el cambio respecto a la escena anterior?
+    percepcion_cambio: Optional[PercepcionCambio] = None
+    aclaraciones: list[Aclaracion] = Field(default_factory=list, max_length=50)
     escalas: Optional[Escalas] = None
     criterios: Optional[dict[str, int]] = None
     errores: list[ErrorRegistrado] = Field(default_factory=list, max_length=50)
@@ -368,14 +392,31 @@ class CierreIn(_M):
 # ACCESO A DISCO
 # ──────────────────────────────────────────────────────────────
 
+# Carpeta por grupo: los datos de participantes reales, del piloto y de las pruebas
+# técnicas nunca comparten carpeta. Las sesiones anteriores (en la raíz) se siguen leyendo.
+GROUP_DIRS = ("objetivo", "piloto", "pruebas_tecnicas")
+
+
+def _group(codigo: str, tipo: str) -> str:
+    return "pruebas_tecnicas" if TEST_CODE_RE.match(codigo) else tipo
+
+
 def _session_dir(session_id: str) -> Path:
     if not _SESSION_ID_RE.match(session_id):
         raise HTTPException(status_code=404, detail="Sesión no encontrada.")
-    d = _STUDY_DIR / session_id
-    if not (d / SESSION_FILE).is_file():
-        # Incluye las sesiones del formato anterior: no se sirven (session_id con nombre).
-        raise HTTPException(status_code=404, detail="Sesión no encontrada.")
-    return d
+    for d in [_STUDY_DIR / g / session_id for g in GROUP_DIRS] + [_STUDY_DIR / session_id]:
+        if (d / SESSION_FILE).is_file():
+            return d
+    # Incluye las sesiones del formato anterior: no se sirven (session_id con nombre).
+    raise HTTPException(status_code=404, detail="Sesión no encontrada.")
+
+
+def _response_subdir(d: Path, rec: dict) -> Path:
+    """respuestas/formales|ensayos/<rid>; las respuestas anteriores (respuestas/<rid>) se respetan."""
+    legacy = d / "respuestas" / rec["response_id"]
+    if legacy.is_dir():
+        return legacy
+    return d / "respuestas" / ("formales" if rec["modo"] == "formal" else "ensayos") / rec["response_id"]
 
 
 def _read_session(d: Path) -> dict:
@@ -391,7 +432,7 @@ def _read_responses(d: Path) -> list[dict]:
         if not line.strip():
             continue
         rec = json.loads(line)
-        meta = d / "respuestas" / rec["response_id"] / "grabacion.json"
+        meta = _response_subdir(d, rec) / "grabacion.json"
         rec["grabacion_participante"] = json.loads(meta.read_text(encoding="utf-8")) if meta.is_file() else None
         out.append(rec)
     return out
@@ -401,7 +442,9 @@ def _iter_sessions():
     """(dir, sesión v2 | None si es del formato anterior)."""
     if not _STUDY_DIR.exists():
         return
-    for d in sorted(_STUDY_DIR.iterdir(), reverse=True):
+    dirs = [d for g in GROUP_DIRS if (_STUDY_DIR / g).is_dir() for d in (_STUDY_DIR / g).iterdir()]
+    dirs += [d for d in _STUDY_DIR.iterdir() if d.name not in GROUP_DIRS]
+    for d in sorted(dirs, key=lambda x: x.name, reverse=True):
         if not d.is_dir():
             continue
         if (d / SESSION_FILE).is_file():
@@ -421,67 +464,115 @@ def _pct(num: int, den: int) -> float | None:
     return round(100.0 * num / den, 1) if den else None
 
 
-def derive_metrics(comp: dict | None, reproducciones: list[dict], tiempo_ms: float | None) -> tuple[dict, list]:
+def derive_metrics(comp: dict | None, reproducciones: list[dict], tiempo_ms: float | None,
+                   codificacion: list[str] | None = None, aclaraciones: list[dict] | None = None) -> tuple[dict, list]:
+    """Métricas de UNA respuesta. Solo se cuenta lo que la prueba codifica (catalog.yaml →
+    codificacion): así una prueba que no pregunta por los objetos (p. ej. OBJ-03) no genera
+    omisiones artificiales. La referencia es siempre la narrativa escuchada."""
+    cod = set(codificacion or [])
     comp = comp or {"objetos": [], "objetos_inventados": [], "relaciones": []}
-    objetos = comp["objetos"]
+    objetos = comp["objetos"] if "objetos" in cod else []
     identificados = [o for o in objetos if o["identificado"]]
     omitidos = [o["objeto"] for o in objetos if not o["identificado"]]
-    ubic_eval = [o for o in objetos if o["ubicacion_correcta"] in ("si", "no")]
-    rel_eval = [r for r in comp["relaciones"] if r["comprendida"] in ("si", "no")]
+    inventados = list(comp["objetos_inventados"]) if "objetos" in cod else []
+    ubic_eval = [o for o in comp["objetos"] if o["ubicacion_correcta"] in ("si", "no")] if "ubicacion" in cod else []
+    dist_eval = [o for o in comp["objetos"] if o.get("distancia_correcta") in ("si", "no")] if "distancia" in cod else []
+    rel_eval = [r for r in comp["relaciones"] if r["comprendida"] in ("si", "no")] if "relaciones" in cod else []
+    ubic_ok = sum(o["ubicacion_correcta"] == "si" for o in ubic_eval)
+    dist_ok = sum(o["distancia_correcta"] == "si" for o in dist_eval)
+    rel_ok = sum(r["comprendida"] == "si" for r in rel_eval)
     metricas = {
         "objetos_referencia": len(objetos),
         "objetos_identificados": len(identificados),
         "pct_objetos_identificados": _pct(len(identificados), len(objetos)),
         "objetos_omitidos": omitidos,
-        "objetos_inventados": list(comp["objetos_inventados"]),
+        "objetos_inventados": inventados,
         "ubicaciones_evaluadas": len(ubic_eval),
-        "ubicaciones_correctas": sum(o["ubicacion_correcta"] == "si" for o in ubic_eval),
+        "ubicaciones_correctas": ubic_ok,
+        "pct_ubicaciones_correctas": _pct(ubic_ok, len(ubic_eval)),
+        "distancias_evaluadas": len(dist_eval),
+        "distancias_correctas": dist_ok,
         "relaciones_evaluadas": len(rel_eval),
-        "relaciones_comprendidas": sum(r["comprendida"] == "si" for r in rel_eval),
-        "pct_relaciones_comprendidas": _pct(sum(r["comprendida"] == "si" for r in rel_eval), len(rel_eval)),
+        "relaciones_comprendidas": rel_ok,
+        "pct_relaciones_comprendidas": _pct(rel_ok, len(rel_eval)),
         "repeticiones_audio": sum(r["tipo"] == "repeticion" for r in reproducciones),
+        "aclaraciones": len(aclaraciones or []),
         "tiempo_respuesta_ms": tiempo_ms,
     }
     errores = ([{"tipo": "omision", "elemento": o} for o in omitidos]
-               + [{"tipo": "invencion", "elemento": o} for o in comp["objetos_inventados"]]
+               + [{"tipo": "invencion", "elemento": o} for o in inventados]
                + [{"tipo": "ubicacion_incorrecta", "elemento": o["objeto"]}
                   for o in ubic_eval if o["ubicacion_correcta"] == "no"]
+               + [{"tipo": "distancia_incorrecta", "elemento": o["objeto"]}
+                  for o in dist_eval if o["distancia_correcta"] == "no"]
                + [{"tipo": "relacion_incorrecta", "elemento": r["relacion"]}
                   for r in rel_eval if r["comprendida"] == "no"])
     return metricas, errores
 
 
-def summarize(respuestas: list[dict]) -> dict:
-    """Resumen de una sesión sobre respuestas FORMALES. Sin tasa de éxito global (doc. 27, §I)."""
+_SUM_KEYS = ("objetos_referencia", "objetos_identificados", "ubicaciones_evaluadas", "ubicaciones_correctas",
+             "distancias_evaluadas", "distancias_correctas", "relaciones_evaluadas", "relaciones_comprendidas",
+             "repeticiones_audio", "aclaraciones")
+
+
+def _aggregate(rs: list[dict]) -> dict:
+    """Conteos descriptivos de un grupo de respuestas formales (sin tasa de éxito global)."""
+    m = [r["metricas"] for r in rs]
+    out = {k: sum(x.get(k, 0) for x in m) for k in _SUM_KEYS}
+    out["objetos_omitidos"] = sum(len(x["objetos_omitidos"]) for x in m)
+    out["objetos_inventados"] = sum(len(x["objetos_inventados"]) for x in m)
+    out["pct_objetos_identificados"] = _pct(out["objetos_identificados"], out["objetos_referencia"])
+    out["pct_ubicaciones_correctas"] = _pct(out["ubicaciones_correctas"], out["ubicaciones_evaluadas"])
+    out["pct_relaciones_comprendidas"] = _pct(out["relaciones_comprendidas"], out["relaciones_evaluadas"])
+    tiempos = [x["tiempo_respuesta_ms"] for x in m if x.get("tiempo_respuesta_ms") is not None]
+    out["tiempo_respuesta_mediana_ms"] = statistics.median(tiempos) if tiempos else None
+    dec = [r["decision"] for r in rs if r.get("decision")]
+    out.update({
+        "decisiones_registradas": len(dec),
+        "decisiones_sin_respuesta": sum(x["seleccionada"] == decisions.NO_RESPONDE for x in dec),
+        # Capa P (comprensión): participante frente a la instrucción narrada.
+        "decisiones_siguen_narrativa": sum(x.get("coincide_con_narrativa") is True for x in dec),
+        "decisiones_no_siguen_narrativa": sum(x.get("coincide_con_narrativa") is False for x in dec),
+        # Capa R (resultado): participante frente al diseño de la escena.
+        "decisiones_coinciden_diseno": sum(x["correcto"] is True for x in dec),
+        "decisiones_no_coinciden_diseno": sum(x["correcto"] is False for x in dec),
+    })
+    cambios = [r.get("percepcion_cambio") for r in rs if r.get("percepcion_cambio")]
+    out["percepcion_cambio"] = {k: cambios.count(k) for k in sorted(set(cambios))}
+    criterios: dict[str, list[int]] = {}
+    for r in rs:
+        for k, v in (r.get("criterios") or {}).items():
+            criterios.setdefault(k, []).append(v)
+    out["criterios"] = {k: {"n": len(v), "mediana": statistics.median(v), "min": min(v), "max": max(v)}
+                        for k, v in sorted(criterios.items())}
+    return out
+
+
+def summarize(respuestas: list[dict], sesion: dict | None = None) -> dict:
+    """Resumen de una sesión sobre respuestas FORMALES, total y por prueba. Sin tasa de éxito
+    global (doc. 27 §I). En el piloto se resumen sus actividades formales igual que en objetivo."""
     formales = [r for r in respuestas if r["modo"] == "formal"]
-    m = [r["metricas"] for r in formales if r["metricas"]["objetos_referencia"] or r["metricas"]["relaciones_evaluadas"]]
-    obj_ref = sum(x["objetos_referencia"] for x in m)
-    obj_id = sum(x["objetos_identificados"] for x in m)
-    rel_ev = sum(x["relaciones_evaluadas"] for x in m)
-    rel_ok = sum(x["relaciones_comprendidas"] for x in m)
-    tiempos = [r["metricas"]["tiempo_respuesta_ms"] for r in formales if r["metricas"]["tiempo_respuesta_ms"] is not None]
-    decisiones = [r["decision"] for r in formales if r.get("decision")]
+    por_prueba: dict[str, list[dict]] = {}
+    for r in formales:
+        por_prueba.setdefault(r["prueba"]["id"], []).append(r)
+    duracion = None
+    if sesion and sesion.get("cierre") and sesion["cierre"].get("finalizada_en"):
+        try:
+            ini = datetime.fromisoformat(sesion["creado"])
+            fin = datetime.fromisoformat(sesion["cierre"]["finalizada_en"])
+            duracion = round((fin - ini).total_seconds() / 60, 1)
+        except (KeyError, ValueError):
+            duracion = None
     return {
         "respuestas_formales": len(formales),
         "respuestas_ensayo": len(respuestas) - len(formales),
-        "pruebas_formales_registradas": sorted({r["prueba"]["id"] for r in formales}),
-        "objetos_referencia": obj_ref,
-        "objetos_identificados": obj_id,
-        "pct_objetos_identificados": _pct(obj_id, obj_ref),
-        "objetos_omitidos": sum(len(x["objetos_omitidos"]) for x in m),
-        "objetos_inventados": sum(len(x["objetos_inventados"]) for x in m),
-        "relaciones_evaluadas": rel_ev,
-        "relaciones_comprendidas": rel_ok,
-        "pct_relaciones_comprendidas": _pct(rel_ok, rel_ev),
-        "repeticiones_audio": sum(r["metricas"]["repeticiones_audio"] for r in formales),
-        "tiempo_respuesta_mediana_ms": statistics.median(tiempos) if tiempos else None,
-        # Decisiones: conteos por tipo de resultado (no se combinan en una tasa global).
-        "decisiones_registradas": len(decisiones),
-        "decisiones_correctas": sum(x["correcto"] is True for x in decisiones),
-        "decisiones_incorrectas": sum(x["correcto"] is False for x in decisiones),
-        "decisiones_sin_respuesta": sum(x["seleccionada"] == decisions.NO_RESPONDE for x in decisiones),
-        "nota": ("Agregados descriptivos por sesión. No se calcula una tasa de éxito global "
-                 "(tamaño de muestra, doc. 27 §I). El tiempo de respuesta es una métrica débil."),
+        "pruebas_formales_registradas": sorted(por_prueba),
+        **_aggregate(formales),
+        "por_prueba": {k: {"respuestas": len(v), **_aggregate(v)} for k, v in sorted(por_prueba.items())},
+        "duracion_sesion_min": duracion,
+        "nota": ("Agregados descriptivos por sesión y por prueba. Cada prueba solo codifica lo que pregunta "
+                 "(catalog.yaml → codificacion). No se calcula una tasa de éxito global (doc. 27 §I). "
+                 "El tiempo de respuesta es una métrica débil."),
     }
 
 
@@ -525,7 +616,7 @@ def create_session(body: SessionCreate):
             if s and s["codigo"] == body.codigo:
                 raise _conflict(f"Ya existe una sesión para {body.codigo} ({s['session_id']}). "
                                 "Recupérela desde la lista: el protocolo prevé una sesión por participante.")
-        session_path = _STUDY_DIR / session_id
+        session_path = _STUDY_DIR / _group(body.codigo, body.tipo_participante) / session_id
         session_path.mkdir(parents=True, exist_ok=False)
         # La voz del participante nunca se escribe en el repositorio: sin DATA_ROOT (solo
         # PTEST) se conserva únicamente la huella de la grabación.
@@ -592,7 +683,8 @@ def list_sessions():
 def get_session(session_id: str):
     d = _session_dir(session_id)
     respuestas = _read_responses(d)
-    return {"sesion": _read_session(d), "respuestas": respuestas, "resumen": summarize(respuestas)}
+    sesion = _read_session(d)
+    return {"sesion": sesion, "respuestas": respuestas, "resumen": summarize(respuestas, sesion)}
 
 
 # ──────────────────────────────────────────────────────────────
@@ -604,16 +696,22 @@ def _validate_response(sesion: dict, body: ResponseIn):
     if test is None:
         raise HTTPException(status_code=400, detail=f"La prueba {body.prueba_id} no existe en el catálogo.")
     tipo = sesion["tipo_participante"]
+    catalog = loader.get_catalog()
+    practica = body.estimulo is not None and body.estimulo.stimulus_id in catalog.practica
     if body.modo == "formal":
         if not test.ejecutable_formal:
             raise _conflict(f"{test.id} tiene estímulos {test.estado_estimulos.upper()}: no puede "
                             "registrarse como prueba formal hasta que se definan en el catálogo.")
-        if test.pista != tipo:
+        # El piloto recorre las mismas actividades que el objetivo y se consolida aparte
+        # (doc. 34, C6); el objetivo nunca registra las preguntas del piloto.
+        if test.pista != tipo and not (tipo == "piloto" and test.pista == "objetivo"):
             raise _conflict(f"{test.id} pertenece a la pista '{test.pista}' y la sesión es '{tipo}'.")
-    elif not (tipo == "piloto" or sesion["es_prueba_tecnica"]):
-        raise _conflict("El modo ensayo solo está permitido en sesiones piloto o de prueba técnica.")
+        if practica:
+            raise _conflict("La escena de práctica solo se registra como ensayo.")
+    elif not (tipo == "piloto" or sesion["es_prueba_tecnica"] or practica):
+        raise _conflict("En una sesión objetivo el modo ensayo solo se usa con la escena de práctica "
+                        f"({', '.join(catalog.practica) or 'no definida'}).")
 
-    catalog = loader.get_catalog()
     estimulo = None
     if test.requiere_estimulo:
         if body.ejecucion is None or body.estimulo is None:
@@ -636,8 +734,24 @@ def _validate_response(sesion: dict, body: ResponseIn):
                 raise _conflict("Sin audio del sistema la prueba no puede registrarse como formal.")
             if sum(r.tipo == "inicial" for r in body.reproducciones) != 1:
                 raise HTTPException(status_code=400, detail="Una prueba formal registra exactamente una reproducción inicial.")
+            # Todos los participantes escuchan el MISMO audio (doc. 30/33): solo el congelado.
+            frozen = catalog.congelados.get(estimulo["stimulus_id"])
+            if frozen is None:
+                raise _conflict(f"{estimulo['stimulus_id']} no tiene audio congelado válido: genérelo con "
+                                "scripts/study/freeze_study_audio.py antes de registrar pruebas formales.")
+            if body.ejecucion.audio.sha256 != frozen.sha256 or body.ejecucion.narrativa_final != frozen.narrativa_final:
+                raise _conflict("Una prueba formal reproduce el audio congelado del estímulo; no una narrativa "
+                                "regenerada (el sha256 o la narrativa no coinciden).")
     elif body.ejecucion or body.estimulo or body.audio_narrativa_base64:
         raise HTTPException(status_code=400, detail=f"{test.id} no usa estímulo ni audio de la API.")
+
+    cod = set(test.codificacion)
+    if body.comprension is not None and not cod & {"objetos", "relaciones", "ubicacion", "distancia"}:
+        raise HTTPException(status_code=400, detail=f"{test.id} no codifica objetos ni relaciones (catálogo).")
+    if body.percepcion_cambio is not None and "cambio" not in cod:
+        raise HTTPException(status_code=400, detail=f"{test.id} no registra percepción de cambio.")
+    if "cambio" in cod and body.modo == "formal" and body.percepcion_cambio is None:
+        raise HTTPException(status_code=400, detail=f"{test.id}: registre si el participante percibió el cambio.")
 
     task = decisions.get_decisions().task(test.id)
     if body.decision is not None:
@@ -670,16 +784,25 @@ def _decision_record(sesion: dict, body: ResponseIn, test, estimulo: dict | None
         raise _conflict(f"{test.id}: la alternativa esperada para {stimulus_id} está POR_DEFINIR; "
                         "la decisión no puede registrarse como formal.")
     sel = body.decision.seleccionada
+    respondio = sel != decisions.NO_RESPONDE
+    # Dirección que indicó la narrativa escuchada (instrucción de movimiento).
+    narrada = decisions.narrated_direction(body.ejecucion.narrativa_final if body.ejecucion else None)
     return {
         "pregunta": task.pregunta,
         "alternativas": [a.model_dump() for a in task.alternativas],
         "seleccionada": sel,
+        # Capa P — comprensión: ¿el participante eligió lo que indicó la narrativa?
+        "direccion_narrativa": narrada,
+        "coincide_con_narrativa": None if narrada is None or not respondio else sel == narrada,
+        # Capa R — resultado: ¿la elección coincide con la dirección libre del diseño de la escena?
         "esperada": esperada,
-        "correcto": None if esperada is None or sel == decisions.NO_RESPONDE else sel == esperada,
+        "correcto": None if esperada is None or not respondio else sel == esperada,
+        # Capa S — sistema: ¿la narrativa indicó la dirección libre del diseño? (no depende del participante)
+        "narrativa_coincide_con_diseno": None if esperada is None or narrada is None else narrada == esperada,
         "fuente_esperada": fuente,
         "fixture_tecnico": fixture_id,
         "definicion_sha256": defs.sha256,
-        "coincide_con_narrativa": body.decision.coincide_con_narrativa,
+        "juicio_investigador": body.decision.coincide_con_narrativa,
         "nota": "Decisión hipotética basada en información espacial auditiva; sin desplazamiento (doc. 27, §H).",
     }
 
@@ -711,23 +834,36 @@ def add_response(session_id: str, body: ResponseIn):
         test, estimulo = _validate_response(sesion, body)
         decision = _decision_record(sesion, body, test, estimulo)
         audio_raw = _decode_tts_audio(body)
+        frozen_path = None
+        if estimulo and estimulo.get("stimulus_id") and body.ejecucion is not None:
+            fz = loader.get_catalog().congelados.get(estimulo["stimulus_id"])
+            if fz is not None and body.ejecucion.audio.sha256 == fz.sha256:
+                frozen_path = loader.get_catalog().frozen_audio_path(fz.stimulus_id)
+                if audio_raw is None:
+                    audio_raw = frozen_path.read_bytes()
 
         indice = len(_read_responses(d)) + 1
         response_id = f"R{indice:03d}"
         reproducciones = [r.model_dump(mode="json") for r in body.reproducciones]
         comprension = body.comprension.model_dump() if body.comprension else None
-        metricas, errores_derivados = derive_metrics(comprension, reproducciones, body.tiempo_respuesta_ms)
-        metricas["decision_correcta"] = decision["correcto"] if decision else None
-        if decision and decision["correcto"] is False:
-            errores_derivados.append({"tipo": "decision_incorrecta", "elemento":
-                                      f"{decision['seleccionada']} (esperada: {decision['esperada']})"})
+        aclaraciones = [a.model_dump(mode="json") for a in body.aclaraciones]
+        metricas, errores_derivados = derive_metrics(comprension, reproducciones, body.tiempo_respuesta_ms,
+                                                     test.codificacion, aclaraciones)
+        metricas["decision_sigue_narrativa"] = decision["coincide_con_narrativa"] if decision else None
+        metricas["decision_coincide_diseno"] = decision["correcto"] if decision else None
+        if decision and decision["coincide_con_narrativa"] is False:
+            errores_derivados.append({"tipo": "decision_distinta_de_la_narrativa", "elemento":
+                                      f"{decision['seleccionada']} (narrativa: {decision['direccion_narrativa']})"})
+        if body.percepcion_cambio in ("no_menciona_cambio", "menciona_cambio_inexistente"):
+            errores_derivados.append({"tipo": "cambio_no_percibido", "elemento": body.percepcion_cambio})
 
         ejecucion = body.ejecucion.model_dump() if body.ejecucion else None
         if ejecucion is not None:
             ejecucion["audio"]["archivo"] = None
+            ejecucion["origen_audio"] = "congelado" if frozen_path is not None else "generado_en_sesion"
         if audio_raw is not None:
             ext = _AUDIO_EXT.get((ejecucion["audio"]["content_type"] or "").split(";")[0], "bin")
-            rdir = d / "respuestas" / response_id
+            rdir = _response_subdir(d, {"response_id": response_id, "modo": body.modo})
             rdir.mkdir(parents=True, exist_ok=True)
             (rdir / f"audio_narrativa_api.{ext}").write_bytes(audio_raw)
             ejecucion["audio"].update(archivo=f"audio_narrativa_api.{ext}",
@@ -742,7 +878,7 @@ def add_response(session_id: str, body: ResponseIn):
             "modo": body.modo,
             "prueba": {"id": test.id, "nombre": test.nombre, "tipo": test.tipo, "pista": test.pista,
                        "tipo_evaluacion": test.tipo_evaluacion, "metricas": test.metricas,
-                       "estado_estimulos": test.estado_estimulos},
+                       "codificacion": test.codificacion, "estado_estimulos": test.estado_estimulos},
             "estimulo": estimulo,
             "ejecucion": ejecucion,
             "reproducciones": reproducciones,
@@ -751,6 +887,8 @@ def add_response(session_id: str, body: ResponseIn):
             "respuesta_transcrita": body.respuesta_transcrita,
             "comprension": comprension,
             "decision": decision,
+            "percepcion_cambio": body.percepcion_cambio,
+            "aclaraciones": aclaraciones,
             "escalas": body.escalas.model_dump() if body.escalas else None,
             "criterios": body.criterios,
             "errores": [e.model_dump() for e in body.errores],
@@ -761,6 +899,7 @@ def add_response(session_id: str, body: ResponseIn):
             "metricas": metricas,
             "catalogo_schema_version": loader.get_catalog().source.schema_version,
             "asignaciones_sha256": loader.get_catalog().asignaciones_sha256,
+            "audios_congelados_sha256": loader.get_catalog().congelados_sha256,
             "backend_commit": _backend_commit(),
         }
         with (d / "responses.jsonl").open("a", encoding="utf-8") as f:
@@ -773,9 +912,11 @@ def add_response(session_id: str, body: ResponseIn):
 # ──────────────────────────────────────────────────────────────
 
 def _response_dir(d: Path, response_id: str) -> Path:
-    if not _RESPONSE_ID_RE.match(response_id) or not any(r["response_id"] == response_id for r in _read_responses(d)):
+    rec = next((r for r in _read_responses(d) if r["response_id"] == response_id), None) \
+        if _RESPONSE_ID_RE.match(response_id) else None
+    if rec is None:
         raise HTTPException(status_code=404, detail="Respuesta no encontrada.")
-    return d / "respuestas" / response_id
+    return _response_subdir(d, rec)
 
 
 @router.post("/study/sessions/{session_id}/responses/{response_id}/grabacion", status_code=201)
@@ -820,6 +961,19 @@ def get_audio(session_id: str, response_id: str, tipo: Literal["narrativa", "par
     ext = files[0].suffix.lstrip(".")
     media = next((k for k, v in _AUDIO_EXT.items() if v == ext), "application/octet-stream")
     return FileResponse(files[0], media_type=media, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/study/stimuli/{stimulus_id}/audio")
+def get_frozen_audio(stimulus_id: str):
+    """Audio CONGELADO del estímulo (el que se reproduce en las pruebas formales). Se busca
+    solo por id y solo si su hash se verificó al cargar el catálogo."""
+    catalog = loader.get_catalog()
+    frozen = catalog.congelados.get(stimulus_id)
+    path = catalog.frozen_audio_path(stimulus_id)
+    if frozen is None or path is None or not path.is_file():
+        raise HTTPException(status_code=404, detail="El estímulo no tiene audio congelado válido.")
+    return FileResponse(path, media_type=frozen.content_type,
+                        headers={"Cache-Control": "no-store", "X-Audio-SHA256": frozen.sha256})
 
 
 @router.get("/study/sessions/{session_id}/consentimiento/audio")
@@ -890,7 +1044,9 @@ def consolidated():
                 "audio_sha256": ((r["ejecucion"] or {}).get("audio") or {}).get("sha256"),
                 **{k: v for k, v in r["metricas"].items()},
                 "decision_seleccionada": (r.get("decision") or {}).get("seleccionada"),
+                "decision_narrativa": (r.get("decision") or {}).get("direccion_narrativa"),
                 "decision_esperada": (r.get("decision") or {}).get("esperada"),
+                "percepcion_cambio": r.get("percepcion_cambio"),
                 "escalas": r["escalas"], "criterios": r["criterios"],
                 "errores_registrados": len(r["errores"]),
             })
