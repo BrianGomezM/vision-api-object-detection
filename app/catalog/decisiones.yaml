@@ -12,27 +12,35 @@
 # pregunta y las alternativas, nunca la respuesta esperada, para no sesgar al
 # investigador. El servidor la aplica al guardar la respuesta: el cliente no la decide.
 #
-# pregunta / alternativas: tomadas literalmente del guion del catálogo (OBJ-03 indica
-# "izquierda/derecha/frente"). No se añaden alternativas nuevas.
+# pregunta / alternativas: las del guion del catálogo (revisado el 2026-10-01). No se
+# añaden alternativas nuevas.
 # esperada_por_estimulo: {stimulus_id: alternativa}. Los estímulos de OBJ-03/OBJ-04 se
 # asignan en asignaciones.yaml (decisión del investigador del 2026-09-29, pendiente de
 # revisión de los directores). La esperada sale del DISEÑO geométrico del manifest,
 # no de lo que dijo el sistema:
 #   DS1-C2: sofá al centro, planta a la derecha, nada a la izquierda → izquierda.
 #   DS1-B2: sofá a la izquierda, planta a la derecha, centro despejado → frente.
+#
+# CAPAS (2026-10-01, doc. 34). La esperada de este archivo es la referencia de la ESCENA.
+# El servidor extrae además la dirección que INDICÓ la narrativa (instrucción de movimiento)
+# y registra por separado: participante vs. narrativa (comprensión, métrica principal),
+# participante vs. escena y narrativa vs. escena (resultado técnico del sistema). En una
+# corrida local (2026-10-01) el sistema indicó «frente» en DS1-C2: el sofá está a distancia
+# media y no bloquea el espacio inmediato. Esa discrepancia es un resultado del sistema, no
+# un error del participante.
 
 schema_version: 1
 
 tareas:
   - prueba_id: OBJ-03
-    pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría?"
+    pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?"
     alternativas:
       - {id: izquierda, texto: "Izquierda"}
       - {id: frente, texto: "Frente"}
       - {id: derecha, texto: "Derecha"}
     esperada_por_estimulo: {DS1-C2: izquierda}
   - prueba_id: OBJ-04
-    pregunta: "¿Cambió algo respecto a lo anterior? ¿Hacia dónde avanzaría ahora?"
+    pregunta: "Según lo que escuchó ahora, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?"
     alternativas:
       - {id: izquierda, texto: "Izquierda"}
       - {id: frente, texto: "Frente"}

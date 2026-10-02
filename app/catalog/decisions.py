@@ -13,6 +13,7 @@ Tareas de DECISIÓN (tipo C) del estudio con usuarios: app/catalog/decisiones.ya
 from __future__ import annotations
 
 import hashlib
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal, Union
@@ -25,6 +26,18 @@ from app.catalog import loader
 DECISIONS_PATH = Path(__file__).resolve().parent / "decisiones.yaml"
 
 NO_RESPONDE = "no_responde"
+
+# Dirección que INDICÓ la narrativa: la instrucción de movimiento de risk_engine va al
+# final ("Puedes avanzar hacia el frente…", "Gira con cuidado hacia la derecha…", "La
+# salida menos bloqueada es hacia la izquierda"). Se toma la ÚLTIMA mención.
+_NARRATED_DIR = re.compile(r"hacia (el frente|la izquierda|la derecha)", re.IGNORECASE)
+_DIR_ID = {"el frente": "frente", "la izquierda": "izquierda", "la derecha": "derecha"}
+
+
+def narrated_direction(text: str | None) -> str | None:
+    """'izquierda' | 'frente' | 'derecha' según la instrucción narrada, o None si no la hay."""
+    found = _NARRATED_DIR.findall(text or "")
+    return _DIR_ID[found[-1].lower()] if found else None
 
 
 class _Model(BaseModel):

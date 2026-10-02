@@ -39,3 +39,9 @@ asignaciones:
     estimulos: null
   - prueba_id: OBJ-07            # utilidad percibida (cierre)
     estimulos: null
+
+# Escena de PRÁCTICA (2026-10-01, doc. 34): familiariza al participante con la voz y el
+# formato antes de OBJ-01. Se registra como ensayo (no es evidencia) y no está asignada a
+# ninguna prueba, para que el participante no escuche antes una escena evaluada.
+#   DS1-A2: una silla a la izquierda, distancia media (detectada con los umbrales congelados).
+practica: [DS1-A2]

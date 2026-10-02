@@ -1,0 +1,188 @@
+# GENERADO por scripts/study/freeze_study_audio.py — NO editar salvo verificacion_fidelidad.
+schema_version: 1
+conjunto: estudio-ds1-20261002
+generado_en: '2026-10-02T04:32:30.654527+00:00'
+configuracion:
+  umbral_confianza: 0.35
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  arbol_con_cambios: true
+  criterios_aceptacion: 'doc. 33 §9: solo fallos técnicos; primer intento válido;
+    máx. 3 intentos'
+  duracion_s: estimada a partir del tamaño (MP3 48 kbps)
+verificacion_fidelidad:
+  estado: pendiente
+  verificado_por: null
+  fecha: null
+estimulos:
+- stimulus_id: DS1-A2
+  archivo: DS1-A2.mp3
+  sha256: 9b4d2e8f6bcf4f2379e8c552091356e1183414ac71082aa8fdccf07ce5e29dc8
+  content_type: audio/mpeg
+  tamano_bytes: 42768
+  duracion_s: 7.1
+  narrativa_final: Silla a tu izquierda a aproximadamente 5 pasos. Puedes avanzar
+    hacia el frente con cuidado.
+  instruccion_movimiento: Puedes avanzar hacia el frente con cuidado.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:18.438514+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: chair
+    confianza: 0.942
+    bbox:
+      x1: 170.63
+      y1: 169.02
+      x2: 227.41
+      y2: 279.9
+- stimulus_id: DS1-C1
+  archivo: DS1-C1.mp3
+  sha256: 3f0d227bd8c24f76a1b47d271c42e99caaa183f2cbce18c3a2872344deb80408
+  content_type: audio/mpeg
+  tamano_bytes: 118656
+  duracion_s: 19.8
+  narrativa_final: Parece que estás en un comedor. Silla frente a ti a aproximadamente
+    5 pasos. Mesa de comedor un poco más adelante frente a ti a aproximadamente 5
+    pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes
+    del primer obstáculo.
+  instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
+    pasos libres antes del primer obstáculo.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:20.625616+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: chair
+    confianza: 0.92
+    bbox:
+      x1: 375.41
+      y1: 170.12
+      x2: 424.24
+      y2: 281.34
+  - clase: dining table
+    confianza: 0.451
+    bbox:
+      x1: 348.11
+      y1: 170.6
+      x2: 452.86
+      y2: 251.99
+- stimulus_id: DS1-A8
+  archivo: DS1-A8.mp3
+  sha256: 71c96ad4160d1132a73c6f8bcc41fce5d50c39a4ef30adfc4f5b4db9f8115d9a
+  content_type: audio/mpeg
+  tamano_bytes: 44208
+  duracion_s: 7.4
+  narrativa_final: Silla a tu derecha a aproximadamente 5 pasos. Puedes avanzar hacia
+    el frente con cuidado.
+  instruccion_movimiento: Puedes avanzar hacia el frente con cuidado.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:22.671402+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: chair
+    confianza: 0.933
+    bbox:
+      x1: 572.48
+      y1: 168.87
+      x2: 629.66
+      y2: 279.94
+- stimulus_id: DS1-C2
+  archivo: DS1-C2.mp3
+  sha256: 31cda625159610f1f04e84d794bf3fa8041a06bdcdd3667ee77632a878150865
+  content_type: audio/mpeg
+  tamano_bytes: 115920
+  duracion_s: 19.3
+  narrativa_final: Parece que estás en una sala de estar. Planta en maceta a tu derecha
+    a aproximadamente 5 pasos. Sofá frente a ti a aproximadamente 5 pasos. Puedes
+    avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer
+    obstáculo.
+  instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
+    pasos libres antes del primer obstáculo.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:25.709800+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: potted plant
+    confianza: 0.907
+    bbox:
+      x1: 569.09
+      y1: 130.88
+      x2: 635.93
+      y2: 274.98
+  - clase: couch
+    confianza: 0.756
+    bbox:
+      x1: 388.79
+      y1: 178.39
+      x2: 538.93
+      y2: 261.61
+- stimulus_id: DS1-B2
+  archivo: DS1-B2.mp3
+  sha256: 959d79df01462276f7095995b8206cbba41ea10c244755bcca1a8a37307a2f03
+  content_type: audio/mpeg
+  tamano_bytes: 88272
+  duracion_s: 14.7
+  narrativa_final: 'Parece que estás en una sala de estar. Sofá a tu izquierda a aproximadamente
+    4 pasos.
+
+    Planta en maceta a tu derecha a aproximadamente 5 pasos. Puedes avanzar hacia
+    el frente con cuidado.'
+  instruccion_movimiento: Puedes avanzar hacia el frente con cuidado.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:28.334959+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: potted plant
+    confianza: 0.897
+    bbox:
+      x1: 569.14
+      y1: 130.66
+      x2: 636.0
+      y2: 274.98
+  - clase: couch
+    confianza: 0.78
+    bbox:
+      x1: 99.1
+      y1: 186.13
+      x2: 290.12
+      y2: 292.21
+- stimulus_id: DS1-A5
+  archivo: DS1-A5.mp3
+  sha256: fc5aba9d9e3203b95ed5fcb465530f9df01de51db1e44e4797114119041ba4fb
+  content_type: audio/mpeg
+  tamano_bytes: 76320
+  duracion_s: 12.7
+  narrativa_final: Silla un poco más adelante frente a ti a aproximadamente 5 pasos.
+    Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del
+    primer obstáculo.
+  instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
+    pasos libres antes del primer obstáculo.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-02T04:32:30.633690+00:00'
+  intento: 1
+  backend_commit: e7d204261765dd5963a10b2efa8daf66eea830a2
+  detecciones:
+  - clase: chair
+    confianza: 0.856
+    bbox:
+      x1: 378.86
+      y1: 165.07
+      x2: 420.87
+      y2: 263.82

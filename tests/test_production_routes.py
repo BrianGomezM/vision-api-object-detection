@@ -32,6 +32,7 @@ PRODUCTION_ROUTES = {
     ("POST", "/api/study/sessions/{session_id}/responses/{response_id}/grabacion"),
     ("GET", "/api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}"),
     ("GET", "/api/study/sessions/{session_id}/consentimiento/audio"),
+    ("GET", "/api/study/stimuli/{stimulus_id}/audio"),
     ("POST", "/api/study/sessions/{session_id}/cierre"), ("GET", "/api/study/consolidado"),
     ("GET", "/api/metrics/summary"), ("GET", "/api/metrics/latency"),
 }
@@ -132,7 +133,7 @@ def test_flujo_completo_de_sesion_en_production(prod, tmp_path):
     listed = prod.get("/api/study/sessions", headers=H).json()
     assert [s["num_respuestas"] for s in listed["sesiones"] if s["session_id"] == sid] == [1]
 
-    session_dir = tmp_path / "study" / "sessions" / sid
+    session_dir = tmp_path / "study" / "sessions" / "pruebas_tecnicas" / sid
     assert json.loads((session_dir / "sesion.json").read_text(encoding="utf-8"))["codigo"] == "PTEST01"
     assert len((session_dir / "responses.jsonl").read_text(encoding="utf-8").splitlines()) == 1
 

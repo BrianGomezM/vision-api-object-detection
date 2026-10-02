@@ -280,6 +280,9 @@ experimento:
   c2_espejo: PENDIENTE (CP3B D6)
   catalogo:
     archivo: app/catalog/catalog.yaml
-    sha256: ff0404979a0493c78b855aa480f125561a08009a2870c6fb29cfa7fdae11070f
+    # 2026-10-01: nuevo hash tras revisar SOLO las pruebas de usuario (guiones, codificación,
+    # PIL-03) antes de cualquier sesión real (docs/EVALUACION_USUARIOS.md §0). Las pruebas
+    # técnicas, los datasets y las métricas técnicas no cambiaron. Anterior: ff0404979a04…
+    sha256: 6d0cb24d3305db36613a129c29c374ae71f3d0d895763cf703e335cf34326008
   metricas_version: PENDIENTE (CP3B)
   latencia: NO forma parte de las métricas del CP3B; si se reporta, por separado (CPU local ≠ despliegue)
