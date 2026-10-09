@@ -26,6 +26,24 @@ Se hizo antes de cualquier sesión con participantes reales. La detección, el p
 | 12 | PIL-01 decía "antes de comenzar" y se hacía al final; PIL-03 duplicaba el registro técnico; faltaba validar las escalas | PIL-01 en retrospectiva; PIL-02 compara con la duración real (`resumen.duracion_sesion_min`); **PIL-03 ahora es "Comprensión de las escalas y las preguntas"** (el registro técnico va en el cierre). |
 | 13 | Ficha sin rango de edad ni audición | `ficha.rango_edad` (rangos, nunca la edad exacta) y `ficha.audicion_autodeclarada`; obligatorios en el cliente, opcionales en el servidor por compatibilidad. |
 
+**Solo participantes objetivo (2026-10-09).** Por decisión de los directores, por tiempo, no se realiza prueba piloto. Se retiraron:
+- las preguntas PIL-01 a PIL-05 y la métrica M-PIL del catálogo (nuevo sha256 en `experimental_config.yaml`);
+- el consentimiento piloto, el tipo «piloto» en el asistente y el grupo piloto del consolidado.
+
+Las sesiones de prueba técnica (PTEST) siguen disponibles para ensayos. Si existieran sesiones piloto anteriores, se siguen leyendo, pero no entran al consolidado. En consecuencia, las menciones al piloto en las secciones siguientes ya no aplican.
+
+**Descarga de la evidencia (2026-10-09).** `GET /api/study/sessions/{id}/export` (botones «Evidencia» en la lista y «Descargar evidencia (.zip)» en Resultados) entrega un .zip por participante con:
+- `evidencia_<código>.xlsx`, con las hojas Sesion, Respuestas, Codificacion y Resumen_por_prueba (generado sin dependencias nuevas);
+- `sesion.json` y `responses.jsonl`, el registro original;
+- la grabación del consentimiento y, por respuesta, el audio escuchado y la grabación del participante, en `respuestas/formales` y `respuestas/ensayos`;
+- un `LEEME.txt`.
+
+**Verificación automática de los audios (2026-10-09).** `scripts/study/verify_frozen_audio.py` transcribe los seis audios congelados con Whisper (Groq, `whisper-large-v3`) y los compara palabra por palabra con su narrativa. Resultado en `stimuli/dataset1/estudio/verificacion_automatica.json`:
+- los seis audios contienen todas las palabras con contenido (objetos, lados, número de pasos e instrucción);
+- la única diferencia es la preposición «a» fundida con la vocal anterior («a aproximadamente», «sofá a tu», «maceta a tu»), una sinalefa propia del habla.
+
+La escucha humana (criterio 6 del doc. 33 §9) sigue pendiente.
+
 **Carpetas separadas (2026-10-02).** Las sesiones se guardan por grupo y, dentro de cada sesión, las respuestas por modo. Las sesiones anteriores, que están en la raíz, se siguen leyendo:
 
 ```

@@ -28,7 +28,7 @@ def test_catalogo_real_carga_y_verifica_dataset1():
     assert len(tests) == 18
     ids = [t["test_id"] for t in tests] + [p.id for p in cat.source.pruebas_usuario]
     assert len(ids) == len(set(ids))
-    assert {p.id for p in cat.source.pruebas_usuario} == {f"OBJ-0{i}" for i in range(1, 8)} | {f"PIL-0{i}" for i in range(1, 6)}
+    assert {p.id for p in cat.source.pruebas_usuario} == {f"OBJ-0{i}" for i in range(1, 8)}
 
 
 def test_metricas_tecnicas_por_definir_y_de_usuario_definidas():
@@ -36,7 +36,7 @@ def test_metricas_tecnicas_por_definir_y_de_usuario_definidas():
     # las técnicas siguen pendientes del CP3B.
     cat = loader.load_catalog()
     for m in cat.source.metricas:
-        esperado = "DEFINIDA_EVALUACION_USUARIOS" if m.id.startswith(("M-USR", "M-PIL")) else "POR_DEFINIR_CP3B"
+        esperado = "DEFINIDA_EVALUACION_USUARIOS" if m.id.startswith("M-USR") else "POR_DEFINIR_CP3B"
         assert m.estado == esperado, m.id
 
 

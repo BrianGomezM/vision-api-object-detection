@@ -1,0 +1,122 @@
+{
+  "fecha": "2026-10-09T06:50:34.659563+00:00",
+  "modelo_transcripcion": "groq:whisper-large-v3",
+  "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
+  "resultados": [
+    {
+      "stimulus_id": "DS1-A2",
+      "palabras_narrativa": 15,
+      "diferencias_palabras": 1,
+      "wer": 0.067,
+      "coincide": false,
+      "transcripcion": "Silla a tu izquierda aproximadamente cinco pasos. Puedes avanzar hacia el frente con cuidado.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "DS1-C1",
+      "palabras_narrativa": 42,
+      "diferencias_palabras": 2,
+      "wer": 0.048,
+      "coincide": false,
+      "transcripcion": "Parece que estás en un comedor. Silla frente a ti aproximadamente 5 pasos. Mesa de comedor un poco más adelante frente a ti aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "DS1-A8",
+      "palabras_narrativa": 15,
+      "diferencias_palabras": 1,
+      "wer": 0.067,
+      "coincide": false,
+      "transcripcion": "Silla a tu derecha aproximadamente cinco pasos. Puedes avanzar hacia el frente con cuidado.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "DS1-C2",
+      "palabras_narrativa": 40,
+      "diferencias_palabras": 2,
+      "wer": 0.05,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Planta en maceta a tu derecha aproximadamente cinco pasos. Sofá frente a ti aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "DS1-B2",
+      "palabras_narrativa": 33,
+      "diferencias_palabras": 4,
+      "wer": 0.121,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Sofá tu izquierda aproximadamente cuatro pasos. Planta en maceta tu derecha aproximadamente cinco pasos. ¿Puedes avanzar hacia el frente con cuidado?",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "DS1-A5",
+      "palabras_narrativa": 26,
+      "diferencias_palabras": 1,
+      "wer": 0.038,
+      "coincide": false,
+      "transcripcion": "Silla un poco más adelante frente a ti aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    }
+  ]
+}
