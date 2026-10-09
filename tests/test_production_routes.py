@@ -8,7 +8,7 @@ production publica, además de POST /api/detect (público) y GET /api/health:
 Sin claves configuradas, las rutas del investigador responden 401 (fallo cerrado),
 nunca 200: los datos de participantes no quedan públicos junto al detect público.
 
-Solo participantes de prueba (PTEST01, piloto). Las sesiones se escriben en tmp_path.
+Solo participantes de prueba (PTEST01). Las sesiones se escriben en tmp_path.
 """
 
 import json
@@ -33,6 +33,7 @@ PRODUCTION_ROUTES = {
     ("GET", "/api/study/sessions/{session_id}/responses/{response_id}/audio/{tipo}"),
     ("GET", "/api/study/sessions/{session_id}/consentimiento/audio"),
     ("GET", "/api/study/stimuli/{stimulus_id}/audio"),
+    ("GET", "/api/study/sessions/{session_id}/export"),
     ("POST", "/api/study/sessions/{session_id}/cierre"), ("GET", "/api/study/consolidado"),
     ("GET", "/api/metrics/summary"), ("GET", "/api/metrics/latency"),
 }
@@ -122,13 +123,13 @@ def test_flujo_completo_de_sesion_en_production(prod, tmp_path):
     assert sid.endswith("_ptest01")
 
     r = prod.post(f"/api/study/sessions/{sid}/responses", headers=H,
-                  json={"prueba_id": "PIL-02", "modo": "formal", "respuesta_transcrita": "adecuada"})
+                  json={"prueba_id": "OBJ-07", "modo": "formal", "respuesta_transcrita": "adecuada"})
     assert r.status_code == 201, r.text
 
     detail = prod.get(f"/api/study/sessions/{sid}", headers=H)
     assert detail.status_code == 200
-    assert detail.json()["sesion"]["tipo_participante"] == "piloto"
-    assert [x["prueba"]["id"] for x in detail.json()["respuestas"]] == ["PIL-02"]
+    assert detail.json()["sesion"]["tipo_participante"] == "objetivo"
+    assert [x["prueba"]["id"] for x in detail.json()["respuestas"]] == ["OBJ-07"]
 
     listed = prod.get("/api/study/sessions", headers=H).json()
     assert [s["num_respuestas"] for s in listed["sesiones"] if s["session_id"] == sid] == [1]

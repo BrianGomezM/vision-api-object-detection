@@ -31,7 +31,6 @@ metricas:
   - {id: M-USR-ESP, nombre: "Relación espacial reportada por el participante", estado: DEFINIDA_EVALUACION_USUARIOS}
   - {id: M-USR-RUTA, nombre: "Elección de ruta por el participante",         estado: DEFINIDA_EVALUACION_USUARIOS}
   - {id: M-USR-SUBJ, nombre: "Valoraciones subjetivas (escala 1–5)",         estado: DEFINIDA_EVALUACION_USUARIOS}
-  - {id: M-PIL,    nombre: "Validación del instrumento (piloto)",            estado: DEFINIDA_EVALUACION_USUARIOS}
 
 datasets:
   - id: dataset1
@@ -104,6 +103,8 @@ pruebas_tecnicas:
     disponibilidad: {investigador: true, participante: false}
 
 # Tareas del estudio con usuarios (Objetivo Específico 3).
+# Desde el 2026-10-09 el estudio se aplica SOLO a participantes objetivo (decisión de los
+# directores): se retiraron la prueba piloto y sus preguntas PIL-01…05.
 # Revisadas el 2026-10-01, antes de cualquier sesión con
 # participantes reales: guiones literales, una pregunta por constructo y el campo
 # "codificacion" (qué se codifica de la respuesta). Ver docs/EVALUACION_USUARIOS.md §0.
@@ -201,66 +202,4 @@ pruebas_usuario:
     metricas_texto: ["utilidad percibida"]
     tipo_evaluacion: usuario_subjetiva
     estimulos: POR_DEFINIR
-    disponibilidad: {investigador: true, participante: false}
-  - id: PIL-01
-    pista: piloto
-    nombre: "Comprensión de las instrucciones"
-    objetivo: "Verificar que las instrucciones del estudio se entienden sin ambigüedad antes de aplicarlas a la población objetivo."
-    guion_investigador: 'Al terminar las actividades, pregunta: "Desde el inicio, ¿qué tan claro le quedó lo que se le iba a pedir en cada actividad?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Anota en los comentarios qué instrucción no quedó clara, si la hubo.'
-    tipo: escala
-    criterios: [claridad_instrucciones]
-    codificacion: []
-    metricas: [M-PIL]
-    metricas_texto: ["validación de instrucciones (no es evidencia de accesibilidad)"]
-    tipo_evaluacion: piloto_instrumento
-    estimulos: null
-    disponibilidad: {investigador: true, participante: false}
-  - id: PIL-02
-    pista: piloto
-    nombre: "Duración de la sesión"
-    objetivo: "Comparar la duración percibida con la duración real de la sesión (registrada por el sistema) y con los 30 minutos que indica el consentimiento."
-    guion_investigador: 'Pregunta: "¿La duración de la sesión le pareció corta, adecuada o larga?". Anota la opción y el motivo. La duración real la calcula el sistema al finalizar la sesión.'
-    tipo: texto
-    codificacion: []
-    metricas: [M-PIL]
-    metricas_texto: ["duración percibida", "duración real"]
-    tipo_evaluacion: piloto_instrumento
-    estimulos: null
-    disponibilidad: {investigador: true, participante: false}
-  - id: PIL-03
-    pista: piloto
-    nombre: "Comprensión de las escalas y las preguntas"
-    objetivo: "Verificar que el participante entiende las escalas de 1 a 5 leídas en voz alta y las preguntas de cada actividad."
-    guion_investigador: 'Pregunta: "¿Qué tan fácil le resultó responder con números del 1 al 5?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Alguna pregunta de las actividades le pareció confusa? ¿Cuál?" y anota la respuesta en los comentarios.'
-    tipo: escala
-    criterios: [comprension_escalas]
-    codificacion: []
-    metricas: [M-PIL]
-    metricas_texto: ["comprensión de las escalas", "preguntas confusas"]
-    tipo_evaluacion: piloto_instrumento
-    estimulos: null
-    disponibilidad: {investigador: true, participante: false}
-  - id: PIL-04
-    pista: piloto
-    nombre: "Claridad del formulario y el consentimiento"
-    objetivo: "Confirmar que el formulario de registro y el texto de consentimiento se entienden sin apoyo adicional."
-    guion_investigador: 'Pregunta: "¿Hubo alguna parte del formulario o del consentimiento que no le quedara clara?". Anota la respuesta tal cual.'
-    tipo: texto
-    codificacion: []
-    metricas: [M-PIL]
-    metricas_texto: ["validación de instrumentos de consentimiento"]
-    tipo_evaluacion: piloto_instrumento
-    estimulos: null
-    disponibilidad: {investigador: true, participante: false}
-  - id: PIL-05
-    pista: piloto
-    nombre: "Comentario general"
-    objetivo: "Recoger observaciones libres sobre la sesión antes de aplicarla a la población objetivo."
-    guion_investigador: 'Pregunta abierta de cierre: "¿Hay algo que deberíamos ajustar antes de hacer esta actividad con las personas participantes?". Anota la respuesta tal cual.'
-    tipo: texto
-    codificacion: []
-    metricas: [M-PIL]
-    metricas_texto: ["mejora del instrumento"]
-    tipo_evaluacion: piloto_instrumento
-    estimulos: null
     disponibilidad: {investigador: true, participante: false}

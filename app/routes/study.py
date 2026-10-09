@@ -7,11 +7,9 @@ final Objetivo 3" (diseño exploratorio, una sesión por participante, sin
 navegación 3D: el participante escucha el audio de la API y responde
 verbalmente; el investigador opera la interfaz y registra).
 
-DOS TIPOS DE PARTICIPANTE (`tipo_participante`):
-  - "objetivo" : persona con ceguera (población objetivo). Evidencia del Objetivo 3.
-  - "piloto"   : persona sin discapacidad visual. Solo valida procedimiento, duración,
-                 instrumento y funcionamiento técnico (doc. 27, §M); NO es evidencia
-                 de accesibilidad.
+PARTICIPANTES: solo "objetivo" (personas con ceguera total). Por decisión de los
+directores (2026-10-09) no se realiza prueba piloto. Las pruebas técnicas usan códigos
+PTEST y nunca son evidencia.
 
 PRIVACIDAD:
   - El identificador es un código anonimizado (P01, P02… ; PTEST01… para pruebas
@@ -25,14 +23,14 @@ PRIVACIDAD:
     se sirven ni se modifican; solo se informa cuántas hay.
 
 ALMACENAMIENTO (data_dir("study_sessions") = DATA_ROOT/study/sessions), separado por tipo:
-  objetivo/ · piloto/ · pruebas_tecnicas/ (PTEST)     una carpeta por grupo (desde 2026-10-02)
+  objetivo/ · pruebas_tecnicas/ (PTEST)              una carpeta por grupo (desde 2026-10-02)
   <grupo>/<session_id>/
     sesion.json                       ficha, contexto técnico, consentimiento (4 afirmaciones
                                       y huella de su grabación), estado y cierre
                                       (cuestionario posterior, entrevista, registro técnico)
     grabacion_consentimiento.<ext>    lectura del consentimiento y respuestas (solo DATA_ROOT)
     responses.jsonl                   una línea por respuesta (append-only)
-    respuestas/formales/<R001>/       respuestas formales (evidencia o grupo piloto)
+    respuestas/formales/<R001>/       respuestas formales (evidencia)
     respuestas/ensayos/<R001>/        práctica y ensayos (nunca evidencia)
       audio_narrativa_api.<ext>       audio TTS que escuchó el participante (API)
       respuesta_participante.<ext>    grabación del participante (solo con autorización)
@@ -42,6 +40,7 @@ ENDPOINTS (todos con clave del investigador, X-API-Key):
   POST   /api/study/sessions                                   crear sesión (ficha + consentimiento + grabación)
   GET    /api/study/sessions/{id}/consentimiento/audio         grabación de la lectura del consentimiento
   GET    /api/study/stimuli/{stimulus_id}/audio                audio CONGELADO del estímulo (pruebas formales)
+  GET    /api/study/sessions/{id}/export                       evidencia completa (.zip con Excel y audios)
   GET    /api/study/sessions                                   listar sesiones
   GET    /api/study/sessions/{id}                              sesión + respuestas + resumen
   POST   /api/study/sessions/{id}/responses                    registrar una respuesta
@@ -216,7 +215,6 @@ class ContextoSesion(_M):
 # versión registrada corresponda al tipo de participante.
 # v0.4 (2026-09-29): §9 con el almacenamiento en el servidor (Azure) y conservación de un año.
 CONSENT_VERSIONS: dict[str, tuple[str, ...]] = {
-    "piloto": ("CI-VisionNav-Piloto v0.4",),
     "objetivo": ("CI-VisionNav-Objetivo v0.4",),
 }
 MAX_CONSENT_RECORDING_BYTES = 20 * 1024 * 1024
@@ -242,7 +240,7 @@ class GrabacionConsentimiento(_M):
 
 class SessionCreate(_M):
     codigo: str = Field(..., description="Código anonimizado: P01, P02… (PTEST01… para pruebas técnicas)")
-    tipo_participante: Literal["objetivo", "piloto"]
+    tipo_participante: Literal["objetivo"] = "objetivo"
     ficha: Ficha
     contexto: ContextoSesion
     consentimiento: Consentimiento
@@ -394,7 +392,9 @@ class CierreIn(_M):
 
 # Carpeta por grupo: los datos de participantes reales, del piloto y de las pruebas
 # técnicas nunca comparten carpeta. Las sesiones anteriores (en la raíz) se siguen leyendo.
-GROUP_DIRS = ("objetivo", "piloto", "pruebas_tecnicas")
+GROUP_DIRS = ("objetivo", "pruebas_tecnicas")
+# Solo lectura: carpeta de sesiones piloto anteriores a la decisión del 2026-10-09.
+LEGACY_GROUP_DIRS = ("piloto",)
 
 
 def _group(codigo: str, tipo: str) -> str:
@@ -404,7 +404,7 @@ def _group(codigo: str, tipo: str) -> str:
 def _session_dir(session_id: str) -> Path:
     if not _SESSION_ID_RE.match(session_id):
         raise HTTPException(status_code=404, detail="Sesión no encontrada.")
-    for d in [_STUDY_DIR / g / session_id for g in GROUP_DIRS] + [_STUDY_DIR / session_id]:
+    for d in [_STUDY_DIR / g / session_id for g in GROUP_DIRS + LEGACY_GROUP_DIRS] + [_STUDY_DIR / session_id]:
         if (d / SESSION_FILE).is_file():
             return d
     # Incluye las sesiones del formato anterior: no se sirven (session_id con nombre).
@@ -442,8 +442,9 @@ def _iter_sessions():
     """(dir, sesión v2 | None si es del formato anterior)."""
     if not _STUDY_DIR.exists():
         return
-    dirs = [d for g in GROUP_DIRS if (_STUDY_DIR / g).is_dir() for d in (_STUDY_DIR / g).iterdir()]
-    dirs += [d for d in _STUDY_DIR.iterdir() if d.name not in GROUP_DIRS]
+    groups = GROUP_DIRS + LEGACY_GROUP_DIRS
+    dirs = [d for g in groups if (_STUDY_DIR / g).is_dir() for d in (_STUDY_DIR / g).iterdir()]
+    dirs += [d for d in _STUDY_DIR.iterdir() if d.name not in groups]
     for d in sorted(dirs, key=lambda x: x.name, reverse=True):
         if not d.is_dir():
             continue
@@ -550,7 +551,7 @@ def _aggregate(rs: list[dict]) -> dict:
 
 def summarize(respuestas: list[dict], sesion: dict | None = None) -> dict:
     """Resumen de una sesión sobre respuestas FORMALES, total y por prueba. Sin tasa de éxito
-    global (doc. 27 §I). En el piloto se resumen sus actividades formales igual que en objetivo."""
+    global (doc. 27 §I)."""
     formales = [r for r in respuestas if r["modo"] == "formal"]
     por_prueba: dict[str, list[dict]] = {}
     for r in formales:
@@ -704,11 +705,11 @@ def _validate_response(sesion: dict, body: ResponseIn):
                             "registrarse como prueba formal hasta que se definan en el catálogo.")
         # El piloto recorre las mismas actividades que el objetivo y se consolida aparte
         # (doc. 34, C6); el objetivo nunca registra las preguntas del piloto.
-        if test.pista != tipo and not (tipo == "piloto" and test.pista == "objetivo"):
+        if test.pista != tipo:
             raise _conflict(f"{test.id} pertenece a la pista '{test.pista}' y la sesión es '{tipo}'.")
         if practica:
             raise _conflict("La escena de práctica solo se registra como ensayo.")
-    elif not (tipo == "piloto" or sesion["es_prueba_tecnica"] or practica):
+    elif not (sesion["es_prueba_tecnica"] or practica):
         raise _conflict("En una sesión objetivo el modo ensayo solo se usa con la escena de práctica "
                         f"({', '.join(catalog.practica) or 'no definida'}).")
 
@@ -963,6 +964,21 @@ def get_audio(session_id: str, response_id: str, tipo: Literal["narrativa", "par
     return FileResponse(files[0], media_type=media, headers={"Cache-Control": "no-store"})
 
 
+@router.get("/study/sessions/{session_id}/export")
+def export_session(session_id: str):
+    """Toda la evidencia de la sesión en un .zip: Excel (sesión, respuestas, codificación y
+    resumen por prueba), registro original y audios. Evita descargar del servidor a mano."""
+    from fastapi.responses import Response
+    from app.study_export import build_session_zip
+    d = _session_dir(session_id)
+    with _lock:
+        sesion = _read_session(d)
+        respuestas = _read_responses(d)
+        data, filename = build_session_zip(d, sesion, respuestas, summarize(respuestas, sesion))
+    return Response(content=data, media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{filename}"', "Cache-Control": "no-store"})
+
+
 @router.get("/study/stimuli/{stimulus_id}/audio")
 def get_frozen_audio(stimulus_id: str):
     """Audio CONGELADO del estímulo (el que se reproduce en las pruebas formales). Se busca
@@ -1026,13 +1042,13 @@ def delete_session(session_id: str):
 
 @router.get("/study/consolidado")
 def consolidated():
-    """Una fila por respuesta FORMAL, separada por tipo de participante. Las pruebas
-    técnicas (PTEST) y los ensayos se excluyen; el piloto nunca se mezcla con objetivo."""
-    out: dict[str, dict] = {t: {"sesiones": 0, "filas": []} for t in ("objetivo", "piloto")}
+    """Una fila por respuesta FORMAL de participantes objetivo. Las pruebas técnicas
+    (PTEST), los ensayos y las sesiones piloto anteriores se excluyen."""
+    out: dict[str, dict] = {"objetivo": {"sesiones": 0, "filas": []}}
     for d, s in _iter_sessions():
-        if s is None or s["es_prueba_tecnica"]:
+        if s is None or s["es_prueba_tecnica"] or s["tipo_participante"] != "objetivo":
             continue
-        grupo = out[s["tipo_participante"]]
+        grupo = out["objetivo"]
         grupo["sesiones"] += 1
         for r in _read_responses(d):
             if r["modo"] != "formal":
@@ -1051,7 +1067,6 @@ def consolidated():
                 "errores_registrados": len(r["errores"]),
             })
     return {
-        "nota": ("Solo respuestas formales de participantes reales. El piloto valida el instrumento "
-                 "y no es evidencia de accesibilidad (doc. 27, §M). Sin tasa de éxito global."),
+        "nota": "Solo respuestas formales de participantes objetivo reales. Sin tasa de éxito global.",
         **out,
     }

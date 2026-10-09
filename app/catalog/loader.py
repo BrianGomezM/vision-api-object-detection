@@ -69,7 +69,7 @@ class PruebaTecnica(_Model):
 
 class PruebaUsuario(_Model):
     id: str
-    pista: Literal["objetivo", "piloto"]
+    pista: Literal["objetivo"]
     nombre: str
     objetivo: str
     guion_investigador: str
