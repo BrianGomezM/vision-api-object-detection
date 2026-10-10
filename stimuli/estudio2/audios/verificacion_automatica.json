@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-10-10T04:41:21.424920+00:00",
+  "fecha": "2026-10-10T20:10:25.501437+00:00",
   "modelo_transcripcion": "groq:whisper-large-v3",
   "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
   "resultados": [
@@ -65,11 +65,11 @@
     },
     {
       "stimulus_id": "EST2-E3",
-      "palabras_narrativa": 57,
-      "diferencias_palabras": 5,
-      "wer": 0.088,
+      "palabras_narrativa": 73,
+      "diferencias_palabras": 3,
+      "wer": 0.041,
       "coincide": false,
-      "transcripcion": "Parece que estás en una sala de estar. Sofá frente a ti aproximadamente tres pasos. Silla a tu derecha aproximadamente cuatro pasos. Dos personas, una planta en maceta y un jarrón un poco más adelante frente a ti aproximadamente seis pasos. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda con cuidado.",
+      "transcripcion": "Parece que estás en una sala de estar. Silla a tu derecha aproximadamente dos pasos. Sofá frente a ti aproximadamente cuatro pasos. Dos plantas en maceta un poco más adelante, una a tu izquierda y otra a tu derecha aproximadamente cinco pasos. Televisor un poco más adelante frente a ti. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -80,16 +80,6 @@
           "op": "delete",
           "narrativa": "a",
           "audio": ""
-        },
-        {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "una"
-        },
-        {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "un"
         },
         {
           "op": "delete",
@@ -100,11 +90,11 @@
     },
     {
       "stimulus_id": "EST2-E4",
-      "palabras_narrativa": 57,
-      "diferencias_palabras": 5,
-      "wer": 0.088,
+      "palabras_narrativa": 73,
+      "diferencias_palabras": 3,
+      "wer": 0.041,
       "coincide": false,
-      "transcripcion": "Parece que estás en una sala de estar. Sofá frente a ti aproximadamente tres pasos. Silla a tu izquierda aproximadamente cuatro pasos. Dos personas, una planta en maceta y un jarrón un poco más adelante frente a ti aproximadamente seis pasos. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+      "transcripcion": "Parece que estás en una sala de estar. Silla a tu izquierda aproximadamente dos pasos. Sofá frente a ti aproximadamente cuatro pasos. Dos plantas en maceta un poco más adelante, una a tu derecha y otra a tu izquierda aproximadamente cinco pasos. Televisor un poco más adelante frente a ti. El paso al frente está bloqueado. Puedes avanzar hacia la derecha. tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -115,16 +105,6 @@
           "op": "delete",
           "narrativa": "a",
           "audio": ""
-        },
-        {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "una"
-        },
-        {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "un"
         },
         {
           "op": "delete",

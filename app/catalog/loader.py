@@ -163,6 +163,9 @@ class AudioCongelado(_Model):
     intento: int
     backend_commit: str | None = None
     detecciones: list[dict] = Field(default_factory=list)
+    # sha256 de la imagen con la que se generó (audios sustituidos desde 2026-10-10). Si no coincide
+    # con la imagen vigente, el audio describe otra escena y no se sirve.
+    imagen_sha256: str | None = None
 
 
 class CongeladosFile(_Model):
@@ -172,6 +175,8 @@ class CongeladosFile(_Model):
     configuracion: dict = Field(default_factory=dict)
     verificacion_fidelidad: dict | None = None
     estimulos: list[AudioCongelado]
+    actualizado_en: str | None = None
+    reemplazos: list[dict] = Field(default_factory=list)   # audios sustituidos (archivados en reemplazados/)
 
 
 class Catalog(BaseModel):
@@ -336,6 +341,8 @@ def _load_frozen(path: Path | None, stimuli: dict[str, Stimulus]):
             bad[a.stimulus_id] = "archivo ausente"
         elif _sha256(f) != a.sha256:
             bad[a.stimulus_id] = "sha256 no coincide"
+        elif a.imagen_sha256 and a.imagen_sha256 != stimuli[a.stimulus_id].sha256:
+            bad[a.stimulus_id] = "el audio se generó con otra imagen"
         else:
             ok[a.stimulus_id] = a
     return ok, base, _sha256(path), bad
