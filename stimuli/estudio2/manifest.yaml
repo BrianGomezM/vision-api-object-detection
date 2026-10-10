@@ -2,11 +2,43 @@
 # Condiciones de diseño y referencias al ground truth: uso interno del servidor.
 schema_version: 1
 dataset_id: estudio2
-name: Estudio con usuarios v2 — escenas E1–E5 (más objetos por escena)
+name: Estudio con usuarios v2 — escenas E1–E5 (más objetos por escena; E3/E4 en v3)
 status: ESTUDIO_V2
 source:
   repository: generador_escenas_experimentales
-  commit: 346191e1c0612119c93f0beae5f64578db85046f
+  por_escena:
+    E1:
+      commit: 346191e1c0612119c93f0beae5f64578db85046f
+      carpeta: output
+    E2:
+      commit: 346191e1c0612119c93f0beae5f64578db85046f
+      carpeta: output
+    E3:
+      commit: 84eb7c22fb69da962a546065c45675603e60c8ea
+      carpeta: output/estudio_v3
+    E4:
+      commit: 84eb7c22fb69da962a546065c45675603e60c8ea
+      carpeta: output/estudio_v3
+    E5:
+      commit: 346191e1c0612119c93f0beae5f64578db85046f
+      carpeta: output
+reemplazos:
+- stimulus_id: EST2-E3
+  fecha: '2026-10-10'
+  commit_anterior: 346191e1c0612119c93f0beae5f64578db85046f
+  sha256_anterior: c44792ca0c870466f8acb94969301d44475c92e8d1eaf420b21037498d1266e6
+  motivo: 'ruta libre ambigua o no verificada; v3: sala con sofá divisor y puertas
+    laterales, una sola ruta libre (E3 izquierda, E4 derecha) comprobada con corredores
+    0,8 × 3 m y con VisionNav; se cambió el sillón porque el anterior también se detectaba
+    como sofá'
+- stimulus_id: EST2-E4
+  fecha: '2026-10-10'
+  commit_anterior: 346191e1c0612119c93f0beae5f64578db85046f
+  sha256_anterior: d3a5ea5e3363c4ec1f5875e2cbd7726a19674dab08996855f283eec5e662ee36
+  motivo: 'ruta libre ambigua o no verificada; v3: sala con sofá divisor y puertas
+    laterales, una sola ruta libre (E3 izquierda, E4 derecha) comprobada con corredores
+    0,8 × 3 m y con VisionNav; se cambió el sillón porque el anterior también se detectaba
+    como sofá'
 image_format:
   width: 800
   height: 450
@@ -51,6 +83,7 @@ stimuli:
   ground_truth_ref:
     path: output/ground_truth/E1.json
     sha256: 635d1feb6e280cf9153c04faff31032436982d2e8c299c60e7f11316124961b0
+    commit: 346191e1c0612119c93f0beae5f64578db85046f
     scene_spec_sha256: 06dcebcfc2f43b21ec1e0207cf1b4e9a054e468d43fffcf9f99a9e12c395b7de
 - stimulus_id: EST2-E2
   scene_id: E2
@@ -77,107 +110,168 @@ stimuli:
   ground_truth_ref:
     path: output/ground_truth/E2.json
     sha256: 70255d8b66b990f3be005e549a97c161e28e5354a971e09ea9c15054fb93eab6
+    commit: 346191e1c0612119c93f0beae5f64578db85046f
     scene_spec_sha256: 439da1424484fb607206ef13d9291df00666851e0b814c571704833ec2105162
 - stimulus_id: EST2-E3
   scene_id: E3
   block: E
   file: E3.png
-  sha256: c44792ca0c870466f8acb94969301d44475c92e8d1eaf420b21037498d1266e6
-  bytes: 75890
+  sha256: f0c5e8f4b50a21b1f03c7544014a27f7f5e60372b8ac017ac7eccb0885beeaa3
+  bytes: 358468
   design:
     objects:
     - id: sofa_01
       class: couch
       horizontal: center
       depth_condition: near
-      distance_m: 3.02
+      distance_m: 3.280954
       occlusion_O: 0.0
-      relation: null
-    - id: chair_01
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: armchair_01
       class: chair
       horizontal: right
       depth_condition: near
-      distance_m: 3.02
-      occlusion_O: 0.0
-      relation: null
-    - id: person_01
-      class: person
-      horizontal: right
-      depth_condition: far
-      distance_m: 7.14
-      occlusion_O: 0.165314
-      relation: null
-    - id: plant_01
-      class: potted plant
-      horizontal: center
-      depth_condition: far
-      distance_m: 7.14
-      occlusion_O: 0.063685
-      relation: null
-    - id: person_02
-      class: person
-      horizontal: center
-      depth_condition: far
-      distance_m: 7.18118
+      distance_m: 3.098316
       occlusion_O: 0.0
       relation:
-        type: beside
-        target: plant_01
-        side: left
+        type: free
+        target: null
+        side: null
+    - id: table_tv
+      class: side table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.662807
+      occlusion_O: 0.206037
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: tv_01
+      class: tv
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.582133
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: table_tv
+        side: null
+    - id: plant_01
+      class: potted plant
+      horizontal: left
+      depth_condition: far
+      distance_m: 5.989929
+      occlusion_O: 0.0
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: plant_02
+      class: potted plant
+      horizontal: right
+      depth_condition: far
+      distance_m: 5.989929
+      occlusion_O: 0.09484
+      relation:
+        type: free
+        target: null
+        side: null
   ground_truth_ref:
-    path: output/ground_truth/E3.json
-    sha256: 7e31f1d32f9d89da53190af6a738f8b1dceb8aefb84d6a1affbcf607254763bc
-    scene_spec_sha256: 63d6ef26e66e296df622dca2fe76684ad750ef7244e8df03737d087e35d23e15
+    path: output/estudio_v3/ground_truth/E3.json
+    sha256: fd97222a08b50e9696fd0508cbf58bc2379297580b28af275f00388c836e608a
+    commit: 84eb7c22fb69da962a546065c45675603e60c8ea
+    scene_spec_sha256: 7c7f28354e158053624f378489006d581fd6622aaa8a0417d58754a3d76fa9ef
+  routes:
+    free_sides:
+    - left
+    blocked_sides:
+    - center
+    - right
+    criterion: rutas_v1
 - stimulus_id: EST2-E4
   scene_id: E4
   block: E
   file: E4.png
-  sha256: d3a5ea5e3363c4ec1f5875e2cbd7726a19674dab08996855f283eec5e662ee36
-  bytes: 75182
+  sha256: 56bfb32f6d3a957758720a3c358bca2e068b9942068d4075a5dba0763b4243cd
+  bytes: 357973
   design:
     objects:
     - id: sofa_01
       class: couch
       horizontal: center
       depth_condition: near
-      distance_m: 3.02
+      distance_m: 3.280954
       occlusion_O: 0.0
-      relation: null
-    - id: chair_01
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: armchair_01
       class: chair
       horizontal: left
       depth_condition: near
-      distance_m: 3.02
-      occlusion_O: 0.0
-      relation: null
-    - id: person_01
-      class: person
-      horizontal: left
-      depth_condition: far
-      distance_m: 7.14
-      occlusion_O: 0.163076
-      relation: null
-    - id: plant_01
-      class: potted plant
-      horizontal: center
-      depth_condition: far
-      distance_m: 7.14
-      occlusion_O: 0.063685
-      relation: null
-    - id: person_02
-      class: person
-      horizontal: center
-      depth_condition: far
-      distance_m: 7.179882
+      distance_m: 3.098316
       occlusion_O: 0.0
       relation:
-        type: beside
-        target: plant_01
-        side: right
+        type: free
+        target: null
+        side: null
+    - id: table_tv
+      class: side table
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.662807
+      occlusion_O: 0.206037
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: tv_01
+      class: tv
+      horizontal: center
+      depth_condition: medium
+      distance_m: 5.582133
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: table_tv
+        side: null
+    - id: plant_01
+      class: potted plant
+      horizontal: left
+      depth_condition: far
+      distance_m: 5.989929
+      occlusion_O: 0.034075
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: plant_02
+      class: potted plant
+      horizontal: right
+      depth_condition: far
+      distance_m: 5.989929
+      occlusion_O: 0.0
+      relation:
+        type: free
+        target: null
+        side: null
   ground_truth_ref:
-    path: output/ground_truth/E4.json
-    sha256: d64e37d6d5b2d49914e7fc81ed43f5186f7dcf70e252bc86543189a58e369d85
-    scene_spec_sha256: 45539449fea496c6f909640b2341d203c34fe46fea10050c961fc4006deaea9b
+    path: output/estudio_v3/ground_truth/E4.json
+    sha256: b084ce21ff55f7a1711f79910865645888ded868db6c11c1439d2c7a43ae142e
+    commit: 84eb7c22fb69da962a546065c45675603e60c8ea
+    scene_spec_sha256: cb2983e44f7673895fb37b4b9e437ce7335d4ab5846f16fefb48669ce1b177dc
+  routes:
+    free_sides:
+    - right
+    blocked_sides:
+    - left
+    - center
+    criterion: rutas_v1
 - stimulus_id: EST2-E5
   scene_id: E5
   block: E
@@ -217,4 +311,5 @@ stimuli:
   ground_truth_ref:
     path: output/ground_truth/E5.json
     sha256: ca7bd2ff05d7bd358bb4ea1d9f4138da32bad4498b75d9a9e3c938190c9f2ab7
+    commit: 346191e1c0612119c93f0beae5f64578db85046f
     scene_spec_sha256: d072e4279f508918549aab6eefdff3334a101cc4d550dc44c66de7631368bf05
