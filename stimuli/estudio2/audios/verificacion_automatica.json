@@ -1,0 +1,162 @@
+{
+  "fecha": "2026-10-10T04:41:21.424920+00:00",
+  "modelo_transcripcion": "groq:whisper-large-v3",
+  "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
+  "resultados": [
+    {
+      "stimulus_id": "DS1-A2",
+      "palabras_narrativa": 15,
+      "diferencias_palabras": 1,
+      "wer": 0.067,
+      "coincide": false,
+      "transcripcion": "Silla a tu izquierda aproximadamente cinco pasos. Puedes avanzar hacia el frente con cuidado.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E1",
+      "palabras_narrativa": 49,
+      "diferencias_palabras": 3,
+      "wer": 0.061,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Silla a tu izquierda aproximadamente cuatro pasos. Sofá a tu derecha aproximadamente cuatro pasos. Dos personas frente a ti aproximadamente cinco y seis pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E2",
+      "palabras_narrativa": 36,
+      "diferencias_palabras": 2,
+      "wer": 0.056,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Persona cerca a tu izquierda aproximadamente dos pasos. Sofá un poco más adelante, a tu derecha aproximadamente cinco pasos. ¿Puedes avanzar hacia el frente con cuidado?",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E3",
+      "palabras_narrativa": 57,
+      "diferencias_palabras": 5,
+      "wer": 0.088,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Sofá frente a ti aproximadamente tres pasos. Silla a tu derecha aproximadamente cuatro pasos. Dos personas, una planta en maceta y un jarrón un poco más adelante frente a ti aproximadamente seis pasos. El paso al frente está bloqueado. Puedes avanzar hacia la izquierda con cuidado.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "una"
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "un"
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E4",
+      "palabras_narrativa": 57,
+      "diferencias_palabras": 5,
+      "wer": 0.088,
+      "coincide": false,
+      "transcripcion": "Parece que estás en una sala de estar. Sofá frente a ti aproximadamente tres pasos. Silla a tu izquierda aproximadamente cuatro pasos. Dos personas, una planta en maceta y un jarrón un poco más adelante frente a ti aproximadamente seis pasos. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "una"
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "un"
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E5",
+      "palabras_narrativa": 42,
+      "diferencias_palabras": 3,
+      "wer": 0.071,
+      "coincide": false,
+      "transcripcion": "Silla frente a ti aproximadamente 5 pasos. Persona cerca a tu derecha aproximadamente 5 pasos. Planta en maceta cerca a tu izquierda aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    }
+  ]
+}

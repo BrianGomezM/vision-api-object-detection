@@ -140,24 +140,27 @@ def session_rows(sesion: dict, resumen: dict) -> list[list]:
 
 
 RESP_HEADER = [
-    "response_id", "modo", "prueba", "nombre_prueba", "estimulo", "origen_audio", "audio_sha256", "tts_modelo",
+    "response_id", "vigente", "reemplaza", "modo", "prueba", "nombre_prueba", "estimulo", "origen_audio", "audio_sha256", "tts_modelo",
     "narrativa", "reproducciones", "repeticiones", "aclaraciones", "tiempo_respuesta_ms", "transcripcion",
     "objetos_identificados", "objetos_referencia", "pct_objetos_identificados", "objetos_omitidos", "objetos_inventados",
     "ubicaciones_correctas", "ubicaciones_evaluadas", "distancias_correctas", "distancias_evaluadas",
     "relaciones_comprendidas", "relaciones_evaluadas",
     "decision_seleccionada", "decision_narrativa", "decision_sigue_narrativa", "decision_esperada_diseno",
-    "decision_coincide_diseno", "percepcion_cambio", "criterios", "comentarios", "observaciones",
+    "decision_coincide_diseno", "decision_elige_bloqueada", "percepcion_cambio", "cambios_percibidos", "cambio_otro",
+    "criterios", "comentarios", "observaciones",
     "incidencias", "errores_derivados", "grabacion_participante", "registrado_en",
 ]
 
 
 def response_rows(respuestas: list[dict]) -> list[list]:
     rows = [RESP_HEADER]
+    corregidas = {r.get("reemplaza") for r in respuestas if r.get("reemplaza")}
     for r in respuestas:
         m, d, e = r.get("metricas") or {}, r.get("decision") or {}, r.get("ejecucion") or {}
         g = r.get("grabacion_participante") or {}
         rows.append([
-            r["response_id"], r["modo"], r["prueba"]["id"], r["prueba"].get("nombre"),
+            r["response_id"], r["response_id"] not in corregidas, r.get("reemplaza"), r["modo"],
+            r["prueba"]["id"], r["prueba"].get("nombre"),
             (r.get("estimulo") or {}).get("stimulus_id") or (r.get("estimulo") or {}).get("nombre_archivo"),
             e.get("origen_audio"), (e.get("audio") or {}).get("sha256"), e.get("tts_modelo"), e.get("narrativa_final"),
             len(r.get("reproducciones") or []), m.get("repeticiones_audio"), m.get("aclaraciones"), m.get("tiempo_respuesta_ms"),
@@ -167,7 +170,9 @@ def response_rows(respuestas: list[dict]) -> list[list]:
             m.get("ubicaciones_correctas"), m.get("ubicaciones_evaluadas"), m.get("distancias_correctas"), m.get("distancias_evaluadas"),
             m.get("relaciones_comprendidas"), m.get("relaciones_evaluadas"),
             d.get("seleccionada"), d.get("direccion_narrativa"), d.get("coincide_con_narrativa"), d.get("esperada"),
-            d.get("correcto"), r.get("percepcion_cambio"), r.get("criterios"), r.get("comentarios"), r.get("observaciones"),
+            d.get("correcto"), d.get("elige_direccion_bloqueada"), r.get("percepcion_cambio"),
+            "; ".join(r.get("cambios_percibidos") or []), r.get("cambio_otro"),
+            r.get("criterios"), r.get("comentarios"), r.get("observaciones"),
             "; ".join(f'{x["tipo"]}: {x["descripcion"]}' for x in r.get("errores") or []),
             "; ".join(f'{x["tipo"]}: {x["elemento"]}' for x in r.get("errores_derivados") or []),
             g.get("archivo"), r.get("registrado_en"),
@@ -212,12 +217,16 @@ Exportada el {fecha} (UTC) desde VisionNav — Evaluación con usuarios.
 evidencia_{codigo}.xlsx
   Sesion              ficha del participante, condiciones, consentimiento y cierre.
   Respuestas          una fila por respuesta (formales y práctica/ensayos), con sus métricas.
+                      «vigente» = falso si la respuesta se corrigió después (la corrección indica
+                      en «reemplaza» qué respuesta sustituye). El resumen solo usa las vigentes.
   Codificacion        una fila por objeto, objeto inventado o relación codificada.
   Resumen_por_prueba  conteos descriptivos de las respuestas FORMALES (sin tasa de éxito global).
 sesion.json, responses.jsonl
   Registro original del servidor, sin modificar.
 grabacion_consentimiento.*
   Lectura del consentimiento y respuestas del participante (si se almacenó).
+grabacion_cierre.*
+  Comentarios finales del participante (opinión, sugerencias y cómo se sintió).
 respuestas/formales/R00N/   respuestas formales: evidencia.
 respuestas/ensayos/R00N/    práctica y ensayos: NO son evidencia.
   audio_narrativa_api.*       audio que escuchó el participante (congelado; mismo sha256 que en el registro).

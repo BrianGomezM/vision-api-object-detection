@@ -1,13 +1,13 @@
 """
 scripts/study/verify_frozen_audio.py
 
-Verificación AUTOMÁTICA de fidelidad de los audios congelados (stimuli/dataset1/estudio/):
+Verificación AUTOMÁTICA de fidelidad de los audios congelados (conjunto vigente, FROZEN_AUDIO_PATH):
 transcribe cada MP3 con Whisper (Groq, whisper-large-v3, español) y compara la
 transcripción, palabra por palabra, con la narrativa congelada.
 
 Es un apoyo, no sustituye la escucha humana (doc. 33 §9, criterio 6): Whisper puede
 equivocarse en números o en palabras poco frecuentes. Resultado en
-stimuli/dataset1/estudio/verificacion_automatica.json.
+<carpeta del conjunto>/verificacion_automatica.json.
 
 Uso (requiere GROQ_API_KEY):
     python scripts/study/verify_frozen_audio.py
@@ -29,7 +29,10 @@ sys.path.insert(0, str(REPO))
 
 import yaml  # noqa: E402
 
-DIR = REPO / "stimuli" / "dataset1" / "estudio"
+from app.catalog.loader import FROZEN_AUDIO_PATH  # noqa: E402
+
+# Conjunto vigente (estudio v2: stimuli/estudio2/audios/).
+DIR = FROZEN_AUDIO_PATH.parent
 MODEL = "whisper-large-v3"
 NUM = {"1": "uno", "2": "dos", "3": "tres", "4": "cuatro", "5": "cinco", "6": "seis", "7": "siete", "8": "ocho", "9": "nueve"}
 
