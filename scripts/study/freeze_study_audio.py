@@ -25,6 +25,12 @@ Uso (requiere GROQ_API_KEY, AZURE_SPEECH_KEY y AZURE_SPEECH_REGION en .env):
     python scripts/study/freeze_study_audio.py --dry-run  # muestra qué generaría
 
 No sobrescribe un conjunto existente: para generar otro, mueva primero la carpeta.
+
+Sustituir estímulos concretos cuya IMAGEN cambió (sin tocar los demás audios):
+    python scripts/study/freeze_study_audio.py --replace EST2-E3,EST2-E4 --motivo "..."
+El audio anterior se mueve a <conjunto>/reemplazados/<id>-<sha8>.mp3 (no se borra) y se anota en
+`reemplazos` del congelados.yaml (sha256, narrativa y motivo). La verificación de fidelidad vuelve
+a «pendiente» para los audios nuevos. Nunca se reutiliza un audio anterior.
 """
 
 from __future__ import annotations
@@ -97,7 +103,11 @@ def _attempt(stimulus, pipeline, tts_service, groq_client):
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--replace", help="ids separados por comas: regenera solo esos audios")
+    ap.add_argument("--motivo", help="motivo de la sustitución (obligatorio con --replace)")
     args = ap.parse_args()
+    if args.replace:
+        return replace(args)
 
     catalog = load_catalog(frozen_path=None)
     ids = [s for p in catalog.source.pruebas_usuario if isinstance(p.estimulos, list) for s in p.estimulos]
@@ -172,6 +182,92 @@ def main() -> int:
         + yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False), encoding="utf-8")
     print(f"Congelados {len(accepted)}/{len(ids)} → {FROZEN_AUDIO_PATH}")
     return 0 if len(accepted) == len(ids) else 1
+
+
+def replace(args) -> int:
+    if not args.motivo:
+        print("--motivo es obligatorio con --replace")
+        return 2
+    ids = [s.strip() for s in args.replace.split(",") if s.strip()]
+    catalog = load_catalog(frozen_path=None)
+    bad = [s for s in ids if s not in catalog.stimuli or not catalog.stimuli[s].valid]
+    if bad:
+        print(f"Estímulos inexistentes o con hash inválido: {bad}")
+        return 2
+    if not FROZEN_AUDIO_PATH.exists():
+        print("No hay un conjunto congelado que modificar.")
+        return 3
+    out_dir = FROZEN_AUDIO_PATH.parent
+    manifest = yaml.safe_load(FROZEN_AUDIO_PATH.read_text(encoding="utf-8"))
+    current = {e["stimulus_id"]: e for e in manifest["estimulos"]}
+    missing = [s for s in ids if s not in current]
+    if missing:
+        print(f"No están en el conjunto (use el modo normal): {missing}")
+        return 2
+    print(f"Sustituir: {ids}\nDestino: {out_dir}")
+    if args.dry_run:
+        return 0
+
+    from app.core import pipeline
+    from app.services import tts_service
+    from app.utils.groq_client import GROQ_MODEL, get_groq_client
+    if not tts_service.is_azure_tts_configured():
+        print("Azure Speech no está configurado (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION).")
+        return 4
+    commit, dirty = _commit()
+    log = out_dir / "intentos.jsonl"
+    new, failed = {}, []
+    for sid in ids:
+        st = catalog.stimuli[sid]
+        for n in range(1, MAX_ATTEMPTS + 1):
+            ok, motivo, data = _attempt(st, pipeline, tts_service, get_groq_client())
+            audio = data.pop("audio", None)
+            entry = {"stimulus_id": sid, "intento": n, "fecha": _now(), "aceptado": ok, "motivo_rechazo": motivo,
+                     "sustitucion": True, "imagen_sha256": st.sha256,
+                     "narrativa_sha256": hashlib.sha256(data["narrativa_final"].encode("utf-8")).hexdigest(), **data}
+            with log.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            print(f"{sid} intento {n}: {'ACEPTADO' if ok else 'rechazado: ' + motivo}")
+            if ok:
+                new[sid] = (audio, {
+                    "stimulus_id": sid, "archivo": f"{sid}.mp3", "sha256": hashlib.sha256(audio).hexdigest(),
+                    "content_type": "audio/mpeg", "tamano_bytes": len(audio),
+                    "duracion_s": round(len(audio) * 8 / (MP3_KBPS * 1000), 1),
+                    "narrativa_final": data["narrativa_final"],
+                    "instruccion_movimiento": data["instruccion_movimiento"],
+                    "tts_modelo": STUDY_TTS_MODEL, "llm_modelo": GROQ_MODEL, "origen_descripcion": "llm",
+                    "generado_en": entry["fecha"], "intento": n, "backend_commit": commit,
+                    "imagen_sha256": st.sha256, "detecciones": data["detecciones"],
+                })
+                break
+        else:
+            failed.append(sid)
+    if failed:
+        print(f"FALLIDOS {failed}: no se sustituye nada (el conjunto queda como estaba).")
+        return 1
+
+    old_dir = out_dir / "reemplazados"
+    old_dir.mkdir(exist_ok=True)
+    reemplazos = manifest.setdefault("reemplazos", [])
+    for sid, (audio, rec) in new.items():
+        old = current[sid]
+        archived = old_dir / f"{sid}-{old['sha256'][:8]}.mp3"
+        (out_dir / old["archivo"]).replace(archived)
+        (out_dir / rec["archivo"]).write_bytes(audio)
+        reemplazos.append({"stimulus_id": sid, "fecha": _now(), "motivo": args.motivo,
+                           "archivo_anterior": archived.relative_to(out_dir).as_posix(),
+                           "sha256_anterior": old["sha256"], "narrativa_anterior": old["narrativa_final"],
+                           "sha256_nuevo": rec["sha256"], "backend_commit": commit, "arbol_con_cambios": dirty})
+        manifest["estimulos"] = [rec if e["stimulus_id"] == sid else e for e in manifest["estimulos"]]
+    manifest["actualizado_en"] = _now()
+    manifest["verificacion_fidelidad"] = {
+        "estado": "pendiente", "verificado_por": None, "fecha": None,
+        "nota": f"audios nuevos por sustitución: {sorted(new)}; escuchar y confirmar antes de la sesión"}
+    FROZEN_AUDIO_PATH.write_text(
+        "# GENERADO por scripts/study/freeze_study_audio.py — NO editar salvo verificacion_fidelidad.\n"
+        + yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    print(f"Sustituidos {sorted(new)} → {FROZEN_AUDIO_PATH}")
+    return 0
 
 
 if __name__ == "__main__":
