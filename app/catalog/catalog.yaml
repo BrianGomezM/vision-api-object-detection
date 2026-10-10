@@ -40,6 +40,14 @@ datasets:
     descripcion: >-
       18 escenas sintéticas con cámara, posiciones horizontales y profundidades
       controladas. Condición geométrica conocida por diseño (generador, commit ae85f90).
+  - id: estudio2
+    nombre: "Estudio con usuarios v2 — escenas E1–E5"
+    manifest: stimuli/estudio2/manifest.yaml
+    estado: ESTUDIO_V2
+    descripcion: >-
+      Cinco escenas sintéticas del mismo generador (bloque E, 2026-10-10) con cuatro o cinco
+      objetos, pensadas para cada prueba del estudio con usuarios: varios objetos a distintas
+      distancias, una sala con una sola salida libre y la misma sala con los objetos movidos.
   - id: dataset2
     nombre: "Dataset 2 — variabilidad visual (robustez)"
     manifest: null
@@ -105,96 +113,101 @@ pruebas_tecnicas:
 # Tareas del estudio con usuarios (Objetivo Específico 3).
 # Desde el 2026-10-09 el estudio se aplica SOLO a participantes objetivo (decisión de los
 # directores): se retiraron la prueba piloto y sus preguntas PIL-01…05.
-# Revisadas el 2026-10-01, antes de cualquier sesión con
-# participantes reales: guiones literales, una pregunta por constructo y el campo
-# "codificacion" (qué se codifica de la respuesta). Ver docs/EVALUACION_USUARIOS.md §0.
+# Estudio v2 (2026-10-10), tras la sesión de prueba con la profesora:
+#   - Escenas nuevas (stimuli/estudio2, E1–E5) con más objetos: las anteriores tenían dos
+#     objetos, se repetían y no permitían reconocer el lugar.
+#   - Cada prueba sigue el mismo orden: «le pondré un audio, escúchelo con atención; al
+#     terminar le haré unas preguntas». Preguntas cortas y en lenguaje cotidiano.
+#   - El investigador ya no transcribe (la respuesta queda grabada): marca respuestas
+#     definidas de antemano según la narrativa (referencia en asignaciones.yaml).
+#   - OBJ-03/OBJ-04 admiten varias direcciones (por dónde podría avanzar).
 #   codificacion: objetos    → ¿nombró cada objeto de la narrativa? (omisiones, invenciones)
-#                 relaciones → ¿comprendió las relaciones entre objetos de la narrativa?
+#                 relaciones → ¿respondió bien la pregunta de relación (objeto más lejano)?
 #                 ubicacion  → ¿el lado que dijo coincide con el de la narrativa?
 #                 distancia  → ¿la distancia que dijo coincide con la de la narrativa?
-#                 cambio     → ¿percibió el cambio entre dos escenas consecutivas?
+#                 cambio     → ¿percibió los cambios entre dos escenas consecutivas?
 # La referencia de toda la codificación es la NARRATIVA escuchada (Ref-N), no la imagen.
-# Los estímulos quedan pendientes aquí y se asignan en asignaciones.yaml.
+# Escala de todas las valoraciones: 1 nada, 2 poco, 3 más o menos, 4 bastante, 5 mucho.
 pruebas_usuario:
   - id: OBJ-01
     pista: objetivo
-    nombre: "Identificación de objetos y relación entre ellos"
-    objetivo: "Medir qué proporción de los objetos mencionados en la narrativa recuerda el participante, si menciona objetos que la narrativa no dijo y si comprende la relación espacial entre ellos."
-    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "¿Qué objetos mencionó la descripción?". Anota la respuesta tal cual, sin corregir ni dar pistas. Después pregunta: "¿Cómo están ubicados esos objetos entre sí?". Repite el audio solo si el participante lo pide y registra cada aclaración que solicite.'
+    nombre: "Objetos de la escena y cuál está más lejos"
+    objetivo: "Saber cuántos de los objetos de la descripción recuerda el participante, si menciona objetos que no estaban y si identifica cuál está más lejos de él."
+    guion_investigador: 'Diga: "Le pondré un audio. Escúchelo con atención; al terminar le haré unas preguntas." Reproduzca el audio una vez. Pregunte: "¿Qué objetos mencionó la descripción?" y marque cada objeto que nombre. Después pregunte: "De esos objetos, ¿cuál está más lejos de usted?". Repita el audio solo si el participante lo pide.'
     tipo: imagen
     codificacion: [objetos, relaciones]
     metricas: [M-USR-ID, M-USR-ESP]
-    metricas_texto: ["% de objetos de la narrativa identificados", "objetos omitidos", "objetos inventados", "% de relaciones comprendidas"]
+    metricas_texto: ["objetos recordados de la descripción", "objetos mencionados que no estaban", "acierta el objeto más lejano"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-02
     pista: objetivo
-    nombre: "Ubicación egocéntrica de un objeto"
-    objetivo: "Medir si el participante ubica un objeto respecto a sí mismo (izquierda, frente o derecha) y a qué distancia, tal como lo indicó la narrativa."
-    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "¿Dónde se encuentra la silla respecto a usted: a su izquierda, al frente o a su derecha?". Después pregunta: "¿Aproximadamente a qué distancia está?". Repite el audio solo si el participante lo pide.'
+    nombre: "Dónde está cada objeto"
+    objetivo: "Saber si el participante ubica cada objeto respecto a sí mismo (izquierda, al frente o derecha) y a cuántos pasos, tal como lo dijo la descripción."
+    guion_investigador: 'Diga: "Le pondré otro audio. Escúchelo con atención; al terminar le haré unas preguntas." Reproduzca el audio una vez. Para cada objeto pregunte: "¿Dónde está [objeto]: a su izquierda, al frente o a su derecha?" y "¿A cuántos pasos, más o menos?". Repita el audio solo si el participante lo pide.'
     tipo: imagen
     codificacion: [ubicacion, distancia]
     metricas: [M-USR-ESP]
-    metricas_texto: ["ubicación coincidente con la narrativa", "distancia coincidente con la narrativa", "repeticiones de audio"]
+    metricas_texto: ["lado coincidente con la descripción", "pasos coincidentes con la descripción (±1)", "repeticiones del audio"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-03
     pista: objetivo
-    nombre: "Decisión de dirección"
-    objetivo: "Evaluar si el participante comprende la indicación de movimiento de la narrativa y elige la dirección que esta indica. Como capa aparte se compara su elección con la dirección libre según el diseño de la escena."
-    guion_investigador: 'Reproduce el audio una vez. Cuando termine, pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?". Registra la opción que elija; si no elige ninguna, registra "No responde". Repite el audio solo si el participante lo pide.'
+    nombre: "Por dónde puede avanzar"
+    objetivo: "Saber si el participante identifica por dónde podría avanzar sin chocar, según la descripción. Se compara con la dirección que indicó la descripción y con las direcciones libres según el diseño de la escena."
+    guion_investigador: 'Diga: "Ahora escuchará la descripción de una sala. Escúchela con atención; al terminar le haré una pregunta." Reproduzca el audio una vez. Pregunte: "Según lo que escuchó, ¿por dónde podría avanzar sin chocar: por la izquierda, al frente o por la derecha? Puede decir más de una." Marque todas las que diga.'
     tipo: ruta
     codificacion: []
     metricas: [M-USR-RUTA]
-    metricas_texto: ["elección coincidente con la instrucción narrada", "elección coincidente con el diseño de la escena", "repeticiones de audio"]
+    metricas_texto: ["elige solo las direcciones libres", "elige alguna dirección bloqueada", "elige la dirección que indicó la descripción"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-04
     pista: objetivo
-    nombre: "Actualización de contexto"
-    objetivo: "Evaluar si el participante percibe que la disposición de los objetos cambió respecto a la escena anterior y qué dirección elige con la nueva descripción."
-    guion_investigador: 'Inmediatamente después de OBJ-03, reproduce el audio de la segunda escena sin anunciar que hubo un cambio. Primero pregunta: "¿Notó algo distinto respecto a la descripción anterior?" y registra la respuesta. Después pregunta: "Según lo que escuchó ahora, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?".'
+    nombre: "Qué cambió en la sala"
+    objetivo: "Saber si el participante actualiza su idea del lugar cuando la descripción cambia: si nota que los objetos se movieron y si cambia la dirección por la que avanzaría."
+    guion_investigador: 'Inmediatamente después de OBJ-03 diga: "Le pondré la descripción de la misma sala un momento después. Escúchela con atención." Reproduzca el audio una vez, sin anunciar qué cambió. Pregunte: "¿Notó algún cambio respecto a la descripción anterior?"; si dice que sí: "¿Qué cambió?". Después pregunte: "Y ahora, ¿por dónde podría avanzar sin chocar: por la izquierda, al frente o por la derecha? Puede decir más de una."'
     tipo: ruta
     codificacion: [cambio]
     metricas: [M-USR-RUTA]
-    metricas_texto: ["percepción del cambio", "elección coincidente con la instrucción narrada", "elección coincidente con el diseño de la escena"]
+    metricas_texto: ["nota el cambio", "cambios reales que menciona", "elige solo las direcciones libres de la nueva escena"]
     tipo_evaluacion: usuario_objetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-05
     pista: objetivo
-    nombre: "Calidad de la voz (independiente del contenido)"
-    objetivo: "Medir la calidad percibida de la voz sintética del estudio, separada de la comprensión del contenido. Se usa una narrativa corta del propio sistema, porque la voz evaluada es la del sistema."
-    guion_investigador: 'Reproduce el audio una vez. Indica: "Ahora no le preguntaré por lo que dijo la voz, sino por cómo sonó". Para cada criterio lee la pregunta y las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy) y registra el número.'
+    nombre: "Cómo suena la voz"
+    objetivo: "Conocer cómo percibe el participante la voz del sistema (claridad, ritmo, parecido a una persona y volumen), aparte del contenido."
+    guion_investigador: 'Diga: "Le pondré un último audio. Esta vez le preguntaré por cómo suena la voz, no por lo que dice." Reproduzca el audio una vez. Haga cada pregunta y lea siempre las opciones: 1 nada, 2 poco, 3 más o menos, 4 bastante, 5 mucho.'
     tipo: escala
     criterios: [inteligibilidad, velocidad, naturalidad, volumen]
     codificacion: []
     metricas: [M-USR-SUBJ]
-    metricas_texto: ["inteligibilidad", "velocidad percibida", "naturalidad", "comodidad del volumen"]
+    metricas_texto: ["facilidad para entender la voz", "ritmo cómodo", "parecido a una persona", "volumen cómodo"]
     tipo_evaluacion: usuario_subjetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-06
     pista: objetivo
-    nombre: "Suficiencia de la información"
-    objetivo: "Determinar si el participante percibe la cantidad de información de las descripciones como suficiente y si le parecieron repetitivas."
-    guion_investigador: 'Pregunta, pensando en todas las descripciones que escuchó: "¿Qué tan suficiente fue la información para hacerse una idea del lugar?" y "¿Qué tan repetitivas le parecieron?". Lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Faltó algo? ¿Sobró algo?" y anota la respuesta en los comentarios.'
+    nombre: "Información suficiente"
+    objetivo: "Saber si las descripciones dieron suficiente información para imaginar el lugar y si repetían cosas."
+    guion_investigador: 'Pregunte, pensando en todas las descripciones: "¿Le dieron suficiente información para imaginarse el lugar?" y "¿Sintió que repetían cosas?". Lea las opciones: 1 nada, 2 poco, 3 más o menos, 4 bastante, 5 mucho. Después pregunte: "¿Qué le faltó o qué le sobró?".'
     tipo: escala
     criterios: [suficiencia, redundancia]
     codificacion: []
     metricas: [M-USR-SUBJ]
-    metricas_texto: ["suficiencia de información", "redundancia percibida"]
+    metricas_texto: ["información suficiente", "sensación de repetición"]
     tipo_evaluacion: usuario_subjetiva
     estimulos: POR_DEFINIR
     disponibilidad: {investigador: true, participante: false}
   - id: OBJ-07
     pista: objetivo
-    nombre: "Utilidad percibida"
-    objetivo: "Obtener una valoración global de la utilidad de las descripciones y comentarios espontáneos."
-    guion_investigador: 'Pregunta: "En general, ¿qué tan útiles le parecen estas descripciones para orientarse en un espacio que no conoce?" y lee las cinco opciones (1 nada, 2 poco, 3 moderadamente, 4 bastante, 5 muy). Después pregunta: "¿Por qué?" y anota la respuesta en los comentarios.'
+    nombre: "Utilidad"
+    objetivo: "Conocer qué tan útiles le parecen las descripciones para moverse en un lugar que no conoce."
+    guion_investigador: 'Pregunte: "¿Qué tan útil le parecería una descripción así para moverse en un lugar que no conoce?" y lea las opciones: 1 nada, 2 poco, 3 más o menos, 4 bastante, 5 mucho. Después pregunte: "¿Por qué?".'
     tipo: escala
     criterios: [utilidad_general]
     codificacion: []

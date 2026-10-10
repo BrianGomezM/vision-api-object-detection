@@ -27,7 +27,9 @@ CATALOG_PATH = Path(__file__).resolve().parent / "catalog.yaml"
 ASSIGNMENTS_PATH = Path(__file__).resolve().parent / "asignaciones.yaml"
 # Audios CONGELADOS del estudio con usuarios (scripts/study/freeze_study_audio.py): en las
 # sesiones formales solo se reproducen estos archivos; nunca se regenera la narrativa.
-FROZEN_AUDIO_PATH = REPO_ROOT / "stimuli" / "dataset1" / "estudio" / "congelados.yaml"
+# Estudio v2 (2026-10-10): escenas E1–E5 con más objetos. El conjunto anterior
+# (stimuli/dataset1/estudio/) se conserva como histórico y ya no se carga.
+FROZEN_AUDIO_PATH = REPO_ROOT / "stimuli" / "estudio2" / "audios" / "congelados.yaml"
 
 Codificacion = Literal["objetos", "relaciones", "ubicacion", "distancia", "cambio"]
 
@@ -83,6 +85,10 @@ class PruebaUsuario(_Model):
     # "POR_DEFINIR" (pendiente), null (la tarea no usa estímulo) o lista de stimulus_id.
     estimulos: Literal["POR_DEFINIR"] | list[str] | None
     disponibilidad: Disponibilidad
+    # Respuesta de referencia SEGÚN LA NARRATIVA congelada (Ref-N), para que el investigador
+    # marque sin escribir: objetos, lado y pasos de cada uno, objeto más cercano, cambios
+    # entre escenas. Se define en asignaciones.yaml, junto al estímulo.
+    referencia: dict | None = None
 
     @property
     def estado_estimulos(self) -> Literal["por_definir", "no_requiere", "definido"]:
@@ -130,6 +136,7 @@ class Stimulus(BaseModel):
 class Asignacion(_Model):
     prueba_id: str
     estimulos: list[str] | None
+    referencia: dict | None = None
 
 
 class AsignacionesFile(_Model):
@@ -303,6 +310,8 @@ def _apply_assignments(source: CatalogFile, path: Path | None) -> tuple[str | No
     for a in data.asignaciones:
         if a.prueba_id not in tests:
             raise ValueError(f"asignaciones.yaml: la prueba {a.prueba_id} no existe en el catálogo")
+        if a.referencia is not None:
+            tests[a.prueba_id].referencia = a.referencia
         if tests[a.prueba_id].estimulos == "POR_DEFINIR":
             tests[a.prueba_id].estimulos = a.estimulos
             applied.append(a.prueba_id)

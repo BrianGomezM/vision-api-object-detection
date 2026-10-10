@@ -53,7 +53,10 @@ class TareaDecision(_Model):
     prueba_id: str
     pregunta: str = Field(..., min_length=1, max_length=500)
     alternativas: list[Alternativa] = Field(..., min_length=2)
-    esperada_por_estimulo: Union[dict[str, str], Literal["POR_DEFINIR"]]
+    # Dirección o direcciones LIBRES según el diseño de la escena. Desde el estudio v2
+    # (2026-10-10) el participante puede elegir varias, así que la referencia puede ser
+    # una lista; un texto equivale a una lista de un elemento.
+    esperada_por_estimulo: Union[dict[str, Union[str, list[str]]], Literal["POR_DEFINIR"]]
 
     @model_validator(mode="after")
     def _coherente(self):
@@ -61,7 +64,8 @@ class TareaDecision(_Model):
         if len(ids) != len(set(ids)) or NO_RESPONDE in ids:
             raise ValueError(f"{self.prueba_id}: alternativas repetidas o reservadas")
         if isinstance(self.esperada_por_estimulo, dict):
-            bad = {s: v for s, v in self.esperada_por_estimulo.items() if v not in ids}
+            bad = {s: v for s, v in self.esperada_por_estimulo.items()
+                   if not v or any(x not in ids for x in ([v] if isinstance(v, str) else v))}
             if bad:
                 raise ValueError(f"{self.prueba_id}: esperadas fuera de las alternativas {bad}")
         return self
@@ -106,19 +110,20 @@ class Decisiones(BaseModel):
                                   for f in self.source.fixtures_tecnicos if f.prueba_id == prueba_id],
         }
 
-    def expected(self, prueba_id: str, stimulus_id: str | None, *, fixtures: bool) -> tuple[str | None, str, str | None]:
-        """(esperada, fuente, fixture_id). fuente: "definicion" | "fixture_tecnico" | "no_definida".
+    def expected(self, prueba_id: str, stimulus_id: str | None, *, fixtures: bool) -> tuple[list[str] | None, str, str | None]:
+        """(direcciones libres, fuente, fixture_id). fuente: "definicion" | "fixture_tecnico" | "no_definida".
         Los fixtures solo se consultan si `fixtures` (sesión PTEST en modo ensayo)."""
         t = self.task(prueba_id)
         if t is None or stimulus_id is None:
             return None, "no_definida", None
         if isinstance(t.esperada_por_estimulo, dict) and stimulus_id in t.esperada_por_estimulo:
-            return t.esperada_por_estimulo[stimulus_id], "definicion", None
+            v = t.esperada_por_estimulo[stimulus_id]
+            return ([v] if isinstance(v, str) else list(v)), "definicion", None
         if fixtures:
             f = next((f for f in self.source.fixtures_tecnicos
                       if f.prueba_id == prueba_id and f.stimulus_id == stimulus_id), None)
             if f is not None:
-                return f.esperada, "fixture_tecnico", f.id
+                return [f.esperada], "fixture_tecnico", f.id
         return None, "no_definida", None
 
 

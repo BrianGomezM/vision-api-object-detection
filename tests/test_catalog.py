@@ -21,9 +21,10 @@ def _all_keys(obj):
 
 def test_catalogo_real_carga_y_verifica_dataset1():
     cat = loader.load_catalog()
-    assert len(cat.stimuli) == 18
+    # 18 escenas del Dataset 1 + 5 del estudio con usuarios v2 (bloque E).
+    assert len(cat.stimuli) == 23
     assert all(s.valid for s in cat.stimuli.values())
-    assert {s.block for s in cat.stimuli.values()} == {"A", "B", "C", "D"}
+    assert {s.block for s in cat.stimuli.values()} == {"A", "B", "C", "D", "E"}
     tests = cat.technical_tests()
     assert len(tests) == 18
     ids = [t["test_id"] for t in tests] + [p.id for p in cat.source.pruebas_usuario]
@@ -69,7 +70,7 @@ def test_imagen_alterada_queda_invalida(tmp_path):
     assert not cat.stimuli["DS1-B2"].valid
     assert "sha256" in cat.stimuli["DS1-B2"].invalid_reason
     assert not cat.stimuli["DS1-C1"].valid
-    assert sum(s.valid for s in cat.stimuli.values()) == 16
+    assert sum(s.valid for s in cat.stimuli.values()) == 21
     view = {s["stimulus_id"]: s for s in cat.researcher_view()["estimulos"]}
     assert view["DS1-B2"]["imagen_url"] is None
 
@@ -84,7 +85,7 @@ def test_metrica_no_declarada_falla(tmp_path):
 
 def test_endpoint_catalogo(make_client):
     body = make_client("development").get("/api/catalog").json()
-    assert len(body["estimulos"]) == 18
+    assert len(body["estimulos"]) == 23
     assert not (FORBIDDEN_KEYS & set(_all_keys(body)))
     body_p = make_client("development").get("/api/catalog?vista=participante").json()
     assert "pruebas" in body_p

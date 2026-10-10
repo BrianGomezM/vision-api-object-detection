@@ -4,9 +4,25 @@
 - **Fuente metodológica:** "27 - Preparación evaluación final Objetivo 3" (diseño exploratorio, una sesión por participante, sin navegación 3D; el participante escucha el audio de la API y responde verbalmente).
 - **Estado:** el instrumento está implementado y probado solo con datos técnicos (PTEST01, PTEST02). **La evaluación con usuarios objetivo NO se ha ejecutado.**
 - **Código:** backend `app/routes/study.py`, `app/catalog/loader.py`; cliente `components/study/*`, `lib/study-protocol.ts`, `hooks/use-study.ts`.
-- **Revisión del 2026-10-01:** ver §0. Prevalece sobre lo que digan las secciones siguientes.
+- **Estudio v2 (2026-10-10):** ver §0. Prevalece sobre la revisión del 2026-10-01 (§0-bis) y las secciones siguientes.
 
-## 0. Revisión del diseño de pruebas (2026-10-01)
+## 0. Estudio v2 (2026-10-10): cambios tras la sesión de prueba con la profesora
+
+Prevalece sobre §0-bis y las secciones siguientes. La detección, el pipeline, la narrativa, el TTS y el contrato de `POST /api/detect` **no cambian**; cambian las escenas del estudio y el instrumento.
+
+| # | Observación de la sesión de prueba | Cambio |
+|---|---|---|
+| 1 | El consentimiento debe ir primero: es el aval para cualquier pregunta | El asistente de sesión empieza por el consentimiento (lectura grabada + 4 afirmaciones) y después las preguntas iniciales. La «experiencia visual previa» se deduce del tipo de ceguera (una pregunta menos). |
+| 2 | Escenas con dos objetos, repetitivas; una «sala de estar» sin elementos suficientes | Escenas nuevas **E1–E5** del generador (bloque E, `stimuli/estudio2/`, importadas con `scripts/import_estudio2.py`), de 4 o 5 objetos, revisadas antes de congelar con `scripts/study/check_scenes.py`. Audios congelados nuevos en `stimuli/estudio2/audios/`. El conjunto anterior (`stimuli/dataset1/estudio/`) queda como histórico. |
+| 3 | El investigador se pierde: transcripción, «Volver a cargar objetos», relaciones sin saber qué llenar | Sin transcripción (la respuesta queda grabada). Cada prueba trae su **referencia** según la narrativa congelada (`asignaciones.yaml → referencia`): el investigador solo marca. OBJ-01: objetos nombrados (lista fija) + «¿cuál está más cerca?»; OBJ-02: lado y pasos de **dos** objetos (coincide si ±1 paso); OBJ-04: lista de cambios reales. Se retiró «Respuesta iniciada». |
+| 4 | Decisión de dirección: la escena anterior mandaba al frente con un sofá delante | E3: sofá y silla cerca al frente y a la derecha → solo la izquierda libre, y la narrativa dice «Puedes avanzar hacia la izquierda». E4: misma sala con la silla a la izquierda → solo la derecha libre. El participante puede decir **varias** direcciones (`decision.seleccionadas`); el servidor registra si eligió exactamente las libres (`correcto`), si eligió alguna bloqueada (`elige_direccion_bloqueada`) y si siguió la narrativa. |
+| 5 | Preguntas de las escalas muy técnicas («inteligibilidad», «suficiencia») | Preguntas en lenguaje cotidiano y anclas **1 nada · 2 poco · 3 más o menos · 4 bastante · 5 mucho**. |
+| 6 | El motivo de cierre y las preguntas finales en una pantalla aparte | «Cierre y comentarios finales» es el último elemento de la lista de pruebas: facilidad y esfuerzo (1–5), preguntas abiertas **grabadas** (`cierre.grabacion`, `grabacion_cierre.*`), motivo del cierre y agradecimiento. |
+| 7 | Al volver a una prueba se perdían las respuestas | Las pruebas abiertas quedan montadas durante la sesión. Una respuesta guardada se puede **editar**, también con la sesión finalizada: la corrección es una respuesta nueva con `reemplaza: Rxxx` (el servidor conserva ambas; el resumen y el consolidado solo usan las vigentes; el Excel marca `vigente`). El cierre se corrige con `editar: true`. |
+
+Limitación conocida de las escenas: el generador solo dispone de silla, sofá, mesa, planta, portátil, botella y dos personas, por lo que los objetos se repiten entre escenas (en combinaciones y posiciones distintas). En E3/E4 el detector reconoce la maceta de la planta del fondo también como «jarrón»; como la referencia es la narrativa, todos los participantes escuchan lo mismo y se codifica frente a ella.
+
+## 0-bis. Revisión del diseño de pruebas (2026-10-01)
 
 Se hizo antes de cualquier sesión con participantes reales. La detección, el pipeline, la narrativa, el TTS y el contrato de `POST /api/detect` **no cambian**; solo cambia el instrumento de evaluación.
 

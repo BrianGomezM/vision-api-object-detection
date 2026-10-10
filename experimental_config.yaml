@@ -283,7 +283,10 @@ experimento:
     # 2026-10-01: nuevo hash tras revisar SOLO las pruebas de usuario (guiones, codificación)
     # antes de cualquier sesión real (docs/EVALUACION_USUARIOS.md §0). 2026-10-09: se retiran
     # las pruebas piloto (PIL-*) y la métrica M-PIL por decisión de los directores. Las pruebas
-    # técnicas, los datasets y las métricas técnicas no cambiaron. Anteriores: ff0404979a04…, 6d0cb24d3305…
-    sha256: c7671ff0684c9068d9b9d63fdfc1058e8b0cf7d8fbf14c30390b2d2913ffb40a
+    # técnicas, los datasets y las métricas técnicas no cambiaron. 2026-10-10 (estudio v2): pruebas
+    # de usuario reescritas en lenguaje cotidiano y nuevo dataset del estudio (estudio2, escenas
+    # E1–E5); las pruebas técnicas y sus métricas no cambiaron.
+    # Anteriores: c7671ff0684c…, ff0404979a04…, 6d0cb24d3305…
+    sha256: 4877481e6e9f13322615aa4ee408c84473989641041e61abfc130904abcd5931
   metricas_version: PENDIENTE (CP3B)
   latencia: NO forma parte de las métricas del CP3B; si se reporta, por separado (CPU local ≠ despliegue)

@@ -318,10 +318,25 @@ class DecisionIn(_M):
     """Tarea de decisión (tipo C): alternativa que eligió el participante tras escuchar
     la narrativa. Decisión hipotética, sin desplazamiento (doc. 27, §H). La esperada
     NO la envía el cliente: el servidor la toma de app/catalog/decisiones.yaml."""
-    seleccionada: str = Field(..., min_length=1, max_length=40)
+    seleccionada: Optional[str] = Field(None, min_length=1, max_length=40)
+    # Estudio v2 (2026-10-10): el participante puede indicar VARIAS direcciones por las que
+    # podría avanzar. `seleccionada` se conserva por compatibilidad (equivale a una lista de uno).
+    seleccionadas: list[str] = Field(default_factory=list, max_length=5)
     # Juicio opcional del investigador. Desde el 2026-10-01 el servidor calcula la
     # coincidencia con la narrativa a partir de la instrucción narrada.
     coincide_con_narrativa: Optional[bool] = None
+
+    @model_validator(mode="after")
+    def _seleccion(self):
+        if not self.seleccionadas:
+            if not self.seleccionada:
+                raise ValueError("registre al menos una dirección o 'no_responde'")
+            self.seleccionadas = [self.seleccionada]
+        if len(set(self.seleccionadas)) != len(self.seleccionadas):
+            raise ValueError("direcciones repetidas")
+        if decisions.NO_RESPONDE in self.seleccionadas and len(self.seleccionadas) > 1:
+            raise ValueError("'no_responde' no se combina con otras direcciones")
+        return self
 
 
 class Aclaracion(_M):
@@ -364,6 +379,13 @@ class ResponseIn(_M):
     decision: Optional[DecisionIn] = None
     # OBJ-04 (codificación "cambio"): ¿percibió el cambio respecto a la escena anterior?
     percepcion_cambio: Optional[PercepcionCambio] = None
+    # Estudio v2: cambios reales de la escena (lista fija de la referencia) que el participante
+    # mencionó, y cualquier otro cambio que dijo.
+    cambios_percibidos: list[str] = Field(default_factory=list, max_length=20)
+    cambio_otro: Optional[str] = Field(None, max_length=500)
+    # Edición: id de la respuesta anterior de la MISMA prueba que esta reemplaza (append-only:
+    # la anterior se conserva y deja de contar en el resumen).
+    reemplaza: Optional[str] = Field(None, pattern=r"^R\d{3,4}$")
     aclaraciones: list[Aclaracion] = Field(default_factory=list, max_length=50)
     escalas: Optional[Escalas] = None
     criterios: Optional[dict[str, int]] = None
@@ -381,6 +403,10 @@ class CuestionarioPosterior(_M):
 class CierreIn(_M):
     motivo: Literal["completada", "retiro_participante", "interrumpida_tecnica"] = "completada"
     cuestionario_posterior: Optional[CuestionarioPosterior] = None
+    # Estudio v2: grabación de los comentarios finales (opinión, sugerencias, cómo se sintió).
+    grabacion: Optional[GrabacionConsentimiento] = None
+    # Corrige el cierre de una sesión ya finalizada (conserva la fecha de finalización).
+    editar: bool = False
     entrevista: Optional[str] = Field(None, max_length=5000, description="Notas de la entrevista semiestructurada")
     incidencias_tecnicas: Optional[str] = Field(None, max_length=3000)
     observaciones_generales: Optional[str] = Field(None, max_length=3000)
@@ -537,6 +563,7 @@ def _aggregate(rs: list[dict]) -> dict:
         # Capa R (resultado): participante frente al diseño de la escena.
         "decisiones_coinciden_diseno": sum(x["correcto"] is True for x in dec),
         "decisiones_no_coinciden_diseno": sum(x["correcto"] is False for x in dec),
+        "decisiones_eligen_bloqueada": sum(x.get("elige_direccion_bloqueada") is True for x in dec),
     })
     cambios = [r.get("percepcion_cambio") for r in rs if r.get("percepcion_cambio")]
     out["percepcion_cambio"] = {k: cambios.count(k) for k in sorted(set(cambios))}
@@ -549,9 +576,17 @@ def _aggregate(rs: list[dict]) -> dict:
     return out
 
 
+def vigentes(respuestas: list[dict]) -> list[dict]:
+    """Respuestas que no fueron corregidas por otra posterior (campo `reemplaza`)."""
+    corregidas = {r.get("reemplaza") for r in respuestas if r.get("reemplaza")}
+    return [r for r in respuestas if r["response_id"] not in corregidas]
+
+
 def summarize(respuestas: list[dict], sesion: dict | None = None) -> dict:
-    """Resumen de una sesión sobre respuestas FORMALES, total y por prueba. Sin tasa de éxito
-    global (doc. 27 §I)."""
+    """Resumen de una sesión sobre respuestas FORMALES vigentes, total y por prueba. Sin tasa
+    de éxito global (doc. 27 §I). Las respuestas corregidas no cuentan."""
+    corregidas = len(respuestas) - len(vigentes(respuestas))
+    respuestas = vigentes(respuestas)
     formales = [r for r in respuestas if r["modo"] == "formal"]
     por_prueba: dict[str, list[dict]] = {}
     for r in formales:
@@ -571,6 +606,7 @@ def summarize(respuestas: list[dict], sesion: dict | None = None) -> dict:
         **_aggregate(formales),
         "por_prueba": {k: {"respuestas": len(v), **_aggregate(v)} for k, v in sorted(por_prueba.items())},
         "duracion_sesion_min": duracion,
+        "respuestas_corregidas": corregidas,
         "nota": ("Agregados descriptivos por sesión y por prueba. Cada prueba solo codifica lo que pregunta "
                  "(catalog.yaml → codificacion). No se calcula una tasa de éxito global (doc. 27 §I). "
                  "El tiempo de respuesta es una métrica débil."),
@@ -749,7 +785,7 @@ def _validate_response(sesion: dict, body: ResponseIn):
     cod = set(test.codificacion)
     if body.comprension is not None and not cod & {"objetos", "relaciones", "ubicacion", "distancia"}:
         raise HTTPException(status_code=400, detail=f"{test.id} no codifica objetos ni relaciones (catálogo).")
-    if body.percepcion_cambio is not None and "cambio" not in cod:
+    if (body.percepcion_cambio is not None or body.cambios_percibidos or body.cambio_otro) and "cambio" not in cod:
         raise HTTPException(status_code=400, detail=f"{test.id} no registra percepción de cambio.")
     if "cambio" in cod and body.modo == "formal" and body.percepcion_cambio is None:
         raise HTTPException(status_code=400, detail=f"{test.id}: registre si el participante percibió el cambio.")
@@ -758,7 +794,7 @@ def _validate_response(sesion: dict, body: ResponseIn):
     if body.decision is not None:
         if task is None:
             raise HTTPException(status_code=400, detail=f"{test.id} no es una tarea de decisión.")
-        if body.decision.seleccionada not in task.alternative_ids() | {decisions.NO_RESPONDE}:
+        if set(body.decision.seleccionadas) - (task.alternative_ids() | {decisions.NO_RESPONDE}):
             raise HTTPException(status_code=400,
                                 detail=f"Alternativas de {test.id}: {sorted(task.alternative_ids())} o 'no_responde'.")
     elif task is not None and body.modo == "formal":
@@ -784,22 +820,29 @@ def _decision_record(sesion: dict, body: ResponseIn, test, estimulo: dict | None
     if body.modo == "formal" and esperada is None:
         raise _conflict(f"{test.id}: la alternativa esperada para {stimulus_id} está POR_DEFINIR; "
                         "la decisión no puede registrarse como formal.")
-    sel = body.decision.seleccionada
-    respondio = sel != decisions.NO_RESPONDE
+    orden = [a.id for a in task.alternativas]
+    elegidas = set(body.decision.seleccionadas)
+    respondio = decisions.NO_RESPONDE not in elegidas
+    sel = [a for a in orden if a in elegidas] if respondio else [decisions.NO_RESPONDE]
+    libres = set(esperada) if esperada else None
     # Dirección que indicó la narrativa escuchada (instrucción de movimiento).
     narrada = decisions.narrated_direction(body.ejecucion.narrativa_final if body.ejecucion else None)
     return {
         "pregunta": task.pregunta,
         "alternativas": [a.model_dump() for a in task.alternativas],
-        "seleccionada": sel,
-        # Capa P — comprensión: ¿el participante eligió lo que indicó la narrativa?
+        "seleccionadas": sel,
+        "seleccionada": "+".join(sel),
+        # Capa P — comprensión: ¿el participante eligió exactamente lo que indicó la narrativa?
         "direccion_narrativa": narrada,
-        "coincide_con_narrativa": None if narrada is None or not respondio else sel == narrada,
-        # Capa R — resultado: ¿la elección coincide con la dirección libre del diseño de la escena?
-        "esperada": esperada,
-        "correcto": None if esperada is None or not respondio else sel == esperada,
-        # Capa S — sistema: ¿la narrativa indicó la dirección libre del diseño? (no depende del participante)
-        "narrativa_coincide_con_diseno": None if esperada is None or narrada is None else narrada == esperada,
+        "coincide_con_narrativa": None if narrada is None or not respondio else elegidas == {narrada},
+        "incluye_direccion_narrativa": None if narrada is None or not respondio else narrada in elegidas,
+        # Capa R — resultado: ¿eligió exactamente las direcciones libres del diseño de la escena?
+        "esperada": "+".join(a for a in orden if a in libres) if libres else None,
+        "direcciones_libres": [a for a in orden if a in libres] if libres else None,
+        "correcto": None if libres is None or not respondio else elegidas == libres,
+        "elige_direccion_bloqueada": None if libres is None or not respondio else bool(elegidas - libres),
+        # Capa S — sistema: ¿la narrativa indicó una dirección libre del diseño? (no depende del participante)
+        "narrativa_coincide_con_diseno": None if libres is None or narrada is None else narrada in libres,
         "fuente_esperada": fuente,
         "fixture_tecnico": fixture_id,
         "definicion_sha256": defs.sha256,
@@ -830,9 +873,16 @@ def add_response(session_id: str, body: ResponseIn):
     d = _session_dir(session_id)
     with _lock:
         sesion = _read_session(d)
-        if sesion["estado"] != "en_curso":
-            raise _conflict("La sesión está finalizada: no admite nuevas respuestas.")
+        if sesion["estado"] != "en_curso" and not body.reemplaza:
+            raise _conflict("La sesión está finalizada: no admite nuevas respuestas (solo correcciones).")
         test, estimulo = _validate_response(sesion, body)
+        previas = _read_responses(d)
+        if body.reemplaza:
+            anterior = next((r for r in previas if r["response_id"] == body.reemplaza), None)
+            if anterior is None or anterior["prueba"]["id"] != test.id or anterior["modo"] != body.modo:
+                raise _conflict(f"{body.reemplaza} no es una respuesta {body.modo} de {test.id} en esta sesión.")
+            if any(r.get("reemplaza") == body.reemplaza for r in previas):
+                raise _conflict(f"{body.reemplaza} ya fue corregida: edite la versión más reciente.")
         decision = _decision_record(sesion, body, test, estimulo)
         audio_raw = _decode_tts_audio(body)
         frozen_path = None
@@ -843,7 +893,7 @@ def add_response(session_id: str, body: ResponseIn):
                 if audio_raw is None:
                     audio_raw = frozen_path.read_bytes()
 
-        indice = len(_read_responses(d)) + 1
+        indice = len(previas) + 1
         response_id = f"R{indice:03d}"
         reproducciones = [r.model_dump(mode="json") for r in body.reproducciones]
         comprension = body.comprension.model_dump() if body.comprension else None
@@ -857,6 +907,8 @@ def add_response(session_id: str, body: ResponseIn):
                                       f"{decision['seleccionada']} (narrativa: {decision['direccion_narrativa']})"})
         if body.percepcion_cambio in ("no_menciona_cambio", "menciona_cambio_inexistente"):
             errores_derivados.append({"tipo": "cambio_no_percibido", "elemento": body.percepcion_cambio})
+        metricas["cambios_percibidos"] = len(body.cambios_percibidos) if "cambio" in test.codificacion else None
+        metricas["decision_elige_bloqueada"] = decision["elige_direccion_bloqueada"] if decision else None
 
         ejecucion = body.ejecucion.model_dump() if body.ejecucion else None
         if ejecucion is not None:
@@ -889,6 +941,9 @@ def add_response(session_id: str, body: ResponseIn):
             "comprension": comprension,
             "decision": decision,
             "percepcion_cambio": body.percepcion_cambio,
+            "cambios_percibidos": body.cambios_percibidos,
+            "cambio_otro": body.cambio_otro,
+            "reemplaza": body.reemplaza,
             "aclaraciones": aclaraciones,
             "escalas": body.escalas.model_dump() if body.escalas else None,
             "criterios": body.criterios,
@@ -1015,10 +1070,24 @@ def close_session(session_id: str, body: CierreIn):
     d = _session_dir(session_id)
     with _lock:
         sesion = _read_session(d)
-        if sesion["estado"] != "en_curso":
-            raise _conflict("La sesión ya está finalizada.")
+        finalizada = sesion["estado"] != "en_curso"
+        if finalizada and not body.editar:
+            raise _conflict("La sesión ya está finalizada (use la edición del cierre para corregirlo).")
+        previo = sesion.get("cierre") or {}
+        grabacion = previo.get("grabacion")
+        if body.grabacion is not None:
+            raw, content_type = _decode_consent_recording(body.grabacion)
+            archivo = None
+            if _outside_repo():
+                archivo = f"grabacion_cierre.{_AUDIO_EXT[content_type]}"
+                (d / archivo).write_bytes(raw)
+            grabacion = {"archivo": archivo, "almacenada": archivo is not None, "content_type": content_type,
+                         "tamano_bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+                         "duracion_s": body.grabacion.duracion_s}
         sesion["estado"] = "finalizada"
-        sesion["cierre"] = {**body.model_dump(), "finalizada_en": _now()}
+        sesion["cierre"] = {**body.model_dump(exclude={"grabacion", "editar"}), "grabacion": grabacion,
+                            "finalizada_en": previo.get("finalizada_en") if finalizada else _now(),
+                            **({"editado_en": _now()} if finalizada else {})}
         _write_json(d / SESSION_FILE, sesion)
     return {"status": "finalizada", "session_id": session_id, "sesion": sesion}
 
@@ -1050,7 +1119,7 @@ def consolidated():
             continue
         grupo = out["objetivo"]
         grupo["sesiones"] += 1
-        for r in _read_responses(d):
+        for r in vigentes(_read_responses(d)):
             if r["modo"] != "formal":
                 continue
             grupo["filas"].append({

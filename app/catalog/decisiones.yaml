@@ -31,21 +31,28 @@
 
 schema_version: 1
 
+# Estudio v2 (2026-10-10): escenas E3 y E4 (stimuli/estudio2). El participante puede decir
+# VARIAS direcciones; la referencia de la escena es la lista de direcciones LIBRES según el
+# diseño geométrico (solo cuentan los obstáculos cercanos):
+#   EST2-E3: sofá cerca al frente y silla cerca a la derecha → solo la izquierda está libre.
+#   EST2-E4: misma sala; la silla pasó a la izquierda → solo la derecha está libre.
+# En la revisión previa (scripts/study/check_scenes.py, 2026-10-10) la narrativa indicó
+# «izquierda» en E3 y «derecha» en E4, igual que el diseño.
 tareas:
   - prueba_id: OBJ-03
-    pregunta: "Según lo que escuchó, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?"
+    pregunta: "Según lo que escuchó, ¿por dónde podría avanzar sin chocar: por la izquierda, al frente o por la derecha? Puede decir más de una."
     alternativas:
-      - {id: izquierda, texto: "Izquierda"}
-      - {id: frente, texto: "Frente"}
-      - {id: derecha, texto: "Derecha"}
-    esperada_por_estimulo: {DS1-C2: izquierda}
+      - {id: izquierda, texto: "Por la izquierda"}
+      - {id: frente, texto: "Al frente"}
+      - {id: derecha, texto: "Por la derecha"}
+    esperada_por_estimulo: {EST2-E3: [izquierda]}
   - prueba_id: OBJ-04
-    pregunta: "Según lo que escuchó ahora, ¿hacia dónde avanzaría: hacia la izquierda, al frente o hacia la derecha?"
+    pregunta: "Y ahora, ¿por dónde podría avanzar sin chocar: por la izquierda, al frente o por la derecha? Puede decir más de una."
     alternativas:
-      - {id: izquierda, texto: "Izquierda"}
-      - {id: frente, texto: "Frente"}
-      - {id: derecha, texto: "Derecha"}
-    esperada_por_estimulo: {DS1-B2: frente}
+      - {id: izquierda, texto: "Por la izquierda"}
+      - {id: frente, texto: "Al frente"}
+      - {id: derecha, texto: "Por la derecha"}
+    esperada_por_estimulo: {EST2-E4: [derecha]}
 
 # Fixtures TÉCNICOS: solo verifican el mecanismo (seleccionada / esperada / correcto)
 # en sesiones de prueba técnica (PTEST…) y en modo ENSAYO. No son estímulos del

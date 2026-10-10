@@ -299,8 +299,8 @@ def test_un_codigo_una_sesion(client):
 def test_catalogo_declara_estado_de_estimulos(client):
     pruebas = {p["id"]: p for p in client.get("/api/catalog").json()["pruebas_usuario"]}
     # OBJ-01…05: un estímulo asignado en asignaciones.yaml; OBJ-06/07 no usan estímulo.
-    esperado = {"OBJ-01": ["DS1-C1"], "OBJ-02": ["DS1-A8"], "OBJ-03": ["DS1-C2"], "OBJ-04": ["DS1-B2"],
-                "OBJ-05": ["DS1-A5"], "OBJ-06": None, "OBJ-07": None}
+    esperado = {"OBJ-01": ["EST2-E1"], "OBJ-02": ["EST2-E2"], "OBJ-03": ["EST2-E3"], "OBJ-04": ["EST2-E4"],
+                "OBJ-05": ["EST2-E5"], "OBJ-06": None, "OBJ-07": None}
     for tid, est in esperado.items():
         p = pruebas[tid]
         assert p["estimulos"] == est and p["ejecutable_formal"] is True, tid
@@ -310,6 +310,18 @@ def test_catalogo_declara_estado_de_estimulos(client):
     assert pruebas["OBJ-02"]["codificacion"] == ["ubicacion", "distancia"]
     assert pruebas["OBJ-03"]["codificacion"] == [] and pruebas["OBJ-04"]["codificacion"] == ["cambio"]
     assert not [k for k in pruebas if k.startswith("PIL")]                    # sin prueba piloto (2026-10-09)
+    # Estudio v2: referencia según la narrativa congelada, para marcar sin transcribir.
+    ref1, ref2, ref4 = (pruebas[k]["referencia"] for k in ("OBJ-01", "OBJ-02", "OBJ-04"))
+    assert [o["nombre"] for o in ref1["objetos"]] == ["Silla", "Sofá", "Personas"]
+    assert ref1["relacion"]["respuesta"] == "Personas"
+    assert [(o["nombre"], o["lado"], o["pasos"]) for o in ref2["objetos"]] == [("Persona", "izquierda", 2), ("Sofá", "derecha", 5)]
+    assert len(ref4["cambios"]) == 2 and pruebas["OBJ-05"]["referencia"] is None
+    # La referencia coincide con lo que dice la narrativa congelada.
+    cat = loader.get_catalog()
+    for tid, ref in (("OBJ-01", ref1), ("OBJ-02", ref2)):
+        narr = cat.congelados[pruebas[tid]["estimulos"][0]].narrativa_final
+        for o in ref["objetos"]:
+            assert f"{o['pasos']} pasos" in narr or f"{o['pasos']} y" in narr, (tid, o)
 
 
 def test_asignaciones_solo_resuelven_lo_pendiente_sin_tocar_el_catalogo():
@@ -324,12 +336,14 @@ def test_asignaciones_solo_resuelven_lo_pendiente_sin_tocar_el_catalogo():
 
 
 def test_estimulos_asignados_se_detectan_completos_segun_el_diseno():
-    """Las escenas asignadas no contienen la mesa (falso negativo sistemático de YOLO26s)."""
+    """Las escenas asignadas no contienen la mesa (falso negativo sistemático de YOLO26s) y,
+    en el estudio v2, tienen al menos dos objetos (cuatro o más salvo OBJ-02)."""
     cat = loader.load_catalog()
     for p in cat.source.pruebas_usuario:
         for sid in p.estimulos or []:
             clases = [o["class"] for o in cat.stimuli[sid].design["objects"]]
-            assert sid != "DS1-B3" and ("dining table" not in clases or sid == "DS1-C1"), (p.id, sid)
+            assert "dining table" not in clases and sid.startswith("EST2-"), (p.id, sid)
+            assert len(clases) >= (2 if p.id == "OBJ-02" else 4), (p.id, sid)
 
 
 def test_por_definir_no_se_registra_como_formal(client, pending_catalog):
@@ -473,7 +487,7 @@ def defined_decisions(monkeypatch, tmp_path, defined_catalog):
     """Esperada de PRUEBA para OBJ-03 × DS1-C1 (la real está POR_DEFINIR)."""
     from app.catalog import decisions
     text = decisions.DECISIONS_PATH.read_text(encoding="utf-8").replace(
-        "esperada_por_estimulo: {DS1-C2: izquierda}", "esperada_por_estimulo: {DS1-C1: derecha}", 1)
+        "esperada_por_estimulo: {EST2-E3: [izquierda]}", "esperada_por_estimulo: {DS1-C1: derecha}", 1)
     p = tmp_path / "decisiones.yaml"
     p.write_text(text, encoding="utf-8")
     defs = decisions.load_decisions(p, catalog=defined_catalog)
@@ -492,10 +506,13 @@ def test_decisiones_yaml_valido_y_sin_contenido_inventado():
         # La esperada sale del DISEÑO del manifest: no hay ningún objeto en esa dirección.
         zona = {"izquierda": "left", "frente": "center", "derecha": "right"}
         assert isinstance(t.esperada_por_estimulo, dict)
-        for sid, alt in t.esperada_por_estimulo.items():
+        for sid, libres in t.esperada_por_estimulo.items():
             assert sid in (test.estimulos or []), (t.prueba_id, sid)                # estímulo asignado a la prueba
-            ocupadas = {o["horizontal"] for o in loader.get_catalog().stimuli[sid].design["objects"]}
-            assert zona[alt] not in ocupadas, (t.prueba_id, sid, alt, ocupadas)
+            # Solo los obstáculos CERCANOS bloquean el paso (free_space_analyzer).
+            cercanas = {o["horizontal"] for o in loader.get_catalog().stimuli[sid].design["objects"]
+                        if o["depth_condition"] == "near"}
+            libres = [libres] if isinstance(libres, str) else libres
+            assert {zona[a] for a in libres} == {"left", "center", "right"} - cercanas, (t.prueba_id, sid, libres)
     for f in defs.source.fixtures_tecnicos:
         assert f.stimulus_id in loader.get_catalog().stimuli
 
@@ -505,7 +522,7 @@ def test_catalogo_publica_pregunta_y_alternativas_pero_no_la_esperada(client):
     tests = {p["id"]: p for p in r.json()["pruebas_usuario"]}
     d = tests["OBJ-03"]["decision"]
     assert [a["id"] for a in d["alternativas"]] == ["izquierda", "frente", "derecha"]
-    assert d["estado_esperadas"] == "definido" and d["esperada_definida_para"] == ["DS1-C2"]
+    assert d["estado_esperadas"] == "definido" and d["esperada_definida_para"] == ["EST2-E3"]
     assert d["fixtures_tecnicos"] == [{"id": "FIX-DEC-01", "stimulus_id": "DS1-B3"}]
     assert "esperada\"" not in r.text and "fundamento" not in r.text
     assert tests["OBJ-01"]["decision"] is None
@@ -542,6 +559,11 @@ def test_decision_formal_con_esperada_de_la_definicion(client, defined_decisions
             res["decisiones_coinciden_diseno"], res["decisiones_no_coinciden_diseno"],
             res["decisiones_sin_respuesta"]) == (3, 1, 1, 1, 1, 1)
     assert res["por_prueba"]["OBJ-03"]["respuestas"] == 3
+    # Estudio v2: varias direcciones. Elegir también una bloqueada no coincide con el diseño.
+    varias = client.post(url, json=obj03(decision={"seleccionadas": ["derecha", "izquierda"]})).json()["respuesta"]["decision"]
+    assert varias["seleccionadas"] == ["izquierda", "derecha"] and varias["seleccionada"] == "izquierda+derecha"
+    assert (varias["correcto"], varias["elige_direccion_bloqueada"], varias["incluye_direccion_narrativa"]) == (False, True, True)
+    assert client.post(url, json=obj03(decision={"seleccionadas": ["derecha", "no_responde"]})).status_code == 400
     assert "tasa" not in json.dumps(res, ensure_ascii=False).replace("tasa de éxito global", "")
 
 
@@ -843,12 +865,12 @@ def test_audios_congelados_reales_validos_y_servidos(client):
     cat = loader.get_catalog()
     asignados = {s for p in cat.source.pruebas_usuario if isinstance(p.estimulos, list) for s in p.estimulos}
     assert asignados | set(cat.practica) <= set(cat.congelados) and not cat.congelados_invalidos
-    a = cat.congelados["DS1-C2"]
-    r = client.get("/api/study/stimuli/DS1-C2/audio")
+    a = cat.congelados["EST2-E3"]
+    r = client.get("/api/study/stimuli/EST2-E3/audio")
     assert r.status_code == 200 and hashlib.sha256(r.content).hexdigest() == a.sha256 == r.headers["x-audio-sha256"]
     assert client.get("/api/study/stimuli/DS1-A1/audio").status_code == 404
     est = {e["stimulus_id"]: e for e in client.get("/api/catalog").json()["estimulos"]}
-    assert est["DS1-C2"]["audio_congelado"]["sha256"] == a.sha256 and est["DS1-A1"]["audio_congelado"] is None
+    assert est["EST2-E3"]["audio_congelado"]["sha256"] == a.sha256 and est["DS1-A1"]["audio_congelado"] is None
     assert est["DS1-A2"]["practica"] is True
 
 
@@ -863,24 +885,30 @@ def _frozen_body(prueba, sid, **over):
 
 
 def test_obj03_real_registra_las_tres_capas(client, sdir):
-    """DS1-C2: la narrativa congelada indica «frente»; el diseño, «izquierda»."""
+    """EST2-E3: la narrativa congelada indica «izquierda», igual que el diseño (única salida libre)."""
     sid = create(client, tipo="objetivo", codigo="PTEST20")
     r = client.post(f"/api/study/sessions/{sid}/responses",
-                    json=_frozen_body("OBJ-03", "DS1-C2", decision={"seleccionada": "frente"}))
+                    json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["izquierda"]}))
     assert r.status_code == 201, r.text
     d = r.json()["respuesta"]["decision"]
-    assert (d["direccion_narrativa"], d["esperada"]) == ("frente", "izquierda")
-    assert (d["coincide_con_narrativa"], d["correcto"], d["narrativa_coincide_con_diseno"]) == (True, False, False)
+    assert (d["direccion_narrativa"], d["esperada"], d["direcciones_libres"]) == ("izquierda", "izquierda", ["izquierda"])
+    assert (d["coincide_con_narrativa"], d["correcto"], d["narrativa_coincide_con_diseno"]) == (True, True, True)
+    assert d["elige_direccion_bloqueada"] is False
     assert (sd(sdir, sid) / "respuestas" / "formales" / "R001" / "audio_narrativa_api.mp3").is_file()
+    # Dice también «al frente» (bloqueado): no coincide con el diseño.
+    r2 = client.post(f"/api/study/sessions/{sid}/responses",
+                     json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["frente", "izquierda"]}))
+    d2 = r2.json()["respuesta"]["decision"]
+    assert (d2["correcto"], d2["elige_direccion_bloqueada"], d2["incluye_direccion_narrativa"]) == (False, True, True)
     # OBJ-03 no codifica objetos
-    bad = _frozen_body("OBJ-03", "DS1-C2", decision={"seleccionada": "frente"}, comprension=COMPRENSION)
+    bad = _frozen_body("OBJ-03", "EST2-E3", decision={"seleccionada": "frente"}, comprension=COMPRENSION)
     assert client.post(f"/api/study/sessions/{sid}/responses", json=bad).status_code == 400
 
 
 def test_obj04_exige_percepcion_del_cambio(client):
     sid = create(client, tipo="objetivo", codigo="PTEST21")
     url = f"/api/study/sessions/{sid}/responses"
-    base = _frozen_body("OBJ-04", "DS1-B2", decision={"seleccionada": "frente"})
+    base = _frozen_body("OBJ-04", "EST2-E4", decision={"seleccionadas": ["derecha"]})
     assert client.post(url, json=base).status_code == 400
     assert client.post(url, json={**base, "percepcion_cambio": "quizas"}).status_code == 400
     r = client.post(url, json={**base, "percepcion_cambio": "no_menciona_cambio",
@@ -890,9 +918,16 @@ def test_obj04_exige_percepcion_del_cambio(client):
     assert rec["percepcion_cambio"] == "no_menciona_cambio" and rec["metricas"]["aclaraciones"] == 1
     assert {"tipo": "cambio_no_percibido", "elemento": "no_menciona_cambio"} in rec["errores_derivados"]
     # OBJ-01 no registra cambio
-    assert client.post(url, json=_frozen_body("OBJ-01", "DS1-C1", percepcion_cambio="no_responde")).status_code == 400
+    assert client.post(url, json=_frozen_body("OBJ-01", "EST2-E1", percepcion_cambio="no_responde")).status_code == 400
+    assert client.post(url, json=_frozen_body("OBJ-01", "EST2-E1", cambios_percibidos=["x"])).status_code == 400
     res = client.get(f"/api/study/sessions/{sid}").json()["resumen"]
     assert res["por_prueba"]["OBJ-04"]["percepcion_cambio"] == {"no_menciona_cambio": 1}
+    # Estudio v2: cambios reales mencionados (lista de la referencia) y otro cambio dicho.
+    cambio = "La silla pasó de la derecha a la izquierda"
+    r = client.post(url, json={**base, "percepcion_cambio": "menciona_cambio_real", "cambios_percibidos": [cambio],
+                               "cambio_otro": "apareció una mesa"})
+    rec = r.json()["respuesta"]
+    assert (rec["cambios_percibidos"], rec["cambio_otro"], rec["metricas"]["cambios_percibidos"]) == ([cambio], "apareció una mesa", 1)
 
 
 def test_obj02_codifica_ubicacion_y_distancia_sin_identificacion(client):
@@ -900,7 +935,7 @@ def test_obj02_codifica_ubicacion_y_distancia_sin_identificacion(client):
     comp = {"objetos": [{"objeto": "silla (derecha)", "ubicacion_reportada": "derecha", "ubicacion_correcta": "si",
                          "distancia_reportada": "como 3 pasos", "distancia_correcta": "no"}],
             "objetos_inventados": [], "relaciones": []}
-    r = client.post(f"/api/study/sessions/{sid}/responses", json=_frozen_body("OBJ-02", "DS1-A8", comprension=comp))
+    r = client.post(f"/api/study/sessions/{sid}/responses", json=_frozen_body("OBJ-02", "EST2-E2", comprension=comp))
     assert r.status_code == 201, r.text
     m = r.json()["respuesta"]["metricas"]
     assert (m["objetos_referencia"], m["objetos_omitidos"]) == (0, [])          # no se pregunta "¿qué objetos?"
@@ -930,7 +965,7 @@ def test_sesiones_y_respuestas_separadas_por_carpeta(client, sdir):
     a = loader.get_catalog().congelados["DS1-A2"]
     practica = _frozen_body("OBJ-01", "DS1-A2", modo="ensayo")
     assert client.post(f"/api/study/sessions/{real}/responses", json=practica).status_code == 201
-    assert client.post(f"/api/study/sessions/{real}/responses", json=_frozen_body("OBJ-01", "DS1-C1")).status_code == 201
+    assert client.post(f"/api/study/sessions/{real}/responses", json=_frozen_body("OBJ-01", "EST2-E1")).status_code == 201
     assert (sdir / "objetivo" / real / "respuestas" / "ensayos" / "R001" / "audio_narrativa_api.mp3").read_bytes() == \
         loader.get_catalog().frozen_audio_path("DS1-A2").read_bytes()
     assert (sdir / "objetivo" / real / "respuestas" / "formales" / "R002" / "audio_narrativa_api.mp3").is_file()
@@ -959,7 +994,7 @@ def test_exportar_evidencia_de_la_sesion(client, sdir):
     sid = create(client, codigo="PTEST30")
     assert client.post(f"/api/study/sessions/{sid}/responses",
                        json=_frozen_body("OBJ-01", "DS1-A2", modo="ensayo")).status_code == 201
-    r = client.post(f"/api/study/sessions/{sid}/responses", json=_frozen_body("OBJ-01", "DS1-C1", comprension=COMPRENSION))
+    r = client.post(f"/api/study/sessions/{sid}/responses", json=_frozen_body("OBJ-01", "EST2-E1", comprension=COMPRENSION))
     assert r.status_code == 201, r.text
     _upload(client, sid, rid="R002")
     client.post(f"/api/study/sessions/{sid}/cierre", json={"entrevista": "Notas de prueba."})
@@ -974,13 +1009,56 @@ def test_exportar_evidencia_de_la_sesion(client, sdir):
               "respuestas/formales/R002/respuesta_participante.webm"):
         assert root + f in names, f
     assert z.read(root + "respuestas/formales/R002/audio_narrativa_api.mp3") == \
-        loader.get_catalog().frozen_audio_path("DS1-C1").read_bytes()
+        loader.get_catalog().frozen_audio_path("EST2-E1").read_bytes()
     # el Excel es un .xlsx válido con sus cuatro hojas y una fila por respuesta
     x = zipfile.ZipFile(io.BytesIO(z.read(root + "evidencia_PTEST30.xlsx")))
     wb = x.read("xl/workbook.xml").decode()
     assert all(f'name="{n}"' in wb for n in ("Sesion", "Respuestas", "Codificacion", "Resumen_por_prueba"))
     respuestas = x.read("xl/worksheets/sheet2.xml").decode()
-    assert respuestas.count("<row ") == 3 and "R002" in respuestas and "DS1-C1" in respuestas
+    assert respuestas.count("<row ") == 3 and "R002" in respuestas and "EST2-E1" in respuestas
     assert "televisor" in x.read("xl/worksheets/sheet3.xml").decode()
     assert "Notas de prueba." in x.read("xl/worksheets/sheet1.xml").decode()
     assert client.get("/api/study/sessions/20990101_000000_nada/export").status_code == 404
+
+
+# ── Estudio v2: edición de respuestas y del cierre ─────────────────────────────
+
+def test_editar_respuesta_reemplaza_sin_borrar_la_anterior(client):
+    sid = create(client, tipo="objetivo", codigo="PTEST40")
+    url = f"/api/study/sessions/{sid}/responses"
+    assert client.post(url, json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["frente"]})).status_code == 201
+    # Corrección: misma prueba, misma ejecución, nueva codificación.
+    r = client.post(url, json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["izquierda"]}, reemplaza="R001"))
+    assert r.status_code == 201, r.text and r.json()["respuesta"]["reemplaza"] == "R001"
+    # No se corrige dos veces la misma ni con otra prueba.
+    assert client.post(url, json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["derecha"]}, reemplaza="R001")).status_code == 409
+    assert client.post(url, json=_frozen_body("OBJ-01", "EST2-E1", reemplaza="R002")).status_code == 409
+    det = client.get(f"/api/study/sessions/{sid}").json()
+    assert [x["response_id"] for x in det["respuestas"]] == ["R001", "R002"]          # se conservan ambas
+    res = det["resumen"]
+    assert (res["respuestas_formales"], res["respuestas_corregidas"]) == (1, 1)
+    assert (res["decisiones_coinciden_diseno"], res["decisiones_no_coinciden_diseno"]) == (1, 0)
+    # Con la sesión finalizada solo se admiten correcciones.
+    assert client.post(f"/api/study/sessions/{sid}/cierre", json={}).status_code == 200
+    assert client.post(url, json=_frozen_body("OBJ-01", "EST2-E1")).status_code == 409
+    ok = client.post(url, json=_frozen_body("OBJ-03", "EST2-E3", decision={"seleccionadas": ["izquierda", "derecha"]}, reemplaza="R002"))
+    assert ok.status_code == 201, ok.text
+    cons = client.get("/api/study/consolidado").json()["objetivo"]["filas"]
+    assert [f["response_id"] for f in cons if f["session_id"] == sid] == []        # PTEST no entra al consolidado
+
+
+def test_cierre_con_grabacion_y_edicion(client, sdir):
+    sid = create(client, codigo="PTEST41")
+    url = f"/api/study/sessions/{sid}/cierre"
+    grab = {"content_type": "audio/webm;codecs=opus", "data_base64": base64.b64encode(b"comentarios finales").decode()}
+    r = client.post(url, json={"motivo": "completada", "grabacion": grab,
+                               "cuestionario_posterior": {"escalas": {"claridad": 4, "carga_percibida": 2}}})
+    assert r.status_code == 200, r.text
+    c = r.json()["sesion"]["cierre"]
+    assert c["grabacion"]["sha256"] == hashlib.sha256(b"comentarios finales").hexdigest() and "editado_en" not in c
+    fin = c["finalizada_en"]
+    assert client.post(url, json={"motivo": "completada"}).status_code == 409          # sin editar: rechazado
+    e = client.post(url, json={"motivo": "retiro_participante", "editar": True,
+                               "cuestionario_posterior": {"escalas": {"claridad": 3}}}).json()["sesion"]["cierre"]
+    assert (e["motivo"], e["finalizada_en"], e["grabacion"]["sha256"]) == ("retiro_participante", fin, c["grabacion"]["sha256"])
+    assert e["cuestionario_posterior"]["escalas"]["claridad"] == 3 and "editado_en" in e
