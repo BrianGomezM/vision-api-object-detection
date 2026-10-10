@@ -12,6 +12,7 @@ import json
 import logging
 
 import pytest
+import yaml
 
 from app.catalog import loader
 from app.routes import study
@@ -1062,3 +1063,36 @@ def test_cierre_con_grabacion_y_edicion(client, sdir):
                                "cuestionario_posterior": {"escalas": {"claridad": 3}}}).json()["sesion"]["cierre"]
     assert (e["motivo"], e["finalizada_en"], e["grabacion"]["sha256"]) == ("retiro_participante", fin, c["grabacion"]["sha256"])
     assert e["cuestionario_posterior"]["escalas"]["claridad"] == 3 and "editado_en" in e
+
+
+def test_e3_e4_v3_audios_sustituidos_con_registro_y_ruta_unica():
+    """E3/E4 v3 (2026-10-10): el audio nuevo corresponde a la imagen vigente, el anterior queda
+    archivado y anotado, y la narrativa indica la única ruta libre del diseño."""
+    from app.catalog.decisions import narrated_direction
+    cat = loader.load_catalog()
+    data = yaml.safe_load(loader.FROZEN_AUDIO_PATH.read_text(encoding="utf-8"))
+    reemplazados = {r["stimulus_id"]: r for r in data["reemplazos"]}
+    for sid, libre in (("EST2-E3", "izquierda"), ("EST2-E4", "derecha")):
+        a = cat.congelados[sid]
+        assert a.imagen_sha256 == cat.stimuli[sid].sha256
+        assert narrated_direction(a.narrativa_final) == libre
+        r = reemplazados[sid]
+        assert r["sha256_anterior"] != a.sha256 and r["sha256_nuevo"] == a.sha256
+        old = loader.FROZEN_AUDIO_PATH.parent / r["archivo_anterior"]
+        assert old.is_file() and hashlib.sha256(old.read_bytes()).hexdigest() == r["sha256_anterior"]
+    manifest = yaml.safe_load((loader.REPO_ROOT / "stimuli/estudio2/manifest.yaml").read_text(encoding="utf-8"))
+    rutas = {s["stimulus_id"]: s.get("routes") for s in manifest["stimuli"]}
+    assert rutas["EST2-E3"]["free_sides"] == ["left"] and rutas["EST2-E4"]["free_sides"] == ["right"]
+
+
+def test_audio_generado_con_otra_imagen_no_se_sirve(tmp_path):
+    src = loader.FROZEN_AUDIO_PATH.parent
+    data = yaml.safe_load((src / "congelados.yaml").read_text(encoding="utf-8"))
+    for e in data["estimulos"]:
+        (tmp_path / e["archivo"]).write_bytes((src / e["archivo"]).read_bytes())
+        if e["stimulus_id"] == "EST2-E3":
+            e["imagen_sha256"] = "0" * 64
+    (tmp_path / "congelados.yaml").write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    cat = loader.load_catalog(frozen_path=tmp_path / "congelados.yaml")
+    assert "EST2-E3" not in cat.congelados and cat.congelados_invalidos["EST2-E3"] == "el audio se generó con otra imagen"
+    assert "EST2-E4" in cat.congelados
