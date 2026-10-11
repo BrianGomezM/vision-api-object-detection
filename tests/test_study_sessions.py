@@ -313,9 +313,9 @@ def test_catalogo_declara_estado_de_estimulos(client):
     assert not [k for k in pruebas if k.startswith("PIL")]                    # sin prueba piloto (2026-10-09)
     # Estudio v2: referencia según la narrativa congelada, para marcar sin transcribir.
     ref1, ref2, ref4 = (pruebas[k]["referencia"] for k in ("OBJ-01", "OBJ-02", "OBJ-04"))
-    assert [o["nombre"] for o in ref1["objetos"]] == ["Silla", "Sofá", "Personas"]
-    assert ref1["relacion"]["respuesta"] == "Personas"
-    assert [(o["nombre"], o["lado"], o["pasos"]) for o in ref2["objetos"]] == [("Persona", "izquierda", 2), ("Sofá", "derecha", 5)]
+    assert [o["nombre"] for o in ref1["objetos"]] == ["Silla", "Planta en maceta", "Persona"]
+    assert ref1["relacion"]["respuesta"] == "Persona"
+    assert [(o["nombre"], o["lado"], o["pasos"]) for o in ref2["objetos"]] == [("Persona", "izquierda", 3), ("Mesa de comedor", "derecha", 5)]
     assert len(ref4["cambios"]) == 2 and pruebas["OBJ-05"]["referencia"] is None
     # La referencia coincide con lo que dice la narrativa congelada.
     cat = loader.get_catalog()
@@ -337,14 +337,20 @@ def test_asignaciones_solo_resuelven_lo_pendiente_sin_tocar_el_catalogo():
 
 
 def test_estimulos_asignados_se_detectan_completos_segun_el_diseno():
-    """Las escenas asignadas no contienen la mesa (falso negativo sistemático de YOLO26s) y,
-    en el estudio v2, tienen al menos dos objetos (cuatro o más salvo OBJ-02)."""
+    """Escenas del estudio (v3/v4, 2026-10-10): al menos 6 objetos por escena (petición del autor tras
+    la revisión de realismo) y una ruta libre comprobada con la geometría.
+
+    Antes se prohibía la mesa de comedor porque YOLO26s no la detectaba en las escenas grises del
+    Dataset 1. En la cocina-comedor v4 (EST2-E2) sí se detecta (0,49) y la narrativa congelada la
+    menciona, así que la regla se sustituye por exigir que, si hay mesa, la narrativa la nombre."""
     cat = loader.load_catalog()
     for p in cat.source.pruebas_usuario:
         for sid in p.estimulos or []:
-            clases = [o["class"] for o in cat.stimuli[sid].design["objects"]]
-            assert "dining table" not in clases and sid.startswith("EST2-"), (p.id, sid)
-            assert len(clases) >= (2 if p.id == "OBJ-02" else 4), (p.id, sid)
+            st = cat.stimuli[sid]
+            clases = [o["class"] for o in st.design["objects"]]
+            assert sid.startswith("EST2-") and len(clases) >= 6, (p.id, sid, len(clases))
+            if "dining table" in clases:
+                assert "mesa" in cat.congelados[sid].narrativa_final.lower(), (p.id, sid)
 
 
 def test_por_definir_no_se_registra_como_formal(client, pending_catalog):
@@ -365,7 +371,7 @@ def test_ensayo_solo_en_prueba_tecnica_o_practica(client, sdir):
     sid = create(client, tipo="objetivo", codigo="P05")         # participante real (directorio temporal)
     assert client.post(f"/api/study/sessions/{sid}/responses", json=body).status_code == 409
     # El objetivo SÍ hace una práctica de familiarización con la escena de práctica (doc. 34, C5).
-    practica = {**body, "estimulo": {"origen": "catalogo", "stimulus_id": "DS1-A2"}}
+    practica = {**body, "estimulo": {"origen": "catalogo", "stimulus_id": "EST2-E6"}}
     r = client.post(f"/api/study/sessions/{sid}/responses", json=practica)
     assert r.status_code == 201, r.text
     assert client.post(f"/api/study/sessions/{sid}/responses", json={**practica, "modo": "formal"}).status_code == 409
@@ -872,7 +878,7 @@ def test_audios_congelados_reales_validos_y_servidos(client):
     assert client.get("/api/study/stimuli/DS1-A1/audio").status_code == 404
     est = {e["stimulus_id"]: e for e in client.get("/api/catalog").json()["estimulos"]}
     assert est["EST2-E3"]["audio_congelado"]["sha256"] == a.sha256 and est["DS1-A1"]["audio_congelado"] is None
-    assert est["DS1-A2"]["practica"] is True
+    assert est["EST2-E6"]["practica"] is True
 
 
 def _frozen_body(prueba, sid, **over):
@@ -963,12 +969,12 @@ def test_sesiones_y_respuestas_separadas_por_carpeta(client, sdir):
     assert (sdir / "objetivo" / real / "sesion.json").is_file()
     assert (sdir / "pruebas_tecnicas" / tecnica / "sesion.json").is_file()
     # práctica (ensayo) y formal en subcarpetas distintas
-    a = loader.get_catalog().congelados["DS1-A2"]
-    practica = _frozen_body("OBJ-01", "DS1-A2", modo="ensayo")
+    a = loader.get_catalog().congelados["EST2-E6"]
+    practica = _frozen_body("OBJ-01", "EST2-E6", modo="ensayo")
     assert client.post(f"/api/study/sessions/{real}/responses", json=practica).status_code == 201
     assert client.post(f"/api/study/sessions/{real}/responses", json=_frozen_body("OBJ-01", "EST2-E1")).status_code == 201
     assert (sdir / "objetivo" / real / "respuestas" / "ensayos" / "R001" / "audio_narrativa_api.mp3").read_bytes() == \
-        loader.get_catalog().frozen_audio_path("DS1-A2").read_bytes()
+        loader.get_catalog().frozen_audio_path("EST2-E6").read_bytes()
     assert (sdir / "objetivo" / real / "respuestas" / "formales" / "R002" / "audio_narrativa_api.mp3").is_file()
     assert hashlib.sha256((sdir / "objetivo" / real / "respuestas" / "ensayos" / "R001" / "audio_narrativa_api.mp3")
                           .read_bytes()).hexdigest() == a.sha256
@@ -994,7 +1000,7 @@ def test_exportar_evidencia_de_la_sesion(client, sdir):
     import zipfile
     sid = create(client, codigo="PTEST30")
     assert client.post(f"/api/study/sessions/{sid}/responses",
-                       json=_frozen_body("OBJ-01", "DS1-A2", modo="ensayo")).status_code == 201
+                       json=_frozen_body("OBJ-01", "EST2-E6", modo="ensayo")).status_code == 201
     r = client.post(f"/api/study/sessions/{sid}/responses", json=_frozen_body("OBJ-01", "EST2-E1", comprension=COMPRENSION))
     assert r.status_code == 201, r.text
     _upload(client, sid, rid="R002")

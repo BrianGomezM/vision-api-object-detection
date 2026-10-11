@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-10-10T20:10:25.501437+00:00",
+  "fecha": "2026-10-11T03:19:31.945206+00:00",
   "modelo_transcripcion": "groq:whisper-large-v3",
   "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
   "resultados": [
@@ -20,11 +20,11 @@
     },
     {
       "stimulus_id": "EST2-E1",
-      "palabras_narrativa": 49,
+      "palabras_narrativa": 40,
       "diferencias_palabras": 3,
-      "wer": 0.061,
+      "wer": 0.075,
       "coincide": false,
-      "transcripcion": "Parece que estás en una sala de estar. Silla a tu izquierda aproximadamente cuatro pasos. Sofá a tu derecha aproximadamente cuatro pasos. Dos personas frente a ti aproximadamente cinco y seis pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "transcripcion": "Silla a tu derecha aproximadamente 4 pasos. Planta en maceta a tu derecha aproximadamente 5 pasos. Persona frente a ti aproximadamente 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -45,12 +45,17 @@
     },
     {
       "stimulus_id": "EST2-E2",
-      "palabras_narrativa": 36,
-      "diferencias_palabras": 2,
-      "wer": 0.056,
+      "palabras_narrativa": 51,
+      "diferencias_palabras": 3,
+      "wer": 0.059,
       "coincide": false,
-      "transcripcion": "Parece que estás en una sala de estar. Persona cerca a tu izquierda aproximadamente dos pasos. Sofá un poco más adelante, a tu derecha aproximadamente cinco pasos. ¿Puedes avanzar hacia el frente con cuidado?",
+      "transcripcion": "Parece que estás en un comedor. Persona a tu izquierda aproximadamente tres pasos. Dos sillas y mesa de comedor a tu derecha aproximadamente cinco pasos. Planta en maceta a tu derecha aproximadamente seis pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
       "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
         {
           "op": "delete",
           "narrativa": "a",
@@ -115,11 +120,11 @@
     },
     {
       "stimulus_id": "EST2-E5",
-      "palabras_narrativa": 42,
+      "palabras_narrativa": 46,
       "diferencias_palabras": 3,
-      "wer": 0.071,
+      "wer": 0.065,
       "coincide": false,
-      "transcripcion": "Silla frente a ti aproximadamente 5 pasos. Persona cerca a tu derecha aproximadamente 5 pasos. Planta en maceta cerca a tu izquierda aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres antes del primer obstáculo.",
+      "transcripcion": "Parece que estás en un dormitorio. Silla a tu derecha aproximadamente cuatro pasos. Cama frente a ti aproximadamente cinco pasos. Planta en maceta a tu izquierda aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -130,6 +135,41 @@
           "op": "delete",
           "narrativa": "a",
           "audio": ""
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        }
+      ]
+    },
+    {
+      "stimulus_id": "EST2-E6",
+      "palabras_narrativa": 49,
+      "diferencias_palabras": 5,
+      "wer": 0.102,
+      "coincide": false,
+      "transcripcion": "Parece que estás en un comedor. Dos sillas a tu izquierda aproximadamente cinco pasos. Un silla frente a ti aproximadamente cinco pasos. Un mesa de comedor a tu izquierda aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "diferencias": [
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "un"
+        },
+        {
+          "op": "delete",
+          "narrativa": "a",
+          "audio": ""
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "un"
         },
         {
           "op": "delete",

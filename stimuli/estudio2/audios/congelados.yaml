@@ -16,9 +16,9 @@ verificacion_fidelidad:
   verificado_por: Brayan Julio Gómez Muñoz
   fecha: '2026-10-10'
   verificados: [EST2-E3, EST2-E4]
-  pendientes: [DS1-A2, EST2-E1, EST2-E2, EST2-E5]
-  nota: escucha humana completa de EST2-E3 y EST2-E4 (dicen literalmente la narrativa congelada
-    y coinciden con los objetos de la imagen); faltan los demás audios del conjunto
+  pendientes: [EST2-E1, EST2-E2, EST2-E5, EST2-E6]
+  nota: escucha humana completa de EST2-E3 y EST2-E4; los audios v4 (E1, E2, E5 y la práctica E6) se
+    generaron después y falta escucharlos. DS1-A2 ya no es la práctica.
 estimulos:
 - stimulus_id: DS1-A2
   archivo: DS1-A2.mp3
@@ -45,82 +45,121 @@ estimulos:
       y2: 279.9
 - stimulus_id: EST2-E1
   archivo: EST2-E1.mp3
-  sha256: 877c7858a8b52a28077d733651a5cdf2b2ce183f5549eb47b3e39f2ea40ec02a
+  sha256: 3d736754742c4eb67585f15d0289398666f3ffd5d07c16ccfff66cf17a23a517
   content_type: audio/mpeg
-  tamano_bytes: 138960
-  duracion_s: 23.2
-  narrativa_final: Parece que estás en una sala de estar. Silla a tu izquierda a aproximadamente
-    4 pasos. Sofá a tu derecha a aproximadamente 4 pasos. 2 personas frente a ti a
-    aproximadamente 5 y 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente
-    5 pasos libres antes del primer obstáculo.
+  tamano_bytes: 121248
+  duracion_s: 20.2
+  narrativa_final: Silla a tu derecha a aproximadamente 4 pasos. Planta en maceta
+    a tu derecha a aproximadamente 5 pasos. Persona frente a ti a aproximadamente
+    6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres
+    antes del primer obstáculo.
+  instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 6
+    pasos libres antes del primer obstáculo.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-11T03:18:33.885536+00:00'
+  intento: 1
+  backend_commit: null
+  imagen_sha256: 5f4378c86192ddfce11fc86c2a3337c21c1e6b6e2077045431f68b8011ef159d
+  detecciones:
+  - clase: potted plant
+    confianza: 0.94
+    bbox:
+      x1: 580.04
+      y1: 128.75
+      x2: 636.91
+      y2: 236.06
+  - clase: person
+    confianza: 0.893
+    bbox:
+      x1: 464.94
+      y1: 109.88
+      x2: 511.9
+      y2: 222.57
+  - clase: clock
+    confianza: 0.871
+    bbox:
+      x1: 450.68
+      y1: 73.19
+      x2: 471.38
+      y2: 93.88
+  - clase: chair
+    confianza: 0.823
+    bbox:
+      x1: 543.75
+      y1: 176.4
+      x2: 735.61
+      y2: 343.29
+  - clase: clock
+    confianza: 0.466
+    bbox:
+      x1: 450.59
+      y1: 73.18
+      x2: 471.29
+      y2: 93.84
+- stimulus_id: EST2-E2
+  archivo: EST2-E2.mp3
+  sha256: cafe104e9f8429248747ccb332db00731a68c6ffd96a67e409ed46e15bed7e0e
+  content_type: audio/mpeg
+  tamano_bytes: 145728
+  duracion_s: 24.3
+  narrativa_final: Parece que estás en un comedor. Persona a tu izquierda a aproximadamente
+    3 pasos. 2 sillas y mesa de comedor a tu derecha a aproximadamente 5 pasos. Planta
+    en maceta a tu derecha a aproximadamente 6 pasos. Puedes avanzar hacia el frente.
+    Tienes aproximadamente 5 pasos libres antes del primer obstáculo.
   instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
     pasos libres antes del primer obstáculo.
   tts_modelo: azure:es-CO-SalomeNeural
   llm_modelo: qwen/qwen3.8-27b
   origen_descripcion: llm
-  generado_en: '2026-10-10T04:40:04.177626+00:00'
+  generado_en: '2026-10-11T03:18:37.610437+00:00'
   intento: 1
   backend_commit: null
+  imagen_sha256: df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427
   detecciones:
   - clase: person
-    confianza: 0.951
+    confianza: 0.948
     bbox:
-      x1: 369.52
-      y1: 103.77
-      x2: 431.2
-      y2: 257.82
+      x1: 122.85
+      y1: 81.39
+      x2: 257.61
+      y2: 384.23
+  - clase: clock
+    confianza: 0.895
+    bbox:
+      x1: 431.13
+      y1: 61.37
+      x2: 454.31
+      y2: 85.66
   - clase: chair
-    confianza: 0.936
+    confianza: 0.826
     bbox:
-      x1: 154.34
-      y1: 191.35
-      x2: 243.03
-      y2: 371.1
-  - clase: person
-    confianza: 0.922
+      x1: 619.52
+      y1: 168.13
+      x2: 699.22
+      y2: 271.35
+  - clase: chair
+    confianza: 0.821
     bbox:
-      x1: 158.22
-      y1: 105.31
-      x2: 238.05
-      y2: 192.01
-  - clase: couch
-    confianza: 0.705
+      x1: 464.62
+      y1: 166.6
+      x2: 522.77
+      y2: 270.22
+  - clase: dining table
+    confianza: 0.494
     bbox:
-      x1: 511.18
-      y1: 186.19
-      x2: 700.63
-      y2: 291.85
-- stimulus_id: EST2-E2
-  archivo: EST2-E2.mp3
-  sha256: 8bdcdcfb54f4866f721fbfb9b45afa81797247d7e8001ed42d239a37f66a1463
-  content_type: audio/mpeg
-  tamano_bytes: 96768
-  duracion_s: 16.1
-  narrativa_final: Parece que estás en una sala de estar. Persona cerca a tu izquierda
-    a aproximadamente 2 pasos. Sofá un poco más adelante, a tu derecha a aproximadamente
-    5 pasos. Puedes avanzar hacia el frente con cuidado.
-  instruccion_movimiento: Puedes avanzar hacia el frente con cuidado.
-  tts_modelo: azure:es-CO-SalomeNeural
-  llm_modelo: qwen/qwen3.8-27b
-  origen_descripcion: llm
-  generado_en: '2026-10-10T04:40:09.976595+00:00'
-  intento: 1
-  backend_commit: null
-  detecciones:
-  - clase: person
-    confianza: 0.965
+      x1: 532.25
+      y1: 178.56
+      x2: 618.45
+      y2: 282.7
+  - clase: potted plant
+    confianza: 0.329
     bbox:
-      x1: 93.98
-      y1: 75.9
-      x2: 289.32
-      y2: 347.13
-  - clase: couch
-    confianza: 0.722
-    bbox:
-      x1: 540.95
-      y1: 165.65
-      x2: 662.72
-      y2: 228.8
+      x1: 557.94
+      y1: 201.94
+      x2: 594.55
+      y2: 230.02
 - stimulus_id: EST2-E3
   archivo: EST2-E3.mp3
   sha256: 3d61bf0772cdaff73bde1ac5a3e19fcac18b0d683fc0cb5376552947361573d0
@@ -237,58 +276,135 @@ estimulos:
       y2: 321.98
 - stimulus_id: EST2-E5
   archivo: EST2-E5.mp3
-  sha256: ccb3e6062648a67f77a726220f4f144e425449836e62b1d4519739d3f8c42f85
+  sha256: d4807b1d5a8e7263c1747864969b143a00548b89c6aa12a6c17125ed760c9b87
   content_type: audio/mpeg
-  tamano_bytes: 126000
-  duracion_s: 21.0
-  narrativa_final: Silla frente a ti a aproximadamente 5 pasos. Persona cerca a tu
-    derecha a aproximadamente 5 pasos. Planta en maceta cerca a tu izquierda a aproximadamente
-    5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 5 pasos libres
-    antes del primer obstáculo.
+  tamano_bytes: 136656
+  duracion_s: 22.8
+  narrativa_final: Parece que estás en un dormitorio. Silla a tu derecha a aproximadamente
+    4 pasos. Cama frente a ti a aproximadamente 5 pasos. Planta en maceta a tu izquierda
+    a aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente
+    5 pasos libres antes del primer obstáculo.
   instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
     pasos libres antes del primer obstáculo.
   tts_modelo: azure:es-CO-SalomeNeural
   llm_modelo: qwen/qwen3.8-27b
   origen_descripcion: llm
-  generado_en: '2026-10-10T04:40:24.459507+00:00'
+  generado_en: '2026-10-11T03:18:40.335130+00:00'
   intento: 1
   backend_commit: null
+  imagen_sha256: 6bc659ffd6a896bedeb3c89a5865761d49d72fc1d764e04a928d6121c92a5907
   detecciones:
-  - clase: person
-    confianza: 0.919
-    bbox:
-      x1: 563.19
-      y1: 101.37
-      x2: 637.59
-      y2: 271.3
-  - clase: chair
-    confianza: 0.891
-    bbox:
-      x1: 365.84
-      y1: 186.22
-      x2: 434.12
-      y2: 343.33
   - clase: potted plant
+    confianza: 0.912
+    bbox:
+      x1: 175.4
+      y1: 128.92
+      x2: 236.44
+      y2: 252.31
+  - clase: clock
     confianza: 0.88
     bbox:
-      x1: 162.41
-      y1: 131.12
-      x2: 233.73
-      y2: 273.65
-  - clase: person
-    confianza: 0.661
+      x1: 532.56
+      y1: 63.6
+      x2: 557.77
+      y2: 88.23
+  - clase: vase
+    confianza: 0.856
     bbox:
-      x1: 366.55
-      y1: 106.88
-      x2: 433.36
-      y2: 185.5
-  - clase: person
-    confianza: 0.469
+      x1: 473.98
+      y1: 157.39
+      x2: 489.96
+      y2: 187.68
+  - clase: chair
+    confianza: 0.839
     bbox:
-      x1: 366.81
-      y1: 106.82
-      x2: 433.31
-      y2: 185.52
+      x1: 550.61
+      y1: 170.09
+      x2: 712.17
+      y2: 334.56
+  - clase: tv
+    confianza: 0.532
+    bbox:
+      x1: 29.1
+      y1: 179.35
+      x2: 160.07
+      y2: 249.71
+  - clase: bed
+    confianza: 0.44
+    bbox:
+      x1: 329.74
+      y1: 114.69
+      x2: 467.28
+      y2: 263.36
+- stimulus_id: EST2-E6
+  archivo: EST2-E6.mp3
+  sha256: 960934a6a402fd6eadc404a92e2c287897e3a15c17ee0c89944532456fb55fb4
+  content_type: audio/mpeg
+  tamano_bytes: 138672
+  duracion_s: 23.1
+  narrativa_final: Parece que estás en un comedor. 2 sillas a tu izquierda a aproximadamente
+    5 pasos. 1 silla frente a ti a aproximadamente 5 pasos. 1 mesa de comedor a tu
+    izquierda a aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente
+    5 pasos libres antes del primer obstáculo.
+  instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
+    pasos libres antes del primer obstáculo.
+  tts_modelo: azure:es-CO-SalomeNeural
+  llm_modelo: qwen/qwen3.8-27b
+  origen_descripcion: llm
+  generado_en: '2026-10-11T03:18:42.978266+00:00'
+  intento: 1
+  backend_commit: null
+  imagen_sha256: 7ddf06ff2bf787ed53a5b6616f8c0bf3beaaa39be41eb0b18e558cb3c9b1e4c3
+  detecciones:
+  - clase: potted plant
+    confianza: 0.931
+    bbox:
+      x1: 553.59
+      y1: 127.74
+      x2: 601.16
+      y2: 237.2
+  - clase: vase
+    confianza: 0.907
+    bbox:
+      x1: 198.56
+      y1: 148.89
+      x2: 226.02
+      y2: 198.2
+  - clase: chair
+    confianza: 0.905
+    bbox:
+      x1: 67.98
+      y1: 172.33
+      x2: 158.97
+      y2: 286.67
+  - clase: chair
+    confianza: 0.882
+    bbox:
+      x1: 271.44
+      y1: 169.01
+      x2: 350.42
+      y2: 298.74
+  - clase: clock
+    confianza: 0.837
+    bbox:
+      x1: 388.66
+      y1: 61.27
+      x2: 411.81
+      y2: 85.91
+  - clase: tv
+    confianza: 0.804
+    bbox:
+      x1: 590.74
+      y1: 173.12
+      x2: 693.52
+      y2: 231.68
+  - clase: dining table
+    confianza: 0.163
+    bbox:
+      x1: 163.71
+      y1: 181.82
+      x2: 261.4
+      y2: 300.06
 reemplazos:
 - stimulus_id: EST2-E3
   fecha: '2026-10-10T20:09:57.613917+00:00'
@@ -316,4 +432,50 @@ reemplazos:
   sha256_nuevo: c6d779adee51ba4062f5dd04386381db15c69b48bddb68ddbd186b5056c2b266
   backend_commit: null
   arbol_con_cambios: null
-actualizado_en: '2026-10-10T20:09:57.625935+00:00'
+- stimulus_id: EST2-E1
+  fecha: '2026-10-11T03:18:42.994737+00:00'
+  motivo: 'La imagen cambió a la versión v4 (escenas más realistas: oficina, cocina-comedor,
+    dormitorio y comedor de práctica); el audio anterior describía otra escena'
+  archivo_anterior: reemplazados/EST2-E1-877c7858.mp3
+  sha256_anterior: 877c7858a8b52a28077d733651a5cdf2b2ce183f5549eb47b3e39f2ea40ec02a
+  narrativa_anterior: Parece que estás en una sala de estar. Silla a tu izquierda
+    a aproximadamente 4 pasos. Sofá a tu derecha a aproximadamente 4 pasos. 2 personas
+    frente a ti a aproximadamente 5 y 6 pasos. Puedes avanzar hacia el frente. Tienes
+    aproximadamente 5 pasos libres antes del primer obstáculo.
+  sha256_nuevo: 3d736754742c4eb67585f15d0289398666f3ffd5d07c16ccfff66cf17a23a517
+  backend_commit: null
+  arbol_con_cambios: null
+- stimulus_id: EST2-E2
+  fecha: '2026-10-11T03:18:43.001819+00:00'
+  motivo: 'La imagen cambió a la versión v4 (escenas más realistas: oficina, cocina-comedor,
+    dormitorio y comedor de práctica); el audio anterior describía otra escena'
+  archivo_anterior: reemplazados/EST2-E2-8bdcdcfb.mp3
+  sha256_anterior: 8bdcdcfb54f4866f721fbfb9b45afa81797247d7e8001ed42d239a37f66a1463
+  narrativa_anterior: Parece que estás en una sala de estar. Persona cerca a tu izquierda
+    a aproximadamente 2 pasos. Sofá un poco más adelante, a tu derecha a aproximadamente
+    5 pasos. Puedes avanzar hacia el frente con cuidado.
+  sha256_nuevo: cafe104e9f8429248747ccb332db00731a68c6ffd96a67e409ed46e15bed7e0e
+  backend_commit: null
+  arbol_con_cambios: null
+- stimulus_id: EST2-E5
+  fecha: '2026-10-11T03:18:43.014646+00:00'
+  motivo: 'La imagen cambió a la versión v4 (escenas más realistas: oficina, cocina-comedor,
+    dormitorio y comedor de práctica); el audio anterior describía otra escena'
+  archivo_anterior: reemplazados/EST2-E5-ccb3e606.mp3
+  sha256_anterior: ccb3e6062648a67f77a726220f4f144e425449836e62b1d4519739d3f8c42f85
+  narrativa_anterior: Silla frente a ti a aproximadamente 5 pasos. Persona cerca a
+    tu derecha a aproximadamente 5 pasos. Planta en maceta cerca a tu izquierda a
+    aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente
+    5 pasos libres antes del primer obstáculo.
+  sha256_nuevo: d4807b1d5a8e7263c1747864969b143a00548b89c6aa12a6c17125ed760c9b87
+  backend_commit: null
+  arbol_con_cambios: null
+- stimulus_id: EST2-E6
+  fecha: '2026-10-11T03:18:43.018454+00:00'
+  motivo: 'La imagen cambió a la versión v4 (escenas más realistas: oficina, cocina-comedor,
+    dormitorio y comedor de práctica); el audio anterior describía otra escena'
+  anadido: true
+  sha256_nuevo: 960934a6a402fd6eadc404a92e2c287897e3a15c17ee0c89944532456fb55fb4
+  backend_commit: null
+  arbol_con_cambios: null
+actualizado_en: '2026-10-11T03:18:43.018487+00:00'

@@ -13,18 +13,23 @@
 # Criterio de selección del estudio v2 (revisión previa con scripts/study/check_scenes.py,
 # 2026-10-10): escenas del bloque E en las que el detector encuentra los objetos del diseño y la
 # narrativa no repite objetos; E3 y E4 con una sola salida libre que la narrativa indica. Se
-# descartaron variantes en las que el sofá lejano se detectaba también como «banco». En E3/E4
-# la maceta del fondo se detecta también como «jarrón» y en E5 la narrativa no menciona a las
-# personas del fondo: son resultados del sistema y la referencia es la narrativa congelada.
+# descartaron variantes en las que el sofá lejano se detectaba también como «banco».
+# Revisión de realismo (2026-10-10): E3/E4 pasan a v3 (sala con una sola ruta libre) y E1, E2, E5 y la
+# práctica E6 a v4 (oficina, cocina-comedor, dormitorio y comedor; 8 a 11 objetos; ruta libre al
+# frente comprobada con la geometría). El audio menciona solo los objetos que VisionNav detecta
+# (no detecta escritorio, libros, estufa ni microondas): son resultados del sistema y la referencia
+# es la narrativa congelada.
 #
 # estimulos: lista de stimulus_id (del manifest) o null (la prueba no usa estímulo:
 # se pregunta sobre lo escuchado en la sesión).
 # referencia: respuesta según la NARRATIVA CONGELADA (stimuli/estudio2/audios/congelados.yaml),
 # no según la imagen. Permite que el investigador marque sin transcribir. Narrativas del 2026-10-10:
-#   E1: «Silla a tu izquierda a aproximadamente 4 pasos. Sofá a tu derecha a aproximadamente
-#        4 pasos. 2 personas frente a ti a aproximadamente 5 y 6 pasos.» → la más lejana: personas.
-#   E2: «Persona cerca a tu izquierda a aproximadamente 2 pasos. Sofá … a tu derecha a
-#        aproximadamente 5 pasos.»
+#   E1 (v4, oficina): «Silla a tu derecha a aproximadamente 4 pasos. Planta en maceta a tu derecha a
+#        aproximadamente 5 pasos. Persona frente a ti a aproximadamente 6 pasos.» → la más lejana: persona.
+#        (VisionNav no reconoce el escritorio ni los libros: el audio no nombra el lugar.)
+#   E2 (v4, cocina-comedor): «Parece que estás en un comedor. Persona a tu izquierda a aproximadamente
+#        3 pasos. 2 sillas y mesa de comedor a tu derecha a aproximadamente 5 pasos. Planta en maceta a
+#        tu derecha a aproximadamente 6 pasos.»
 #   E3 → «Puedes avanzar hacia la izquierda»; E4 → «Silla a tu izquierda … Puedes avanzar hacia
 #        la derecha»: entre E3 y E4 la narrativa solo cambia la silla y la salida.
 
@@ -32,19 +37,19 @@ schema_version: 1
 
 asignaciones:
   - prueba_id: OBJ-01            # objetos de la escena y cuál está más lejos
-    estimulos: [EST2-E1]         # silla, sofá y dos personas
+    estimulos: [EST2-E1]         # oficina v4: silla, planta y persona al fondo
     referencia:
       objetos:
-        - {nombre: Silla, lado: izquierda, pasos: 4}
-        - {nombre: Sofá, lado: derecha, pasos: 4}
-        - {nombre: Personas, lado: frente, pasos: 5}
-      relacion: {pregunta: "De esos objetos, ¿cuál está más lejos de usted?", respuesta: Personas}
+        - {nombre: Silla, lado: derecha, pasos: 4}
+        - {nombre: Planta en maceta, lado: derecha, pasos: 5}
+        - {nombre: Persona, lado: frente, pasos: 6}
+      relacion: {pregunta: "De esos objetos, ¿cuál está más lejos de usted?", respuesta: Persona}
   - prueba_id: OBJ-02            # dónde está cada objeto (dos objetos)
-    estimulos: [EST2-E2]         # persona cerca a la izquierda, sofá lejos a la derecha
+    estimulos: [EST2-E2]         # cocina-comedor v4: persona cerca a la izquierda, mesa con sillas a la derecha
     referencia:
       objetos:
-        - {nombre: Persona, articulo: la persona, lado: izquierda, pasos: 2}
-        - {nombre: Sofá, articulo: el sofá, lado: derecha, pasos: 5}
+        - {nombre: Persona, articulo: la persona, lado: izquierda, pasos: 3}
+        - {nombre: Mesa de comedor, articulo: la mesa, lado: derecha, pasos: 5}
   - prueba_id: OBJ-03            # por dónde puede avanzar
     estimulos: [EST2-E3]         # sala: frente y derecha bloqueados de cerca → izquierda libre
     referencia: {direccion_narrativa: izquierda}
@@ -56,7 +61,7 @@ asignaciones:
         - "La silla pasó de la derecha a la izquierda"
         - "Ahora se puede avanzar por la derecha (antes, por la izquierda)"
   - prueba_id: OBJ-05            # cómo suena la voz
-    estimulos: [EST2-E5]         # cuatro objetos
+    estimulos: [EST2-E5]         # dormitorio v4 (pregunta por la voz, sin referencia)
   - prueba_id: OBJ-06            # información suficiente (sobre lo escuchado)
     estimulos: null
   - prueba_id: OBJ-07            # utilidad (cierre)
