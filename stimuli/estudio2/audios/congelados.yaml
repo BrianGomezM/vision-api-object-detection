@@ -12,11 +12,13 @@ configuracion:
     máx. 3 intentos'
   duracion_s: estimada a partir del tamaño (MP3 48 kbps)
 verificacion_fidelidad:
-  estado: pendiente
-  verificado_por: null
-  fecha: null
-  nota: 'audios nuevos por sustitución: [''EST2-E3'', ''EST2-E4'']; escuchar y confirmar
-    antes de la sesión'
+  estado: parcial
+  verificado_por: Brayan Julio Gómez Muñoz
+  fecha: '2026-10-10'
+  verificados: [EST2-E3, EST2-E4]
+  pendientes: [DS1-A2, EST2-E1, EST2-E2, EST2-E5]
+  nota: escucha humana completa de EST2-E3 y EST2-E4 (dicen literalmente la narrativa congelada
+    y coinciden con los objetos de la imagen); faltan los demás audios del conjunto
 estimulos:
 - stimulus_id: DS1-A2
   archivo: DS1-A2.mp3
