@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-10-11T04:40:13.804230+00:00",
+  "fecha": "2026-10-11T06:42:33.203265+00:00",
   "modelo_transcripcion": "groq:whisper-large-v3",
   "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
   "resultados": [
@@ -20,11 +20,11 @@
     },
     {
       "stimulus_id": "EST2-E1",
-      "palabras_narrativa": 40,
+      "palabras_narrativa": 55,
       "diferencias_palabras": 3,
-      "wer": 0.075,
+      "wer": 0.055,
       "coincide": false,
-      "transcripcion": "Silla a tu derecha aproximadamente 4 pasos. Planta en maceta a tu derecha aproximadamente 5 pasos. Persona frente a ti aproximadamente 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+      "transcripcion": "Silla a tu derecha aproximadamente 4 pasos. Dos plantas en maceta un poco más adelante, una a tu izquierda y otra a tu derecha aproximadamente 5 pasos. Persona un poco más adelante frente a ti aproximadamente 6 pasos. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -45,11 +45,11 @@
     },
     {
       "stimulus_id": "EST2-E2",
-      "palabras_narrativa": 50,
+      "palabras_narrativa": 57,
       "diferencias_palabras": 4,
-      "wer": 0.08,
+      "wer": 0.07,
       "coincide": false,
-      "transcripcion": "Parece que estás en un comedor. Persona a tu izquierda aproximadamente tres pasos. Dos sillas y un mesa de comedor a tu derecha aproximadamente cinco pasos. Banco frente a ti aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "transcripcion": "Parece que estás en un comedor. Persona a tu izquierda aproximadamente tres pasos. Dos sillas y un mesa de comedor a tu derecha aproximadamente cinco pasos. Banco y dos plantas en maceta frente a ti aproximadamente cinco y seis pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
@@ -150,11 +150,11 @@
     },
     {
       "stimulus_id": "EST2-E6",
-      "palabras_narrativa": 49,
-      "diferencias_palabras": 5,
-      "wer": 0.102,
+      "palabras_narrativa": 41,
+      "diferencias_palabras": 3,
+      "wer": 0.073,
       "coincide": false,
-      "transcripcion": "Parece que estás en un comedor. Dos sillas a tu izquierda aproximadamente cinco pasos. Un silla frente a ti aproximadamente cinco pasos. Un mesa de comedor a tu izquierda aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "transcripcion": "Parece que estás en un comedor. Silla a tu izquierda aproximadamente cinco pasos. Mesa de comedor a tu izquierda aproximadamente cinco pasos. Planta en maceta a tu derecha aproximadamente cinco pasos. Puedes avanzar hacia el frente con cuidado.",
       "diferencias": [
         {
           "op": "delete",
@@ -162,19 +162,9 @@
           "audio": ""
         },
         {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "un"
-        },
-        {
           "op": "delete",
           "narrativa": "a",
           "audio": ""
-        },
-        {
-          "op": "replace",
-          "narrativa": "uno",
-          "audio": "un"
         },
         {
           "op": "delete",

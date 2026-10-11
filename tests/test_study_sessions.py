@@ -313,7 +313,7 @@ def test_catalogo_declara_estado_de_estimulos(client):
     assert not [k for k in pruebas if k.startswith("PIL")]                    # sin prueba piloto (2026-10-09)
     # Estudio v2: referencia según la narrativa congelada, para marcar sin transcribir.
     ref1, ref2, ref4 = (pruebas[k]["referencia"] for k in ("OBJ-01", "OBJ-02", "OBJ-04"))
-    assert [o["nombre"] for o in ref1["objetos"]] == ["Silla", "Planta en maceta", "Persona"]
+    assert [o["nombre"] for o in ref1["objetos"]] == ["Silla", "Planta en maceta (izquierda)", "Planta en maceta (derecha)", "Persona"]
     assert ref1["relacion"]["respuesta"] == "Persona"
     assert [(o["nombre"], o["lado"], o["pasos"]) for o in ref2["objetos"]] == [("Persona", "izquierda", 3), ("Mesa de comedor", "derecha", 5)]
     assert len(ref4["cambios"]) == 2 and pruebas["OBJ-05"]["referencia"] is None
