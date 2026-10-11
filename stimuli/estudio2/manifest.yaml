@@ -9,11 +9,11 @@ source:
   repository: generador_escenas_experimentales
   por_escena:
     E1:
-      commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-      carpeta: output/estudio_v4
+      commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+      carpeta: output/estudio_v6
     E2:
-      commit: cc09442f804a881cd63ae6b8f877f84905fe7a86
-      carpeta: output/estudio_v5
+      commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+      carpeta: output/estudio_v6
     E3:
       commit: 84eb7c22fb69da962a546065c45675603e60c8ea
       carpeta: output/estudio_v3
@@ -21,11 +21,11 @@ source:
       commit: 84eb7c22fb69da962a546065c45675603e60c8ea
       carpeta: output/estudio_v3
     E5:
-      commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-      carpeta: output/estudio_v4
+      commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+      carpeta: output/estudio_v6
     E6:
-      commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-      carpeta: output/estudio_v4
+      commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+      carpeta: output/estudio_v6
 reemplazos:
 - stimulus_id: EST2-E3
   fecha: '2026-10-10'
@@ -71,6 +71,26 @@ reemplazos:
   motivo: 'v5: el microondas y el juego de té (clases que el backend descarta) se
     cambian por una banca y botellas, clases COCO que el backend sí deja pasar; la
     narrativa menciona más objetos'
+- stimulus_id: EST2-E1
+  fecha: '2026-10-11'
+  sha256_anterior: 5f4378c86192ddfce11fc86c2a3337c21c1e6b6e2077045431f68b8011ef159d
+  motivo: 'v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta
+    se cambian por objetos detectables, sin perder la respuesta de cada prueba'
+- stimulus_id: EST2-E2
+  fecha: '2026-10-11'
+  sha256_anterior: a7a64e7d5be490c57b8e022a6393cd9d981661d55f0264d547a9f78ded472f3f
+  motivo: 'v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta
+    se cambian por objetos detectables, sin perder la respuesta de cada prueba'
+- stimulus_id: EST2-E5
+  fecha: '2026-10-11'
+  sha256_anterior: 6bc659ffd6a896bedeb3c89a5865761d49d72fc1d764e04a928d6121c92a5907
+  motivo: 'v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta
+    se cambian por objetos detectables, sin perder la respuesta de cada prueba'
+- stimulus_id: EST2-E6
+  fecha: '2026-10-11'
+  sha256_anterior: 7ddf06ff2bf787ed53a5b6616f8c0bf3beaaa39be41eb0b18e558cb3c9b1e4c3
+  motivo: 'v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta
+    se cambian por objetos detectables, sin perder la respuesta de cada prueba'
 image_format:
   width: 800
   height: 450
@@ -80,40 +100,10 @@ stimuli:
   scene_id: E1
   block: E
   file: E1.png
-  sha256: 5f4378c86192ddfce11fc86c2a3337c21c1e6b6e2077045431f68b8011ef159d
-  bytes: 363542
+  sha256: 5eb8840d34dfdd6bc5c6127145da86dc5e7b4be809ae17b196fb0e5d2b696042
+  bytes: 356511
   design:
     objects:
-    - id: desk_01
-      class: desk
-      horizontal: left
-      depth_condition: medium
-      distance_m: 4.480518
-      occlusion_O: 0.037816
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: books_01
-      class: book
-      horizontal: left
-      depth_condition: medium
-      distance_m: 4.390037
-      occlusion_O: 0.0
-      relation:
-        type: on_top_of
-        target: desk_01
-        side: null
-    - id: chair_01
-      class: chair
-      horizontal: left
-      depth_condition: medium
-      distance_m: 5.329084
-      occlusion_O: 0.868778
-      relation:
-        type: free
-        target: null
-        side: null
     - id: armchair_01
       class: chair
       horizontal: right
@@ -130,16 +120,6 @@ stimuli:
       depth_condition: medium
       distance_m: 5.593345
       occlusion_O: 0.219661
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: shelf_01
-      class: shelf
-      horizontal: center
-      depth_condition: far
-      distance_m: 7.319801
-      occlusion_O: 0.0
       relation:
         type: free
         target: null
@@ -164,11 +144,41 @@ stimuli:
         type: free
         target: null
         side: null
+    - id: plant_02
+      class: potted plant
+      horizontal: left
+      depth_condition: medium
+      distance_m: 5.61086
+      occlusion_O: 0.0
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: side_01
+      class: side table
+      horizontal: left
+      depth_condition: far
+      distance_m: 7.375458
+      occlusion_O: 0.012579
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: bottle_01
+      class: bottle
+      horizontal: left
+      depth_condition: medium
+      distance_m: 7.321938
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: side_01
+        side: null
   ground_truth_ref:
-    path: output/estudio_v4/ground_truth/E1.json
-    sha256: 56a0df615b9a6ac5e63938c4ccc44ec5a633a4acd9c98c635d7526b5878bf21a
-    commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-    scene_spec_sha256: 235b15d5be5b1b0573199e554aa0359d53670fa2bddfa248fdc4b18b97137c57
+    path: output/estudio_v6/ground_truth/E1.json
+    sha256: f1ad3a32d4331759e76d344bc0fc97171896d2cbd008234bc7d2934a2836b53f
+    commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+    scene_spec_sha256: 36504dcae6c3a7dcfa2a822e1e20e6fb288ab8f965cd19785f51a673ed5a81c8
   routes:
     free_sides:
     - left
@@ -180,8 +190,8 @@ stimuli:
   scene_id: E2
   block: E
   file: E2.png
-  sha256: a7a64e7d5be490c57b8e022a6393cd9d981661d55f0264d547a9f78ded472f3f
-  bytes: 370078
+  sha256: da8bb3e3852f8fd84ba2bc2e6d0e4e906daa90006db1acc00f1f02f6ae224c6a
+  bytes: 372574
   design:
     objects:
     - id: person_01
@@ -189,16 +199,6 @@ stimuli:
       horizontal: left
       depth_condition: near
       distance_m: 2.638618
-      occlusion_O: 0.0
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: stove_01
-      class: oven
-      horizontal: center
-      depth_condition: far
-      distance_m: 6.29223
       occlusion_O: 0.0
       relation:
         type: free
@@ -284,11 +284,21 @@ stimuli:
         type: on_top_of
         target: table_01
         side: null
+    - id: plant_02
+      class: potted plant
+      horizontal: center
+      depth_condition: far
+      distance_m: 6.161616
+      occlusion_O: 0.0
+      relation:
+        type: free
+        target: null
+        side: null
   ground_truth_ref:
-    path: output/estudio_v5/ground_truth/E2.json
-    sha256: f1643293850620bbe3ab2bcce1b93b8cf80d488c058d6927d9983718ec6eb69c
-    commit: cc09442f804a881cd63ae6b8f877f84905fe7a86
-    scene_spec_sha256: 7659c64df3c6a12e6b2daab9a9326088fe1ebb14009c443a736c464cd6b25b37
+    path: output/estudio_v6/ground_truth/E2.json
+    sha256: 9cba95599fe941b6c17a9abccdda6e8089d1b75ad841e698758efcfa68a644ed
+    commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+    scene_spec_sha256: d052146db11cedeee84e9effd0090a30d51f9ff685b1a8bdb2b91fe70e131d20
   routes:
     free_sides:
     - center
@@ -460,8 +470,8 @@ stimuli:
   scene_id: E5
   block: E
   file: E5.png
-  sha256: 6bc659ffd6a896bedeb3c89a5865761d49d72fc1d764e04a928d6121c92a5907
-  bytes: 369499
+  sha256: c049deb5594d5aa2d9f4b839f8dd3ed1adcd8c8862cc2712b0dcff84076a3055
+  bytes: 365919
   design:
     objects:
     - id: bed_01
@@ -473,26 +483,6 @@ stimuli:
       relation:
         type: free
         target: null
-        side: null
-    - id: night_l
-      class: side table
-      horizontal: center
-      depth_condition: far
-      distance_m: 6.260182
-      occlusion_O: 0.210156
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: lamp_01
-      class: lamp
-      horizontal: center
-      depth_condition: medium
-      distance_m: 6.174639
-      occlusion_O: 0.0
-      relation:
-        type: on_top_of
-        target: night_l
         side: null
     - id: night_r
       class: side table
@@ -529,7 +519,7 @@ stimuli:
       horizontal: left
       depth_condition: medium
       distance_m: 5.419918
-      occlusion_O: 0.0
+      occlusion_O: 0.433875
       relation:
         type: free
         target: null
@@ -537,9 +527,9 @@ stimuli:
     - id: tvtable_01
       class: side table
       horizontal: left
-      depth_condition: near
-      distance_m: 3.725236
-      occlusion_O: 0.036924
+      depth_condition: medium
+      distance_m: 4.115505
+      occlusion_O: 0.033266
       relation:
         type: free
         target: null
@@ -548,7 +538,7 @@ stimuli:
       class: tv
       horizontal: left
       depth_condition: medium
-      distance_m: 3.604237
+      distance_m: 4.006311
       occlusion_O: 0.0
       relation:
         type: on_top_of
@@ -564,11 +554,31 @@ stimuli:
         type: free
         target: null
         side: null
+    - id: night_l
+      class: side table
+      horizontal: center
+      depth_condition: far
+      distance_m: 6.260182
+      occlusion_O: 0.200781
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: vase_02
+      class: vase
+      horizontal: center
+      depth_condition: medium
+      distance_m: 6.192452
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: night_l
+        side: null
   ground_truth_ref:
-    path: output/estudio_v4/ground_truth/E5.json
-    sha256: 8023fcd17440d386130053fe8fc9056e82daee0318a3e3c72b7e26a47a73e98c
-    commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-    scene_spec_sha256: 6e809c82871da49d5b3dddcdf048d25059030526c73c4b1f02e2600aa5ad61d9
+    path: output/estudio_v6/ground_truth/E5.json
+    sha256: 2081ff933d047cb9bf83ec80a34b3f4f560024c53fe58fb5874a994de3f00816
+    commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+    scene_spec_sha256: 9f3196e56c9f2a0d4013a1b634719b58382114a231dc6b4265bba46cdaa9ab2d
   routes:
     free_sides:
     - left
@@ -580,8 +590,8 @@ stimuli:
   scene_id: E6
   block: E
   file: E6.png
-  sha256: 7ddf06ff2bf787ed53a5b6616f8c0bf3beaaa39be41eb0b18e558cb3c9b1e4c3
-  bytes: 352024
+  sha256: 1d189b54a3c458d4c9cfdc88263125f8fa47dd9a9ae894bc0b832888db74695b
+  bytes: 347768
   design:
     objects:
     - id: table_01
@@ -589,47 +599,7 @@ stimuli:
       horizontal: left
       depth_condition: medium
       distance_m: 4.370407
-      occlusion_O: 0.070826
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: vase_01
-      class: vase
-      horizontal: left
-      depth_condition: medium
-      distance_m: 4.02437
-      occlusion_O: 0.0
-      relation:
-        type: on_top_of
-        target: table_01
-        side: null
-    - id: bowl_01
-      class: bowl
-      horizontal: left
-      depth_condition: medium
-      distance_m: 4.587933
-      occlusion_O: 0.866667
-      relation:
-        type: on_top_of
-        target: table_01
-        side: null
-    - id: chair_01
-      class: chair
-      horizontal: center
-      depth_condition: medium
-      distance_m: 3.799229
-      occlusion_O: 0.0
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: chair_02
-      class: chair
-      horizontal: center
-      depth_condition: medium
-      distance_m: 4.516264
-      occlusion_O: 0.375782
+      occlusion_O: 0.093231
       relation:
         type: free
         target: null
@@ -649,30 +619,10 @@ stimuli:
       horizontal: right
       depth_condition: far
       distance_m: 6.097172
-      occlusion_O: 0.056858
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: tvtable_01
-      class: side table
-      horizontal: right
-      depth_condition: medium
-      distance_m: 4.053996
-      occlusion_O: 0.03302
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: tv_01
-      class: tv
-      horizontal: right
-      depth_condition: medium
-      distance_m: 3.943098
       occlusion_O: 0.0
       relation:
-        type: on_top_of
-        target: tvtable_01
+        type: free
+        target: null
         side: null
     - id: clock_01
       class: clock
@@ -684,11 +634,31 @@ stimuli:
         type: free
         target: null
         side: null
+    - id: bowl_01
+      class: bowl
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.042497
+      occlusion_O: 0.0
+      relation:
+        type: on_top_of
+        target: table_01
+        side: null
+    - id: bottle_01
+      class: bottle
+      horizontal: left
+      depth_condition: medium
+      distance_m: 4.526111
+      occlusion_O: 0.139013
+      relation:
+        type: on_top_of
+        target: table_01
+        side: null
   ground_truth_ref:
-    path: output/estudio_v4/ground_truth/E6.json
-    sha256: c5c0fa9a828c7c97bb79435331154c8f1be94dbb439657ca2c9010629fa7056b
-    commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-    scene_spec_sha256: a0a1bf9b557b9c2babd0abe1fa646256d1c324bb58b12b86d0a2c50d3d275454
+    path: output/estudio_v6/ground_truth/E6.json
+    sha256: 0f3aca56ba2400fd1d9c516986e3b134fece422be1760c1358a5e2abf52342b3
+    commit: 1b2f0182137fba5721b478391990cbf7c3c198cf
+    scene_spec_sha256: 7722542badfca699a4a2db3ce19fe9bf8639e8238a32b96a5df7a6ff8ec162a9
   routes:
     free_sides:
     - left
