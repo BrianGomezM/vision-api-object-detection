@@ -1,0 +1,320 @@
+{
+ "fecha_utc": "2026-10-11T16:27:56+00:00",
+ "commit": "fcf80e97e05e8064f3192f5e800058f710a1b464",
+ "dispositivo": "cpu",
+ "nucleos_logicos": 8,
+ "resumen": {
+  "NF-01 tiempo de respuesta total (s)": {
+   "media": 17.02,
+   "min": 12.73,
+   "max": 20.6
+  },
+  "NF-02 desglose medio por etapa (ms)": {
+   "deteccion_ms": 600.0,
+   "espacial_ms": 0.3,
+   "pasos_ms": 0.0,
+   "visualizer_ms": 20.4,
+   "espacio_ms": 0.1,
+   "decision_ms": 0.2,
+   "escenario_ms": 561.0,
+   "llm_ms": 561.0,
+   "total_ms": 1192.5,
+   "tts_ms": 15686.2
+  },
+  "NF-04 tasa de solicitudes exitosas": "6/6",
+  "NF-05 CPU del proceso por solicitud (%)": {
+   "media": 31.1,
+   "max": 57.3
+  },
+  "NF-06 memoria RSS (MB)": {
+   "inicio": 279.7,
+   "final": 461.2,
+   "max": 496.1
+  },
+  "NF-07 tamaño de la respuesta JSON (KB)": {
+   "media": 694.0,
+   "max": 834.4
+  },
+  "NF-08 repeticiones idénticas a 0,35": true
+ },
+ "solicitudes": [
+  {
+   "stimulus_id": "EST2-E1",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 20.6,
+   "tiempos_ms": {
+    "deteccion_ms": 1362.81,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 21.27,
+    "espacio_ms": 0.0,
+    "decision_ms": 1.0,
+    "escenario_ms": 1211.39,
+    "llm_ms": 1211.39,
+    "total_ms": 2596.48,
+    "tts_ms": 17743.38
+   },
+   "degradaciones": null,
+   "objetos": 7,
+   "bytes_respuesta": 719702,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 57.3,
+   "rss_mb": 474.6
+  },
+  {
+   "stimulus_id": "EST2-E2",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 15.53,
+   "tiempos_ms": {
+    "deteccion_ms": 440.0,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 20.82,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 524.39,
+    "llm_ms": 524.39,
+    "total_ms": 1001.73,
+    "tts_ms": 14424.51
+   },
+   "degradaciones": null,
+   "objetos": 9,
+   "bytes_respuesta": 709002,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 26.4,
+   "rss_mb": 456.9
+  },
+  {
+   "stimulus_id": "EST2-E3",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 18.93,
+   "tiempos_ms": {
+    "deteccion_ms": 419.62,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 19.7,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 390.67,
+    "llm_ms": 390.67,
+    "total_ms": 832.96,
+    "tts_ms": 17982.55
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 803685,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 22.5,
+   "rss_mb": 496.1
+  },
+  {
+   "stimulus_id": "EST2-E4",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 19.45,
+   "tiempos_ms": {
+    "deteccion_ms": 431.6,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 20.63,
+    "espacio_ms": 0.53,
+    "decision_ms": 0.0,
+    "escenario_ms": 349.82,
+    "llm_ms": 349.82,
+    "total_ms": 815.64,
+    "tts_ms": 18516.54
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 854460,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 21.0,
+   "rss_mb": 469.2
+  },
+  {
+   "stimulus_id": "EST2-E5",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 14.88,
+   "tiempos_ms": {
+    "deteccion_ms": 482.37,
+    "espacial_ms": 1.75,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 19.28,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 538.3,
+    "llm_ms": 538.3,
+    "total_ms": 1055.06,
+    "tts_ms": 13702.07
+   },
+   "degradaciones": null,
+   "objetos": 7,
+   "bytes_respuesta": 662159,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 26.0,
+   "rss_mb": 460.5
+  },
+  {
+   "stimulus_id": "EST2-E6",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 12.73,
+   "tiempos_ms": {
+    "deteccion_ms": 463.87,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 20.49,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 351.65,
+    "llm_ms": 351.65,
+    "total_ms": 853.09,
+    "tts_ms": 11748.45
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 515172,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 33.1,
+   "rss_mb": 461.2
+  }
+ ],
+ "estabilidad_umbral": [
+  {
+   "stimulus_id": "EST2-E1",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    },
+    "0.35": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    },
+    "0.5": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    }
+   },
+   "repeticiones_0_35": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E2",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    },
+    "0.35": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    },
+    "0.5": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    }
+   },
+   "repeticiones_0_35": [
+    9,
+    9,
+    9
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E3",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E4",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E5",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    },
+    "0.35": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    },
+    "0.5": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    }
+   },
+   "repeticiones_0_35": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E6",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  }
+ ]
+}
