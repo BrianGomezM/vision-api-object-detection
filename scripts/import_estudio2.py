@@ -48,7 +48,8 @@ SCENES = ["E1", "E2", "E3", "E4", "E5", "E6"]   # E6: escena de práctica (comed
 V2 = ("346191e1c0612119c93f0beae5f64578db85046f", "output")
 V3 = ("84eb7c22fb69da962a546065c45675603e60c8ea", "output/estudio_v3")
 V4 = ("01891dabc97e5fa37200d0e108f728ac45865dad", "output/estudio_v4")
-SOURCES = {"E1": V4, "E2": V4, "E3": V3, "E4": V3, "E5": V4, "E6": V4}
+V5 = ("cc09442f804a881cd63ae6b8f877f84905fe7a86", "output/estudio_v5")
+SOURCES = {"E1": V4, "E2": V5, "E3": V3, "E4": V3, "E5": V4, "E6": V4}
 REPLACED = [
     {"stimulus_id": sid, "fecha": "2026-10-10", "commit_anterior": V2[0], "sha256_anterior": old,
      "motivo": "ruta libre ambigua o no verificada; v3: sala con sofá divisor y puertas laterales, una sola "
@@ -63,6 +64,10 @@ REPLACED = [
     for sid, old in (("EST2-E1", "05c799f95cbbd9f793e34face85f7b16bca3cb30c4f0827fa515f91714ef5d56"),
                      ("EST2-E2", "5fd74740483d5309af5d366ec61f9970a9319ccb19edab70835e7cb35f5343e4"),
                      ("EST2-E5", "cc58dc98e0ef1574619428502a9256c4af0a847d35f9862353e6a6cc0f99c37c"))
+] + [
+    {"stimulus_id": "EST2-E2", "fecha": "2026-10-10", "commit_anterior": V4[0], "sha256_anterior": "df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427",
+     "motivo": "v5: el microondas y el juego de té (clases que el backend descarta) se cambian por una banca y "
+               "botellas, clases COCO que el backend sí deja pasar; la narrativa menciona más objetos"}
 ]
 
 
