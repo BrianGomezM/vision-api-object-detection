@@ -49,7 +49,8 @@ V2 = ("346191e1c0612119c93f0beae5f64578db85046f", "output")
 V3 = ("84eb7c22fb69da962a546065c45675603e60c8ea", "output/estudio_v3")
 V4 = ("01891dabc97e5fa37200d0e108f728ac45865dad", "output/estudio_v4")
 V5 = ("cc09442f804a881cd63ae6b8f877f84905fe7a86", "output/estudio_v5")
-SOURCES = {"E1": V4, "E2": V5, "E3": V3, "E4": V3, "E5": V4, "E6": V4}
+V6 = ("1b2f0182137fba5721b478391990cbf7c3c198cf", "output/estudio_v6")
+SOURCES = {"E1": V6, "E2": V6, "E3": V3, "E4": V3, "E5": V6, "E6": V6}
 REPLACED = [
     {"stimulus_id": sid, "fecha": "2026-10-10", "commit_anterior": V2[0], "sha256_anterior": old,
      "motivo": "ruta libre ambigua o no verificada; v3: sala con sofá divisor y puertas laterales, una sola "
@@ -68,6 +69,19 @@ REPLACED = [
     {"stimulus_id": "EST2-E2", "fecha": "2026-10-10", "commit_anterior": V4[0], "sha256_anterior": "df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427",
      "motivo": "v5: el microondas y el juego de té (clases que el backend descarta) se cambian por una banca y "
                "botellas, clases COCO que el backend sí deja pasar; la narrativa menciona más objetos"}
+] + [
+    {"stimulus_id": "EST2-E1", "fecha": "2026-10-11", "sha256_anterior": "5f4378c86192ddfce11fc86c2a3337c21c1e6b6e2077045431f68b8011ef159d",
+     "motivo": "v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta se cambian por "
+               "objetos detectables, sin perder la respuesta de cada prueba"},
+    {"stimulus_id": "EST2-E2", "fecha": "2026-10-11", "sha256_anterior": "a7a64e7d5be490c57b8e022a6393cd9d981661d55f0264d547a9f78ded472f3f",
+     "motivo": "v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta se cambian por "
+               "objetos detectables, sin perder la respuesta de cada prueba"},
+    {"stimulus_id": "EST2-E5", "fecha": "2026-10-11", "sha256_anterior": "6bc659ffd6a896bedeb3c89a5865761d49d72fc1d764e04a928d6121c92a5907",
+     "motivo": "v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta se cambian por "
+               "objetos detectables, sin perder la respuesta de cada prueba"},
+    {"stimulus_id": "EST2-E6", "fecha": "2026-10-11", "sha256_anterior": "7ddf06ff2bf787ed53a5b6616f8c0bf3beaaa39be41eb0b18e558cb3c9b1e4c3",
+     "motivo": "v6: ajustes del autor; objetos que YOLO no detecta o que el backend descarta se cambian por "
+               "objetos detectables, sin perder la respuesta de cada prueba"}
 ]
 
 
