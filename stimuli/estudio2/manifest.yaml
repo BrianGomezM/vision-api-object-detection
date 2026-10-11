@@ -12,8 +12,8 @@ source:
       commit: 01891dabc97e5fa37200d0e108f728ac45865dad
       carpeta: output/estudio_v4
     E2:
-      commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-      carpeta: output/estudio_v4
+      commit: cc09442f804a881cd63ae6b8f877f84905fe7a86
+      carpeta: output/estudio_v5
     E3:
       commit: 84eb7c22fb69da962a546065c45675603e60c8ea
       carpeta: output/estudio_v3
@@ -64,6 +64,13 @@ reemplazos:
   motivo: 'v4: escenas más realistas (lugares distintos, 8 a 11 objetos, ruta libre
     al frente comprobada con corredores 0,8 × 3 m y con VisionNav), a petición del
     autor'
+- stimulus_id: EST2-E2
+  fecha: '2026-10-10'
+  commit_anterior: 01891dabc97e5fa37200d0e108f728ac45865dad
+  sha256_anterior: df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427
+  motivo: 'v5: el microondas y el juego de té (clases que el backend descarta) se
+    cambian por una banca y botellas, clases COCO que el backend sí deja pasar; la
+    narrativa menciona más objetos'
 image_format:
   width: 800
   height: 450
@@ -173,8 +180,8 @@ stimuli:
   scene_id: E2
   block: E
   file: E2.png
-  sha256: df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427
-  bytes: 370122
+  sha256: a7a64e7d5be490c57b8e022a6393cd9d981661d55f0264d547a9f78ded472f3f
+  bytes: 370078
   design:
     objects:
     - id: person_01
@@ -197,32 +204,12 @@ stimuli:
         type: free
         target: null
         side: null
-    - id: mwtable_01
-      class: side table
-      horizontal: center
-      depth_condition: far
-      distance_m: 6.259184
-      occlusion_O: 0.086608
-      relation:
-        type: free
-        target: null
-        side: null
-    - id: microwave_01
-      class: microwave
-      horizontal: center
-      depth_condition: medium
-      distance_m: 6.19902
-      occlusion_O: 0.0
-      relation:
-        type: on_top_of
-        target: mwtable_01
-        side: null
     - id: table_01
       class: dining table
       horizontal: right
       depth_condition: medium
       distance_m: 4.748995
-      occlusion_O: 0.113219
+      occlusion_O: 0.090269
       relation:
         type: free
         target: null
@@ -233,16 +220,6 @@ stimuli:
       depth_condition: medium
       distance_m: 4.427217
       occlusion_O: 0.0
-      relation:
-        type: on_top_of
-        target: table_01
-        side: null
-    - id: tea_01
-      class: cup
-      horizontal: right
-      depth_condition: medium
-      distance_m: 4.923392
-      occlusion_O: 0.233766
       relation:
         type: on_top_of
         target: table_01
@@ -272,7 +249,7 @@ stimuli:
       horizontal: right
       depth_condition: far
       distance_m: 6.554521
-      occlusion_O: 0.388759
+      occlusion_O: 0.415691
       relation:
         type: free
         target: null
@@ -287,11 +264,31 @@ stimuli:
         type: free
         target: null
         side: null
+    - id: bench_01
+      class: bench
+      horizontal: center
+      depth_condition: far
+      distance_m: 6.226974
+      occlusion_O: 0.0
+      relation:
+        type: free
+        target: null
+        side: null
+    - id: bottle_01
+      class: bottle
+      horizontal: right
+      depth_condition: medium
+      distance_m: 4.912455
+      occlusion_O: 0.141304
+      relation:
+        type: on_top_of
+        target: table_01
+        side: null
   ground_truth_ref:
-    path: output/estudio_v4/ground_truth/E2.json
-    sha256: 1b8cd4209ae1cf969b5fd3f19334b7215109d7228a7bffc5fbf697dd41b498d8
-    commit: 01891dabc97e5fa37200d0e108f728ac45865dad
-    scene_spec_sha256: 084d3712e3cbe8829fab0c09b61020a66275535defb5f8e8423218527f204ffa
+    path: output/estudio_v5/ground_truth/E2.json
+    sha256: f1643293850620bbe3ab2bcce1b93b8cf80d488c058d6927d9983718ec6eb69c
+    commit: cc09442f804a881cd63ae6b8f877f84905fe7a86
+    scene_spec_sha256: 7659c64df3c6a12e6b2daab9a9326088fe1ebb14009c443a736c464cd6b25b37
   routes:
     free_sides:
     - center
