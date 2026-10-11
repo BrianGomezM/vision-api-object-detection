@@ -44,10 +44,11 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_GENERATOR = REPO_ROOT.parent / "generador_escenas_experimentales"
 DATASET_ID = "estudio2"
 DEST = REPO_ROOT / "stimuli" / DATASET_ID
-SCENES = ["E1", "E2", "E3", "E4", "E5"]
+SCENES = ["E1", "E2", "E3", "E4", "E5", "E6"]   # E6: escena de práctica (comedor), desde v4
 V2 = ("346191e1c0612119c93f0beae5f64578db85046f", "output")
 V3 = ("84eb7c22fb69da962a546065c45675603e60c8ea", "output/estudio_v3")
-SOURCES = {"E1": V2, "E2": V2, "E3": V3, "E4": V3, "E5": V2}
+V4 = ("01891dabc97e5fa37200d0e108f728ac45865dad", "output/estudio_v4")
+SOURCES = {"E1": V4, "E2": V4, "E3": V3, "E4": V3, "E5": V4, "E6": V4}
 REPLACED = [
     {"stimulus_id": sid, "fecha": "2026-10-10", "commit_anterior": V2[0], "sha256_anterior": old,
      "motivo": "ruta libre ambigua o no verificada; v3: sala con sofá divisor y puertas laterales, una sola "
@@ -55,6 +56,13 @@ REPLACED = [
                "se cambió el sillón porque el anterior también se detectaba como sofá"}
     for sid, old in (("EST2-E3", "c44792ca0c870466f8acb94969301d44475c92e8d1eaf420b21037498d1266e6"),
                      ("EST2-E4", "d3a5ea5e3363c4ec1f5875e2cbd7726a19674dab08996855f283eec5e662ee36"))
+] + [
+    {"stimulus_id": sid, "fecha": "2026-10-10", "commit_anterior": V2[0], "sha256_anterior": old,
+     "motivo": "v4: escenas más realistas (lugares distintos, 8 a 11 objetos, ruta libre al frente comprobada "
+               "con corredores 0,8 × 3 m y con VisionNav), a petición del autor"}
+    for sid, old in (("EST2-E1", "05c799f95cbbd9f793e34face85f7b16bca3cb30c4f0827fa515f91714ef5d56"),
+                     ("EST2-E2", "5fd74740483d5309af5d366ec61f9970a9319ccb19edab70835e7cb35f5343e4"),
+                     ("EST2-E5", "cc58dc98e0ef1574619428502a9256c4af0a847d35f9862353e6a6cc0f99c37c"))
 ]
 
 
@@ -115,7 +123,7 @@ def build(generator: Path) -> tuple[dict, dict[str, bytes]]:
     manifest = {
         "schema_version": 1,
         "dataset_id": DATASET_ID,
-        "name": "Estudio con usuarios v2 — escenas E1–E5 (más objetos por escena; E3/E4 en v3)",
+        "name": "Estudio con usuarios — escenas E1–E5 y práctica E6 (E3/E4 en v3; E1, E2, E5 y E6 en v4)",
         "status": "ESTUDIO_V2",
         "source": {"repository": "generador_escenas_experimentales",
                    "por_escena": {sid: {"commit": c, "carpeta": o} for sid, (c, o) in SOURCES.items()}},
