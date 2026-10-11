@@ -12,13 +12,12 @@ configuracion:
     máx. 3 intentos'
   duracion_s: estimada a partir del tamaño (MP3 48 kbps)
 verificacion_fidelidad:
-  estado: parcial
+  estado: verificado
   verificado_por: Brayan Julio Gómez Muñoz
-  fecha: '2026-10-10'
-  verificados: [EST2-E3, EST2-E4]
-  pendientes: [EST2-E1, EST2-E2, EST2-E5, EST2-E6]
-  nota: escucha humana completa de EST2-E3 y EST2-E4; faltan los audios v6 (E1, E2, E5 y la práctica
-    E6, 2026-10-11).
+  fecha: '2026-10-11'
+  verificados: [EST2-E1, EST2-E2, EST2-E3, EST2-E4, EST2-E5, EST2-E6]
+  nota: escucha humana completa de los seis audios en uso (práctica EST2-E6 y pruebas EST2-E1 a EST2-E5);
+    E3 y E4 el 2026-10-10, los demás el 2026-10-11. DS1-A2 queda en el conjunto pero ya no se usa.
 estimulos:
 - stimulus_id: DS1-A2
   archivo: DS1-A2.mp3
