@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-10-11T03:19:31.945206+00:00",
+  "fecha": "2026-10-11T04:40:13.804230+00:00",
   "modelo_transcripcion": "groq:whisper-large-v3",
   "nota": "Apoyo automático; la verificación humana sigue siendo necesaria.",
   "resultados": [
@@ -45,16 +45,21 @@
     },
     {
       "stimulus_id": "EST2-E2",
-      "palabras_narrativa": 51,
-      "diferencias_palabras": 3,
-      "wer": 0.059,
+      "palabras_narrativa": 50,
+      "diferencias_palabras": 4,
+      "wer": 0.08,
       "coincide": false,
-      "transcripcion": "Parece que estás en un comedor. Persona a tu izquierda aproximadamente tres pasos. Dos sillas y mesa de comedor a tu derecha aproximadamente cinco pasos. Planta en maceta a tu derecha aproximadamente seis pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
+      "transcripcion": "Parece que estás en un comedor. Persona a tu izquierda aproximadamente tres pasos. Dos sillas y un mesa de comedor a tu derecha aproximadamente cinco pasos. Banco frente a ti aproximadamente cinco pasos. Puedes avanzar hacia el frente. Tienes aproximadamente cinco pasos libres antes del primer obstáculo.",
       "diferencias": [
         {
           "op": "delete",
           "narrativa": "a",
           "audio": ""
+        },
+        {
+          "op": "replace",
+          "narrativa": "uno",
+          "audio": "un"
         },
         {
           "op": "delete",
