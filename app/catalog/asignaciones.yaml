@@ -27,9 +27,9 @@
 #   E1 (v4, oficina): «Silla a tu derecha a aproximadamente 4 pasos. Planta en maceta a tu derecha a
 #        aproximadamente 5 pasos. Persona frente a ti a aproximadamente 6 pasos.» → la más lejana: persona.
 #        (VisionNav no reconoce el escritorio ni los libros: el audio no nombra el lugar.)
-#   E2 (v4, cocina-comedor): «Parece que estás en un comedor. Persona a tu izquierda a aproximadamente
-#        3 pasos. 2 sillas y mesa de comedor a tu derecha a aproximadamente 5 pasos. Planta en maceta a
-#        tu derecha a aproximadamente 6 pasos.»
+#   E2 (v5, cocina-comedor con banca y botellas): «Parece que estás en un comedor. Persona a tu izquierda
+#        a aproximadamente 3 pasos. 2 sillas y 1 mesa de comedor a tu derecha a aproximadamente 5 pasos.
+#        Banco frente a ti a aproximadamente 5 pasos.»
 #   E3 → «Puedes avanzar hacia la izquierda»; E4 → «Silla a tu izquierda … Puedes avanzar hacia
 #        la derecha»: entre E3 y E4 la narrativa solo cambia la silla y la salida.
 
@@ -45,7 +45,7 @@ asignaciones:
         - {nombre: Persona, lado: frente, pasos: 6}
       relacion: {pregunta: "De esos objetos, ¿cuál está más lejos de usted?", respuesta: Persona}
   - prueba_id: OBJ-02            # dónde está cada objeto (dos objetos)
-    estimulos: [EST2-E2]         # cocina-comedor v4: persona cerca a la izquierda, mesa con sillas a la derecha
+    estimulos: [EST2-E2]         # cocina-comedor v5: persona cerca a la izquierda, mesa con sillas a la derecha
     referencia:
       objetos:
         - {nombre: Persona, articulo: la persona, lado: izquierda, pasos: 3}

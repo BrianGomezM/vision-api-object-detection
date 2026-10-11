@@ -17,8 +17,8 @@ verificacion_fidelidad:
   fecha: '2026-10-10'
   verificados: [EST2-E3, EST2-E4]
   pendientes: [EST2-E1, EST2-E2, EST2-E5, EST2-E6]
-  nota: escucha humana completa de EST2-E3 y EST2-E4; los audios v4 (E1, E2, E5 y la práctica E6) se
-    generaron después y falta escucharlos. DS1-A2 ya no es la práctica.
+  nota: escucha humana completa de EST2-E3 y EST2-E4; faltan los audios v4/v5 (E1, E2, E5 y la
+    práctica E6). DS1-A2 ya no es la práctica.
 estimulos:
 - stimulus_id: DS1-A2
   archivo: DS1-A2.mp3
@@ -100,66 +100,80 @@ estimulos:
       y2: 93.84
 - stimulus_id: EST2-E2
   archivo: EST2-E2.mp3
-  sha256: cafe104e9f8429248747ccb332db00731a68c6ffd96a67e409ed46e15bed7e0e
+  sha256: 457bdacda43a8a1140f6882e61db38cac190893670c52a03d02580c31293b7e1
   content_type: audio/mpeg
-  tamano_bytes: 145728
-  duracion_s: 24.3
+  tamano_bytes: 142128
+  duracion_s: 23.7
   narrativa_final: Parece que estás en un comedor. Persona a tu izquierda a aproximadamente
-    3 pasos. 2 sillas y mesa de comedor a tu derecha a aproximadamente 5 pasos. Planta
-    en maceta a tu derecha a aproximadamente 6 pasos. Puedes avanzar hacia el frente.
-    Tienes aproximadamente 5 pasos libres antes del primer obstáculo.
+    3 pasos. 2 sillas y 1 mesa de comedor a tu derecha a aproximadamente 5 pasos.
+    Banco frente a ti a aproximadamente 5 pasos. Puedes avanzar hacia el frente. Tienes
+    aproximadamente 5 pasos libres antes del primer obstáculo.
   instruccion_movimiento: Puedes avanzar hacia el frente. Tienes aproximadamente 5
     pasos libres antes del primer obstáculo.
   tts_modelo: azure:es-CO-SalomeNeural
   llm_modelo: qwen/qwen3.8-27b
   origen_descripcion: llm
-  generado_en: '2026-10-11T03:18:37.610437+00:00'
+  generado_en: '2026-10-11T04:39:50.072297+00:00'
   intento: 1
   backend_commit: null
-  imagen_sha256: df7a24b87ec1952909c26db68dc38a86724ce57aad7875779a0821660617a427
+  imagen_sha256: a7a64e7d5be490c57b8e022a6393cd9d981661d55f0264d547a9f78ded472f3f
   detecciones:
   - clase: person
-    confianza: 0.948
+    confianza: 0.949
     bbox:
-      x1: 122.85
-      y1: 81.39
+      x1: 122.87
+      y1: 81.42
       x2: 257.61
-      y2: 384.23
+      y2: 384.25
   - clase: clock
-    confianza: 0.895
+    confianza: 0.899
     bbox:
       x1: 431.13
-      y1: 61.37
-      x2: 454.31
-      y2: 85.66
-  - clase: chair
-    confianza: 0.826
+      y1: 61.38
+      x2: 454.3
+      y2: 85.63
+  - clase: bench
+    confianza: 0.851
     bbox:
-      x1: 619.52
-      y1: 168.13
-      x2: 699.22
-      y2: 271.35
+      x1: 342.97
+      y1: 159.92
+      x2: 429.1
+      y2: 228.18
   - clase: chair
     confianza: 0.821
     bbox:
-      x1: 464.62
-      y1: 166.6
-      x2: 522.77
-      y2: 270.22
-  - clase: dining table
-    confianza: 0.494
+      x1: 619.49
+      y1: 168.17
+      x2: 699.24
+      y2: 271.32
+  - clase: chair
+    confianza: 0.815
     bbox:
-      x1: 532.25
-      y1: 178.56
-      x2: 618.45
-      y2: 282.7
+      x1: 464.49
+      y1: 166.56
+      x2: 522.96
+      y2: 270.22
+  - clase: bottle
+    confianza: 0.763
+    bbox:
+      x1: 571.99
+      y1: 153.44
+      x2: 580.84
+      y2: 181.27
+  - clase: dining table
+    confianza: 0.499
+    bbox:
+      x1: 532.15
+      y1: 177.47
+      x2: 618.49
+      y2: 282.88
   - clase: potted plant
-    confianza: 0.329
+    confianza: 0.472
     bbox:
       x1: 557.94
-      y1: 201.94
-      x2: 594.55
-      y2: 230.02
+      y1: 201.9
+      x2: 594.52
+      y2: 230.01
 - stimulus_id: EST2-E3
   archivo: EST2-E3.mp3
   sha256: 3d61bf0772cdaff73bde1ac5a3e19fcac18b0d683fc0cb5376552947361573d0
@@ -478,4 +492,17 @@ reemplazos:
   sha256_nuevo: 960934a6a402fd6eadc404a92e2c287897e3a15c17ee0c89944532456fb55fb4
   backend_commit: null
   arbol_con_cambios: null
-actualizado_en: '2026-10-11T03:18:43.018487+00:00'
+- stimulus_id: EST2-E2
+  fecha: '2026-10-11T04:39:50.092723+00:00'
+  motivo: La imagen cambió a la versión v5 (banca y botellas en lugar del microondas
+    y el juego de té); el audio anterior describía otra escena
+  archivo_anterior: reemplazados/EST2-E2-cafe104e.mp3
+  sha256_anterior: cafe104e9f8429248747ccb332db00731a68c6ffd96a67e409ed46e15bed7e0e
+  narrativa_anterior: Parece que estás en un comedor. Persona a tu izquierda a aproximadamente
+    3 pasos. 2 sillas y mesa de comedor a tu derecha a aproximadamente 5 pasos. Planta
+    en maceta a tu derecha a aproximadamente 6 pasos. Puedes avanzar hacia el frente.
+    Tienes aproximadamente 5 pasos libres antes del primer obstáculo.
+  sha256_nuevo: 457bdacda43a8a1140f6882e61db38cac190893670c52a03d02580c31293b7e1
+  backend_commit: null
+  arbol_con_cambios: null
+actualizado_en: '2026-10-11T04:39:50.092816+00:00'
