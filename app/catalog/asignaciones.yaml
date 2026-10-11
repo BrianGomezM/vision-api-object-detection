@@ -64,5 +64,6 @@ asignaciones:
 
 # Escena de PRÁCTICA: familiariza al participante con la voz y el formato antes de OBJ-01. Se
 # registra como ensayo (no es evidencia) y no está asignada a ninguna prueba.
-#   DS1-A2: una silla a la izquierda, distancia media.
-practica: [DS1-A2]
+#   EST2-E6 (v4, 2026-10-10): comedor con mesa, sillas, jarrón, tazón, planta, televisor y reloj.
+#   Antes: DS1-A2 (una silla a la izquierda), que sigue en el catálogo y en los audios congelados.
+practica: [EST2-E6]

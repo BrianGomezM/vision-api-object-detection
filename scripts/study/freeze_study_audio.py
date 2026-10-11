@@ -200,10 +200,9 @@ def replace(args) -> int:
     out_dir = FROZEN_AUDIO_PATH.parent
     manifest = yaml.safe_load(FROZEN_AUDIO_PATH.read_text(encoding="utf-8"))
     current = {e["stimulus_id"]: e for e in manifest["estimulos"]}
-    missing = [s for s in ids if s not in current]
-    if missing:
-        print(f"No están en el conjunto (use el modo normal): {missing}")
-        return 2
+    nuevos = [s for s in ids if s not in current]      # estímulos que se AÑADEN (p. ej. una práctica nueva)
+    if nuevos:
+        print(f"Se añaden (no tenían audio): {nuevos}")
     print(f"Sustituir: {ids}\nDestino: {out_dir}")
     if args.dry_run:
         return 0
@@ -250,7 +249,13 @@ def replace(args) -> int:
     old_dir.mkdir(exist_ok=True)
     reemplazos = manifest.setdefault("reemplazos", [])
     for sid, (audio, rec) in new.items():
-        old = current[sid]
+        old = current.get(sid)
+        if old is None:
+            (out_dir / rec["archivo"]).write_bytes(audio)
+            reemplazos.append({"stimulus_id": sid, "fecha": _now(), "motivo": args.motivo, "anadido": True,
+                               "sha256_nuevo": rec["sha256"], "backend_commit": commit, "arbol_con_cambios": dirty})
+            manifest["estimulos"].append(rec)
+            continue
         archived = old_dir / f"{sid}-{old['sha256'][:8]}.mp3"
         (out_dir / old["archivo"]).replace(archived)
         (out_dir / rec["archivo"]).write_bytes(audio)
