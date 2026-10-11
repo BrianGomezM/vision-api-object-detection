@@ -29,11 +29,12 @@ import httpx
 import psutil
 
 REPO = Path(__file__).resolve().parents[2]
-PY = REPO / ".venv" / "Scripts" / "python.exe"
+# BENCH_PY / BENCH_OUT permiten usar otro intérprete y guardar la evidencia en otra carpeta.
+PY = Path(os.environ.get("BENCH_PY") or REPO / ".venv" / "Scripts" / "python.exe")
 PORT = 8766
 BASE = f"http://127.0.0.1:{PORT}"
 IMAGES = sorted((REPO / "test_images").glob("0[1-5]_*.jpg"))
-OUT = REPO / "evaluation" / "results" / "hardening" / "concurrencia.json"
+OUT = Path(os.environ.get("BENCH_OUT") or REPO / "evaluation" / "results" / "hardening" / "concurrencia.json")
 
 
 def start(profile, extra=None):

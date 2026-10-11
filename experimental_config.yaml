@@ -285,8 +285,9 @@ experimento:
     # las pruebas piloto (PIL-*) y la métrica M-PIL por decisión de los directores. Las pruebas
     # técnicas, los datasets y las métricas técnicas no cambiaron. 2026-10-10 (estudio v2): pruebas
     # de usuario reescritas en lenguaje cotidiano y nuevo dataset del estudio (estudio2, escenas
-    # E1–E5); las pruebas técnicas y sus métricas no cambiaron.
-    # Anteriores: c7671ff0684c…, ff0404979a04…, 6d0cb24d3305…
-    sha256: 4877481e6e9f13322615aa4ee408c84473989641041e61abfc130904abcd5931
+    # E1–E5); las pruebas técnicas y sus métricas no cambiaron. 2026-10-11: solo se actualiza la
+    # descripción de estudio2 (seis escenas de interiores, E1–E6); ninguna prueba ni métrica cambia.
+    # Anteriores: c7671ff0684c…, ff0404979a04…, 6d0cb24d3305…, 4877481e6e9f…
+    sha256: ad566628319f797aa252e8c14aed2f400266eb055285941e05486df70f55da75
   metricas_version: PENDIENTE (CP3B)
   latencia: NO forma parte de las métricas del CP3B; si se reporta, por separado (CPU local ≠ despliegue)

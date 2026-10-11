@@ -1,0 +1,284 @@
+{
+ "config": {
+  "llm_simulado_s": 0.5,
+  "tts_simulado_s": 16.5,
+  "yolo": "real CPU",
+  "workers": 1
+ },
+ "rss_mb_en_reposo": 442,
+ "escenarios": [
+  {
+   "concurrentes": 1,
+   "tiempo_total_s": 18.3,
+   "resultados": [
+    {
+     "imagen": "01_persona_bolso.jpg",
+     "status": 200,
+     "latencia_ms": 18327,
+     "request_id": "3eb7760aa8e24373a06f3fadd1babbea",
+     "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    }
+   ],
+   "latencia_ms": {
+    "min": 18327,
+    "max": 18327,
+    "media": 18327
+   },
+   "errores": [],
+   "health_latencia_ms_max": 34,
+   "health_fallos": 0,
+   "rss_mb_max": 594
+  },
+  {
+   "concurrentes": 2,
+   "tiempo_total_s": 36.1,
+   "resultados": [
+    {
+     "imagen": "01_persona_bolso.jpg",
+     "status": 200,
+     "latencia_ms": 18184,
+     "request_id": "b7dc0bfddbc34e4283eb2be6c5803ef9",
+     "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "latencia_ms": 36119,
+     "request_id": "f997078b7b3d45c5998b701c44b8c434",
+     "narrativa": "Parece que estás en una sala de estar. Descripción a3741fcbf4. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
+     "codigo": null,
+     "retry_after": null
+    }
+   ],
+   "latencia_ms": {
+    "min": 18184,
+    "max": 36119,
+    "media": 27152
+   },
+   "errores": [],
+   "health_latencia_ms_max": 50,
+   "health_fallos": 0,
+   "rss_mb_max": 695
+  },
+  {
+   "concurrentes": 3,
+   "tiempo_total_s": 54.3,
+   "resultados": [
+    {
+     "imagen": "01_persona_bolso.jpg",
+     "status": 200,
+     "latencia_ms": 18428,
+     "request_id": "c9f44b32c4324b589ad2c314d0b8248b",
+     "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "latencia_ms": 54260,
+     "request_id": "8e9dd6eabb204107a4db87635d5896c0",
+     "narrativa": "Parece que estás en una sala de estar. Descripción a3741fcbf4. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "03_escritorio_objetos.jpg",
+     "status": 200,
+     "latencia_ms": 36277,
+     "request_id": "9d8a84b94f8e47c2817c6079fe3facc2",
+     "narrativa": "Parece que estás en una sala de estar. Descripción fc4c687aaa. El paso al frente está bloqueado. Gira con cuidado hacia la derecha y avanza despacio. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    }
+   ],
+   "latencia_ms": {
+    "min": 18428,
+    "max": 54260,
+    "media": 36322
+   },
+   "errores": [],
+   "health_latencia_ms_max": 41,
+   "health_fallos": 0,
+   "rss_mb_max": 739
+  },
+  {
+   "concurrentes": 5,
+   "tiempo_total_s": 89.4,
+   "resultados": [
+    {
+     "imagen": "01_persona_bolso.jpg",
+     "status": 200,
+     "latencia_ms": 35877,
+     "request_id": "4ea8bdcc17c14ff4b62746b5442274da",
+     "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "02_calle_carros.jpg",
+     "status": 200,
+     "latencia_ms": 89426,
+     "request_id": "4bee8a7aadf04d74bffce3ba09a46356",
+     "narrativa": "Parece que estás en una sala de estar. Descripción a3741fcbf4. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "03_escritorio_objetos.jpg",
+     "status": 200,
+     "latencia_ms": 53650,
+     "request_id": "ece16e8af0ba4804af0ac634f7110b77",
+     "narrativa": "Parece que estás en una sala de estar. Descripción fc4c687aaa. El paso al frente está bloqueado. Gira con cuidado hacia la derecha y avanza despacio. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "04_cocina_utensilios.jpg",
+     "status": 200,
+     "latencia_ms": 17945,
+     "request_id": "4f8f10f143b14734bc84d504375a9d00",
+     "narrativa": "Parece que estás en una sala de estar. Descripción 399eab70bb. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
+     "codigo": null,
+     "retry_after": null
+    },
+    {
+     "imagen": "05_sala_muebles.jpg",
+     "status": 200,
+     "latencia_ms": 71522,
+     "request_id": "0962cfb9a5a74d148e9225493d386e46",
+     "narrativa": "Parece que estás en una sala de estar. Descripción e6bd872dcf. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+     "codigo": null,
+     "retry_after": null
+    }
+   ],
+   "latencia_ms": {
+    "min": 17945,
+    "max": 89426,
+    "media": 53684
+   },
+   "errores": [],
+   "health_latencia_ms_max": 124,
+   "health_fallos": 0,
+   "rss_mb_max": 731
+  }
+ ],
+ "estado_compartido": {
+  "01_persona_bolso.jpg": true,
+  "02_calle_carros.jpg": true,
+  "03_escritorio_objetos.jpg": true,
+  "04_cocina_utensilios.jpg": true,
+  "05_sala_muebles.jpg": true
+ },
+ "request_ids_unicos": true,
+ "production_rafaga_8": {
+  "concurrentes": 8,
+  "tiempo_total_s": 26.6,
+  "resultados": [
+   {
+    "imagen": "01_persona_bolso.jpg",
+    "status": 200,
+    "latencia_ms": 9102,
+    "request_id": "82ace5d40b284efda27e13238534f960",
+    "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "02_calle_carros.jpg",
+    "status": 200,
+    "latencia_ms": 22230,
+    "request_id": "86faed0d2c07407cbfeb3c3ba0ea3e2c",
+    "narrativa": "Parece que estás en una sala de estar. Descripción a3741fcbf4. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha. Tienes aproximadamente 4 pasos libres antes del primer obstáculo.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "03_escritorio_objetos.jpg",
+    "status": 200,
+    "latencia_ms": 17810,
+    "request_id": "91d29f128f854ec8aa1ee0e80b5b9b4d",
+    "narrativa": "Parece que estás en una sala de estar. Descripción fc4c687aaa. El paso al frente está bloqueado. Gira con cuidado hacia la derecha y avanza despacio. Puedes avanzar hacia la derecha con cuidado.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "04_cocina_utensilios.jpg",
+    "status": 200,
+    "latencia_ms": 4707,
+    "request_id": "022f9b9078d9400e9a10f91dbf4703d1",
+    "narrativa": "Parece que estás en una sala de estar. Descripción 399eab70bb. Hay obstáculos en todas las direcciones. La salida menos bloqueada es hacia la derecha. Puedes avanzar hacia la derecha con cuidado.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "05_sala_muebles.jpg",
+    "status": 200,
+    "latencia_ms": 26622,
+    "request_id": "6bba0590f7af449fb3eaeb8f93513d52",
+    "narrativa": "Parece que estás en una sala de estar. Descripción e6bd872dcf. Puedes avanzar hacia el frente. Tienes aproximadamente 6 pasos libres antes del primer obstáculo.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "01_persona_bolso.jpg",
+    "status": 200,
+    "latencia_ms": 13489,
+    "request_id": "35ff930dc4f94030b3a98fd616acfb35",
+    "narrativa": "Parece que estás en una sala de estar. Descripción 55eefac12c. El paso al frente está bloqueado. Puedes avanzar hacia la derecha con cuidado.",
+    "codigo": null,
+    "retry_after": null
+   },
+   {
+    "imagen": "02_calle_carros.jpg",
+    "status": 429,
+    "latencia_ms": 214,
+    "request_id": "64055ab1718e45c19559d649a75f07d4",
+    "narrativa": null,
+    "codigo": "RATE_LIMITED",
+    "retry_after": "60"
+   },
+   {
+    "imagen": "03_escritorio_objetos.jpg",
+    "status": 429,
+    "latencia_ms": 212,
+    "request_id": "ff757b6c074b4c66b623fb92dd87bb14",
+    "narrativa": null,
+    "codigo": "RATE_LIMITED",
+    "retry_after": "60"
+   }
+  ],
+  "latencia_ms": {
+   "min": 4707,
+   "max": 26622,
+   "media": 15660
+  },
+  "errores": [
+   {
+    "imagen": "02_calle_carros.jpg",
+    "status": 429,
+    "latencia_ms": 214,
+    "request_id": "64055ab1718e45c19559d649a75f07d4",
+    "narrativa": null,
+    "codigo": "RATE_LIMITED",
+    "retry_after": "60"
+   },
+   {
+    "imagen": "03_escritorio_objetos.jpg",
+    "status": 429,
+    "latencia_ms": 212,
+    "request_id": "ff757b6c074b4c66b623fb92dd87bb14",
+    "narrativa": null,
+    "codigo": "RATE_LIMITED",
+    "retry_after": "60"
+   }
+  ],
+  "health_latencia_ms_max": 203,
+  "health_fallos": 0,
+  "rss_mb_max": 630
+ }
+}

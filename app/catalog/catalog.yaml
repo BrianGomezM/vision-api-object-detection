@@ -41,13 +41,13 @@ datasets:
       18 escenas sintéticas con cámara, posiciones horizontales y profundidades
       controladas. Condición geométrica conocida por diseño (generador, commit ae85f90).
   - id: estudio2
-    nombre: "Estudio con usuarios v2 — escenas E1–E5"
+    nombre: "Estudio con usuarios v2 — escenas E1–E6"
     manifest: stimuli/estudio2/manifest.yaml
     estado: ESTUDIO_V2
     descripcion: >-
-      Cinco escenas sintéticas del mismo generador (bloque E, 2026-10-10) con cuatro o cinco
-      objetos, pensadas para cada prueba del estudio con usuarios: varios objetos a distintas
-      distancias, una sala con una sola salida libre y la misma sala con los objetos movidos.
+      Seis escenas de interiores del mismo generador (2026-10-11), con entre 6 y 11 objetos
+      y un corredor libre verificado: comedor (práctica), oficina, cocina-comedor, dos
+      versiones de una sala de estar (una sola salida libre y los objetos movidos) y dormitorio.
   - id: dataset2
     nombre: "Dataset 2 — variabilidad visual (robustez)"
     manifest: null
