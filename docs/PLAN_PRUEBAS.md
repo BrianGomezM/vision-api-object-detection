@@ -38,7 +38,7 @@
 
 | ID | Requisito | Qué se mide | Evidencia | Resultado |
 |---|---|---|---|---|
-| NF-01 | RNF-02 | Tiempo total de respuesta | `plan_pruebas_nf.py`, 6 escenas, CPU | Procesamiento sin voz: 1,2 s de media (cumple < 5 s). Con la voz por defecto (Gemini TTS): 17,0 s de media (12,7–20,6 s); la síntesis ocupa 15,7 s. Con la voz del estudio (Azure): ver `nf_fcf80e9_es-CO-SalomeNeural.json` |
+| NF-01 | RNF-02 | Tiempo total de respuesta | `plan_pruebas_nf.py`, 6 escenas, CPU | Procesamiento sin voz: 1,2 s de media (cumple < 5 s). Con la voz por defecto (Gemini TTS): 17,0 s de media (12,7–20,6 s); la síntesis ocupa 15,7 s. Con la voz de Azure (es-CO-SalomeNeural, `nf_302db7e_es-CO-SalomeNeural.json`): 3,7 s de media (2,6–5,8 s), síntesis 2,3 s de media; 5 de 6 solicitudes por debajo de 5 s (la primera tardó 5,8 s porque su procesamiento fue más lento, 3,0 s) |
 | NF-02 | RNF-02 | Tiempo por etapa | `plan_pruebas_nf.py` | Detección 600 ms; escenario y narrativa 561 ms (en paralelo); análisis espacial, pasos, espacio libre y decisión < 1 ms cada uno; imagen anotada 20 ms; voz 15 686 ms |
 | NF-03 | RNF-01, RNF-02 | Comportamiento con solicitudes simultáneas | `concurrency_bench.py` (1 worker, YOLO real en CPU, voz simulada con 16,5 s) | Sin errores ni caídas; `/api/health` responde en 34–124 ms durante la carga. En el perfil de desarrollo las solicitudes se atienden en serie: 1, 2, 3 y 5 simultáneas terminan en 18, 36, 54 y 89 s. En el perfil de producción, una ráfaga de 8 atiende 6 (4,7–26,6 s) y rechaza 2 con 429 `RATE_LIMITED` por el límite por cliente, como está diseñado. Memoria máxima 739 MB; sin mezcla de datos entre solicitudes |
 | NF-04 | RNF-06 | Tasa de solicitudes exitosas | `plan_pruebas_nf.py` y `concurrency_bench.py` | 6/6 con proveedores reales; con carga, 0 errores del servidor (los únicos rechazos son los 429 del límite de solicitudes) |
@@ -67,7 +67,7 @@
 
 - **Ejecutados y aprobados:** 32 de 33 casos.
 - **Sustituido:** FUN-13, porque el endpoint con el defecto se eliminó.
-- **Requisito no cumplido en todas las configuraciones:** RNF-02 (menos de 5 s) se cumple en el
-  procesamiento (1,2 s), pero no cuando se incluye la síntesis con la voz por defecto.
+- **RNF-02 (menos de 5 s):** se cumple en el procesamiento (1,2 s) y con la voz de Azure (3,7 s de
+  media; 5 de 6 solicitudes por debajo de 5 s), pero no con la voz por defecto de Gemini (17,0 s).
 - **Cambios de expectativa documentados:** FUN-09 responde 400 en lugar de 422, y FUN-06/07/14 son
   herramientas de desarrollo que no se publican en producción.
