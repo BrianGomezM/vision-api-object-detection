@@ -1,0 +1,321 @@
+{
+ "fecha_utc": "2026-10-12T05:45:24+00:00",
+ "commit": "302db7e51518a641c130ff62a5b41b5894778038",
+ "voz": "azure:es-CO-SalomeNeural",
+ "dispositivo": "cpu",
+ "nucleos_logicos": 8,
+ "resumen": {
+  "NF-01 tiempo de respuesta total (s)": {
+   "media": 3.72,
+   "min": 2.55,
+   "max": 5.81
+  },
+  "NF-02 desglose medio por etapa (ms)": {
+   "deteccion_ms": 765.3,
+   "espacial_ms": 0.1,
+   "pasos_ms": 0.0,
+   "visualizer_ms": 21.5,
+   "espacio_ms": 0.0,
+   "decision_ms": 0.0,
+   "escenario_ms": 500.0,
+   "llm_ms": 500.0,
+   "total_ms": 1297.7,
+   "tts_ms": 2267.0
+  },
+  "NF-04 tasa de solicitudes exitosas": "6/6",
+  "NF-05 CPU del proceso por solicitud (%)": {
+   "media": 145.4,
+   "max": 206.1
+  },
+  "NF-06 memoria RSS (MB)": {
+   "inicio": 278.9,
+   "final": 463.0,
+   "max": 464.9
+  },
+  "NF-07 tamaño de la respuesta JSON (KB)": {
+   "media": 534.1,
+   "max": 636.6
+  },
+  "NF-08 repeticiones idénticas a 0,35": true
+ },
+ "solicitudes": [
+  {
+   "stimulus_id": "EST2-E1",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 5.81,
+   "tiempos_ms": {
+    "deteccion_ms": 1887.56,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 23.59,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 1084.23,
+    "llm_ms": 1084.23,
+    "total_ms": 3005.55,
+    "tts_ms": 2525.7
+   },
+   "degradaciones": null,
+   "objetos": 7,
+   "bytes_respuesta": 524746,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 206.1,
+   "rss_mb": 464.9
+  },
+  {
+   "stimulus_id": "EST2-E2",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 3.98,
+   "tiempos_ms": {
+    "deteccion_ms": 467.07,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 21.35,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 375.75,
+    "llm_ms": 375.75,
+    "total_ms": 874.6,
+    "tts_ms": 2982.49
+   },
+   "degradaciones": null,
+   "objetos": 9,
+   "bytes_respuesta": 550397,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 110.3,
+   "rss_mb": 447.9
+  },
+  {
+   "stimulus_id": "EST2-E3",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 3.75,
+   "tiempos_ms": {
+    "deteccion_ms": 670.96,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 23.38,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 412.08,
+    "llm_ms": 412.08,
+    "total_ms": 1118.45,
+    "tts_ms": 2487.24
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 651867,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 112.2,
+   "rss_mb": 412.4
+  },
+  {
+   "stimulus_id": "EST2-E4",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 3.27,
+   "tiempos_ms": {
+    "deteccion_ms": 561.02,
+    "espacial_ms": 0.53,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 21.15,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 381.83,
+    "llm_ms": 381.83,
+    "total_ms": 976.02,
+    "tts_ms": 2182.94
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 648242,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 139.9,
+   "rss_mb": 405.3
+  },
+  {
+   "stimulus_id": "EST2-E5",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 2.95,
+   "tiempos_ms": {
+    "deteccion_ms": 574.89,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 20.43,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 381.58,
+    "llm_ms": 381.58,
+    "total_ms": 986.95,
+    "tts_ms": 1855.23
+   },
+   "degradaciones": null,
+   "objetos": 7,
+   "bytes_respuesta": 492035,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 139.7,
+   "rss_mb": 460.6
+  },
+  {
+   "stimulus_id": "EST2-E6",
+   "status": 200,
+   "exito": true,
+   "latencia_s": 2.55,
+   "tiempos_ms": {
+    "deteccion_ms": 430.56,
+    "espacial_ms": 0.0,
+    "pasos_ms": 0.0,
+    "visualizer_ms": 19.05,
+    "espacio_ms": 0.0,
+    "decision_ms": 0.0,
+    "escenario_ms": 364.33,
+    "llm_ms": 364.33,
+    "total_ms": 824.63,
+    "tts_ms": 1568.37
+   },
+   "degradaciones": null,
+   "objetos": 5,
+   "bytes_respuesta": 414424,
+   "audio_disponible": true,
+   "cpu_pct_proceso": 164.1,
+   "rss_mb": 463.0
+  }
+ ],
+ "estabilidad_umbral": [
+  {
+   "stimulus_id": "EST2-E1",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    },
+    "0.35": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    },
+    "0.5": {
+     "objetos": 7,
+     "confianza_media": 0.851
+    }
+   },
+   "repeticiones_0_35": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E2",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    },
+    "0.35": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    },
+    "0.5": {
+     "objetos": 9,
+     "confianza_media": 0.779
+    }
+   },
+   "repeticiones_0_35": [
+    9,
+    9,
+    9
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E3",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.882
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E4",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.878
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E5",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    },
+    "0.35": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    },
+    "0.5": {
+     "objetos": 7,
+     "confianza_media": 0.798
+    }
+   },
+   "repeticiones_0_35": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "stimulus_id": "EST2-E6",
+   "por_umbral": {
+    "0.25": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    },
+    "0.35": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    },
+    "0.5": {
+     "objetos": 5,
+     "confianza_media": 0.713
+    }
+   },
+   "repeticiones_0_35": [
+    5,
+    5,
+    5
+   ]
+  }
+ ]
+}
