@@ -50,7 +50,7 @@ ENDPOINTS (todos con clave del investigador, X-API-Key):
   DELETE /api/study/sessions/{id}                              eliminar (p. ej. retiro o ensayo)
   GET    /api/study/consolidado                                matriz consolidada (solo formales)
 
-Contrato detallado: docs/EVALUACION_USUARIOS.md.
+Descripción del estudio: docs/EVALUACION.md.
 """
 
 from __future__ import annotations
@@ -187,7 +187,7 @@ class Ficha(_M):
     condicion_visual: CondicionVisual
     tecnologias: TecnologiasAsistivas
     experiencia_descripcion_audio: Literal["si", "no", "no_informa"]
-    # Desde el 2026-10-01 (doc. 34): rango (nunca la edad exacta) para describir la muestra,
+    # Desde el 2026-10-01: rango (nunca la edad exacta) para describir la muestra,
     # y audición autodeclarada (el estudio es auditivo). Opcionales por compatibilidad con
     # sesiones anteriores; el cliente los exige en sesiones nuevas.
     rango_edad: Optional[Literal["18_29", "30_44", "45_59", "60_mas", "no_informa"]] = None
@@ -316,7 +316,7 @@ class Comprension(_M):
 
 class DecisionIn(_M):
     """Tarea de decisión (tipo C): alternativa que eligió el participante tras escuchar
-    la narrativa. Decisión hipotética, sin desplazamiento (doc. 27, §H). La esperada
+    la narrativa. Decisión hipotética, sin desplazamiento. La esperada
     NO la envía el cliente: el servidor la toma de app/catalog/decisiones.yaml."""
     seleccionada: Optional[str] = Field(None, min_length=1, max_length=40)
     # Estudio v2 (2026-10-10): el participante puede indicar VARIAS direcciones por las que
@@ -340,7 +340,7 @@ class DecisionIn(_M):
 
 
 class Aclaracion(_M):
-    """Solicitud de aclaración del participante (doc. 33 §13): indicador de claridad del guion."""
+    """Solicitud de aclaración del participante: indicador de claridad del guion."""
     instante: datetime
     tipo: Literal["pregunta", "escala", "otra"]
 
@@ -352,7 +352,7 @@ _Likert = Optional[int]
 
 
 class Escalas(_M):
-    """Escalas subjetivas 1–5 del doc. 27, §J (null = no se preguntó)."""
+    """Escalas subjetivas de 1 a 5 (null = no se preguntó)."""
     claridad: _Likert = Field(None, ge=1, le=5)
     utilidad: _Likert = Field(None, ge=1, le=5)
     suficiencia: _Likert = Field(None, ge=1, le=5)
@@ -484,7 +484,7 @@ def _iter_sessions():
 
 
 # ──────────────────────────────────────────────────────────────
-# MÉTRICAS DERIVADAS (doc. 27, §I) — el servidor las calcula, el cliente no.
+# MÉTRICAS DERIVADAS — el servidor las calcula, el cliente no.
 # ──────────────────────────────────────────────────────────────
 
 def _pct(num: int, den: int) -> float | None:
@@ -584,7 +584,7 @@ def vigentes(respuestas: list[dict]) -> list[dict]:
 
 def summarize(respuestas: list[dict], sesion: dict | None = None) -> dict:
     """Resumen de una sesión sobre respuestas FORMALES vigentes, total y por prueba. Sin tasa
-    de éxito global (doc. 27 §I). Las respuestas corregidas no cuentan."""
+    de éxito global. Las respuestas corregidas no cuentan."""
     corregidas = len(respuestas) - len(vigentes(respuestas))
     respuestas = vigentes(respuestas)
     formales = [r for r in respuestas if r["modo"] == "formal"]
@@ -739,8 +739,8 @@ def _validate_response(sesion: dict, body: ResponseIn):
         if not test.ejecutable_formal:
             raise _conflict(f"{test.id} tiene estímulos {test.estado_estimulos.upper()}: no puede "
                             "registrarse como prueba formal hasta que se definan en el catálogo.")
-        # El piloto recorre las mismas actividades que el objetivo y se consolida aparte
-        # (doc. 34, C6); el objetivo nunca registra las preguntas del piloto.
+        # El piloto recorre las mismas actividades que el objetivo y se consolida aparte;
+        # el objetivo nunca registra las preguntas del piloto.
         if test.pista != tipo:
             raise _conflict(f"{test.id} pertenece a la pista '{test.pista}' y la sesión es '{tipo}'.")
         if practica:
@@ -771,7 +771,7 @@ def _validate_response(sesion: dict, body: ResponseIn):
                 raise _conflict("Sin audio del sistema la prueba no puede registrarse como formal.")
             if sum(r.tipo == "inicial" for r in body.reproducciones) != 1:
                 raise HTTPException(status_code=400, detail="Una prueba formal registra exactamente una reproducción inicial.")
-            # Todos los participantes escuchan el MISMO audio (doc. 30/33): solo el congelado.
+            # Todos los participantes escuchan el MISMO audio: solo el congelado.
             frozen = catalog.congelados.get(estimulo["stimulus_id"])
             if frozen is None:
                 raise _conflict(f"{estimulo['stimulus_id']} no tiene audio congelado válido: genérelo con "

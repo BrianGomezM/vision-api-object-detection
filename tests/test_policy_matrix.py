@@ -1,5 +1,5 @@
 """
-Matriz FORMAL de la política HTTP de /api/detect (docs/CONTRATO_ERRORES.md §3).
+Matriz FORMAL de la política HTTP de /api/detect (docs/API.md).
 
 Regla: un FALLO FUNCIONAL (entrada inválida, etapa del pipeline, componente
 OBLIGATORIO en ese contexto) → 4xx/5xx. Una DEGRADACIÓN de una parte OPCIONAL →

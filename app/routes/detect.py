@@ -367,7 +367,7 @@ async def detect(
         if request is not None:
             request.state.weights_sha256 = experiment.weights_identity()["sha256"]
 
-        # ── Política de degradación (docs/CONTRATO_ERRORES.md §3) ──
+        # ── Política de degradación (docs/API.md, «Componentes opcionales») ──
         degradations = []
         if request is not None:
             request.state.degradations = degradations      # visible en el log también si se lanza un error
@@ -431,7 +431,7 @@ async def detect(
 
         # ── Perfil production: no conservar derivados de la imagen del usuario ──
         # La imagen anotada y el audio ya están en memoria (base64 / stream); en
-        # producción no se guardan en disco (docs/DATOS_PERSISTENCIA.md).
+        # producción no se guardan en disco (docs/DATOS.md).
         if profile == "production":
             annotated_info["archivo"] = annotated_info["url"] = None
             audio_info["archivo"] = None
@@ -549,11 +549,11 @@ async def debug_detect(
         n_det       = len(result["detections"])
 
         if n_det == 0:
-            aviso = "⚠️  NINGÚN objeto detectado. Prueba bajar confidence_threshold."
+            aviso = "No se detectó ningún objeto. Pruebe con un confidence_threshold menor."
         elif n_det < 3:
-            aviso = f"⚠️  Solo {n_det} objeto(s) detectado(s)."
+            aviso = f"Solo se detectaron {n_det} objeto(s)."
         else:
-            aviso = f"✅  {n_det} detecciones procesadas sin anomalías."
+            aviso = f"{n_det} detecciones procesadas."
 
         return {
             "imagen":          result["imagen"],

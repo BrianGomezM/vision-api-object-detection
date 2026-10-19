@@ -75,7 +75,7 @@ def dev_mode() -> bool:
 
 # Claves SOLO del investigador (RESEARCHER_API_KEYS). Protegen las rutas del estudio
 # (/api/study/*, /api/catalog*, métricas) sin exigir clave en /api/detect, que en
-# production es público (docs/POLITICA_API_DETECT.md). Se suman a API_KEYS.
+# production es público (docs/API.md). Se suman a API_KEYS.
 def _researcher_keys() -> set[str]:
     return {k.strip() for k in os.getenv("RESEARCHER_API_KEYS", "").split(",") if k.strip()}
 

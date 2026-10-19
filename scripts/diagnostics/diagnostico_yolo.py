@@ -215,7 +215,7 @@ def run(image_path: str, threshold: float) -> None:
             motivo = f"conf {conf:.2f} < efectivo {effective:.2f}"
             discarded_nav.append({**d, "effective": effective})
         else:
-            motivo = "✅ pasa"
+            motivo = "pasa"
             passed.append(d)
 
         marca = "+" if pasa else "·"
@@ -226,7 +226,7 @@ def run(image_path: str, threshold: float) -> None:
 
     # ── Objetos que pasan ──────────────────────────────────────
     print(SEP)
-    print(f"\n  ✅ {len(passed)} objeto(s) pasan los filtros:\n")
+    print(f"\n  {len(passed)} objeto(s) pasan los filtros:\n")
 
     for d in passed:
         x1, y1, x2, y2 = d["bbox"]
@@ -236,7 +236,7 @@ def run(image_path: str, threshold: float) -> None:
 
     # ── Objetos de navegación descartados ──────────────────────
     if discarded_nav:
-        print(f"\n  ⚠️  {len(discarded_nav)} objeto(s) de navegación descartados (baja confianza):")
+        print(f"\n  Aviso: {len(discarded_nav)} objeto(s) de navegación descartados (baja confianza):")
         print(f"      → Considera bajar el umbral o YOLO_CONF_INTERNAL en .env\n")
         for d in discarded_nav:
             class_min = _CLASS_MIN_CONF.get(d["label"], threshold)
@@ -258,14 +258,14 @@ def run(image_path: str, threshold: float) -> None:
     # ── Resumen final ──────────────────────────────────────────
     print(f"\n{SEP2}")
     if not passed:
-        print(f"  ❌ Ningún objeto relevante detectado.")
+        print(f"  Ningún objeto relevante detectado.")
         print(f"     → Verifica YOLO_WEIGHTS={WEIGHTS} en .env")
         print(f"     → Prueba bajar el threshold (actualmente {threshold})")
     elif len(passed) < 3:
-        print(f"  ⚠️  Solo {len(passed)} objeto(s). La narrativa puede ser escasa.")
+        print(f"  Aviso: Solo {len(passed)} objeto(s). La narrativa puede ser escasa.")
         print(f"     → Prueba bajar el threshold o usar imgsz mayor en .env")
     else:
-        print(f"  ✅ {len(passed)} objeto(s) detectados. Pipeline listo.")
+        print(f"  {len(passed)} objeto(s) detectados. Pipeline listo.")
     print(SEP2 + "\n")
 
 
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     thr = float(sys.argv[2]) if len(sys.argv) > 2 else 0.35
 
     if not os.path.exists(img):
-        print(f"❌ Imagen no encontrada: {img}")
+        print(f"Imagen no encontrada: {img}")
         sys.exit(1)
 
     run(img, thr)

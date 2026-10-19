@@ -178,10 +178,10 @@ def create_app(profile: str | None = None) -> FastAPI:
 
     def home():
         if profile == "study":
-            return {"message": "API de navegación egocéntrica funcionando 🚀",
+            return {"message": "API de navegación egocéntrica funcionando",
                     "version": "3.2.0", "perfil": profile}
         return {
-            "message": "API de navegación egocéntrica funcionando 🚀",
+            "message": "API de navegación egocéntrica funcionando",
             "version": "3.2.0",
             "perfil": profile,
             "endpoints": {

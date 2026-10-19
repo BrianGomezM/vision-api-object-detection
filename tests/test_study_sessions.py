@@ -370,7 +370,7 @@ def test_ensayo_solo_en_prueba_tecnica_o_practica(client, sdir):
     assert r.json()["respuesta"]["ejecucion"]["origen_audio"] == "generado_en_sesion"
     sid = create(client, tipo="objetivo", codigo="P05")         # participante real (directorio temporal)
     assert client.post(f"/api/study/sessions/{sid}/responses", json=body).status_code == 409
-    # El objetivo SÍ hace una práctica de familiarización con la escena de práctica (doc. 34, C5).
+    # El objetivo SÍ hace una práctica de familiarización con la escena de práctica.
     practica = {**body, "estimulo": {"origen": "catalogo", "stimulus_id": "EST2-E6"}}
     r = client.post(f"/api/study/sessions/{sid}/responses", json=practica)
     assert r.status_code == 201, r.text
@@ -548,7 +548,7 @@ def test_decision_formal_con_esperada_de_la_definicion(client, defined_decisions
     assert client.post(url, json=obj03(decision={"seleccionada": "arriba"})).status_code == 400  # no es alternativa
     assert client.post(url, json=obj03(decision={"seleccionada": "derecha", "esperada": "x"})).status_code == 400
     # La narrativa congelada de prueba indica la IZQUIERDA y el diseño espera la DERECHA:
-    # las tres capas se registran por separado (doc. 34).
+    # las tres capas se registran por separado.
     ok = client.post(url, json=obj03(decision={"seleccionada": "derecha", "coincide_con_narrativa": True}))
     assert ok.status_code == 201, ok.text
     d = ok.json()["respuesta"]["decision"]
@@ -855,7 +855,7 @@ def test_con_data_root_las_sesiones_van_fuera_del_repo(monkeypatch, tmp_path):
 
 
 # ──────────────────────────────────────────────────────────────
-# Revisión del 2026-10-01 (doc. 34): audio congelado, codificación por prueba,
+# Revisión del 2026-10-01: audio congelado, codificación por prueba,
 # percepción del cambio, aclaraciones y capas de la decisión con el catálogo REAL.
 # ──────────────────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@ Verificación AUTOMÁTICA de fidelidad de los audios congelados (conjunto vigent
 transcribe cada MP3 con Whisper (Groq, whisper-large-v3, español) y compara la
 transcripción, palabra por palabra, con la narrativa congelada.
 
-Es un apoyo, no sustituye la escucha humana (doc. 33 §9, criterio 6): Whisper puede
+Es un apoyo, no sustituye la escucha humana: Whisper puede
 equivocarse en números o en palabras poco frecuentes. Resultado en
 <carpeta del conjunto>/verificacion_automatica.json.
 

@@ -1,16 +1,15 @@
 # Plan de pruebas funcionales y no funcionales: trazabilidad y resultados
 
-- **Plan original:** 33 casos (14 funcionales, 8 no funcionales y 11 de integración), definidos en la
-  fase de cierre metodológico. En septiembre de 2026 solo 8
-  estaban codificados.
-- **Este documento:** relaciona cada caso con la prueba que hoy lo verifica y con su resultado.
-  Verificado el **11 de octubre de 2026** sobre el commit `fcf80e9` (versión desplegada).
+- **Plan:** 33 casos (14 funcionales, 8 no funcionales y 11 de integración), definidos en la etapa
+  de diseño.
+- **Este documento:** relaciona cada caso con la prueba que lo verifica y con su resultado.
+  Verificado el 11 de octubre de 2026 sobre el commit `fcf80e9`.
 - **Suites:**
   - Suite automatizada (`pytest -m "not entorno_referencia and not live_smoke"`): 442 pruebas,
     438 aprobadas y 4 omitidas por requerir el entorno de referencia. Proveedores simulados: no
     consume servicios externos. Se ejecuta en GitHub Actions antes de cada despliegue.
   - Regresión del procesamiento (`tests/regression`, entorno de referencia): 3/3 aprobadas; las
-    41 imágenes de la fase 2A producen una salida idéntica a la línea base.
+    41 imágenes de referencia producen una salida idéntica a la línea base.
   - Mediciones con los proveedores reales: `scripts/evaluation/plan_pruebas_nf.py`
     (`evaluation/results/plan_pruebas/nf_fcf80e9*.json`) y `scripts/hardening/concurrency_bench.py`
     (`evaluation/results/plan_pruebas/concurrencia_fcf80e9.json`).
@@ -31,7 +30,7 @@
 | FUN-10 | RF-07 | Respuesta en audio | `test_E2E05b_audio_true_devuelve_mp3`, `test_E2E05c_cabeceras_de_texto_codificadas` | Aprobado (audio/mpeg y cabeceras) |
 | FUN-11 | Diagnóstico | Modo `debug` con objetos y entrada del modelo de lenguaje | `test_debug_detect_usa_core_pipeline_run`, `test_core_pipeline.py` | Aprobado |
 | FUN-12 | Diagnóstico | Las ocho etapas del procesamiento | `test_FUN12_diagnostico_con_las_ocho_etapas` | Aprobado |
-| FUN-13 | Hallazgo H19 | `/api/metrics` en memoria | `test_get_api_metrics_eliminado`; sustituto: `/api/metrics/summary` y `/api/metrics/latency` (`test_production_routes.py`) | Sustituido: el endpoint con el defecto se eliminó y sus métricas pasaron a la telemetría persistente |
+| FUN-13 | — | `/api/metrics` en memoria | `test_get_api_metrics_eliminado`; sustituto: `/api/metrics/summary` y `/api/metrics/latency` (`test_production_routes.py`) | Sustituido: el endpoint se eliminó y sus métricas pasaron a la telemetría persistente |
 | FUN-14 | Infraestructura del objetivo 3 | Registro de la valoración de una narrativa | `test_FUN14_valoracion_persistida` | Aprobado. Para el estudio con usuarios se usa el módulo de sesiones (`tests/test_study_sessions.py`, 63 pruebas) |
 
 ## No funcionales (NF)
@@ -66,8 +65,10 @@
 ## Resumen
 
 - **Ejecutados y aprobados:** 32 de 33 casos.
-- **Sustituido:** FUN-13, porque el endpoint con el defecto se eliminó.
-- **RNF-02 (menos de 5 s):** se cumple en el procesamiento (1,2 s) y con la voz de Azure (3,7 s de
-  media; 5 de 6 solicitudes por debajo de 5 s), pero no con la voz por defecto de Gemini (17,0 s).
+- **Sustituido:** FUN-13, porque el endpoint que verificaba se eliminó y su función pasó a la telemetría.
+- **RNF-02 (menos de 5 s):** en el equipo de desarrollo, usando solo el procesador, se cumple en el
+  procesamiento (1,2 s) y con la voz de Azure (3,7 s de media; 5 de 6 solicitudes por debajo de 5 s),
+  pero no con la voz por defecto de Gemini (17,0 s). En el servicio desplegado (plan B1, un núcleo)
+  una solicitud con la voz de Azure tomó cerca de 5,3 s.
 - **Cambios de expectativa documentados:** FUN-09 responde 400 en lugar de 422, y FUN-06/07/14 son
   herramientas de desarrollo que no se publican en producción.

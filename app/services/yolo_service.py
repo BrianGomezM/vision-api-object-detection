@@ -21,13 +21,10 @@ ESTRATEGIA DE UMBRAL:
   El umbral efectivo = min(class_min, confidence_threshold_del_endpoint):
   el mínimo de la clase REBAJA el umbral para no perder obstáculos críticos
   que YOLO detecta con baja confianza (p.ej. mesas en perspectiva frontal,
-  puertas blancas). Es la regla documentada en la tesis (Tabla 9 y tabla de
-  run_yolo) y la usada en las evidencias (fases 9 y 10) y en la versión
-  desplegada (origin/main). Regla OFICIAL del experimento (experimental_config.yaml).
-  Limitación conocida: el umbral del endpoint no puede endurecer las clases
-  con mínimo propio, y clases con mínimo > umbral (tv 0.40) quedan en el umbral.
-  (Entre el 21-09-2026 y el 27-09-2026 el código usó max() por una razón de
-  interfaz no validada; ver docs/AUDITORIA_REGLA_UMBRAL_FASE10.md.)
+  puertas blancas). Es la regla registrada en experimental_config.yaml.
+  Consecuencia: el umbral de la solicitud no puede endurecer las clases con
+  mínimo propio, y las clases con mínimo mayor que el umbral (tv, 0.40)
+  quedan en el umbral de la solicitud.
 
 WARM-UP:
   Al cargar el modelo se ejecuta una inferencia con imagen negra para
@@ -323,10 +320,9 @@ def run_yolo(image_bytes: bytes, confidence_threshold: float = 0.35) -> dict:
                 continue
 
             # Filtro 2: umbral efectivo por clase
-            # REGLA OFICIAL (tesis, fases 9-10, origin/main): el mínimo entre
-            # el umbral de la clase y el del endpoint, para no perder obstáculos
-            # críticos detectados con baja confianza. Ver la cabecera del módulo
-            # y docs/AUDITORIA_REGLA_UMBRAL_FASE10.md antes de cambiarla.
+            # Se toma el menor entre el umbral de la clase y el de la solicitud,
+            # para no perder obstáculos detectados con baja confianza.
+            # Ver la cabecera del módulo antes de cambiar esta regla.
             class_min = _CLASS_MIN_CONF.get(label, confidence_threshold)
             effective = min(class_min, confidence_threshold)
 

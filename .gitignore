@@ -1,76 +1,57 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 *.log
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Entorno virtual
+# Entornos virtuales
 .venv/
 venv/
 env/
 ENV/
 
-# Variables de entorno (usar .env.example como plantilla, sin secretos)
+# Variables de entorno (la plantilla .env.example sí se versiona)
 .env
 .env.*
 !.env.example
 
-# Credenciales (reglas ESPECÍFICAS; no se usa una regla global *.json, que
-# ocultaba la evidencia JSON de evaluation/results/)
+# Credenciales
 google_credentials.json
 *credentials*.json
 *service-account*.json
 
-# Modelos (archivos grandes; el hash de referencia está en docs/REPRODUCIBILIDAD.md)
+# Pesos de modelos: se descargan aparte (ver docs/REPRODUCIBILIDAD.md)
 *.pt
 *.pth
 
-# ── Datos DINÁMICOS: nunca en el repositorio ──────────────────────
-# Con DATA_ROOT definido se escriben fuera del repositorio (ver app/storage.py).
-# Estas reglas cubren las rutas históricas cuando DATA_ROOT no está definido.
-
-# Archivos generados por el sistema de evaluación
-test_results_json/
-charts/
-*.xlsx
-
-# Dataset acumulado para fine-tuning (imágenes, etiquetas y metadatos subidos)
-dataset/images/
-dataset/labels/
-dataset/finetune/
-dataset/metadata/
-
-# Métricas de producción (JSONL, crece con el uso)
+# Datos que genera el servicio (con DATA_ROOT se escriben fuera del proyecto)
+audio_output/*
+!audio_output/.gitkeep
+detections_output/*
+!detections_output/.gitkeep
 metrics/
 test_results/
-
-# Datos de participantes y retroalimentación (información personal — nunca versionar)
+test_results_json/
+charts/
+dataset/
 study_data/
 feedback_data/
 
-# Copias comprimidas del proyecto (pueden incluir .env y datos personales)
+# Resultados sueltos de pruebas manuales
+*_smoke_response.json
+*.xlsx
+
+# Copias comprimidas del proyecto (pueden incluir .env o datos personales)
 *.zip
 
-# Audio generado por TTS
-audio_output/
-
-# Imágenes anotadas generadas por el visualizador de detecciones
-detections_output/
-
-# Cache de librerías
+# Cachés
 *.cache
 translation_cache.json
 
-# IDEs
+# Editores y sistema operativo
 .vscode/
 .idea/
-
-# Sistema operativo
 .DS_Store
 Thumbs.db
-
-# NOTA: stimuli/ (estímulos congelados de entrada, con hash verificado) SÍ se versiona.

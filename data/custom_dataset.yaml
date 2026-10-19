@@ -25,9 +25,9 @@ val:   images/val
 # para navegación de personas ciegas en entornos arquitectónicos.
 #
 # Prioridad de recolección de imágenes:
-#   🔴 Crítico  : stairs, wall, floor (bloqueo físico directo)
-#   🟠 Alto     : door_frame, ramp, handrail
-#   🟡 Medio    : elevator, column, window
+#   Crítico  : stairs, wall, floor (bloqueo físico directo)
+#   Alto     : door_frame, ramp, handrail
+#   Medio    : elevator, column, window
 
 nc: 9  # número de clases
 

@@ -20,7 +20,7 @@ Reglas:
   - `message` es un texto FIJO por código: nunca contiene str(excepción), rutas,
     trazas, claves ni detalles del proveedor. El detalle técnico va solo al log,
     asociado al mismo request_id.
-  - El catálogo (ERRORS) es la única fuente de códigos; docs/CONTRATO_ERRORES.md
+  - El catálogo (ERRORS) es la única fuente de códigos; docs/API.md
     lo documenta.
 """
 

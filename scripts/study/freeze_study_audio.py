@@ -2,7 +2,7 @@
 scripts/study/freeze_study_audio.py
 
 Genera UNA vez la narrativa y el audio de cada estímulo del estudio con usuarios y los
-congela con su sha256 (docs/EVALUACION_USUARIOS.md §0).
+congela con su sha256 (docs/EVALUACION.md).
 Durante las sesiones formales solo se reproducen estos archivos: nunca se regenera la
 narrativa, así que todos los participantes escuchan exactamente lo mismo.
 
@@ -10,7 +10,7 @@ Estímulos: los asignados a las pruebas de usuario (app/catalog/asignaciones.yam
 escena de práctica. Se usan las MISMAS funciones del producto que /api/detect
 (app.core.pipeline.run con el umbral congelado 0,35) y la voz del estudio.
 
-Criterios de aceptación de un intento (definidos ANTES de generar, doc. 33 §9). Un intento
+Criterios de aceptación de un intento, definidos antes de generar. Un intento
 solo se rechaza por fallos técnicos; los errores de CONTENIDO (objeto omitido, dirección
 distinta del diseño) son resultados del sistema y se conservan:
   1. Imagen con el sha256 del manifest (lo verifica el catálogo al cargar).
@@ -172,7 +172,7 @@ def main() -> int:
             "criterios_aceptacion": "doc. 33 §9: solo fallos técnicos; primer intento válido; máx. 3 intentos",
             "duracion_s": "estimada a partir del tamaño (MP3 48 kbps)",
         },
-        # Criterio 6 del doc. 33 §9: una segunda persona escucha cada audio y confirma que dice
+        # Criterio de aceptación: una segunda persona escucha cada audio y confirma que dice
         # literalmente la narrativa. Se completa a mano antes de la primera sesión real.
         "verificacion_fidelidad": {"estado": "pendiente", "verificado_por": None, "fecha": None},
         "estimulos": accepted,

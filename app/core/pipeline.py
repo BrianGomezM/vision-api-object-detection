@@ -1,8 +1,8 @@
 """
 app/core/pipeline.py
 
-Orquestador ÚNICO del producto. Lo usan /api/detect, /api/debug-detect y el
-runner de evaluación (F4), de modo que lo evaluado es exactamente lo desplegado.
+Orquestador ÚNICO del producto. Lo usan /api/detect, /api/debug-detect y los
+scripts de evaluación, de modo que lo evaluado es exactamente lo desplegado.
 
 Extraído sin cambios de lógica de app/routes/detect.py (_run_full_pipeline,
 resize_image, build_narrative, normalize_threshold). La equivalencia se verifica

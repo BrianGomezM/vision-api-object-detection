@@ -516,7 +516,7 @@ async def run_functional_tests(
                     passed = r.status_code == espera["http_status"]
                     detail = {"http_status_recibido": r.status_code}
 
-                # ── FUN-08: Archivo corrupto (H42) ─────────────
+                # ── FUN-08: Archivo corrupto ───────────────────
                 elif tipo == "archivo_corrupto":
                     r = await client.post(
                         "/api/detect",

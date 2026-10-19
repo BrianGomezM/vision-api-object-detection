@@ -1,7 +1,7 @@
 """
 app/experiment.py
 
-Identidad y verificación de la configuración experimental (F4). Módulo de
+Identidad y verificación de la configuración de la evaluación. Módulo de
 plataforma: no forma parte del núcleo y no depende de FastAPI.
 
 Responde a "¿qué configuración exacta produjo este resultado?":
@@ -222,7 +222,7 @@ def preflight(config_path: Path = CONFIG_PATH, *, require_clean_git: bool = True
 
     from app.storage import data_root
     if data_root() is None:
-        problems.append("DATA_ROOT: debe estar definido (los artefactos de F4 no se escriben en el repositorio)")
+        problems.append("DATA_ROOT: debe estar definido (los resultados de la evaluación no se escriben en el repositorio)")
 
     # 4) Estímulos
     exp = config["experimento"]
@@ -242,7 +242,7 @@ def preflight(config_path: Path = CONFIG_PATH, *, require_clean_git: bool = True
         problems.append(f"CÓDIGO: se requiere un commit limpio (commit={commit['commit']}, cambios sin commit={commit['dirty']})")
 
     if problems:
-        raise PreflightError("Preflight F4 fallido:\n  - " + "\n  - ".join(problems))
+        raise PreflightError("Verificación previa fallida:\n  - " + "\n  - ".join(problems))
 
     return {
         "commit": commit,
@@ -297,7 +297,7 @@ class IncompleteResultError(RuntimeError):
 
 
 def assert_complete(result: dict, *, require_audio: bool = True) -> None:
-    """Requisitos del PROTOCOLO F4 para congelar un estímulo (IncompleteResultError si no):
+    """Requisitos de la evaluación para congelar un estímulo (IncompleteResultError si no):
       - narrativa generada por el LLM (no la plantilla de respaldo);
       - audio generado;
       - generación FRESCA del escenario para este estímulo. La caché de escenario es
@@ -313,7 +313,7 @@ def assert_complete(result: dict, *, require_audio: bool = True) -> None:
         if not is_llm_active():
             problems.append("LLM no configurado: la narrativa sería de plantilla")
         if result["escenario"].get("cached"):
-            problems.append("escenario servido desde la caché: el protocolo F4 exige generación fresca "
+            problems.append("escenario servido desde la caché: la evaluación exige generación fresca "
                             "por estímulo (llamar a reset_request_state() antes de cada generación)")
     if require_audio and not result.get("audio_path"):
         problems.append("sin audio (TTS no disponible o fallido)")

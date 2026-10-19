@@ -15,7 +15,7 @@ solo se regenera tras una decisión metodológica aprobada, y el diff queda docu
 
 ## 2026-09-27 — regla del umbral por clase `max()` → `min()` (checkpoint final pre-F4)
 
-**Motivo:** `docs/AUDITORIA_REGLA_UMBRAL_FASE10.md` §5 (decisión) y `experimental_config.yaml`.
+**Motivo:** `experimental_config.yaml` y `docs/REPRODUCIBILIDAD.md`.
 
 **Resultado:**
 - 22 de 41 imágenes cambian. **50 detecciones añadidas**, con confianzas entre 0,157 y 0,349; ninguna eliminada.

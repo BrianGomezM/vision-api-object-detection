@@ -62,7 +62,7 @@ def build() -> dict:
         "descripcion": "Configuración OFICIAL de F4 (congelada). preflight() exige coincidencia exacta de `verificado`.",
         "generado_desde_commit": commit["commit"],
         "estado_decisiones": {
-            "regla_umbral_por_clase": "APROBADA (min) — docs/AUDITORIA_REGLA_UMBRAL_FASE10.md §5",
+            "regla_umbral_por_clase": "APROBADA (min) — docs/REPRODUCIBILIDAD.md",
             "preprocesamiento": "APROBADO (ruta de producción: core.pipeline.resize_image)",
             "modelo_y_pesos": "APROBADO (yolo26s.pt, hash verificado)",
             "dispositivo": "APROBADO (cpu) — CP3B D3, evidencia E11/E12",
@@ -143,7 +143,7 @@ def build() -> dict:
             "alternativas": "ninguna en F4: solo el modelo por defecto (el parámetro tts_model no se usa)",
         },
         "experimento": {
-            "protocolo": "CP3B v2 — docs/CP3B_MATRIZ_DECISIONES.md (decisiones abiertas: ver estado_decisiones)",
+            "protocolo": "CP3B v2 — docs/EVALUACION.md (decisiones abiertas: ver estado_decisiones)",
             "dataset1": {"manifest": "stimuli/dataset1/manifest.yaml",
                          "manifest_sha256": experiment.sha256_text_file(manifest),
                          "generador_commit": "ae85f90", "escenas": 18},

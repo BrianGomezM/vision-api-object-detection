@@ -1,6 +1,6 @@
 """
 Límites de entrada y seguridad básica de /api/detect y del perfil production.
-Comportamiento esperado de cada caso documentado en docs/CONTRATO_ERRORES.md §4.
+Comportamiento esperado de cada caso documentado en docs/API.md.
 Proveedores simulados: sin YOLO/LLM/TTS reales.
 """
 

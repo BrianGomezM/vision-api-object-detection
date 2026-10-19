@@ -1,6 +1,6 @@
 """
 scripts/hardening/docker_resource_limits.py — la imagen bajo límites de CPU/memoria
-equivalentes a los planes de hosting candidatos (docs/DEPLOYMENT.md §B).
+equivalentes a los planes de hosting candidatos (docs/DESPLIEGUE.md).
 
 Por escenario: ¿llega /api/health a 200?, segundos de arranque, latencia de
 /api/detect (YOLO real, SIN claves: LLM/TTS no intervienen), pico de memoria del

@@ -4,7 +4,7 @@ schema_version: 1
 descripcion: Configuración OFICIAL de F4 (congelada). preflight() exige coincidencia exacta de `verificado`.
 generado_desde_commit: 27bb8c3fd4de09c462050b58429661dbfbd11e96
 estado_decisiones:
-  regla_umbral_por_clase: APROBADA (min) — docs/AUDITORIA_REGLA_UMBRAL_FASE10.md §5
+  regla_umbral_por_clase: APROBADA (min) — docs/REPRODUCIBILIDAD.md
   preprocesamiento: 'APROBADO (ruta de producción: core.pipeline.resize_image)'
   modelo_y_pesos: APROBADO (yolo26s.pt, hash verificado)
   dispositivo: APROBADO (cpu) — CP3B D3, evidencia E11/E12
@@ -34,8 +34,8 @@ verificado:
     sha256: 646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
     bytes: 20422725
   codigo_nucleo_sha256:
-    app/core/pipeline.py: 4852c5da3dd9f7033483157e922fed19a7bfc0f5cee814cbb5311976914ba9df
-    app/services/yolo_service.py: 549f509eeaf3eb2ff2f5bdfdd3fc0edf262d4198e1004c8ba243ad1d6756c31a
+    app/core/pipeline.py: 0183da159e2f48469580130168f5458a5c93028d982fe805b69cfaf5fdedc9cd
+    app/services/yolo_service.py: 10256ede2df89c996be087a97645b50527ba1106430bd0e3e347c33f57746c11
     app/services/spatial_analyzer.py: f910340bdd2bc5899d600c529fd32c46e0084ea5e474c3e336882331107b0096
     app/services/step_estimator.py: 6f69407d14d70d03cbc71fabade086b39d05375a2953f03c168eef1b52892256
     app/services/free_space_analyzer.py: 99f563a1297ee684053d7ce9ebd9762b64cab460f5cf7a54e9550ffdfff95813
@@ -271,7 +271,7 @@ tts:
   salida: PCM 24 kHz, 16 bit, mono → MP3 lameenc 64 kbps, calidad 2
   alternativas: 'ninguna en F4: solo el modelo por defecto (el parámetro tts_model no se usa)'
 experimento:
-  protocolo: 'CP3B v2 — docs/CP3B_MATRIZ_DECISIONES.md (decisiones abiertas: ver estado_decisiones)'
+  protocolo: 'CP3B v2 — docs/EVALUACION.md (decisiones abiertas: ver estado_decisiones)'
   dataset1:
     manifest: stimuli/dataset1/manifest.yaml
     manifest_sha256: 04a3d5efbc2dcfae9af26373968cf02c87172541c5c619c3539629dcd3077811
@@ -281,7 +281,7 @@ experimento:
   catalogo:
     archivo: app/catalog/catalog.yaml
     # 2026-10-01: nuevo hash tras revisar SOLO las pruebas de usuario (guiones, codificación)
-    # antes de cualquier sesión real (docs/EVALUACION_USUARIOS.md §0). 2026-10-09: se retiran
+    # antes de cualquier sesión real (docs/EVALUACION.md). 2026-10-09: se retiran
     # las pruebas piloto (PIL-*) y la métrica M-PIL por decisión de los directores. Las pruebas
     # técnicas, los datasets y las métricas técnicas no cambiaron. 2026-10-10 (estudio v2): pruebas
     # de usuario reescritas en lenguaje cotidiano y nuevo dataset del estudio (estudio2, escenas

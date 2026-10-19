@@ -1,12 +1,10 @@
-# Herramientas de desarrollo y scripts de evaluación/hardening (NO producción).
+# Herramientas de desarrollo y scripts de evaluación (no se usan en producción).
 # Versiones del entorno experimental de referencia (requirements.lock.txt).
 # pip install -r requirements.txt -r requirements-test.txt -r requirements-dev.txt
 -r requirements-test.txt
 
-# scripts/evaluation/phase2a_tts.py (voz comparativa de la fase 2A)
+# scripts/evaluation/phase2a_tts.py (comparación de voces)
 edge-tts==7.2.8
-# scripts/evaluation/validate_h40_e2e.py
-requests==2.34.2
 # scripts/evaluation/phase2a_detection.py, scripts/hardening/concurrency_bench.py
 psutil==7.2.2
 # análisis estático

@@ -1,6 +1,6 @@
 # INSTANTÁNEA del entorno EXPERIMENTAL de referencia (Windows 11, Python 3.13.15, torch 2.13.0+cu126,
 # GTX 1050; la inferencia del experimento se fuerza a CPU con CUDA_VISIBLE_DEVICES=-1).
-# pip freeze del 2026-09-27. Es el REGISTRO de lo que se usó en las pruebas y la fase 2A.
+# pip freeze del 2026-09-27. Es el REGISTRO de lo que se usó en las pruebas y en la evaluación.
 # Producción (Docker, Linux) usa requirements-docker.lock.txt: mismas versiones salvo torch +cpu y uvloop.
 # Incluye herramientas de desarrollo y paquetes que la app no usa (edge-tts, grpcio, pypdf…).
 # Ver requirements.txt (directas de producción) y docs/REPRODUCIBILIDAD.md.

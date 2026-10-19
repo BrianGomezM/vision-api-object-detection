@@ -1,5 +1,5 @@
 """Regla OFICIAL del umbral por clase: effective = min(class_min, umbral).
-Fija la decisión del checkpoint pre-F4 (docs/AUDITORIA_REGLA_UMBRAL_FASE10.md).
+Fija la regla registrada en experimental_config.yaml.
 Modelo simulado: no se ejecuta YOLO."""
 
 import io

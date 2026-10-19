@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Imagen de PRODUCCIÓN de la Vision API. Todo se hornea en build time (libs de
 # sistema, torch CPU, ultralytics y los PESOS VERIFICADOS), nada se descarga al
-# arrancar. Ver docs/DEPLOYMENT.md.
+# arrancar. Ver docs/DESPLIEGUE.md.
 # Imagen base FIJADA por versión y digest: una 3.13.x nueva cambiaría Python y la
 # verificación de identidad (versiones.python = 3.13.15) impediría arrancar.
 FROM python:3.13.15-slim@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b
@@ -66,9 +66,9 @@ RUN useradd --create-home --uid 10001 app && mkdir -p /tmp/visionnav /tmp/ultral
 USER app
 
 EXPOSE 8000
-# Salud del contenedor (Docker/Render). start-period: carga de YOLO + warm-up.
+# Salud del contenedor. start-period: carga de YOLO + warm-up.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
     CMD python -c "import urllib.request,os; urllib.request.urlopen(f'http://127.0.0.1:{os.getenv(\"PORT\",\"8000\")}/api/health', timeout=4)"
 
-# PORT: Azure (WEBSITES_PORT=8000) y Render (PORT) · 1 worker (docs/CIERRE_HARDENING.md §2).
+# PORT: Azure usa WEBSITES_PORT=8000. Un solo worker mantiene una única copia del modelo en memoria.
 CMD ["sh", "-c", "exec gunicorn --bind=0.0.0.0:${PORT:-8000} --timeout 600 --workers 1 -k uvicorn.workers.UvicornWorker app.main:app"]

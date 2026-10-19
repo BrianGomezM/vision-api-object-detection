@@ -18,7 +18,7 @@ DATA_ROOT (variable de entorno):
         study/                   ESTUDIO CON PARTICIPANTES (perfiles study/development)
           sessions/              participant.json + responses.jsonl
           feedback/              valoraciones Likert de /api/feedback
-        evaluation/              EVALUACIÓN (F4 y herramientas de desarrollo)
+        evaluation/              EVALUACIÓN (resultados y herramientas de desarrollo)
           runs/                  ejecuciones oficiales del protocolo (requiere DATA_ROOT)
           stimuli_frozen/        paquetes de estímulo congelado (requiere DATA_ROOT)
           api_tests/             historial de /api/test/*
@@ -27,7 +27,7 @@ DATA_ROOT (variable de entorno):
         cache/                   caché de traducción (solo etiquetas fuera del diccionario fijo)
 
     Las carpetas se crean solo cuando la aplicación escribe en ellas.
-    Detalle de qué se persiste y qué no: docs/DATOS_PERSISTENCIA.md.
+    Detalle de qué se persiste y qué no: docs/DATOS.md.
 
 Los estímulos congelados de entrada (stimuli/ en el repositorio) NO son datos
 dinámicos y no dependen de DATA_ROOT.

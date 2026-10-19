@@ -4,7 +4,7 @@ app/catalog/decisions.py
 Tareas de DECISIÓN (tipo C) del estudio con usuarios: app/catalog/decisiones.yaml.
 
 - El participante elige entre alternativas a partir de la narrativa: decisión
-  hipotética, sin desplazamiento (doc. 27, §H).
+  hipotética, sin desplazamiento.
 - La alternativa esperada sale SOLO de la definición (por prueba y estímulo) y la
   aplica el servidor; public_definition() nunca la incluye.
 - Los fixtures técnicos solo se usan en sesiones PTEST y en modo ensayo.

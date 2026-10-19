@@ -33,7 +33,7 @@ def test_catalogo_real_carga_y_verifica_dataset1():
 
 
 def test_metricas_tecnicas_por_definir_y_de_usuario_definidas():
-    # Las métricas de usuario se definieron el 2026-10-01 (docs/EVALUACION_USUARIOS.md §0);
+    # Las métricas de usuario se definieron el 2026-10-01 (docs/EVALUACION.md);
     # las técnicas siguen pendientes del CP3B.
     cat = loader.load_catalog()
     for m in cat.source.metricas:
