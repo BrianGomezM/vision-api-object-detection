@@ -3,7 +3,9 @@
 - **Plan:** 33 casos (14 funcionales, 8 no funcionales y 11 de integración), definidos en la etapa
   de diseño.
 - **Este documento:** relaciona cada caso con la prueba que lo verifica y con su resultado.
-  Verificado el 11 de octubre de 2026 sobre el commit `fcf80e9`.
+  Verificado el 11 de octubre de 2026 sobre el commit `5d0072c`. Los archivos de resultados
+  conservan los identificadores con los que se generaron (`fcf80e9` y `302db7e`), que hoy
+  corresponden a los commits `5d0072c` y `c24e00f`; el código de esos commits es el mismo.
 - **Suites:**
   - Suite automatizada (`pytest -m "not entorno_referencia and not live_smoke"`): 442 pruebas,
     438 aprobadas y 4 omitidas por requerir el entorno de referencia. Proveedores simulados: no
