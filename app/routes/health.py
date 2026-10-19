@@ -4,8 +4,8 @@ app/routes/health.py
 GET /api/health — estado del servicio y configuración activa del producto.
 
   production          → información del producto (modelo, LLM, TTS, configuración)
-                        sin datos internos: ni rutas de evaluación, ni conteos del
-                        dataset, ni almacenamiento, ni el último error del TTS.
+                        sin datos internos: ni rutas de evaluación, ni
+                        almacenamiento, ni el último error del TTS.
   development / study → además: almacenamiento, estado de evaluación y último
                         error del TTS (igual que antes).
 
@@ -22,7 +22,7 @@ from app.services.yolo_service import YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
 from app.services.tts_service import (
     is_tts_active, get_last_tts_error, TTS_MODEL, TTS_VOICE, is_tts_disabled_for_evaluation,
 )
-from app.storage import data_dir, describe as storage_describe
+from app.storage import describe as storage_describe
 from app.utils.groq_client import GROQ_MODEL, is_llm_active
 
 router = APIRouter()
@@ -69,24 +69,17 @@ async def health_check():
         return body
 
     # ── Solo development / study: información interna ──
-    dataset_path  = data_dir("dataset") / "metadata"
-    dataset_count = len(list(dataset_path.glob("*.json"))) if dataset_path.exists() else 0
     body["almacenamiento"] = storage_describe()
     body["tts"]["omitido_por_evaluacion"] = is_tts_disabled_for_evaluation()
     body["tts"]["ultimo_error"] = get_last_tts_error()
     body["evaluacion"] = {
-        "dataset_imagenes":     dataset_count,
         "metricas_registradas": telemetry.count_metrics(),
         "endpoints": [
-            "POST /api/dataset/upload",
-            "GET  /api/dataset/stats",
             "GET  /api/metrics/summary",
             "GET  /api/metrics/latency",
             "POST /api/test/functional",
             "POST /api/test/load",
             "GET  /api/test/results",
-            "POST /api/finetune/prepare",
-            "GET  /api/finetune/status",
         ],
     }
     return body

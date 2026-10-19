@@ -37,40 +37,6 @@ def test_FUN04_umbral_bajo_detecta_igual_o_mas_objetos(make_client, sim):
     assert conteos[0] < conteos[-1]
 
 
-# ── FUN-06 / FUN-07: conjunto de datos (perfil de desarrollo) ────────────────
-
-@pytest.fixture
-def dataset_tmp(monkeypatch, tmp_path):
-    from app.routes import evaluation
-    base = tmp_path / "dataset"
-    for attr, sub in (("DATASET_DIR", ""), ("DATASET_IMAGES", "images"), ("DATASET_LABELS", "labels"),
-                      ("DATASET_METADATA", "metadata")):
-        monkeypatch.setattr(evaluation, attr, base / sub if sub else base)
-    return base
-
-
-def test_FUN06_subida_al_conjunto_de_datos(make_client, sim, dataset_tmp):
-    r = make_client("development").post("/api/dataset/upload", data={"auto_label": "false"},
-                                        files={"file": ("e.png", png_bytes((320, 240)), "image/png")})
-    assert r.status_code == 200 and r.json()["status"] == "stored"
-    assert len(list((dataset_tmp / "images").glob("*.jpg"))) == 1
-    assert len(list((dataset_tmp / "metadata").glob("*.json"))) == 1
-
-
-def test_FUN07_estadisticas_del_conjunto_de_datos(make_client, sim, dataset_tmp):
-    client = make_client("development")
-    for color in ((10, 20, 30), (200, 100, 50)):
-        client.post("/api/dataset/upload", data={"auto_label": "false"},
-                    files={"file": ("e.png", png_bytes((320, 240), color=color), "image/png")})
-    stats = client.get("/api/dataset/stats").json()
-    assert stats["total_images"] >= 2
-
-
-def test_FUN06_07_no_existen_en_production(make_client):
-    client = make_client("production")
-    assert client.get("/api/dataset/stats").status_code == 404
-
-
 # ── FUN-09: umbral fuera de rango ────────────────────────────────────────────
 
 @pytest.mark.parametrize("umbral", ["1.5", "-0.1"])

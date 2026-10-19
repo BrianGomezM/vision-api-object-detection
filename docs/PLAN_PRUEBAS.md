@@ -72,3 +72,5 @@
   una solicitud con la voz de Azure tomó cerca de 5,3 s.
 - **Cambios de expectativa documentados:** FUN-09 responde 400 en lugar de 422, y FUN-06/07/14 son
   herramientas de desarrollo que no se publican en producción.
+- **Ubicación actual:** FUN-06 y FUN-07 (conjunto de datos para ajuste fino) se verifican en la rama
+  `herramientas/ajuste-fino`, donde quedó esa herramienta.

@@ -9,7 +9,7 @@ VisionNav API es un monolito modular: un solo servicio y un solo repositorio, co
 | Núcleo | `app/core/`, `app/services/`, `app/utils/` | Detección, análisis espacial, pasos, espacio libre, decisión de movimiento, escenario, narrativa y voz |
 | Adaptadores HTTP | `app/routes/`, `app/errors.py`, `app/security.py` | Endpoints, validación de entradas, autenticación y traducción de errores |
 | Plataforma | `app/profiles.py`, `app/ratelimit.py`, `app/observability.py`, `app/telemetry.py`, `app/storage.py`, `app/deploy_identity.py`, `app/experiment.py` | Perfil de ejecución, límite de solicitudes, identificador de solicitud, telemetría, rutas de datos e identidad del despliegue |
-| Evaluación | `app/experimental/`, `app/catalog/`, `app/study_export.py`, `scripts/`, `evaluation/` | Comparación de modelos, catálogo de pruebas, sesiones con usuarios y resultados |
+| Evaluación | `app/experimental/`, `scripts/`, `evaluation/` | Comparación de modelos, scripts de medición y resultados |
 
 La prueba `tests/test_architecture.py` verifica que el núcleo no importe FastAPI ni los módulos de evaluación.
 
@@ -34,8 +34,8 @@ La variable `APP_PROFILE` decide qué endpoints se publican.
 | Perfil | Uso | Endpoints |
 |---|---|---|
 | `development` | Desarrollo local (valor por defecto) | Todos, incluida la documentación `/docs` y las herramientas internas |
-| `study` | Sesiones de evaluación con usuarios | Detección, estado, voces, sesiones y catálogo; exige `API_KEYS` |
-| `production` | Servicio desplegado (perfil del Dockerfile) | Detección, estado, voces y, con clave, métricas y rutas del investigador |
+| `study` | Evaluación controlada | Detección, estado y voces; exige `API_KEYS` y no admite respuestas degradadas |
+| `production` | Servicio desplegado (perfil del Dockerfile) | Detección, estado, voces y, con clave, métricas |
 
 ## Configuración registrada
 

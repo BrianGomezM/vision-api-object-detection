@@ -1,24 +1,40 @@
 """
-Reproduce el problema de la caché de escenario detectado antes de F4:
-estímulos DISTINTOS con el mismo conjunto de objetos (A1–A9: una silla cada uno)
-procesados en menos de 10 s reutilizaban la respuesta del LLM del primero.
+Caché de escenario: imágenes DISTINTAS con el mismo conjunto de objetos (nueve
+imágenes con una silla cada una) no deben compartir la respuesta del LLM, aunque
+se procesen en menos de 10 s.
 
-Usa el Dataset 1 real (bytes de las PNG) con YOLO y Groq simulados: no ejecuta
-YOLO, LLM ni TTS.
+Usa nueve PNG sintéticas distintas con YOLO y Groq simulados: no ejecuta YOLO,
+LLM ni TTS.
 """
 
 import itertools
 import json
 import threading
-from pathlib import Path
 
 import pytest
 
 from app.core import pipeline
 from app.services import yolo_service, scene_classifier, llm_enhancer
 
-REPO = Path(__file__).resolve().parents[1]
-BLOCK_A = [REPO / "stimuli" / "dataset1" / f"A{i}.png" for i in range(1, 10)]
+
+
+class _Img:
+    """Imagen PNG sintética; cada índice produce bytes distintos (hash distinto)."""
+    def __init__(self, i):
+        self.i = i
+        self.name = f"A{i}.png"
+
+    def read_bytes(self) -> bytes:
+        import io
+        from PIL import Image, ImageDraw
+        img = Image.new("RGB", (640, 480), (90, 90, 90))
+        ImageDraw.Draw(img).rectangle([60 * self.i, 150, 60 * self.i + 50, 330], fill=(25 * self.i, 200, 40))
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+
+BLOCK_A = [_Img(i) for i in range(1, 10)]
 
 
 class _T:
@@ -86,7 +102,7 @@ def test_la_misma_imagen_repetida_si_puede_usar_la_cache(fakes):
 
 
 def test_reset_request_state_fuerza_una_generacion_nueva(fakes):
-    """F4 (k generaciones del mismo estímulo): el runner limpia el estado entre generaciones."""
+    """Varias generaciones del mismo estímulo: el estado se limpia entre generaciones."""
     from app import experiment
     data = BLOCK_A[0].read_bytes()
     pipeline.run(data, 0.35)
@@ -96,7 +112,7 @@ def test_reset_request_state_fuerza_una_generacion_nueva(fakes):
 
 
 def test_A1_A9_por_http_nueve_narrativas_distintas(make_client, sim, monkeypatch):
-    """Mismo escenario del bloque A pero por /api/detect: A1..A9 (una silla cada una) consecutivas."""
+    """Mismo escenario por /api/detect: nueve imágenes (una silla cada una) consecutivas."""
     def one_chair(img):                    # una silla cuya posición depende de la imagen
         x = float(sum(img.resize((4, 4)).convert("L").getdata()) % 600)
         return [(56, 0.9, [x, 200.0, x + 60, 320.0])]

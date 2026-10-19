@@ -62,6 +62,4 @@ app/experimental/
 .idea/
 
 # NO se excluyen (la app los necesita):
-#   stimuli/          estímulos congelados servidos por /api/catalog
 #   test_images/      imágenes de /api/test/* (perfil development)
-#   app/catalog/      catálogo único de pruebas

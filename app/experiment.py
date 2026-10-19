@@ -224,19 +224,7 @@ def preflight(config_path: Path = CONFIG_PATH, *, require_clean_git: bool = True
     if data_root() is None:
         problems.append("DATA_ROOT: debe estar definido (los resultados de la evaluación no se escriben en el repositorio)")
 
-    # 4) Estímulos
-    exp = config["experimento"]
-    manifest = REPO_ROOT / exp["dataset1"]["manifest"]
-    if sha256_text_file(manifest) != exp["dataset1"]["manifest_sha256"]:
-        problems.append("DATASET 1: manifest.yaml no coincide con el congelado")
-    if sha256_text_file(REPO_ROOT / exp["catalogo"]["archivo"]) != exp["catalogo"]["sha256"]:
-        problems.append("CATÁLOGO: catalog.yaml no coincide con el congelado")
-    from app.catalog.loader import load_catalog
-    invalid = [s.stimulus_id for s in load_catalog().stimuli.values() if not s.valid]
-    if invalid:
-        problems.append(f"ESTÍMULOS INVÁLIDOS (hash): {invalid}")
-
-    # 5) Commit
+    # 4) Commit
     commit = app_commit()
     if require_clean_git and (commit["commit"] is None or commit["dirty"]):
         problems.append(f"CÓDIGO: se requiere un commit limpio (commit={commit['commit']}, cambios sin commit={commit['dirty']})")

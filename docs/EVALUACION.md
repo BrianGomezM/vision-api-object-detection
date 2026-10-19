@@ -20,12 +20,10 @@ Las imágenes Web 3D están en `evaluation/images/web3d/`, y su origen y licenci
 
 ## Evaluación con usuarios
 
-Estudio exploratorio por videollamada. La persona escucha la descripción de una escena y responde de forma verbal; el investigador registra las respuestas.
+Estudio exploratorio por videollamada: la persona escucha la descripción de una escena y responde de forma verbal.
 
-- **Escenas:** seis escenas tridimensionales de interiores en `stimuli/estudio2/`: práctica, oficina, cocina-comedor, dos versiones de una sala de estar y dormitorio.
-- **Audios congelados:** la narrativa y el audio de cada escena se generaron una sola vez con la voz `es-CO-SalomeNeural` y se guardaron con su SHA-256, para que todas las sesiones escuchen exactamente lo mismo. Se generan con `scripts/study/freeze_study_audio.py` y se verifican con `scripts/study/verify_frozen_audio.py`.
-- **Pruebas:** OBJ-01 a OBJ-07 (objetos, ubicación, dirección libre, cambios, voz, suficiencia y utilidad), definidas en `app/catalog/catalog.yaml`.
-- **Escala:** de 1 a 5, con las opciones leídas en voz alta (1 nada, 2 poco, 3 más o menos, 4 bastante y 5 mucho).
-- **Registro:** `app/routes/study.py` guarda cada sesión con un código, sin nombres, y la exporta como un archivo `.zip` con la hoja de cálculo y los registros originales.
+- **Escenas:** seis escenas tridimensionales de interiores en `stimuli/estudio2/` (práctica, oficina, cocina-comedor, dos versiones de una sala de estar y dormitorio).
+- **Audios:** la narrativa y el audio de cada escena se generaron una sola vez con la voz `es-CO-SalomeNeural` y se guardaron con su SHA-256, para que todas las sesiones escuchen exactamente lo mismo.
+- **Pruebas:** OBJ-01 a OBJ-07 (objetos, ubicación, dirección libre, cambios, voz, suficiencia y utilidad), con una escala de 1 a 5 leída en voz alta.
 
-Los datos de participantes no se guardan en el repositorio.
+La herramienta que registró las sesiones (catálogo de pruebas, audios congelados, sesiones y exportación de la evidencia) no forma parte del servicio y está en la rama `herramientas/estudio-usuarios`. Los datos de participantes no se guardan en el repositorio.

@@ -47,12 +47,29 @@ def _letterbox_shape(img_path: Path, imgsz: int, stride: int) -> list:
     return list(LetterBox(imgsz, auto=True, stride=stride)(image=im).shape[:2])
 
 
+def _find(obj, key):
+    """Busca `key` en un diccionario anidado (valores ya registrados en experimental_config.yaml)."""
+    if isinstance(obj, dict):
+        if key in obj:
+            return obj[key]
+        for v in obj.values():
+            found = _find(v, key)
+            if found is not None:
+                return found
+    return None
+
+
 def build() -> dict:
     snap = experiment.runtime_snapshot()
     det = snap["deteccion"]
     weights_path = REPO / det["weights"]
     ckf = _checkpoint_facts(weights_path)
-    lb = _letterbox_shape(REPO / "stimuli/dataset1/A1.png", det["imgsz"], max(ckf["stride"]))
+    # Los estímulos del Dataset 1 y el catálogo de pruebas están en la rama
+    # herramientas/estudio-usuarios. Si no existen aquí, se conservan los valores registrados.
+    prev = experiment.load_config(OUT) if OUT.exists() else {}
+    a1 = REPO / "stimuli/dataset1/A1.png"
+    lb = (_letterbox_shape(a1, det["imgsz"], max(ckf["stride"])) if a1.exists()
+          else _find(prev, "tensor_final_dataset1_hw"))
     manifest = REPO / "stimuli/dataset1/manifest.yaml"
     catalog = REPO / "app/catalog/catalog.yaml"
     commit = experiment.app_commit()
@@ -142,7 +159,7 @@ def build() -> dict:
             "salida": "PCM 24 kHz, 16 bit, mono → MP3 lameenc 64 kbps, calidad 2",
             "alternativas": "ninguna en F4: solo el modelo por defecto (el parámetro tts_model no se usa)",
         },
-        "experimento": {
+        "experimento": ({
             "protocolo": "CP3B v2 — docs/EVALUACION.md (decisiones abiertas: ver estado_decisiones)",
             "dataset1": {"manifest": "stimuli/dataset1/manifest.yaml",
                          "manifest_sha256": experiment.sha256_text_file(manifest),
@@ -151,7 +168,7 @@ def build() -> dict:
             "catalogo": {"archivo": "app/catalog/catalog.yaml", "sha256": experiment.sha256_text_file(catalog)},
             "metricas_version": "PENDIENTE (CP3B)",
             "latencia": "NO forma parte de las métricas del CP3B; si se reporta, por separado (CPU local ≠ despliegue)",
-        },
+        } if manifest.exists() and catalog.exists() else prev.get("experimento", {})),
     }
 
 

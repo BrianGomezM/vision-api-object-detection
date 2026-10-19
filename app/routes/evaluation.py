@@ -1,33 +1,19 @@
 """
 app/routes/evaluation.py
 
-Endpoints de evaluación, dataset y fine-tuning para el sistema de
-navegación egocéntrica.
+Endpoints de métricas y de pruebas del servicio (perfil development; las
+métricas también se publican en production con clave).
 
 ENDPOINTS:
-  POST /api/dataset/upload     — almacena imagen + etiquetas YOLO para fine-tuning
-  GET  /api/dataset/stats      — estadísticas del dataset acumulado
-  GET  /api/metrics/summary    — métricas de producción con percentiles
+  GET  /api/metrics/summary    — métricas de la telemetría con percentiles
   GET  /api/metrics/latency    — historial de latencias (últimas N solicitudes)
-  POST /api/test/functional    — suite de pruebas funcionales automáticas
-  POST /api/test/load          — prueba de carga parametrizable (N req, M concurrentes)
+  POST /api/test/functional    — pruebas funcionales automáticas contra esta instancia
+  POST /api/test/load          — prueba de carga parametrizable (N solicitudes, M simultáneas)
   GET  /api/test/results       — historial de ejecuciones de pruebas
-  POST /api/finetune/prepare   — organiza el dataset en formato YOLO (data.yaml)
-  GET  /api/finetune/status    — estado del dataset preparado para fine-tuning
-
-FUNCIÓN PÚBLICA:
-  log_metric(data)  — re-exportado desde app/telemetry.py (compatibilidad)
 
 ALMACENAMIENTO EN DISCO:
-  dataset/images/     imágenes subidas por usuarios
-  dataset/labels/     etiquetas en formato YOLO txt (class cx cy bw bh)
-  dataset/metadata/   JSON con metadatos de cada imagen
-  metrics/production_metrics.jsonl   métricas de producción (JSONL append-only)
-  test_results/test_history.jsonl    resultados de pruebas ejecutadas
-
-REGISTRO EN main.py:
-  from app.routes.evaluation import router as eval_router
-  app.include_router(eval_router, prefix="/api")
+  metrics/production_metrics.jsonl   telemetría (la escribe app/telemetry.py)
+  test_results/test_history.jsonl    resultados de las pruebas ejecutadas
 """
 
 import os
@@ -35,21 +21,17 @@ import io
 import json
 import time
 import asyncio
-import hashlib
-import shutil
-import random
 from datetime import datetime, timezone
 from pathlib import Path
 from collections import defaultdict
-from typing import Optional, List
+from typing import Optional
 
 import httpx
 import numpy as np
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
+from fastapi import APIRouter, Form, HTTPException, Depends
 from PIL import Image
 
 from app.security import require_api_key
-from app.utils.uploads import read_upload_limited
 
 router = APIRouter()
 
@@ -60,11 +42,7 @@ router = APIRouter()
 from app.storage import data_dir
 
 _BASE            = Path(".")                       # solo para test_images/ (entrada, no datos)
-DATASET_DIR      = data_dir("dataset")              # sin DATA_ROOT: ./dataset
 TEST_DIR         = data_dir("api_tests")            # sin DATA_ROOT: ./test_results
-DATASET_IMAGES   = DATASET_DIR / "images"
-DATASET_LABELS   = DATASET_DIR / "labels"
-DATASET_METADATA = DATASET_DIR / "metadata"
 TEST_RESULTS_LOG = TEST_DIR    / "test_history.jsonl"
 
 
@@ -83,186 +61,7 @@ from app.telemetry import log_metric, read_metrics as _read_metrics   # noqa: F4
 
 
 # ──────────────────────────────────────────────────────────────
-# 1. POST /api/dataset/upload
-# ──────────────────────────────────────────────────────────────
-
-@router.post("/dataset/upload", tags=["Dataset / Fine-Tuning"])
-async def upload_to_dataset(
-    file:       UploadFile = File(..., description="Imagen JPEG o PNG de escena Web 3D"),
-    scene_type: str        = Form("unknown", description="Tipo de escena (sala, cocina, exterior…)"),
-    source:     str        = Form("web3d",   description="Origen de la imagen (web3d, test, manual)"),
-    auto_label: bool       = Form(True,      description="Ejecutar YOLO y guardar etiquetas en formato YOLO txt"),
-    _key:       str        = Depends(require_api_key),
-):
-    """
-    Almacena una imagen en el dataset acumulativo y la etiqueta automáticamente
-    con YOLO26s si auto_label=True.
-
-    Las etiquetas se guardan en formato YOLO normalizado (class_id cx cy bw bh),
-    listas para usarse directamente en `yolo train` mediante /api/finetune/prepare.
-
-    Uso: enviar desde el cliente Web 3D cada vez que el usuario interactúa con
-    una escena, para acumular datos del dominio específico del proyecto.
-    """
-    image_bytes = await read_upload_limited(file)
-    if not image_bytes:
-        raise HTTPException(status_code=400, detail="Archivo vacío.")
-
-    try:
-        img  = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        w, h = img.size
-    except Exception:
-        raise HTTPException(status_code=422, detail="Formato de imagen no válido (se esperaba JPEG o PNG).")
-
-    # ID determinista basado en contenido: evita duplicados exactos
-    img_hash = hashlib.sha1(image_bytes).hexdigest()[:12]
-    ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
-    stem     = f"{ts}_{img_hash}"
-
-    # Comprobar si ya existe (duplicado exacto)
-    if (DATASET_METADATA / f"{stem}.json").exists():
-        return {
-            "status":        "duplicate",
-            "id":            stem,
-            "message":       "Imagen idéntica ya presente en el dataset.",
-            "auto_labeled":  False,
-            "objects_found": 0,
-            "objects":       [],
-        }
-
-    # Guardar imagen
-    _ensure_dir(DATASET_IMAGES, DATASET_LABELS, DATASET_METADATA)
-    img_path = DATASET_IMAGES / f"{stem}.jpg"
-    img.save(img_path, format="JPEG", quality=90)
-
-    # Etiquetado automático con YOLO26s
-    labels_generated = []
-    label_error      = None
-    if auto_label:
-        try:
-            from app.services.yolo_service import run_yolo
-            result     = run_yolo(image_bytes, confidence_threshold=0.35)
-            detections = result.get("detections", [])
-
-            label_lines = []
-            for det in detections:
-                b   = det["bbox"]
-                cx  = ((b["x1"] + b["x2"]) / 2) / w
-                cy  = ((b["y1"] + b["y2"]) / 2) / h
-                bw  = (b["x2"] - b["x1"]) / w
-                bh  = (b["y2"] - b["y1"]) / h
-                # Clampear a [0,1] por si el bbox toca el borde
-                cx, cy, bw, bh = (
-                    max(0.0, min(1.0, cx)),
-                    max(0.0, min(1.0, cy)),
-                    max(0.0, min(1.0, bw)),
-                    max(0.0, min(1.0, bh)),
-                )
-                label_lines.append(
-                    f"{det['class_id']} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}"
-                )
-                labels_generated.append({
-                    "label":      det["label"],
-                    "confidence": det["confidence"],
-                    "class_id":   det["class_id"],
-                })
-
-            (DATASET_LABELS / f"{stem}.txt").write_text(
-                "\n".join(label_lines), encoding="utf-8"
-            )
-        except Exception as e:
-            label_error = str(e)
-            auto_label  = False
-
-    # Guardar metadatos JSON
-    meta = {
-        "id":           stem,
-        "filename":     f"{stem}.jpg",
-        "scene_type":   scene_type,
-        "source":       source,
-        "width":        w,
-        "height":       h,
-        "hash":         img_hash,
-        "auto_labeled": auto_label,
-        "n_objects":    len(labels_generated),
-        "labels":       labels_generated,
-        "label_error":  label_error,
-        "uploaded_at":  datetime.now(timezone.utc).isoformat(),
-    }
-    (DATASET_METADATA / f"{stem}.json").write_text(
-        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-    return {
-        "status":        "stored",
-        "id":            stem,
-        "image_path":    str(img_path),
-        "auto_labeled":  auto_label,
-        "objects_found": len(labels_generated),
-        "objects":       labels_generated,
-        "label_error":   label_error,
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# 2. GET /api/dataset/stats
-# ──────────────────────────────────────────────────────────────
-
-@router.get("/dataset/stats", tags=["Dataset / Fine-Tuning"])
-def dataset_stats():
-    """
-    Retorna estadísticas del dataset acumulado:
-    total de imágenes, imágenes etiquetadas, distribución por tipo de escena,
-    clases más frecuentes y si el dataset está listo para fine-tuning.
-    """
-    meta_files = list(DATASET_METADATA.glob("*.json"))
-    if not meta_files:
-        return {
-            "total_images":       0,
-            "labeled_images":     0,
-            "finetune_ready":     False,
-            "finetune_min_images": 50,
-            "message":            "Dataset vacío. Subir imágenes con POST /api/dataset/upload.",
-        }
-
-    total      = len(meta_files)
-    labeled    = 0
-    by_scene   = defaultdict(int)
-    by_class   = defaultdict(int)
-    total_objs = 0
-
-    for mf in meta_files:
-        try:
-            m = json.loads(mf.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        if m.get("auto_labeled"):
-            labeled += 1
-        by_scene[m.get("scene_type", "unknown")] += 1
-        for lbl in m.get("labels", []):
-            by_class[lbl.get("label", "unknown")] += 1
-            total_objs += 1
-
-    return {
-        "total_images":       total,
-        "labeled_images":     labeled,
-        "unlabeled_images":   total - labeled,
-        "total_objects":      total_objs,
-        "avg_objects_image":  round(total_objs / total, 2) if total else 0,
-        "by_scene_type":      dict(sorted(by_scene.items(), key=lambda x: -x[1])),
-        "top_classes":        dict(sorted(by_class.items(), key=lambda x: -x[1])[:15]),
-        "finetune_ready":     labeled >= 50,
-        "finetune_min_images": 50,
-        "note": (
-            "Se recomienda mínimo 50 imágenes etiquetadas por dominio para "
-            "fine-tuning efectivo. Llamar a POST /api/finetune/prepare cuando "
-            "finetune_ready sea true."
-        ),
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# 3. GET /api/metrics/summary
+# 1. GET /api/metrics/summary
 # ──────────────────────────────────────────────────────────────
 
 @router.get("/metrics/summary", tags=["Métricas"])
@@ -321,7 +120,7 @@ def metrics_summary(limit: int = 500):
 
 
 # ──────────────────────────────────────────────────────────────
-# 4. GET /api/metrics/latency
+# 2. GET /api/metrics/latency
 # ──────────────────────────────────────────────────────────────
 
 @router.get("/metrics/latency", tags=["Métricas"])
@@ -347,7 +146,7 @@ def metrics_latency(limit: int = 100):
 
 
 # ──────────────────────────────────────────────────────────────
-# 5. POST /api/test/functional
+# 3. POST /api/test/functional
 # ──────────────────────────────────────────────────────────────
 
 _FUNCTIONAL_CASES = [
@@ -394,24 +193,6 @@ _FUNCTIONAL_CASES = [
         "tipo":        "archivo_vacio",
         "espera": {
             "http_status": 400,
-        },
-    },
-    {
-        "id":          "FUN-06",
-        "descripcion": "POST /api/dataset/upload con imagen válida debe guardar y etiquetar",
-        "image_path":  "test_images/05_sala_muebles.jpg",
-        "tipo":        "dataset_upload",
-        "espera": {
-            "status": "stored",
-        },
-    },
-    {
-        "id":          "FUN-07",
-        "descripcion": "GET /api/dataset/stats debe retornar total_images ≥ 1 tras upload",
-        "image_path":  None,
-        "tipo":        "dataset_stats",
-        "espera": {
-            "min_total": 1,
         },
     },
     {
@@ -569,39 +350,6 @@ async def run_functional_tests(
                         passed = n_low >= n_high
                         detail = {"objetos_thr_0.0": n_low, "objetos_thr_0.9": n_high}
 
-                # ── FUN-06: Dataset upload ─────────────────────
-                elif tipo == "dataset_upload":
-                    img_path = Path(case["image_path"])
-                    if not img_path.exists():
-                        passed = False
-                        detail = {"error": f"Imagen no encontrada: {img_path}"}
-                    else:
-                        img_bytes = img_path.read_bytes()
-                        r    = await client.post(
-                            "/api/dataset/upload",
-                            data={"scene_type": "sala de estar", "auto_label": "true"},
-                            files={"file": ("img.jpg", img_bytes, "image/jpeg")},
-                        )
-                        data = r.json()
-                        passed = (
-                            r.status_code == 200
-                            and data.get("status") in ("stored", "duplicate")
-                        )
-                        detail = {
-                            "status": data.get("status"),
-                            "id":     data.get("id"),
-                        }
-
-                # ── FUN-07: Dataset stats ──────────────────────
-                elif tipo == "dataset_stats":
-                    r    = await client.get("/api/dataset/stats")
-                    data = r.json()
-                    passed = (
-                        r.status_code == 200
-                        and data.get("total_images", 0) >= espera["min_total"]
-                    )
-                    detail = {"total_images": data.get("total_images")}
-
                 # ── Caso general: imagen real ──────────────────
                 elif tipo == "imagen_real":
                     img_path = Path(case["image_path"])
@@ -665,7 +413,7 @@ async def run_functional_tests(
 
 
 # ──────────────────────────────────────────────────────────────
-# 6. POST /api/test/load
+# 4. POST /api/test/load
 # ──────────────────────────────────────────────────────────────
 
 @router.post("/test/load", tags=["Pruebas"])
@@ -775,7 +523,7 @@ async def run_load_test(
 
 
 # ──────────────────────────────────────────────────────────────
-# 7. GET /api/test/results
+# 5. GET /api/test/results
 # ──────────────────────────────────────────────────────────────
 
 @router.get("/test/results", tags=["Pruebas"])
@@ -791,144 +539,3 @@ def get_test_results(limit: int = 20):
     data  = [json.loads(l) for l in lines[-limit:]]
     data.reverse()
     return {"count": len(data), "results": data}
-
-
-# ──────────────────────────────────────────────────────────────
-# 8. POST /api/finetune/prepare
-# ──────────────────────────────────────────────────────────────
-
-@router.post("/finetune/prepare", tags=["Dataset / Fine-Tuning"])
-def prepare_finetune_dataset(
-    train_split: float = Form(0.8, description="Fracción de imágenes para entrenamiento (0.0-1.0)"),
-    min_images:  int   = Form(10,  description="Mínimo de imágenes etiquetadas requeridas"),
-    _key:        str   = Depends(require_api_key),
-):
-    """
-    Organiza el dataset acumulado en la estructura de directorios que espera
-    Ultralytics YOLO para fine-tuning y genera el archivo data.yaml:
-
-        dataset/finetune/
-          images/train/   imágenes de entrenamiento
-          images/val/     imágenes de validación
-          labels/train/   etiquetas YOLO correspondientes
-          labels/val/
-          data.yaml       configuración lista para `yolo train`
-
-    Retorna la ruta al data.yaml y el comando completo para ejecutar el entrenamiento.
-    Requiere que el dataset tenga al menos `min_images` imágenes etiquetadas.
-    """
-    meta_files = list(DATASET_METADATA.glob("*.json"))
-    labeled    = []
-    for mf in meta_files:
-        try:
-            m = json.loads(mf.read_text(encoding="utf-8"))
-            if m.get("auto_labeled"):
-                labeled.append(mf)
-        except Exception:
-            continue
-
-    if len(labeled) < min_images:
-        return {
-            "status":        "insufficient_data",
-            "message":       (
-                f"Se requieren al menos {min_images} imágenes etiquetadas. "
-                f"Actualmente hay {len(labeled)}. "
-                f"Subir más imágenes con POST /api/dataset/upload."
-            ),
-            "labeled_count": len(labeled),
-            "required":      min_images,
-        }
-
-    random.shuffle(labeled)
-    n_train = int(len(labeled) * train_split)
-    train   = labeled[:n_train]
-    val     = labeled[n_train:]
-
-    ft_dir = DATASET_DIR / "finetune"
-    for split, items in [("train", train), ("val", val)]:
-        (ft_dir / "images" / split).mkdir(parents=True, exist_ok=True)
-        (ft_dir / "labels" / split).mkdir(parents=True, exist_ok=True)
-        for mf in items:
-            stem    = mf.stem
-            src_img = DATASET_IMAGES / f"{stem}.jpg"
-            src_lbl = DATASET_LABELS / f"{stem}.txt"
-            if src_img.exists():
-                shutil.copy(src_img, ft_dir / "images" / split / f"{stem}.jpg")
-            if src_lbl.exists():
-                shutil.copy(src_lbl, ft_dir / "labels" / split / f"{stem}.txt")
-
-    # Recopilar mapa class_id → nombre desde todos los metadatos
-    class_ids = {}
-    for mf in labeled:
-        m = json.loads(mf.read_text(encoding="utf-8"))
-        for lbl in m.get("labels", []):
-            class_ids[lbl["class_id"]] = lbl["label"]
-    names = [class_ids.get(i, f"class_{i}") for i in sorted(class_ids.keys())]
-
-    yaml_path = ft_dir / "data.yaml"
-    yaml_path.write_text(
-        f"# Dataset fine-tuning YOLO — Generado: {datetime.now().isoformat()}\n"
-        f"# Total: {len(labeled)} imgs (train: {len(train)}, val: {len(val)})\n\n"
-        f"path: {ft_dir.resolve()}\n"
-        f"train: images/train\n"
-        f"val:   images/val\n\n"
-        f"nc: {len(names)}\n"
-        f"names: {names}\n",
-        encoding="utf-8",
-    )
-
-    return {
-        "status":        "ready",
-        "yaml_path":     str(yaml_path),
-        "train_images":  len(train),
-        "val_images":    len(val),
-        "total_classes": len(names),
-        "class_names":   names,
-        "comando_yolo":  (
-            f"yolo train model=yolo26s.pt data={yaml_path.resolve()} "
-            f"epochs=50 imgsz=640 batch=8"
-        ),
-        "nota": (
-            "Ejecutar el comando desde la raíz del proyecto. "
-            "Se recomienda GPU para tiempos razonables de entrenamiento. "
-            "En CPU el entrenamiento puede tardar varias horas."
-        ),
-    }
-
-
-# ──────────────────────────────────────────────────────────────
-# 9. GET /api/finetune/status
-# ──────────────────────────────────────────────────────────────
-
-@router.get("/finetune/status", tags=["Dataset / Fine-Tuning"])
-def finetune_status():
-    """
-    Verifica si existe un dataset preparado para fine-tuning y retorna
-    su estado, conteo de imágenes y el comando listo para ejecutar.
-
-    Si no se ha preparado aún, retorna instrucciones para hacerlo.
-    """
-    yaml_path = DATASET_DIR / "finetune" / "data.yaml"
-    if not yaml_path.exists():
-        return {
-            "status":  "not_prepared",
-            "message": (
-                "Dataset no preparado. Acumular imágenes con POST /api/dataset/upload "
-                "y luego llamar POST /api/finetune/prepare."
-            ),
-        }
-
-    train_imgs = list((DATASET_DIR / "finetune" / "images" / "train").glob("*.jpg"))
-    val_imgs   = list((DATASET_DIR / "finetune" / "images" / "val").glob("*.jpg"))
-
-    return {
-        "status":        "ready",
-        "yaml_path":     str(yaml_path),
-        "train_images":  len(train_imgs),
-        "val_images":    len(val_imgs),
-        "total_images":  len(train_imgs) + len(val_imgs),
-        "comando_yolo":  (
-            f"yolo train model=yolo26s.pt data={yaml_path.resolve()} "
-            f"epochs=50 imgsz=640 batch=8"
-        ),
-    }

@@ -14,38 +14,26 @@ CORS:
   En desarrollo se aceptan todos los orígenes de localhost.
 
 PERFILES (APP_PROFILE, ver app/profiles.py):
-  production            → PRODUCTO desplegado: POST /api/detect (público) y GET /api/health
-                          (básico), más las rutas que consume el cliente actual:
-                          GET /api/tts/models (público), /api/study/*, /api/catalog* y
-                          GET /api/metrics/summary|latency, estas con clave del
-                          investigador (RESEARCHER_API_KEYS; sin claves → 401).
-                          Sin /docs, /redoc, /openapi.json, raíz ni endpoints internos
-                          (debug, dataset, fine-tuning, pruebas, feedback, /detections).
-                          Perfil del Dockerfile.
-  development (defecto) → todos los endpoints de abajo, igual que antes.
-  study                 → solo endpoints del investigador para las sesiones con
-                          participantes: /api/detect, /api/health, /api/tts/models,
-                          /api/study/*, /api/catalog*. NO monta endpoints internos
-                          (debug, dataset, fine-tuning, pruebas, métricas/feedback,
-                          /detections) y se niega a arrancar sin API_KEYS.
+  production            → servicio desplegado (perfil del Dockerfile): POST /api/detect y
+                          GET /api/health (públicos), GET /api/tts/models (público) y
+                          GET /api/metrics/summary|latency con clave (RESEARCHER_API_KEYS).
+                          Sin /docs, /redoc, /openapi.json, raíz ni endpoints internos.
+  development (defecto) → todos los endpoints de abajo y la documentación /docs.
+  study                 → evaluación controlada: /api/detect, /api/health y
+                          /api/tts/models con clave obligatoria (API_KEYS); no admite
+                          respuestas degradadas ni monta endpoints internos.
 
 ENDPOINTS registrados (perfil development):
-  /api/detect        POST — narrativa completa (JSON o audio MP3)
-  /api/debug-detect  POST — pipeline paso a paso
-  /api/health        GET  — estado del servicio
-
-  /api/dataset/upload    POST — almacena imagen + etiquetas para fine-tuning
-  /api/dataset/stats     GET  — estadísticas del dataset acumulado
-  /api/metrics/summary   GET  — métricas de producción con percentiles
+  /api/detect            POST — narrativa completa (JSON o audio MP3)
+  /api/debug-detect      POST — procesamiento paso a paso
+  /api/health            GET  — estado del servicio
+  /api/tts/models        GET  — voces disponibles
+  /api/metrics/summary   GET  — resumen de la telemetría con percentiles
   /api/metrics/latency   GET  — historial de latencias
-  /api/test/functional   POST — suite de pruebas funcionales automáticas
+  /api/test/functional   POST — pruebas funcionales automáticas
   /api/test/load         POST — prueba de carga parametrizable
   /api/test/results      GET  — historial de resultados de pruebas
-  /api/finetune/prepare  POST — prepara dataset en formato YOLO (data.yaml)
-  /api/finetune/status   GET  — estado del dataset preparado
-  /api/feedback          POST/GET — evaluación de usuarios (escala Likert)
-  /api/catalog           GET  — catálogo único de pruebas (sin ground truth)
-  /api/study/*                — sesiones de evaluación con usuarios
+  /api/feedback          POST/GET — valoración de una narrativa (escala 1 a 5)
 """
 
 import os
@@ -56,8 +44,6 @@ from app.routes.detect     import router as detect_router, debug_router, tts_rou
 from app.routes.health     import router as health_router
 from app.routes.evaluation import router as eval_router, metrics_summary, metrics_latency
 from app.routes.metrics    import router as metrics_router
-from app.routes.study      import router as study_router
-from app.routes.catalog    import router as catalog_router
 from app.security import app_profile, dev_mode, require_researcher_key
 from app.storage import data_dir
 from app import errors
@@ -100,8 +86,8 @@ def create_app(profile: str | None = None) -> FastAPI:
     profile = profile or app_profile()
     if profile == "study" and dev_mode():
         raise RuntimeError(
-            "APP_PROFILE=study exige API_KEYS configuradas: las sesiones con "
-            "participantes no pueden ejecutarse sin autenticación."
+            "APP_PROFILE=study exige API_KEYS configuradas: la evaluación "
+            "controlada no puede ejecutarse sin autenticación."
         )
 
     production = profile == "production"
@@ -111,7 +97,7 @@ def create_app(profile: str | None = None) -> FastAPI:
         title="API de Detección de Objetos para Accesibilidad",
         description=(
             "Genera descripciones narrativas egocéntricas para personas con ceguera total "
-            "en entornos Web 3D. Incluye endpoints de evaluación, dataset y fine-tuning."
+            "en entornos Web 3D."
         ),
         version="3.2.0",
     )
@@ -136,7 +122,7 @@ def create_app(profile: str | None = None) -> FastAPI:
         allow_origin_regex=_CORS_ORIGIN_REGEX,
         allow_credentials=True,
         # Métodos necesarios para los endpoints del sistema
-        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],   # DELETE: /api/study/sessions/{id}
+        allow_methods=["GET", "POST", "OPTIONS"],
         # Headers que el cliente Next.js envía en peticiones multipart y JSON
         # (X-API-Key: clave del investigador, ver app/security.py)
         allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With", "X-API-Key"],
@@ -189,12 +175,7 @@ def create_app(profile: str | None = None) -> FastAPI:
                 "detect":          "POST /api/detect",
                 "debug_detect":    "POST /api/debug-detect",
                 "health":          "GET  /api/health",
-                "catalog":         "GET  /api/catalog",
-                # Dataset y fine-tuning
-                "dataset_upload":  "POST /api/dataset/upload",
-                "dataset_stats":   "GET  /api/dataset/stats",
-                "finetune_prepare":"POST /api/finetune/prepare",
-                "finetune_status": "GET  /api/finetune/status",
+                "tts_models":      "GET  /api/tts/models",
                 # Métricas
                 "metrics_summary": "GET  /api/metrics/summary",
                 "metrics_latency": "GET  /api/metrics/latency",
@@ -218,12 +199,8 @@ def create_app(profile: str | None = None) -> FastAPI:
     app.include_router(detect_router,  prefix="/api")  # POST /api/detect
     app.include_router(health_router,  prefix="/api")  # GET  /api/health
 
-    # INVESTIGADOR / ESTUDIO (todos los perfiles): lo consume el cliente actual.
-    # /api/tts/models es público (solo lista de modelos); study y catálogo exigen
-    # clave del investigador (require_researcher_key: en production, fallo cerrado).
+    # Lista de voces disponibles (pública en todos los perfiles).
     app.include_router(tts_router,     prefix="/api")  # GET /api/tts/models
-    app.include_router(study_router,   prefix="/api")  # POST/GET /api/study/sessions — evaluación con usuarios
-    app.include_router(catalog_router, prefix="/api")  # GET /api/catalog — catálogo único de pruebas
     if production:
         # Métricas agregadas de /api/detect (pestaña Métricas), solo lectura y con
         # clave del investigador. El resto de eval_router sigue fuera de production.
@@ -237,7 +214,7 @@ def create_app(profile: str | None = None) -> FastAPI:
     if profile == "development":
         # Endpoints INTERNOS: no se montan en el perfil study.
         app.include_router(debug_router,   prefix="/api")  # /debug-detect
-        app.include_router(eval_router,    prefix="/api")  # dataset, fine-tuning, pruebas, métricas
+        app.include_router(eval_router,    prefix="/api")  # pruebas y métricas
         app.include_router(metrics_router, prefix="/api")  # POST/GET /api/feedback
 
         # Imágenes anotadas con bounding boxes: GET /detections/<archivo>.jpg

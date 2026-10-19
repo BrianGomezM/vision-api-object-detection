@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalación de VisionNav API</title>
+<meta name="description" content="Guía paso a paso para instalar y ejecutar VisionNav API en Windows.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231D9E75'/%3E%3Cpath d='M5 16s4-7 11-7 11 7 11 7-4 7-11 7S5 16 5 16Z' fill='none' stroke='white' stroke-width='2.2' stroke-linejoin='round'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='none' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E">
+<style>
+:root {
+  --verde: #1D9E75;
+  --verde-oscuro: #13775A;
+  --verde-suave: #E7F5EF;
+  --fondo: #F7F8FA;
+  --tarjeta: #FFFFFF;
+  --texto: #1F2733;
+  --texto-suave: #5B6472;
+  --borde: #E3E6EB;
+  --codigo-fondo: #0F1A17;
+  --codigo-texto: #D7F2E6;
+  --aviso: #8A5A00;
+  --aviso-fondo: #FFF6E0;
+  --sombra: 0 1px 2px rgb(16 24 40 / .06), 0 4px 16px rgb(16 24 40 / .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --verde: #4CC79C;
+    --verde-oscuro: #2FA77D;
+    --verde-suave: #12302A;
+    --fondo: #0E1316;
+    --tarjeta: #161D21;
+    --texto: #E6EBEF;
+    --texto-suave: #9AA6B2;
+    --borde: #26313A;
+    --codigo-fondo: #0A0F12;
+    --aviso: #F2C46B;
+    --aviso-fondo: #2A2210;
+    --sombra: none;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--texto);
+  background: var(--fondo);
+}
+a { color: var(--verde-oscuro); text-underline-offset: 3px; }
+@media (prefers-color-scheme: dark) { a { color: var(--verde); } }
+:focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; border-radius: 6px; }
+
+.saltar { position: absolute; left: -999px; top: 8px; background: var(--verde); color: #fff; padding: 8px 14px; border-radius: 8px; z-index: 10; }
+.saltar:focus { left: 16px; }
+
+header.barra {
+  background: var(--tarjeta);
+  border-bottom: 1px solid var(--borde);
+}
+.barra-interior {
+  max-width: 880px; margin: 0 auto; padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.logo {
+  width: 40px; height: 40px; border-radius: 11px; background: var(--verde);
+  display: grid; place-items: center; flex: none;
+}
+.marca strong { display: block; font-size: 18px; line-height: 1.2; }
+.marca span { font-size: 13px; color: var(--texto-suave); }
+
+main { max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+@media (max-width: 560px) { .portada { padding: 28px 22px; } .portada h1 { font-size: 26px; } }
+
+.portada {
+  background: linear-gradient(135deg, var(--verde-oscuro), var(--verde));
+  color: #fff; border-radius: 20px; padding: 36px 32px; margin-bottom: 28px;
+}
+.portada h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.2; }
+.portada p { margin: 0; max-width: 620px; font-size: 18px; opacity: .95; }
+.portada .datos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; padding: 0; list-style: none; }
+.portada .datos li { background: rgb(255 255 255 / .16); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
+
+.indice {
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px;
+  padding: 18px 22px; margin-bottom: 28px; box-shadow: var(--sombra);
+}
+.indice h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-suave); margin: 0 0 8px; }
+.indice ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+@media (max-width: 640px) { .indice ol { columns: 1; } }
+
+.paso {
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px;
+  padding: 24px; margin-bottom: 18px; box-shadow: var(--sombra);
+  display: grid; grid-template-columns: 48px 1fr; gap: 18px;
+}
+@media (max-width: 560px) { .paso { grid-template-columns: 1fr; padding: 20px 18px; } }
+.paso > div { min-width: 0; }
+.numero {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--verde-suave);
+  color: var(--verde-oscuro); font-weight: 700; font-size: 20px; display: grid; place-items: center;
+}
+@media (prefers-color-scheme: dark) { .numero { color: var(--verde); } }
+.paso h2 { margin: 6px 0 8px; font-size: 22px; line-height: 1.3; }
+.paso p { margin: 0 0 12px; }
+.paso ul, .paso ol { margin: 0 0 12px; padding-left: 22px; }
+.paso li { margin-bottom: 4px; }
+
+.boton {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  background: var(--verde); color: #fff; font-weight: 600; font-size: 16px;
+  padding: 11px 18px; border-radius: 10px; border: 0; cursor: pointer; margin: 4px 8px 4px 0;
+}
+.boton:hover { background: var(--verde-oscuro); }
+@media (prefers-color-scheme: dark) { .boton { color: #0E1316; } }
+.boton.secundario { background: transparent; color: var(--verde-oscuro); border: 1.5px solid var(--verde); }
+@media (prefers-color-scheme: dark) { .boton.secundario { color: var(--verde); } }
+
+.nota {
+  background: var(--verde-suave); border-radius: 12px; padding: 12px 16px; margin: 12px 0 0; font-size: 16px;
+}
+.aviso {
+  background: var(--aviso-fondo); color: var(--aviso); border-radius: 12px; padding: 12px 16px; margin: 12px 0 0; font-size: 16px;
+}
+.aviso strong, .nota strong { font-weight: 700; }
+
+.codigo { position: relative; margin: 10px 0 12px; }
+.codigo pre {
+  margin: 0; background: var(--codigo-fondo); color: var(--codigo-texto);
+  border-radius: 12px; padding: 16px 92px 16px 16px; overflow-x: auto;
+  font-family: Consolas, "Cascadia Mono", monospace; font-size: 15px; line-height: 1.5;
+}
+.copiar {
+  position: absolute; top: 10px; right: 10px; font: inherit; font-size: 13px; font-weight: 600;
+  background: rgb(255 255 255 / .12); color: #fff; border: 1px solid rgb(255 255 255 / .22);
+  border-radius: 8px; padding: 5px 10px; cursor: pointer;
+}
+.copiar:hover { background: rgb(255 255 255 / .22); }
+
+kbd {
+  font-family: inherit; font-size: 14px; background: var(--fondo); border: 1px solid var(--borde);
+  border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px;
+}
+code.en-linea { overflow-wrap: anywhere; font-family: Consolas, monospace; font-size: 15px; background: var(--verde-suave); padding: 1px 6px; border-radius: 6px; }
+
+details {
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 14px;
+  padding: 4px 20px; margin-bottom: 10px;
+}
+details summary { cursor: pointer; font-weight: 600; padding: 12px 0; }
+details[open] summary { border-bottom: 1px solid var(--borde); margin-bottom: 10px; }
+details p { margin: 0 0 12px; }
+
+h2.seccion { font-size: 24px; margin: 40px 0 14px; }
+footer { text-align: center; font-size: 14px; color: var(--texto-suave); padding: 24px 20px 40px; }
+
+#estado-copiado { position: absolute; left: -9999px; }
+</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Ir al contenido</a>
+
+<header class="barra">
+  <div class="barra-interior">
+    <div class="logo" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="marca">
+      <strong>VisionNav</strong>
+      <span>Navegación visual asistida</span>
+    </div>
+  </div>
+</header>
+
+<main id="contenido">
+  <section class="portada">
+    <h1>Instalar VisionNav API</h1>
+    <p>Siga estos pasos para tener el servicio funcionando en su computador con Windows. No necesita saber programar: la mayor parte se hace con doble clic.</p>
+    <ul class="datos">
+      <li>Tiempo: unos 15 minutos</li>
+      <li>Espacio: unos 2 GB</li>
+      <li>Requiere internet</li>
+    </ul>
+  </section>
+
+  <nav class="indice" aria-label="Pasos de la instalación">
+    <h2>Pasos</h2>
+    <ol>
+      <li><a href="#paso-1">Instalar Python</a></li>
+      <li><a href="#paso-2">Descargar el proyecto</a></li>
+      <li><a href="#paso-3">Conseguir las claves</a></li>
+      <li><a href="#paso-4">Ejecutar el instalador</a></li>
+      <li><a href="#paso-5">Iniciar la API</a></li>
+      <li><a href="#paso-6">Probar con una imagen</a></li>
+    </ol>
+  </nav>
+
+  <section class="paso" id="paso-1" aria-labelledby="t1">
+    <div class="numero" aria-hidden="true">1</div>
+    <div>
+      <h2 id="t1">Instalar Python</h2>
+      <p>VisionNav funciona con Python, un programa gratuito. Si ya lo tiene en la versión 3.13 o 3.12, pase al paso 2.</p>
+      <ol>
+        <li>Descargue Python 3.13 desde la página oficial.</li>
+        <li>Abra el instalador.</li>
+        <li><strong>Antes de continuar, marque la casilla «Add python.exe to PATH»</strong>, en la parte inferior de la primera ventana.</li>
+        <li>Haga clic en «Install Now» y espere a que termine.</li>
+      </ol>
+      <a class="boton" href="https://www.python.org/downloads/" target="_blank" rel="noopener">Descargar Python</a>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-2" aria-labelledby="t2">
+    <div class="numero" aria-hidden="true">2</div>
+    <div>
+      <h2 id="t2">Descargar el proyecto</h2>
+      <p>Descargue el proyecto en un archivo ZIP y descomprímalo en una carpeta fácil de encontrar, por ejemplo en <code class="en-linea">Documentos</code>.</p>
+      <a class="boton" href="https://github.com/BrianGomezM/vision-api-object-detection/archive/refs/heads/main.zip">Descargar el proyecto (ZIP)</a>
+      <p class="nota">Para descomprimir: clic derecho sobre el archivo, <strong>«Extraer todo…»</strong> y luego <strong>«Extraer»</strong>.</p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-3" aria-labelledby="t3">
+    <div class="numero" aria-hidden="true">3</div>
+    <div>
+      <h2 id="t3">Conseguir las claves</h2>
+      <p>VisionNav usa dos servicios externos: uno redacta la descripción y otro la convierte en voz. Cada uno entrega una clave gratuita, que es como una contraseña para usar el servicio.</p>
+      <ul>
+        <li><strong>Groq</strong> (descripción): inicie sesión y cree una clave en «API Keys».</li>
+        <li><strong>Google AI Studio</strong> (voz): inicie sesión y elija «Get API key».</li>
+      </ul>
+      <a class="boton secundario" href="https://console.groq.com/keys" target="_blank" rel="noopener">Abrir Groq</a>
+      <a class="boton secundario" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Abrir Google AI Studio</a>
+      <p class="aviso"><strong>No comparta sus claves.</strong> Guárdelas solo en su computador; el instalador las escribe en el archivo <code class="en-linea">.env</code> de la carpeta del proyecto.</p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-4" aria-labelledby="t4">
+    <div class="numero" aria-hidden="true">4</div>
+    <div>
+      <h2 id="t4">Ejecutar el instalador</h2>
+      <p>En la carpeta del proyecto, haga <strong>doble clic en <code class="en-linea">instalar.bat</code></strong>. Se abrirá una ventana negra que:</p>
+      <ol>
+        <li>comprueba que Python esté instalado;</li>
+        <li>prepara un espacio de trabajo propio del proyecto;</li>
+        <li>instala las librerías necesarias (es la parte más lenta);</li>
+        <li>descarga el modelo de detección y verifica que sea el correcto;</li>
+        <li>le pide las dos claves del paso 3. Pegue cada una con <kbd>Clic derecho</kbd> y presione <kbd>Enter</kbd>.</li>
+      </ol>
+      <p>Cuando vea «Instalación terminada», cierre la ventana.</p>
+      <p class="aviso"><strong>Si aparece «Windows protegió su PC»</strong>, haga clic en «Más información» y luego en «Ejecutar de todas formas». Windows muestra este aviso con los archivos descargados de internet.</p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-5" aria-labelledby="t5">
+    <div class="numero" aria-hidden="true">5</div>
+    <div>
+      <h2 id="t5">Iniciar la API</h2>
+      <p>Haga <strong>doble clic en <code class="en-linea">iniciar.bat</code></strong>. Después de unos segundos se abrirá en el navegador la página de prueba de la API.</p>
+      <p>Mientras la ventana negra esté abierta, la API funciona en esta dirección:</p>
+      <div class="codigo"><pre><code>http://127.0.0.1:8000</code></pre><button class="copiar" type="button">Copiar</button></div>
+      <p class="nota">Para detener la API, cierre la ventana negra. Para usarla otra vez, vuelva a abrir <code class="en-linea">iniciar.bat</code>; no hace falta instalar de nuevo.</p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-6" aria-labelledby="t6">
+    <div class="numero" aria-hidden="true">6</div>
+    <div>
+      <h2 id="t6">Probar con una imagen</h2>
+      <p>En la página que se abrió en el navegador:</p>
+      <ol>
+        <li>Abra la sección <strong>POST /api/detect</strong>.</li>
+        <li>Haga clic en <strong>«Try it out»</strong>.</li>
+        <li>En <strong>file</strong>, elija una imagen. Hay ejemplos en la carpeta <code class="en-linea">test_images</code> del proyecto.</li>
+        <li>Haga clic en <strong>«Execute»</strong>.</li>
+      </ol>
+      <p>En unos segundos verá la respuesta. El campo <code class="en-linea">narrativa_final</code> contiene la descripción de la escena, por ejemplo:</p>
+      <div class="codigo"><pre><code>"Parece que estás en una sala de estar. Sofá a tu derecha a aproximadamente
+3 pasos. Mesa de comedor frente a ti a aproximadamente 4 pasos.
+El paso al frente está bloqueado. Puedes avanzar hacia la izquierda."</code></pre><button class="copiar" type="button">Copiar</button></div>
+      <p>Para recibir solo el audio, cambie <strong>audio</strong> a <code class="en-linea">true</code> antes de hacer clic en «Execute».</p>
+    </div>
+  </section>
+
+  <h2 class="seccion">Si algo no funciona</h2>
+
+  <details>
+    <summary>El instalador dice «No se encontró Python»</summary>
+    <p>Python no se instaló o se instaló sin marcar «Add python.exe to PATH». Vuelva a abrir el instalador de Python, elija «Modify» o reinstálelo marcando esa casilla, y luego ejecute <code class="en-linea">instalar.bat</code> de nuevo.</p>
+  </details>
+  <details>
+    <summary>La respuesta no trae descripción redactada o no trae audio</summary>
+    <p>Revise las claves en el archivo <code class="en-linea">.env</code> de la carpeta del proyecto. Puede abrirlo con el Bloc de notas: las líneas <code class="en-linea">GROQ_API_KEY=</code> y <code class="en-linea">GOOGLE_API_KEY=</code> deben tener su clave después del signo igual. Guarde el archivo y vuelva a abrir <code class="en-linea">iniciar.bat</code>.</p>
+  </details>
+  <details>
+    <summary>El navegador muestra «No se puede acceder a este sitio»</summary>
+    <p>La API tarda unos segundos en cargar el modelo. Espere y recargue la página. Si la ventana negra se cerró, vuelva a abrir <code class="en-linea">iniciar.bat</code> y lea el mensaje que aparece.</p>
+  </details>
+  <details>
+    <summary>Se cortó la descarga durante la instalación</summary>
+    <p>Ejecute <code class="en-linea">instalar.bat</code> otra vez. Lo que ya quedó instalado no se descarga de nuevo, y si el modelo quedó incompleto, lo vuelve a descargar.</p>
+  </details>
+
+  <h2 class="seccion">Opción para personas técnicas: Docker</h2>
+  <p>Si tiene Docker instalado, puede construir y ejecutar la imagen del servicio, que incluye el modelo verificado:</p>
+  <div class="codigo"><pre><code>docker build -t visionnav-api .
+docker run -p 8000:8000 -e GROQ_API_KEY=su_clave -e GOOGLE_API_KEY=su_clave visionnav-api</code></pre><button class="copiar" type="button">Copiar</button></div>
+  <p>La documentación técnica completa está en el archivo <code class="en-linea">README.md</code> del proyecto.</p>
+</main>
+
+<footer>
+  VisionNav API · Trabajo de grado de Brayan Julio Gómez Muñoz · Universidad del Valle
+</footer>
+
+<div id="estado-copiado" role="status" aria-live="polite"></div>
+
+<script>
+document.querySelectorAll(".copiar").forEach(function (boton) {
+  boton.setAttribute("aria-label", "Copiar al portapapeles");
+  boton.addEventListener("click", function () {
+    var texto = boton.parentElement.querySelector("code").innerText;
+    var listo = function () {
+      boton.textContent = "Copiado";
+      document.getElementById("estado-copiado").textContent = "Texto copiado al portapapeles";
+      setTimeout(function () { boton.textContent = "Copiar"; }, 1800);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(texto).then(listo);
+    } else {
+      var area = document.createElement("textarea");
+      area.value = texto; document.body.appendChild(area); area.select();
+      try { document.execCommand("copy"); listo(); } catch (e) {}
+      document.body.removeChild(area);
+    }
+  });
+});
+</script>
+</body>
+</html>

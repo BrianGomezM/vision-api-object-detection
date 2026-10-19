@@ -55,3 +55,4 @@ translation_cache.json
 .idea/
 .DS_Store
 Thumbs.db
+*.part

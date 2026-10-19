@@ -23,7 +23,7 @@ DATA_ROOT (variable de entorno):
           stimuli_frozen/        paquetes de estímulo congelado (requiere DATA_ROOT)
           api_tests/             historial de /api/test/*
         development/
-          dataset_finetune/      imágenes/etiquetas subidas para fine-tuning
+          dataset_finetune/      ajuste fino (rama herramientas/ajuste-fino)
         cache/                   caché de traducción (solo etiquetas fuera del diccionario fijo)
 
     Las carpetas se crean solo cuando la aplicación escribe en ellas.

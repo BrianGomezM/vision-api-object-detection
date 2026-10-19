@@ -137,8 +137,8 @@ def test_path_traversal_en_estaticos(dev, path):
     assert r.status_code == 404 and "GROQ" not in r.text
 
 
-# /api/study/* y /api/metrics/summary|latency SÍ existen en production, con clave del
-# investigador: tests/test_production_routes.py.
+# /api/metrics/summary|latency SÍ existen en production, con clave del investigador:
+# tests/test_production_routes.py.
 @pytest.mark.parametrize("path", ["/docs", "/openapi.json", "/api/debug-detect", "/api/dataset/upload",
                                   "/api/finetune/prepare", "/api/test/functional", "/api/test/load",
                                   "/api/feedback", "/detections/x.jpg"])

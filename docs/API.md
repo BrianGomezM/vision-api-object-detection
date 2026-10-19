@@ -11,7 +11,7 @@ En el perfil `development`, la documentación interactiva está en `http://127.0
 | `/api/tts/models` | GET | Público | Voces disponibles |
 | `/api/metrics/summary`, `/api/metrics/latency` | GET | Con clave (`RESEARCHER_API_KEYS`) | Resumen de la telemetría, sin imágenes ni texto |
 
-En `development` se publican además `/api/debug-detect` (resultado de cada etapa) y las herramientas de conjuntos de datos y ajuste fino.
+En `development` se publican además `/api/debug-detect` (resultado de cada etapa), `/api/test/*` (pruebas funcionales y de carga) y `/api/feedback`.
 
 ## `POST /api/detect`
 

@@ -56,6 +56,10 @@ Cuando se modifica un archivo del núcleo, hay que actualizar su huella en `expe
 - Esta prueba depende de las versiones exactas del entorno de desarrollo, por lo que lleva la marca `entorno_referencia` y no se ejecuta en la integración continua.
 - `tests/regression/contracts.json` fija los parámetros de `POST /api/detect` y las rutas de cada perfil.
 
-## Estímulos
+## Imágenes de evaluación
 
-Las imágenes y los audios de `stimuli/` tienen su SHA-256 registrado. Al arrancar, `app/catalog/loader.py` verifica cada imagen y no sirve las que no coinciden.
+- `test_images/`: las 12 imágenes de la comparación de modelos.
+- `evaluation/images/web3d/`: las 29 imágenes Web 3D, con su origen y licencia en `evaluation/metadata/`.
+- `stimuli/estudio2/`: las seis escenas del estudio con usuarios, usadas también para medir los tiempos de respuesta (`scripts/evaluation/plan_pruebas_nf.py`); `manifest.yaml` registra su SHA-256.
+
+Los estímulos del Dataset 1, el catálogo de pruebas y los audios congelados están en la rama `herramientas/estudio-usuarios`. `scripts/experiment/freeze_config.py` usa sus valores ya registrados cuando no los encuentra.

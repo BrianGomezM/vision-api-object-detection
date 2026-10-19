@@ -6,12 +6,11 @@ from fastapi import Response
 import app.security as security
 
 INTERNAL_PATHS = {
-    "/api/debug-detect", "/api/dataset/upload", "/api/dataset/stats",
-    "/api/finetune/prepare", "/api/finetune/status", "/api/test/functional",
+    "/api/debug-detect", "/api/test/functional",
     "/api/test/load", "/api/test/results", "/api/metrics/summary",
     "/api/metrics/latency", "/api/feedback", "/detections",
 }
-RESEARCHER_PATHS = {"/api/detect", "/api/health", "/api/tts/models", "/api/study/sessions", "/api/catalog"}
+RESEARCHER_PATHS = {"/api/detect", "/api/health", "/api/tts/models"}
 
 
 def _paths(client) -> set[str]:
@@ -82,18 +81,17 @@ def test_debug_detect_exige_clave_cuando_hay_claves(make_client):
     assert r.status_code == 401
 
 
-def test_study_y_catalogo_exigen_clave(make_client):
+def test_study_detect_con_clave_valida(make_client):
     client = make_client("study", keys="k1")
-    assert client.get("/api/study/sessions").status_code == 401
-    assert client.get("/api/catalog").status_code == 401
-    assert client.get("/api/catalog", headers={"X-API-Key": "k1"}).status_code == 200
+    r = client.post("/api/detect", headers={"X-API-Key": "k1"})
+    assert r.status_code == 400                                    # autenticado; falta el archivo
 
 
 def test_cors_permite_el_header_x_api_key(make_client):
     client = make_client("development")
-    r = client.options("/api/catalog", headers={
+    r = client.options("/api/detect", headers={
         "Origin": "http://localhost:3000",
-        "Access-Control-Request-Method": "GET",
+        "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "X-API-Key",
     })
     assert r.status_code == 200
@@ -116,10 +114,9 @@ def test_production_no_expone_endpoints_internos(make_client):
     assert client.get("/api/health").status_code == 200
     assert client.post("/api/detect").status_code == 400          # existe (falta el archivo: INVALID_REQUEST)
     for path in ("/docs", "/redoc", "/openapi.json", "/", "/api/metrics", "/api/feedback",
-                 "/api/test/results", "/api/dataset/stats", "/api/finetune/status", "/detections/x.jpg"):
+                 "/api/test/results", "/detections/x.jpg"):
         assert client.get(path).status_code == 404, path
-    for path in ("/api/debug-detect", "/api/dataset/upload", "/api/finetune/prepare",
-                 "/api/test/functional", "/api/test/load", "/api/feedback"):
+    for path in ("/api/debug-detect", "/api/test/functional", "/api/test/load", "/api/feedback"):
         assert client.post(path).status_code == 404, path
 
 
