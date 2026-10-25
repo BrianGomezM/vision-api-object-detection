@@ -13,7 +13,7 @@ hashes, request_id…).
 |------------------------|--------------------------|-----------------|--------------------------------------------|
 | test_live_yolo         | YOLO26s local (CPU)      | ninguna         | 1 inferencia local, sin coste              |
 | test_live_llm          | Groq (GROQ_MODEL)        | GROQ_API_KEY    | 1 llamada (~450 tokens entrada, ≤160 salida) |
-| test_live_tts          | Gemini TTS (TTS_MODEL)   | GOOGLE_API_KEY  | 1 síntesis de una frase corta              |
+| test_live_tts          | Voz por defecto (Azure)  | AZURE_SPEECH_*  | 1 síntesis de una frase corta              |
 | test_live_endpoint     | los tres + /api/detect   | ambas           | 1 inferencia + 2 llamadas LLM + 1 síntesis |
 
 Coste: nivel gratuito de Groq y Gemini (sin facturación en el proyecto).
@@ -48,11 +48,11 @@ def _sha(b: bytes) -> str:
 def record(test: str, **data):
     from app import experiment
     from app.utils.groq_client import GROQ_MODEL
-    from app.services.tts_service import TTS_MODEL, TTS_VOICE
+    from app.services.tts_service import default_tts_model, describe_tts_model
     import torch
     entry = {"ts": datetime.now(timezone.utc).isoformat(), "test": test,
              "commit": experiment.app_commit(), "llm": {"proveedor": "Groq", "modelo": GROQ_MODEL},
-             "tts": {"proveedor": "Gemini TTS", "modelo": TTS_MODEL, "voz": TTS_VOICE},
+             "tts": describe_tts_model(default_tts_model()),
              "device": "cuda" if torch.cuda.is_available() else "cpu", **data}
     EVIDENCE.parent.mkdir(parents=True, exist_ok=True)
     with EVIDENCE.open("a", encoding="utf-8") as f:
@@ -94,7 +94,7 @@ def test_live_llm():
 
 def test_live_tts():
     from app.services import tts_service
-    assert tts_service.is_tts_active(), "GOOGLE_API_KEY no configurada"
+    assert tts_service.is_tts_active(), "proveedor de la voz por defecto no configurado"
     t0 = time.perf_counter()
     mp3 = tts_service.synthesize_speech("Prueba de voz.")
     ms = round((time.perf_counter() - t0) * 1000, 1)

@@ -47,7 +47,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from PIL import Image, UnidentifiedImageError
 
 from app.services.tts_service          import (
-    get_last_tts_error, get_available_tts_models, TTS_MODEL, TTS_SKIPPED_STATUS, TTS_TIMEOUT_STATUS,
+    get_last_tts_error, get_available_tts_models, default_tts_model, TTS_SKIPPED_STATUS, TTS_TIMEOUT_STATUS,
 )
 from app.utils.uploads                 import read_upload_limited
 
@@ -322,17 +322,16 @@ async def detect(
         False,
         description=(
             "Si true, retorna StreamingResponse audio/mpeg. "
-            "Requiere GOOGLE_API_KEY configurada (ver requirements.txt)."
+            "Requiere el proveedor de voz configurado (Azure AI Speech o GOOGLE_API_KEY)."
         ),
     ),
     tts_model: str = Form(
         None,
         description=(
-            "ID de modelo Gemini TTS a usar en esta llamada (opcional). "
-            "Cada modelo tiene su propia cuota de RPM en el nivel gratuito, "
-            "así que permite seguir generando audio cuando el modelo por "
-            "defecto agota su cuota. Ver GET /api/tts/models para las opciones. "
-            "Un id no reconocido cae al TTS_MODEL configurado en .env."
+            "Voz a usar en esta llamada (opcional). Por defecto, Azure AI Speech "
+            "es-CO-SalomeNeural; también admite las voces de Gemini TTS. "
+            "Ver GET /api/tts/models para las opciones. "
+            "Un id no reconocido cae a la voz por defecto."
         ),
     ),
     _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
@@ -357,8 +356,7 @@ async def detect(
 
     threshold = normalize_threshold(confidence_threshold)
     # Núcleo: pipeline completo + TTS (se genera en toda petición, flujo original).
-    # tts_model permite al cliente elegir un modelo alterno con cuota
-    # propia cuando el modelo por defecto agota su RPM gratuito.
+    # tts_model permite al cliente elegir otra voz de /api/tts/models.
     result, tts_last, tts_reason = await _run_serialized(_run_detect_locked, image_bytes, threshold, debug, tts_model)
     audio_path = result["audio_path"]
     tts_ms     = result["tts_ms"]
@@ -422,7 +420,7 @@ async def detect(
             **result["tiempos"],
             "tts_ms":             tts_ms,
             # Voz que generó el audio: la pedida si está permitida, si no la voz por defecto.
-            "tts_modelo":         tts_model if tts_model in {m["id"] for m in get_available_tts_models()} else TTS_MODEL,
+            "tts_modelo":         tts_model if tts_model in {m["id"] for m in get_available_tts_models()} else default_tts_model(),
             "objetos_detectados": len(result["detections"]),
             "confianza_prom":     avg_conf,
             "umbral_confianza":   threshold,
@@ -637,12 +635,11 @@ async def debug_detect(
 @tts_router.get("/tts/models", tags=["Info"])
 async def tts_models():
     """
-    Modelos Gemini TTS disponibles para seleccionar en /detect (campo
-    tts_model). Cada modelo tiene su propia cuota de RPM en el nivel
-    gratuito de Google AI Studio, así que cambiar de modelo da cuota
-    fresca sin esperar a que se libere la del modelo por defecto.
+    Voces disponibles para seleccionar en /detect (campo tts_model): las de
+    Azure AI Speech (si está configurado; la primera es la voz por defecto) y
+    los modelos de Gemini TTS, cada uno con su propia cuota de RPM gratuita.
     """
     return {
-        "default": TTS_MODEL,
+        "default": default_tts_model(),
         "modelos": get_available_tts_models(),
     }

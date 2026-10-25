@@ -42,8 +42,8 @@ Variables de entorno que se configuran en el servicio:
 | Variable | Uso |
 |---|---|
 | `GROQ_API_KEY` | Modelo de lenguaje (obligatoria) |
-| `GOOGLE_API_KEY` | Voz por defecto, Gemini TTS |
-| `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Voces de Azure AI Speech (opcional) |
+| `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Voz por defecto, Azure AI Speech (es-CO-SalomeNeural). Sin ellas, la voz por defecto pasa a ser Gemini TTS |
+| `GOOGLE_API_KEY` | Voz alterna, Gemini TTS |
 | `CORS_ORIGINS` | Sitios web autorizados para llamar a la API desde el navegador |
 | `RESEARCHER_API_KEYS` | Clave para las métricas y las rutas del investigador (opcional) |
 

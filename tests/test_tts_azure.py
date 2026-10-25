@@ -1,5 +1,5 @@
 """
-Voces alternativas de Azure AI Speech (solo módulo Detectar). HTTP simulado: nunca se
+Voces de Azure AI Speech (Salomé es la voz por defecto). HTTP simulado: nunca se
 llama al servicio real ni se usa una clave real.
 """
 
@@ -41,8 +41,30 @@ def test_sin_clave_las_voces_de_azure_no_se_publican_ni_se_usan(monkeypatch):
     if not tts.is_azure_tts_configured():
         assert not any(i.startswith(tts.AZURE_MODEL_PREFIX) for i in ids)
         assert VOICE not in tts._ALLOWED_TTS_MODEL_IDS
-    # Primero siempre el modelo por defecto (el evaluado).
-    assert tts.get_available_tts_models()[0]["id"] == "models/gemini-3.1-flash-tts-preview"
+    # Primero siempre la voz por defecto efectiva.
+    assert tts.get_available_tts_models()[0]["id"] == tts.default_tts_model()
+
+
+def test_la_voz_por_defecto_configurada_es_salome():
+    assert tts.TTS_DEFAULT_MODEL == VOICE
+
+
+def test_sin_modelo_se_usa_salome(azure):
+    calls, _ = azure
+    assert tts.default_tts_model() == VOICE
+    assert tts.synthesize_speech("Hola.") == b"ID3-MP3-AZURE"
+    assert '<voice name="es-CO-SalomeNeural">' in calls[0]["body"]
+
+
+def test_sin_clave_de_azure_la_voz_por_defecto_efectiva_es_gemini(monkeypatch):
+    monkeypatch.setattr(tts, "_ALLOWED_TTS_MODEL_IDS",
+                        tts._ALLOWED_TTS_MODEL_IDS - {v["id"] for v in tts.AZURE_TTS_VOICES})
+    monkeypatch.delenv("EVALUATION_DISABLE_TTS", raising=False)
+    monkeypatch.setattr(tts, "_synthesize_gemini_tts", lambda text, model=None: f"GEMINI:{model}".encode())
+    monkeypatch.setattr(tts, "_get_gemini_client", lambda: object())
+    assert tts.default_tts_model() == tts.TTS_MODEL
+    assert tts.synthesize_speech("Hola.") == f"GEMINI:{tts.TTS_MODEL}".encode()
+    assert tts.synthesize_speech("Hola.", model=VOICE) == f"GEMINI:{tts.TTS_MODEL}".encode()
 
 
 def test_voz_de_azure_devuelve_mp3_con_ssml_y_la_clave_solo_en_la_cabecera(azure):
@@ -94,9 +116,7 @@ def test_bloqueo_de_evaluacion_tambien_detiene_azure(azure, monkeypatch):
 
 
 def test_id_de_azure_no_permitido_no_llega_a_azure(azure, monkeypatch):
-    """Una voz que no está en la lista blanca nunca se envía a Azure."""
+    """Una voz que no está en la lista blanca nunca se envía a Azure: se usa la voz por defecto."""
     calls, _ = azure
-    monkeypatch.setattr(tts, "_synthesize_gemini_tts", lambda text, model=None: b"GEMINI")
-    monkeypatch.setattr(tts, "_get_gemini_client", lambda: object())
-    assert tts.synthesize_speech("Hola.", model="azure:es-ES-Inventada") == b"GEMINI"
-    assert calls == []
+    assert tts.synthesize_speech("Hola.", model="azure:es-ES-Inventada") == b"ID3-MP3-AZURE"
+    assert "Inventada" not in calls[0]["body"] and '<voice name="es-CO-SalomeNeural">' in calls[0]["body"]

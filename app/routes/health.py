@@ -20,7 +20,8 @@ from app.core.pipeline import DEFAULT_CONF, MAX_IMAGE_DIM
 from app.profiles import app_profile
 from app.services.yolo_service import YOLO_WEIGHTS, YOLO_IMGSZ, YOLO_IOU
 from app.services.tts_service import (
-    is_tts_active, get_last_tts_error, TTS_MODEL, TTS_VOICE, is_tts_disabled_for_evaluation,
+    is_tts_active, get_last_tts_error, default_tts_model, describe_tts_model,
+    is_tts_disabled_for_evaluation,
 )
 from app.storage import describe as storage_describe
 from app.utils.groq_client import GROQ_MODEL, is_llm_active
@@ -51,10 +52,9 @@ async def health_check():
             "modelo":    GROQ_MODEL,
             "activo":    is_llm_active(),
         },
+        # Voz por defecto efectiva (Azure Salomé; Gemini si Azure no está configurado)
         "tts": {
-            "proveedor":    "Gemini TTS",
-            "modelo":       TTS_MODEL,
-            "voz":          TTS_VOICE,
+            **describe_tts_model(default_tts_model()),
             "activo":       is_tts_active(),
         },
         "configuracion": {

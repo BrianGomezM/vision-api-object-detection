@@ -48,6 +48,8 @@ def snapshot(tmp_path_factory):
     out = tmp_path_factory.mktemp("snap") / "actual.json"
     env = {k: v for k, v in os.environ.items() if k not in ("DATA_ROOT", "APP_PROFILE", "API_KEYS")}
     env["PYTHONIOENCODING"] = "utf-8"
+    # Sin Azure (como el CI): metricas.tts_modelo no depende de las claves del .env local.
+    env["AZURE_SPEECH_KEY"] = env["AZURE_SPEECH_REGION"] = ""
     proc = subprocess.run([sys.executable, str(HERE / "snapshot_pipeline.py"), "--out", str(out)],
                           env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
     assert proc.returncode == 0, proc.stderr[-3000:]

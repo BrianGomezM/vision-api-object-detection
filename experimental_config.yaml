@@ -42,7 +42,7 @@ verificado:
     app/services/risk_engine.py: 66102418803510d9212259fa4a0f6f1dff835a2c459c521496ec10e2eea6cf08
     app/services/scene_classifier.py: ca48d7a7eed670d9b5cd0f572c548ba8a7b1044edcdb8ccef11f483ccfef7ed9
     app/services/llm_enhancer.py: 0ace4af89fa0b21a732b5446e671a5f023b17432e1dc9a6be5169990fcd14f76
-    app/services/tts_service.py: 153bfd018686b4431483cd7a03d80deeb1515db38a053bf3a6516c00f4c06e4d
+    app/services/tts_service.py: 3a38aae147d2c66230d556a250b78347c618a7e55af10d4cb6060d7e03a50a6e
     app/services/detection_visualizer.py: 802e4100a99ccd6381196f67b7d309ef970168f9b7f502966806089031bc55b4
     app/utils/groq_client.py: 63b1a48f315f9fac6647d776dee5fbacbecfdf3fc86ffb4d8d603589f7447c28
     app/utils/translator.py: 50745f2d301b40008b1743af8f80a54970c0e5390a5d9fde5c4d5fb45e76e9c1
@@ -169,18 +169,26 @@ verificado:
       max_objetos: 15
       cache_ttl_s: 10.0
     traduccion_diccionario_fijo_sha256: 37b19babcf408cc3f9e75da495e04a540e0dc637401912e13438784a58386728
+  # 2026-10-25: voz por defecto cambiada a Azure Salomé (la de la evaluación con usuarios y la que
+  # cumple RNF-02). Actualizado a mano: solo esta sección y la huella de tts_service.py; el resto no cambia.
   tts:
-    proveedor: Gemini TTS
-    modelo: models/gemini-3.1-flash-tts-preview
-    voz: Sulafat
-    instruccion_estilo: 'Narra con un tono cálido, natural, claro y neutral, ritmo moderado, apto para narración
-      educativa, evitando dramatización excesiva:'
+    modelo_por_defecto: azure:es-CO-SalomeNeural
+    proveedor: Azure AI Speech
+    voz: es-CO-SalomeNeural
+    azure:
+      ritmo: '-5%'
+      formato: audio-24khz-48kbitrate-mono-mp3
+    gemini:
+      modelo: models/gemini-3.1-flash-tts-preview
+      voz: Sulafat
+      instruccion_estilo: 'Narra con un tono cálido, natural, claro y neutral, ritmo moderado, apto para narración
+        educativa, evitando dramatización excesiva:'
+      pcm:
+        sample_rate_hz: 24000
+        sample_width_bytes: 2
+        channels: 1
     max_chars: 4500
     timeout_s: 60.0
-    pcm:
-      sample_rate_hz: 24000
-      sample_width_bytes: 2
-      channels: 1
 ejecucion:
   punto_de_entrada: app.core.pipeline.run (la misma función que /api/detect)
   device: cpu
@@ -267,9 +275,11 @@ narrativa:
   reglas_deterministas: 'build_narrative: intro de escenario solo si confianza media/alta + descripción + instrucción'
   llm: ver verificado.narrativa (modelo, temperaturas, tokens); no determinista
 tts:
-  idioma: es (instrucción de estilo en español)
-  salida: PCM 24 kHz, 16 bit, mono → MP3 lameenc 64 kbps, calidad 2
-  alternativas: 'ninguna en F4: solo el modelo por defecto (el parámetro tts_model no se usa)'
+  idioma: es (voz es-CO; la instrucción de estilo de Gemini está en español)
+  salida: 'Azure: MP3 24 kHz, 48 kbps, mono (directo del proveedor); Gemini: PCM 24 kHz, 16 bit, mono → MP3 lameenc
+    64 kbps, calidad 2'
+  alternativas: 'tts_model admite las voces de /api/tts/models; sin AZURE_SPEECH_KEY/REGION la voz por defecto
+    efectiva es Gemini (TTS_MODEL), declarado en /api/health'
 experimento:
   protocolo: 'CP3B v2 — docs/EVALUACION.md (decisiones abiertas: ver estado_decisiones)'
   dataset1:

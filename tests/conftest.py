@@ -150,6 +150,19 @@ class Simulated:
         return tts_service._pcm_to_mp3(b"\x00\x00" * 2400)   # MP3 real (lameenc) de 0.1 s
 
 
+@pytest.fixture(autouse=True)
+def _sin_azure_speech(monkeypatch):
+    """Todas las pruebas ven Azure AI Speech SIN configurar (como el CI), aunque el .env
+    local tenga AZURE_SPEECH_KEY: la voz por defecto efectiva es Gemini (simulado).
+    Las pruebas de Azure lo configuran explícitamente (tests/test_tts_azure.py)."""
+    from app.services import tts_service as tts
+    azure_ids = {v["id"] for v in tts.AZURE_TTS_VOICES}
+    monkeypatch.setattr(tts, "AZURE_SPEECH_KEY", "")
+    monkeypatch.setattr(tts, "AZURE_SPEECH_REGION", "")
+    monkeypatch.setattr(tts, "AVAILABLE_TTS_MODELS", [m for m in tts.AVAILABLE_TTS_MODELS if m["id"] not in azure_ids])
+    monkeypatch.setattr(tts, "_ALLOWED_TTS_MODEL_IDS", tts._ALLOWED_TTS_MODEL_IDS - azure_ids)
+
+
 @pytest.fixture
 def sim(monkeypatch, tmp_path):
     """Proveedores simulados + salidas en tmp_path. Mismo código de producción en todo lo demás."""

@@ -1,18 +1,27 @@
 """
 app/services/tts_service.py
 
-Síntesis de voz (Text-to-Speech) mediante Gemini TTS (Google).
+Síntesis de voz (Text-to-Speech) con Azure AI Speech (por defecto) o Gemini TTS.
 
 RESPONSABILIDAD ÚNICA:
   Convertir la narrativa egocéntrica generada por llm_enhancer.py
   en un stream de audio MP3 listo para ser reproducido por el cliente
   Web 3D, sin lógica de negocio ni dependencia de otros servicios.
 
-MOTOR SELECCIONADO — Gemini TTS:
-  Proveedor oficial y predeterminado del proyecto. Usa la API de Gemini
-  (paquete `google-genai`) con GOOGLE_API_KEY definida en .env. No existe
-  fallback a otro proveedor: si Gemini TTS no está disponible o falla,
-  el sistema degrada a modo solo-texto (igual que en cualquier otro fallo).
+VOZ POR DEFECTO — Azure AI Speech, es-CO-SalomeNeural (TTS_DEFAULT_MODEL):
+  Es la voz usada en la evaluación con usuarios y la única configuración
+  medida que cumple RNF-02 (< 5 s): ~2,3 s de síntesis frente a ~15,7 s de
+  Gemini (docs/PLAN_PRUEBAS.md, NF-01). Requiere AZURE_SPEECH_KEY y
+  AZURE_SPEECH_REGION. Si no están configuradas (p. ej. una instalación
+  local solo con GOOGLE_API_KEY), la voz por defecto efectiva pasa a ser
+  Gemini TTS (TTS_MODEL) y /api/health lo informa. No hay reintento con
+  otro proveedor cuando una síntesis falla: el sistema degrada a modo
+  solo-texto (igual que en cualquier otro fallo).
+
+MOTOR ALTERNO — Gemini TTS:
+  Usa la API de Gemini (paquete `google-genai`) con GOOGLE_API_KEY. Fue la
+  voz por defecto hasta el 25-10-2026; se conserva como alternativa
+  seleccionable con el campo tts_model.
 
 FORMATO DE AUDIO DEVUELTO POR GEMINI:
   PCM lineal sin comprimir (16 bits, 24000 Hz, mono) — mime_type
@@ -33,13 +42,14 @@ CONTROL DE ESTILO DE VOZ:
   instrucción completa se esté narrando).
 
 CONFIGURACIÓN CENTRALIZADA (variables de entorno en .env):
+  TTS_DEFAULT_MODEL      → voz por defecto     (default: azure:es-CO-SalomeNeural)
   TTS_MODEL              → modelo Gemini TTS   (default: models/gemini-3.1-flash-tts-preview)
   TTS_VOICE              → voz predefinida     (default: Sulafat — ver justificación abajo)
   TTS_STYLE_INSTRUCTIONS → instrucción de estilo en español, antepuesta al texto
   TTS_MAX_CHARS          → límite de caracteres/solicitud (default: 4500)
   TTS_MAX_SAVED_FILES    → archivos de audio a conservar en disco (default: 5)
 
-VOZ SELECCIONADA — Sulafat ("Warm"):
+VOZ DE GEMINI — Sulafat ("Warm"):
   Gemini TTS ofrece 30 voces predefinidas, cada una documentada por
   Google con un único adjetivo de personalidad (p. ej. Kore="Firm",
   Puck="Upbeat", Iapetus="Clear"). Google no publica ninguna dimensión
@@ -110,16 +120,16 @@ TTS_VOICE: str = os.getenv("TTS_VOICE", "Sulafat")
 # así que exponer alternativas deja seguir haciendo pruebas con cuota
 # fresca en vez de esperar a que se libere la del modelo por defecto.
 # IDs verificados contra client.models.list() de la API de Gemini.
-# Orden: el modelo por defecto (el evaluado) y después las alternativas, de la más
-# rápida a la más lenta. Tiempos medidos el 2026-09-29 con la misma narrativa de
-# ~245 caracteres (llamada completa, sin streaming): 3.1 Flash 12–14 s; 3.8 Flash Lite
-# 5,8–9,1 s; 3.8 Flash 9,9–11,7 s; 2.5 Flash 11–16 s. Las alternativas no forman
-# parte de la configuración evaluada (el estudio usa siempre el modelo por defecto).
+# Orden: TTS_MODEL y después las alternativas de Gemini, de la más rápida a la más
+# lenta. Tiempos medidos el 2026-09-29 con la misma narrativa de ~245 caracteres
+# (llamada completa, sin streaming): 3.1 Flash 12–14 s; 3.8 Flash Lite 5,8–9,1 s;
+# 3.8 Flash 9,9–11,7 s; 2.5 Flash 11–16 s. Si Azure está configurado, sus voces van
+# antes (la primera es la voz por defecto).
 AVAILABLE_TTS_MODELS: list[dict] = [
     {
         "id": "models/gemini-3.1-flash-tts-preview",
-        "label": "Gemini 3.1 Flash TTS (por defecto)",
-        "descripcion": "El configurado en .env y el evaluado. $1.00 / $20.00 por 1M tokens (texto/audio). ~12–14 s por narrativa.",
+        "label": "Gemini 3.1 Flash TTS (alterna)",
+        "descripcion": "Voz por defecto si Azure no está configurado. $1.00 / $20.00 por 1M tokens (texto/audio). ~12–14 s por narrativa.",
     },
     {
         "id": "models/gemini-3.8-flash-lite-tts",
@@ -144,12 +154,11 @@ AVAILABLE_TTS_MODELS: list[dict] = [
 ]
 
 # ──────────────────────────────────────────────────────────────
-# AZURE AI SPEECH — voces alternativas SOLO para el módulo Detectar
+# AZURE AI SPEECH — voz por defecto (Salomé) y alternativa (Gonzalo)
 # ──────────────────────────────────────────────────────────────
 # TTS neuronal (no generativo): sintetiza la narrativa completa en ~0,3–1 s frente a los
-# ~12 s de Gemini, y devuelve MP3 directamente (no pasa por lameenc). Solo se usa cuando
-# el cliente elige una de estas voces en Ajustes; el estudio con usuarios y la evaluación
-# usan siempre TTS_MODEL (Gemini). Las voces aparecen en el selector únicamente si
+# ~12 s de Gemini, y devuelve MP3 directamente (no pasa por lameenc). Salomé es la voz
+# de la evaluación con usuarios. Las voces aparecen en el selector únicamente si
 # AZURE_SPEECH_KEY y AZURE_SPEECH_REGION están configuradas.
 AZURE_MODEL_PREFIX: str = "azure:"
 AZURE_SPEECH_KEY: str = os.getenv("AZURE_SPEECH_KEY", "").strip()
@@ -163,7 +172,7 @@ AZURE_OUTPUT_FORMAT: str = "audio-24khz-48kbitrate-mono-mp3"   # 24 kHz como Gem
 AZURE_TTS_VOICES: list[dict] = [
     {
         "id": "azure:es-CO-SalomeNeural",
-        "label": "Azure Speech · Salomé, español de Colombia (recomendada, la más rápida; voz del estudio)",
+        "label": "Azure Speech · Salomé, español de Colombia (por defecto; voz del estudio)",
         "descripcion": "Voz neuronal femenina y cálida, la más parecida a Sulafat. ~0,3–1 s por narrativa (TTS no generativo).",
     },
     {
@@ -179,9 +188,26 @@ def is_azure_tts_configured() -> bool:
 
 
 if is_azure_tts_configured():
-    AVAILABLE_TTS_MODELS.extend(AZURE_TTS_VOICES)
+    AVAILABLE_TTS_MODELS[:0] = AZURE_TTS_VOICES
 
 _ALLOWED_TTS_MODEL_IDS: set[str] = {m["id"] for m in AVAILABLE_TTS_MODELS}
+
+# Voz por defecto CONFIGURADA (la que se congela en experimental_config.yaml).
+TTS_DEFAULT_MODEL: str = os.getenv("TTS_DEFAULT_MODEL", "azure:es-CO-SalomeNeural").strip()
+
+
+def default_tts_model() -> str:
+    """Voz por defecto EFECTIVA: TTS_DEFAULT_MODEL si está habilitada; si no
+    (p. ej. voz de Azure sin AZURE_SPEECH_KEY/REGION), el modelo Gemini TTS_MODEL."""
+    return TTS_DEFAULT_MODEL if TTS_DEFAULT_MODEL in _ALLOWED_TTS_MODEL_IDS else TTS_MODEL
+
+
+def describe_tts_model(model_id: str) -> dict:
+    """Proveedor, modelo y voz de un id de /api/tts/models (para /api/health)."""
+    if model_id.startswith(AZURE_MODEL_PREFIX):
+        voice = model_id[len(AZURE_MODEL_PREFIX):]
+        return {"proveedor": "Azure AI Speech", "modelo": model_id, "voz": voice}
+    return {"proveedor": "Gemini TTS", "modelo": model_id, "voz": TTS_VOICE}
 
 
 def get_available_tts_models() -> list[dict]:
@@ -365,19 +391,18 @@ def _describe_azure_error(exc: BaseException) -> dict:
 
 def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
     """
-    Convierte un texto en español en audio MP3 mediante Gemini TTS.
+    Convierte un texto en español en audio MP3 (Azure AI Speech o Gemini TTS).
 
     Parámetros:
         text  : narrativa egocéntrica generada por llm_enhancer.py.
                 Debe estar en español con marco de referencia egocéntrico.
-        model : ID de modelo Gemini TTS a usar (p. ej. "models/gemini-2.5-flash-preview-tts").
-                Si es None o no está en AVAILABLE_TTS_MODELS, se usa TTS_MODEL (.env).
-                Permite al cliente cambiar de modelo cuando agota la cuota RPM
-                del modelo por defecto — cada modelo tiene su propia cuota.
+        model : ID de /api/tts/models (p. ej. "azure:es-CO-SalomeNeural" o
+                "models/gemini-2.5-flash-preview-tts"). Si es None o no está
+                habilitado, se usa la voz por defecto efectiva (default_tts_model()).
 
     Retorna:
         bytes : audio en formato MP3 listo para StreamingResponse.
-        None  : si Gemini TTS no está disponible o la síntesis falla.
+        None  : si el proveedor no está disponible o la síntesis falla.
                 El endpoint debe degradar a respuesta JSON en este caso.
 
     Ejemplo de uso en detect.py:
@@ -394,8 +419,11 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
                        "message": "TTS omitido intencionalmente por EVALUATION_DISABLE_TTS=true."}
         return None
 
-    # Voz de Azure elegida en Ajustes (solo si está en la lista blanca, es decir, configurada).
-    if model and model.startswith(AZURE_MODEL_PREFIX) and model in _ALLOWED_TTS_MODEL_IDS:
+    # Lista blanca: un id desconocido (o una voz de Azure sin clave configurada) nunca
+    # llega al proveedor tal cual; se usa la voz por defecto efectiva.
+    if not model or model not in _ALLOWED_TTS_MODEL_IDS:
+        model = default_tts_model()
+    if model.startswith(AZURE_MODEL_PREFIX):
         return _synthesize_with_azure(text, model[len(AZURE_MODEL_PREFIX):])
 
     if not _GENAI_AVAILABLE or not _LAMEENC_AVAILABLE:
@@ -419,9 +447,7 @@ def synthesize_speech(text: str, model: str = None) -> Optional[bytes]:
         )
         text = text[:_MAX_CHARS]
 
-    # Validar contra la lista blanca: un id desconocido cae al modelo por
-    # defecto en vez de dejarlo pasar sin más a la API de Gemini.
-    effective_model = model if model in _ALLOWED_TTS_MODEL_IDS else None
+    effective_model = model
 
     _last_error = None
 
@@ -513,7 +539,7 @@ def synthesize_and_save(text: str, filename: str = None, model: str = None) -> O
         text     : narrativa egocéntrica en español.
         filename : nombre del archivo de salida. Si es None, genera uno
                    automático con timestamp: narrativa_YYYYMMDD_HHMMSS.mp3
-        model    : ID de modelo Gemini TTS a usar (ver synthesize_speech).
+        model    : ID de /api/tts/models a usar (ver synthesize_speech).
 
     Retorna:
         str  : ruta relativa al archivo guardado (ej. "audio_output/narrativa_20260521_143022.mp3")
@@ -550,8 +576,10 @@ def synthesize_and_save(text: str, filename: str = None, model: str = None) -> O
 
 def is_tts_active() -> bool:
     """
-    Retorna True si Gemini TTS está disponible y configurado
-    (paquetes instalados y GOOGLE_API_KEY presente en .env).
+    Retorna True si el proveedor de la voz por defecto efectiva está configurado
+    (Azure: AZURE_SPEECH_KEY y AZURE_SPEECH_REGION; Gemini: paquetes y GOOGLE_API_KEY).
     Utilizado por el endpoint /api/health para reportar el estado del servicio.
     """
+    if default_tts_model().startswith(AZURE_MODEL_PREFIX):
+        return is_azure_tts_configured()
     return _get_gemini_client() is not None

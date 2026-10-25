@@ -155,9 +155,11 @@ def build() -> dict:
             "llm": "ver verificado.narrativa (modelo, temperaturas, tokens); no determinista",
         },
         "tts": {
-            "idioma": "es (instrucción de estilo en español)",
-            "salida": "PCM 24 kHz, 16 bit, mono → MP3 lameenc 64 kbps, calidad 2",
-            "alternativas": "ninguna en F4: solo el modelo por defecto (el parámetro tts_model no se usa)",
+            "idioma": "es (voz es-CO; la instrucción de estilo de Gemini está en español)",
+            "salida": ("Azure: MP3 24 kHz, 48 kbps, mono (directo del proveedor); "
+                       "Gemini: PCM 24 kHz, 16 bit, mono → MP3 lameenc 64 kbps, calidad 2"),
+            "alternativas": ("tts_model admite las voces de /api/tts/models; sin AZURE_SPEECH_KEY/REGION la voz "
+                             "por defecto efectiva es Gemini (TTS_MODEL), declarado en /api/health"),
         },
         "experimento": ({
             "protocolo": "CP3B v2 — docs/EVALUACION.md (decisiones abiertas: ver estado_decisiones)",

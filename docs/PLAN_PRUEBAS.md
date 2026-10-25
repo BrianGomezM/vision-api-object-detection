@@ -70,8 +70,11 @@
 - **Sustituido:** FUN-13, porque el endpoint que verificaba se eliminó y su función pasó a la telemetría.
 - **RNF-02 (menos de 5 s):** en el equipo de desarrollo, usando solo el procesador, se cumple en el
   procesamiento (1,2 s) y con la voz de Azure (3,7 s de media; 5 de 6 solicitudes por debajo de 5 s),
-  pero no con la voz por defecto de Gemini (17,0 s). En el servicio desplegado (plan B1, un núcleo)
+  pero no con la voz de Gemini (17,0 s). En el servicio desplegado (plan B1, un núcleo)
   una solicitud con la voz de Azure tomó cerca de 5,3 s.
+- **Voz por defecto (25-10-2026):** pasó de Gemini TTS a Azure AI Speech (es-CO-SalomeNeural), la voz
+  de la evaluación con usuarios y la que cumple RNF-02. Las mediciones de NF-01 no cambian: se hicieron
+  con cada voz por separado.
 - **Cambios de expectativa documentados:** FUN-09 responde 400 en lugar de 422, y FUN-06/07/14 son
   herramientas de desarrollo que no se publican en producción.
 - **Ubicación actual:** FUN-06 y FUN-07 (conjunto de datos para ajuste fino) se verifican en la rama
