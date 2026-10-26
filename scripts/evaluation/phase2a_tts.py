@@ -5,9 +5,10 @@ FASE 2A — Experimento D: alternativas de TTS actualmente disponibles.
 INFRAESTRUCTURA AUXILIAR DE EVALUACIÓN — no modifica el producto ni elige voz.
 
 Alternativas y cómo se prueban:
-  1. Gemini TTS (código local actual, clave local): UN intento por cada modelo
-     TTS listado por la API, con un texto corto, llamando a la función real
-     _synthesize_gemini_tts(). Se registra el resultado o el error exacto.
+  1. Gemini TTS (clave local): UN intento por cada modelo TTS listado por la
+     API, con un texto corto, llamando a la función real _synthesize_gemini_tts()
+     del tts_service.py del commit 494c05d (Gemini se retiró del sistema el
+     26-10-2026). Se registra el resultado o el error exacto.
      (Estado conocido: créditos de prepago agotados → se espera HTTP 402.)
   2. edge-tts (código desplegado en Azure, commit 3a1ddb6): se carga el módulo
      tts_service.py EXACTO de ese commit (git show) y se sintetiza con sus
@@ -92,8 +93,8 @@ def main():
     texts = {"T1": e2e["records"][0]["narrativa_final"], "T2": "Silla a tu derecha a aproximadamente 2 pasos."}
     records = []
 
-    # ── 1. Gemini TTS (código local actual) ──────────────────────
-    import app.services.tts_service as gem
+    # ── 1. Gemini TTS (tts_service.py del commit 494c05d, anterior al retiro de Gemini) ──
+    gem, _ = load_module_from_commit("494c05d", "app/services/tts_service.py", "tts_service_494c05d")
     from dotenv import dotenv_values
     key = dotenv_values(ROOT / ".env").get("GOOGLE_API_KEY")
     listed = json.loads(urllib.request.urlopen(urllib.request.Request(
@@ -102,7 +103,7 @@ def main():
     gem_models = sorted(m["name"] for m in listed.get("models", []) if "tts" in m["name"])
     for model in gem_models:
         t0 = time.perf_counter()
-        rec = {"proveedor": "Gemini TTS (Google)", "codigo": "local (app/services/tts_service.py)", "modelo": model,
+        rec = {"proveedor": "Gemini TTS (Google)", "codigo": "494c05d (app/services/tts_service.py)", "modelo": model,
                "voz": gem.TTS_VOICE, "parametros": {"instruccion_estilo": gem.TTS_STYLE_INSTRUCTIONS},
                "texto": "T2", "repeticion": 1}
         try:

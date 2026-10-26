@@ -155,7 +155,7 @@ def _tts_unavailable_reason() -> str:
     """
     Por qué no hay audio (campo audio.razon de la respuesta):
       - "tts_omitido_evaluacion" : EVALUATION_DISABLE_TTS=true.
-      - "tts_desactivado"        : falta GOOGLE_API_KEY o dependencias.
+      - "tts_desactivado"        : Azure AI Speech no está configurado.
       - "cuota_excedida"         : cuota del proveedor agotada (p. ej. diaria).
       - "limite_proveedor"       : límite de solicitudes del proveedor (429 por minuto).
       - "proveedor_no_disponible": el proveedor está caído o devolvió 5xx.
@@ -168,7 +168,7 @@ def _tts_unavailable_reason() -> str:
     status, kind = err.get("status"), err.get("kind")
     if status == TTS_SKIPPED_STATUS:
         return "tts_omitido_evaluacion"
-    if status in ("NO_CONFIGURADO", "DEPENDENCIAS_NO_DISPONIBLES"):
+    if status == "NO_CONFIGURADO":
         return "tts_desactivado"
     return {"quota_exhausted": "cuota_excedida", "rate_limited": "limite_proveedor",
             "unavailable": "proveedor_no_disponible", "timeout": "tiempo_agotado"}.get(kind, "error_sintesis")
@@ -322,16 +322,15 @@ async def detect(
         False,
         description=(
             "Si true, retorna StreamingResponse audio/mpeg. "
-            "Requiere el proveedor de voz configurado (Azure AI Speech o GOOGLE_API_KEY)."
+            "Requiere Azure AI Speech configurado."
         ),
     ),
     tts_model: str = Form(
         None,
         description=(
-            "Voz a usar en esta llamada (opcional). Por defecto, Azure AI Speech "
-            "es-CO-SalomeNeural; también admite las voces de Gemini TTS. "
-            "Ver GET /api/tts/models para las opciones. "
-            "Un id no reconocido cae a la voz por defecto."
+            "Voz a usar en esta llamada (opcional). El sistema usa Azure AI Speech "
+            "es-CO-SalomeNeural (ver GET /api/tts/models). "
+            "Un id no reconocido cae a esa voz."
         ),
     ),
     _key: str = Depends(require_api_key),   # sin API_KEYS (desarrollo) no exige clave
@@ -635,9 +634,8 @@ async def debug_detect(
 @tts_router.get("/tts/models", tags=["Info"])
 async def tts_models():
     """
-    Voces disponibles para seleccionar en /detect (campo tts_model): las de
-    Azure AI Speech (si está configurado; la primera es la voz por defecto) y
-    los modelos de Gemini TTS, cada uno con su propia cuota de RPM gratuita.
+    Voz de síntesis del sistema (Azure AI Speech, es-CO-SalomeNeural).
+    La lista está vacía si Azure AI Speech no está configurado.
     """
     return {
         "default": default_tts_model(),

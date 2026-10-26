@@ -2,7 +2,7 @@
 scripts/hardening/ui_e2e.py — validación del CLIENTE y E2E REAL local (navegador real).
 
   cliente (Next.js dev, Chrome del sistema vía Playwright) → API local (uvicorn) →
-  YOLO real (CPU) → análisis espacial → pasos → LLM real (Groq) → TTS real (Gemini)
+  YOLO real (CPU) → análisis espacial → pasos → LLM real (Groq) → TTS real (Azure AI Speech)
   → respuesta → visualización / audio en el navegador.
 
 Ejecutar con un entorno que tenga Playwright (NO el .venv del backend, que es el
@@ -206,7 +206,7 @@ def main():
 
         # ── 3) Fallos reales controlados de LLM y TTS (claves inválidas) → degradación declarada ──
         be = start_backend({"APP_PROFILE": "development", "GROQ_API_KEY": "gsk_invalida_prueba",
-                            "GOOGLE_API_KEY": "clave_invalida_prueba"}) if "3" in secciones else None
+                            "AZURE_SPEECH_KEY": "clave_invalida_prueba"}) if "3" in secciones else None
         try:
             if be is None:
                 raise _Skip
@@ -227,7 +227,7 @@ def main():
 
         # ── 4) 429 real (production, límite 1/min) ──
         be = start_backend({"APP_PROFILE": "production", "RATE_LIMIT_IP_REQUESTS": "1",
-                            "GROQ_API_KEY": "gsk_invalida_prueba", "GOOGLE_API_KEY": "clave_invalida_prueba"}) if "4" in secciones else None
+                            "GROQ_API_KEY": "gsk_invalida_prueba", "AZURE_SPEECH_KEY": "clave_invalida_prueba"}) if "4" in secciones else None
         try:
             if be is None:
                 raise _Skip
@@ -267,7 +267,7 @@ def main():
                 page.get_by_role("button", name=re.compile("Generar y reproducir")).click()
             return resp.value
 
-        be = start_backend({"APP_PROFILE": "study", "API_KEYS": "clave-ui", "GOOGLE_API_KEY": "clave_invalida_prueba"}) if "5" in secciones else None
+        be = start_backend({"APP_PROFILE": "study", "API_KEYS": "clave-ui", "AZURE_SPEECH_KEY": "clave_invalida_prueba"}) if "5" in secciones else None
         try:
             if be is None:
                 raise _Skip

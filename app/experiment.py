@@ -48,7 +48,7 @@ CORE_FILES = [
     "app/utils/groq_client.py", "app/utils/translator.py",
 ]
 PACKAGES = ["torch", "torchvision", "ultralytics", "numpy", "pillow", "opencv-python-headless",
-            "groq", "google-genai", "lameenc", "fastapi", "PyYAML"]
+            "groq", "fastapi", "PyYAML"]
 
 
 class PreflightError(RuntimeError):
@@ -164,17 +164,11 @@ def runtime_snapshot() -> dict:
                           "max_objetos": sc._MAX_OBJECTS, "cache_ttl_s": sc._SCENE_CACHE_TTL},
             "traduccion_diccionario_fijo_sha256": canonical_sha256(tr._STATIC_DICT),
         },
-        # Voz por defecto CONFIGURADA (no depende de que las claves estén presentes).
+        # Voz CONFIGURADA (no depende de que las claves estén presentes).
         "tts": {
             "modelo_por_defecto": tts.TTS_DEFAULT_MODEL,
             **{k: v for k, v in tts.describe_tts_model(tts.TTS_DEFAULT_MODEL).items() if k != "modelo"},
             "azure": {"ritmo": tts.AZURE_TTS_RATE, "formato": tts.AZURE_OUTPUT_FORMAT},
-            "gemini": {
-                "modelo": tts.TTS_MODEL, "voz": tts.TTS_VOICE,
-                "instruccion_estilo": tts.TTS_STYLE_INSTRUCTIONS,
-                "pcm": {"sample_rate_hz": tts._SAMPLE_RATE_HZ, "sample_width_bytes": tts._SAMPLE_WIDTH_BYTES,
-                        "channels": tts._CHANNELS},
-            },
             "max_chars": tts._MAX_CHARS,
             "timeout_s": tts.TTS_TIMEOUT_S,
         },

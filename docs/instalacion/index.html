@@ -388,10 +388,10 @@ footer { text-align: center; font-size: 14px; color: var(--texto-suave); padding
           <p>VisionNav usa dos servicios gratuitos: uno escribe la descripción de la escena y el otro la lee en voz alta. Cada uno le da una clave, que funciona como una contraseña. Guárdelas en un bloc de notas; las necesitará en el paso 4.</p>
           <ul>
             <li><strong>Groq</strong>, para la descripción: inicie sesión y haga clic en «Create API Key».</li>
-            <li><strong>Google AI Studio</strong>, para la voz: inicie sesión y haga clic en «Create API key».</li>
+            <li><strong>Azure AI Speech</strong>, para la voz: en el portal de Azure cree un recurso «Speech» con el plan gratuito (F0). En «Claves y punto de conexión» copie la <em>Clave 1</em> y anote la <em>Región</em> (por ejemplo, canadacentral).</li>
           </ul>
           <a class="boton secundario" href="https://console.groq.com/keys" target="_blank" rel="noopener">Abrir Groq</a>
-          <a class="boton secundario" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Abrir Google AI Studio</a>
+          <a class="boton secundario" href="https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices" target="_blank" rel="noopener">Abrir Azure AI Speech</a>
           <p class="aviso">No comparta sus claves con nadie. Solo se guardan en su computador.</p>
           <label class="marcar"><input type="checkbox" data-marca="3"> Ya hice este paso</label>
         </article>
@@ -502,7 +502,7 @@ El paso al frente está bloqueado. Puedes avanzar hacia la izquierda.</code></pr
       <p>Lo más probable es que falte una clave o esté mal copiada.</p>
       <ol>
         <li>En la carpeta de VisionNav, abra el archivo <code class="dato">.env</code> con el Bloc de notas.</li>
-        <li>Revise que después de <code class="dato">GROQ_API_KEY=</code> y de <code class="dato">GOOGLE_API_KEY=</code> esté su clave, sin espacios.</li>
+        <li>Revise que después de <code class="dato">GROQ_API_KEY=</code> y de <code class="dato">AZURE_SPEECH_KEY=</code> esté su clave, sin espacios, y que <code class="dato">AZURE_SPEECH_REGION=</code> tenga la región de su recurso.</li>
         <li>Guarde el archivo, cierre la ventana negra y abra de nuevo <code class="dato">iniciar.bat</code>.</li>
       </ol>
     </details>
@@ -538,7 +538,7 @@ python run.py</code></pre><button class="copiar" type="button">Copiar</button></
       <div class="paso-titulo"><h2 id="a2">Docker</h2></div>
       <p>La imagen incluye el modelo ya verificado.</p>
       <div class="codigo"><pre><code>docker build -t visionnav-api .
-docker run -p 8000:8000 -e GROQ_API_KEY=su_clave -e GOOGLE_API_KEY=su_clave visionnav-api</code></pre><button class="copiar" type="button">Copiar</button></div>
+docker run -p 8000:8000 -e GROQ_API_KEY=su_clave -e AZURE_SPEECH_KEY=su_clave -e AZURE_SPEECH_REGION=su_region visionnav-api</code></pre><button class="copiar" type="button">Copiar</button></div>
     </article>
 
     <article class="paso" aria-labelledby="a3">

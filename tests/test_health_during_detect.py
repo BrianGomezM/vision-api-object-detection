@@ -33,13 +33,13 @@ def slow(sim, monkeypatch):
             with lock:
                 intervals.append((t0, time.perf_counter()))
 
-    def slow_tts(text, model=None):
+    def slow_tts(text, voice=None):
         time.sleep(TTS_DELAY)
-        return orig_tts(text, model)
+        return orig_tts(text, voice)
 
     monkeypatch.setattr(pipeline, "run", timed_run)
     from app.services import tts_service
-    monkeypatch.setattr(tts_service, "_synthesize_gemini_tts", slow_tts)
+    monkeypatch.setattr(tts_service, "_synthesize_azure_tts", slow_tts)
     sim.intervals = intervals
     return sim
 
@@ -142,15 +142,15 @@ def test_motivo_tts_por_solicitud_con_detecciones_encadenadas(make_client, slow,
     que falla y otra que tiene éxito, simultáneas, no intercambian el motivo."""
     from app.services import tts_service
     calls = {"n": 0}
-    base = tts_service._synthesize_gemini_tts
+    base = tts_service._synthesize_azure_tts
 
-    def alternate(text, model=None):
+    def alternate(text, voice=None):
         calls["n"] += 1
         if calls["n"] == 1:
             time.sleep(TTS_DELAY)
             raise RuntimeError("fallo del proveedor")
-        return base(text, model)
-    monkeypatch.setattr(tts_service, "_synthesize_gemini_tts", alternate)
+        return base(text, voice)
+    monkeypatch.setattr(tts_service, "_synthesize_azure_tts", alternate)
 
     async def go():
         async with _client(_app(make_client)) as c:

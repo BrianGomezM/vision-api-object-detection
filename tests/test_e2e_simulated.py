@@ -1,8 +1,7 @@
 """
 END-TO-END con proveedores SIMULADOS: HTTP → validación → preprocesamiento →
 YOLO (simulado) → análisis espacial → pasos → espacio libre/decisión → LLM
-(simulado) → narrativa → TTS (proveedor simulado, codificación MP3 REAL con
-lameenc) → respuesta. Todo el código entre el endpoint y los proveedores es el
+(simulado) → narrativa → TTS (Azure AI Speech simulado) → respuesta. Todo el código entre el endpoint y los proveedores es el
 de producción. No consume créditos: los proveedores reales están en tests/live/.
 """
 

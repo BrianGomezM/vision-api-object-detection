@@ -62,7 +62,7 @@
       "objetos_detectados": 0,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -226,7 +226,7 @@
       "objetos_detectados": 3,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -597,7 +597,7 @@
       "objetos_detectados": 15,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -1311,7 +1311,7 @@
       "objetos_detectados": 27,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -2419,7 +2419,7 @@
       "objetos_detectados": 16,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -3161,7 +3161,7 @@
       "objetos_detectados": 25,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -4032,7 +4032,7 @@
       "objetos_detectados": 8,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -4479,7 +4479,7 @@
       "objetos_detectados": 1,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -4750,7 +4750,7 @@
       "objetos_detectados": 10,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -5332,7 +5332,7 @@
       "objetos_detectados": 30,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -6331,7 +6331,7 @@
       "objetos_detectados": 0,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -6484,7 +6484,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -6761,7 +6761,7 @@
       "objetos_detectados": 3,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -7066,7 +7066,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -7343,7 +7343,7 @@
       "objetos_detectados": 3,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -7736,7 +7736,7 @@
       "objetos_detectados": 28,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -8693,7 +8693,7 @@
       "objetos_detectados": 14,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -9280,7 +9280,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -9601,7 +9601,7 @@
       "objetos_detectados": 14,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -10243,7 +10243,7 @@
       "objetos_detectados": 9,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -10751,7 +10751,7 @@
       "objetos_detectados": 3,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -11100,7 +11100,7 @@
       "objetos_detectados": 6,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -11533,7 +11533,7 @@
       "objetos_detectados": 4,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -11878,7 +11878,7 @@
       "objetos_detectados": 5,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -12306,7 +12306,7 @@
       "objetos_detectados": 12,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -12878,7 +12878,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -13121,7 +13121,7 @@
       "objetos_detectados": 0,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -13362,7 +13362,7 @@
       "objetos_detectados": 24,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -14308,7 +14308,7 @@
       "objetos_detectados": 3,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -14613,7 +14613,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -14956,7 +14956,7 @@
       "objetos_detectados": 15,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -15691,7 +15691,7 @@
       "objetos_detectados": 11,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -16287,7 +16287,7 @@
       "objetos_detectados": 2,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -16619,7 +16619,7 @@
       "objetos_detectados": 8,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -17141,7 +17141,7 @@
       "objetos_detectados": 4,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -17496,7 +17496,7 @@
       "objetos_detectados": 4,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -17830,7 +17830,7 @@
       "objetos_detectados": 6,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -18222,7 +18222,7 @@
       "objetos_detectados": 7,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -18718,7 +18718,7 @@
       "objetos_detectados": 13,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -19351,7 +19351,7 @@
       "objetos_detectados": 5,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"
@@ -19801,7 +19801,7 @@
       "objetos_detectados": 18,
       "pasos_ms": "<ms>",
       "total_ms": "<ms>",
-      "tts_modelo": "models/gemini-3.1-flash-tts-preview",
+      "tts_modelo": "azure:es-CO-SalomeNeural",
       "tts_ms": "<ms>",
       "umbral_confianza": 0.35,
       "visualizer_ms": "<ms>"

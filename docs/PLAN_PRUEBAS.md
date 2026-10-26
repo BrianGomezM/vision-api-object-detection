@@ -76,6 +76,8 @@
 - **Voz por defecto (25-10-2026):** pasó de Gemini TTS a Azure AI Speech (es-CO-SalomeNeural), la voz
   de la evaluación con usuarios y la que cumple RNF-02. Las mediciones de NF-01 no cambian: se hicieron
   con cada voz por separado.
+- **Voz única (26-10-2026):** Gemini TTS se retiró del sistema; Azure AI Speech es el único proveedor
+  de voz. La medición de NF-01 con Gemini se conserva como registro.
 - **Cambios de expectativa documentados:** FUN-09 responde 400 en lugar de 422, y FUN-06/07/14 son
   herramientas de desarrollo que no se publican en producción.
 - **Ubicación actual:** FUN-06 y FUN-07 (conjunto de datos para ajuste fino) se verifican en la rama

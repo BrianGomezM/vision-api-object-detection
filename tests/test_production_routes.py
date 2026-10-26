@@ -45,7 +45,7 @@ def test_health_y_tts_models_publicos(prod):
     r = prod.get("/api/tts/models")
     assert r.status_code == 200
     body = r.json()
-    assert body["default"] == "models/gemini-3.1-flash-tts-preview" and body["modelos"]
+    assert body["default"] == "azure:es-CO-SalomeNeural" and isinstance(body["modelos"], list)
 
 
 def test_detect_sigue_publico_con_clave_del_investigador(prod):

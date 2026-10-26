@@ -52,7 +52,7 @@ async def health_check():
             "modelo":    GROQ_MODEL,
             "activo":    is_llm_active(),
         },
-        # Voz por defecto efectiva (Azure Salomé; Gemini si Azure no está configurado)
+        # Voz del sistema (Azure AI Speech, es-CO-SalomeNeural)
         "tts": {
             **describe_tts_model(default_tts_model()),
             "activo":       is_tts_active(),

@@ -14,7 +14,7 @@ Construir y ejecutar localmente:
 
 ```bash
 docker build --build-arg APP_COMMIT=$(git rev-parse HEAD) -t visionnav-api .
-docker run -p 8000:8000 -e GROQ_API_KEY=... -e GOOGLE_API_KEY=... visionnav-api
+docker run -p 8000:8000 -e GROQ_API_KEY=... -e AZURE_SPEECH_KEY=... -e AZURE_SPEECH_REGION=... visionnav-api
 curl http://127.0.0.1:8000/api/health
 ```
 
@@ -42,8 +42,7 @@ Variables de entorno que se configuran en el servicio:
 | Variable | Uso |
 |---|---|
 | `GROQ_API_KEY` | Modelo de lenguaje (obligatoria) |
-| `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Voz por defecto, Azure AI Speech (es-CO-SalomeNeural). Sin ellas, la voz por defecto pasa a ser Gemini TTS |
-| `GOOGLE_API_KEY` | Voz alterna, Gemini TTS |
+| `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Voz, Azure AI Speech (es-CO-SalomeNeural). Sin ellas, la respuesta es solo texto |
 | `CORS_ORIGINS` | Sitios web autorizados para llamar a la API desde el navegador |
 | `RESEARCHER_API_KEYS` | Clave para las métricas y las rutas del investigador (opcional) |
 

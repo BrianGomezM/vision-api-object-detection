@@ -20,8 +20,7 @@ Este documento registra lo necesario para ejecutar el sistema con la misma confi
 | Umbral de la solicitud por defecto | 0,35 |
 | Reducción previa de la imagen | 800 px en el lado mayor, JPEG de calidad 90 |
 | Modelo de lenguaje (`GROQ_MODEL`) | `qwen/qwen3.8-27b`, temperatura 0,1 |
-| Voz por defecto (`TTS_DEFAULT_MODEL`) | Azure AI Speech, `es-CO-SalomeNeural`, ritmo −5 % (desde el 25-10-2026; antes, Gemini TTS) |
-| Voz alterna (`TTS_MODEL`, `TTS_VOICE`) | `models/gemini-3.1-flash-tts-preview`, Sulafat |
+| Voz (`TTS_DEFAULT_MODEL`) | Azure AI Speech, `es-CO-SalomeNeural`, ritmo −5 % (única voz desde el 26-10-2026; antes, Gemini TTS) |
 
 El umbral `YOLO_IOU` (0,45) se envía al modelo, pero YOLO26s funciona de extremo a extremo y no aplica supresión no máxima.
 

@@ -98,7 +98,7 @@ def test_solicitudes_consecutivas(dev):
 
 # ── Seguridad básica ─────────────────────────────────────────────────────────
 
-SECRET_VALUES = {"GROQ_API_KEY": "gsk_TESTSECRETO_NO_DEBE_SALIR", "GOOGLE_API_KEY": "AIzaTESTSECRETO_NO_DEBE_SALIR"}
+SECRET_VALUES = {"GROQ_API_KEY": "gsk_TESTSECRETO_NO_DEBE_SALIR", "AZURE_SPEECH_KEY": "AZTESTSECRETO_NO_DEBE_SALIR"}
 
 
 @pytest.mark.parametrize("profile", ["development", "study", "production"])

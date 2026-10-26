@@ -66,7 +66,9 @@ if not exist ".env" (
     echo        Puede dejarlas en blanco y escribirlas despues en el archivo .env
     echo.
     set /p "GROQ=        Clave de Groq (descripcion): "
-    set /p "GOOGLE=        Clave de Google AI Studio (voz): "
+    set /p "AZURE=        Clave de Azure AI Speech (voz): "
+    set "REGION=canadacentral"
+    set /p "REGION=        Region de Azure AI Speech [canadacentral]: "
     call :guardar_claves
 ) else (
     echo  [5/5] El archivo .env ya existe; se conserva.
@@ -92,7 +94,8 @@ exit /b 1
 powershell -NoProfile -Command ^
   "$f='.env'; $t=Get-Content $f -Raw;" ^
   "$t=$t -replace '(?m)^GROQ_API_KEY=.*$', ('GROQ_API_KEY=' + $env:GROQ);" ^
-  "$t=$t -replace '(?m)^GOOGLE_API_KEY=.*$', ('GOOGLE_API_KEY=' + $env:GOOGLE);" ^
+  "$t=$t -replace '(?m)^AZURE_SPEECH_KEY=.*$', ('AZURE_SPEECH_KEY=' + $env:AZURE);" ^
+  "$t=$t -replace '(?m)^AZURE_SPEECH_REGION=.*$', ('AZURE_SPEECH_REGION=' + $env:REGION);" ^
   "Set-Content -Path $f -Value $t -NoNewline -Encoding utf8"
 exit /b 0
 

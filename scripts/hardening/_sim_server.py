@@ -1,9 +1,9 @@
 """Servidor REAL (uvicorn, 1 worker, YOLO real) con LLM y TTS SIMULADOS con latencia
 fija, para medir concurrencia sin consumir proveedores ni chocar con sus límites
-(Gemini TTS gratuito: 3 solicitudes/min). Uso interno de concurrency_bench.py.
+(Groq y Azure AI Speech). Uso interno de concurrency_bench.py.
 
 Las esperas (time.sleep) son BLOQUEANTES, igual que los clientes síncronos reales
-de Groq y Gemini dentro del handler async."""
+de Groq y Azure AI Speech dentro del handler async."""
 
 import hashlib
 import json
@@ -41,9 +41,9 @@ class _Groq:
 _client = _Groq()
 for mod in (scene_classifier, llm_enhancer, groq_client):
     mod.get_groq_client = lambda: _client
-tts_service._get_gemini_client = lambda: object()
-tts_service._synthesize_gemini_tts = lambda text, model=None: (time.sleep(TTS_S),
-                                                              tts_service._pcm_to_mp3(b"\0\0" * 24000))[1]
+tts_service.is_azure_tts_configured = lambda: True
+tts_service._ALLOWED_TTS_MODEL_IDS = {v["id"] for v in tts_service.AZURE_TTS_VOICES}
+tts_service._synthesize_azure_tts = lambda text, voice=None: (time.sleep(TTS_S), b"ID3" + bytes(4000))[1]
 
 import uvicorn  # noqa: E402
 from app.main import app  # noqa: E402

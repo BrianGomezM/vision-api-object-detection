@@ -16,7 +16,7 @@ hashes, request_id…).
 | test_live_tts          | Voz por defecto (Azure)  | AZURE_SPEECH_*  | 1 síntesis de una frase corta              |
 | test_live_endpoint     | los tres + /api/detect   | ambas           | 1 inferencia + 2 llamadas LLM + 1 síntesis |
 
-Coste: nivel gratuito de Groq y Gemini (sin facturación en el proyecto).
+Coste: nivel gratuito de Groq y de Azure AI Speech (sin facturación en el proyecto).
 Resultado esperado: todas en verde y SIN degradaciones.
 """
 
@@ -61,7 +61,7 @@ def record(test: str, **data):
 
 
 def _mp3_seconds(mp3: bytes) -> float:
-    return round(len(mp3) * 8 / 64000, 2)          # 64 kbps CBR (lameenc en tts_service) → estimación
+    return round(len(mp3) * 8 / 48000, 2)          # 48 kbps CBR (formato de Azure) → estimación
 
 
 def test_live_yolo():

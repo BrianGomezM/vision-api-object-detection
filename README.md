@@ -13,13 +13,13 @@ Trabajo de grado de Ingeniería de Sistemas, Universidad del Valle.
 3. Ubica cada objeto a la izquierda, al centro o a la derecha, y estima a cuántos pasos está.
 4. Calcula por dónde hay espacio libre para avanzar.
 5. Redacta la descripción con un modelo de lenguaje (Groq).
-6. La convierte en voz con Gemini TTS o Azure AI Speech.
+6. La convierte en voz con Azure AI Speech (voz es-CO-SalomeNeural).
 
 ## Requisitos
 
 - Python 3.13 (también funciona con 3.12)
 - Una clave de [Groq](https://console.groq.com) para la descripción
-- Una clave de [Google AI Studio](https://aistudio.google.com) para la voz
+- Una clave de [Azure AI Speech](https://portal.azure.com) para la voz (el nivel gratuito F0 es suficiente)
 - Docker, solo si se quiere ejecutar en contenedor
 
 ## Instalación
@@ -40,7 +40,7 @@ copy .env.example .env            # Linux/macOS: cp .env.example .env
 
 Después:
 
-- Escriba sus claves en `.env` (`GROQ_API_KEY` y `GOOGLE_API_KEY`).
+- Escriba sus claves en `.env` (`GROQ_API_KEY`, `AZURE_SPEECH_KEY` y `AZURE_SPEECH_REGION`).
 - Descargue los pesos `yolo26s.pt` desde la [versión v8.4.0 de Ultralytics](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26s.pt) y déjelos en la carpeta del proyecto.
 
 ## Uso
@@ -68,7 +68,7 @@ Los parámetros, la respuesta y los códigos de error están en [docs/API.md](do
 
 ```bash
 docker build -t visionnav-api .
-docker run -p 8000:8000 -e GROQ_API_KEY=... -e GOOGLE_API_KEY=... visionnav-api
+docker run -p 8000:8000 -e GROQ_API_KEY=... -e AZURE_SPEECH_KEY=... -e AZURE_SPEECH_REGION=... visionnav-api
 ```
 
 La imagen descarga y verifica los pesos del modelo durante la construcción.

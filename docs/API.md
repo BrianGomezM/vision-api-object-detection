@@ -21,7 +21,7 @@ Se envía como `multipart/form-data`.
 |---|---|---|---|
 | `file` | archivo | obligatorio | Imagen JPEG o PNG de hasta 10 MB |
 | `confidence_threshold` | número de 0 a 1 | 0,35 | Umbral solicitado; se combina con el umbral propio de cada clase |
-| `tts_model` | texto | Azure AI Speech, voz es-CO-SalomeNeural | Voz de la narrativa; admite las de `/api/tts/models` (sin Azure configurado, el valor por defecto es Gemini TTS, voz Sulafat) |
+| `tts_model` | texto | Azure AI Speech, voz es-CO-SalomeNeural | Voz de la narrativa (única voz del sistema; ver `/api/tts/models`). Sin Azure configurado, la respuesta es solo texto |
 | `audio` | booleano | `false` | Si es `true`, la respuesta es directamente el archivo MP3 |
 | `debug` | booleano | `false` | Agrega información de diagnóstico |
 

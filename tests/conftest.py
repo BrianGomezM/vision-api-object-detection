@@ -123,44 +123,35 @@ class Simulated:
                 return type("R", (), {"choices": [type("X", (), {"message": msg})()]})()
         return _C()
 
-    # ── TTS ──
-    def synthesize(self, text, model=None):
+    # ── TTS (Azure AI Speech simulado) ──
+    def synthesize(self, text, voice=None):
         self.tts_calls += 1
-        from app.services import tts_service
+        from app.services.tts_service import AzureTTSError
         if self.tts_mode == "error":
-            raise RuntimeError("Gemini 500 internal: key AIzaSECRETO")
+            raise RuntimeError("Azure 500 internal: key AZSECRETO")
         if self.tts_mode == "timeout":
             raise _httpx.ReadTimeout("read timed out")
-        if self.tts_mode in ("rate_limited", "rate_limited_noinfo", "quota_day"):
-            from google.genai import errors as genai_errors
-            details = []
-            if self.tts_mode == "rate_limited":         # formato real de Gemini: por minuto + RetryInfo
-                details = [{"@type": "type.googleapis.com/google.rpc.QuotaFailure", "violations": [
-                               {"quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"}]},
-                           {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "17s"}]
-            if self.tts_mode == "quota_day":            # cuota DIARIA: sin tiempo de recuperación
-                details = [{"@type": "type.googleapis.com/google.rpc.QuotaFailure", "violations": [
-                               {"quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier"}]}]
-            raise genai_errors.ClientError(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED",
-                                                          "message": "Resource exhausted", "details": details}})
+        if self.tts_mode == "rate_limited":            # 429 con Retry-After
+            raise AzureTTSError(429, "Too many requests", 17.0)
+        if self.tts_mode == "rate_limited_noinfo":     # 429 sin tiempo de recuperación
+            raise AzureTTSError(429, "Too many requests", None)
+        if self.tts_mode == "quota_day":               # cuota del nivel gratuito agotada
+            raise AzureTTSError(403, "Quota exceeded", None)
         if self.tts_mode == "unavailable":
-            from google.genai import errors as genai_errors
-            raise genai_errors.ServerError(503, {"error": {"code": 503, "status": "UNAVAILABLE",
-                                                          "message": "The model is overloaded."}})
-        return tts_service._pcm_to_mp3(b"\x00\x00" * 2400)   # MP3 real (lameenc) de 0.1 s
+            raise AzureTTSError(503, "Service unavailable", None)
+        return b"ID3" + b"\x00" * 400                 # MP3 simulado (cabecera ID3)
 
 
 @pytest.fixture(autouse=True)
 def _sin_azure_speech(monkeypatch):
     """Todas las pruebas ven Azure AI Speech SIN configurar (como el CI), aunque el .env
-    local tenga AZURE_SPEECH_KEY: la voz por defecto efectiva es Gemini (simulado).
-    Las pruebas de Azure lo configuran explícitamente (tests/test_tts_azure.py)."""
+    local tenga AZURE_SPEECH_KEY: ninguna prueba llama al servicio real.
+    El fixture `sim` y tests/test_tts_azure.py lo configuran con un proveedor simulado."""
     from app.services import tts_service as tts
-    azure_ids = {v["id"] for v in tts.AZURE_TTS_VOICES}
     monkeypatch.setattr(tts, "AZURE_SPEECH_KEY", "")
     monkeypatch.setattr(tts, "AZURE_SPEECH_REGION", "")
-    monkeypatch.setattr(tts, "AVAILABLE_TTS_MODELS", [m for m in tts.AVAILABLE_TTS_MODELS if m["id"] not in azure_ids])
-    monkeypatch.setattr(tts, "_ALLOWED_TTS_MODEL_IDS", tts._ALLOWED_TTS_MODEL_IDS - azure_ids)
+    monkeypatch.setattr(tts, "AVAILABLE_TTS_MODELS", [])
+    monkeypatch.setattr(tts, "_ALLOWED_TTS_MODEL_IDS", set())
 
 
 @pytest.fixture
@@ -178,9 +169,10 @@ def sim(monkeypatch, tmp_path):
     monkeypatch.setattr(llm_enhancer, "get_groq_client", lambda: client)
     monkeypatch.setattr(groq_client, "get_groq_client", lambda: client)
     monkeypatch.setattr(scene_classifier, "_scene_cache", None)
-    monkeypatch.setattr(tts_service, "_synthesize_gemini_tts", s.synthesize)
-    monkeypatch.setattr(tts_service, "_get_gemini_client",
-                        lambda: None if s.tts_mode == "not_configured" else object())
+    monkeypatch.setattr(tts_service, "_synthesize_azure_tts", s.synthesize)
+    monkeypatch.setattr(tts_service, "is_azure_tts_configured", lambda: s.tts_mode != "not_configured")
+    monkeypatch.setattr(tts_service, "AVAILABLE_TTS_MODELS", list(tts_service.AZURE_TTS_VOICES))
+    monkeypatch.setattr(tts_service, "_ALLOWED_TTS_MODEL_IDS", {v["id"] for v in tts_service.AZURE_TTS_VOICES})
     for kind, mod, attr in (("annotated", detection_visualizer, "DETECTIONS_OUTPUT_DIR"),
                             ("audio_live", tts_service, "AUDIO_OUTPUT_DIR")):
         d = tmp_path / storage._LEGACY[kind].name

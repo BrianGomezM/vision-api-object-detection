@@ -31,8 +31,6 @@ ultralytics==8.4.123
 
 # ── LLM, TTS y traducción ─────────────────────────────────────
 groq==1.6.0
-google-genai==2.24.0
-lameenc==1.8.4
 deep-translator==1.11.4
 
 # ── Configuración y HTTP ──────────────────────────────────────

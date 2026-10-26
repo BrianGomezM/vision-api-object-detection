@@ -25,7 +25,7 @@ La prueba `tests/test_architecture.py` verifica que el núcleo no importe FastAP
 6. **Espacio libre y decisión** (`services/free_space_analyzer.py`, `services/risk_engine.py`): fracción bloqueada por columna e instrucción de movimiento.
 7. **Escenario** (`services/scene_classifier.py`): tipo de lugar a partir de los objetos detectados.
 8. **Narrativa** (`services/llm_enhancer.py`): descripción en segunda persona redactada por el modelo de lenguaje; si no responde, se usa una plantilla.
-9. **Voz** (`services/tts_service.py`): audio MP3 con Gemini TTS o Azure AI Speech.
+9. **Voz** (`services/tts_service.py`): audio MP3 con Azure AI Speech (es-CO-SalomeNeural).
 
 ## Perfiles de ejecución
 

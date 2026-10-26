@@ -1,5 +1,5 @@
 """
-Voces de Azure AI Speech (Salomé es la voz por defecto). HTTP simulado: nunca se
+Síntesis de voz con Azure AI Speech (voz es-CO-SalomeNeural). HTTP simulado: nunca se
 llama al servicio real ni se usa una clave real.
 """
 
@@ -36,35 +36,30 @@ def azure(monkeypatch):
     return calls, _next
 
 
-def test_sin_clave_las_voces_de_azure_no_se_publican_ni_se_usan(monkeypatch):
-    ids = {m["id"] for m in tts.get_available_tts_models()}
-    if not tts.is_azure_tts_configured():
-        assert not any(i.startswith(tts.AZURE_MODEL_PREFIX) for i in ids)
-        assert VOICE not in tts._ALLOWED_TTS_MODEL_IDS
-    # Primero siempre la voz por defecto efectiva.
-    assert tts.get_available_tts_models()[0]["id"] == tts.default_tts_model()
+def test_sin_clave_no_se_publica_la_voz_ni_se_llama_a_azure(monkeypatch):
+    """Sin AZURE_SPEECH_KEY/REGION (como en el CI): /api/tts/models queda vacío y la
+    síntesis devuelve None con el motivo NO_CONFIGURADO, sin llamar al proveedor."""
+    from app.routes.detect import _tts_unavailable_reason
+    monkeypatch.delenv("EVALUATION_DISABLE_TTS", raising=False)
+    llamado = []
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: llamado.append(1))
+    assert tts.get_available_tts_models() == [] and not tts.is_tts_active()
+    assert tts.synthesize_speech("Hola.") is None
+    assert llamado == [] and tts.get_last_tts_error()["status"] == "NO_CONFIGURADO"
+    assert _tts_unavailable_reason() == "tts_desactivado"
 
 
-def test_la_voz_por_defecto_configurada_es_salome():
-    assert tts.TTS_DEFAULT_MODEL == VOICE
+def test_la_voz_configurada_es_salome():
+    assert tts.TTS_DEFAULT_MODEL == VOICE == tts.default_tts_model()
+    assert [v["id"] for v in tts.AZURE_TTS_VOICES] == [VOICE]
+    assert tts.describe_tts_model(VOICE) == {"proveedor": "Azure AI Speech", "modelo": VOICE,
+                                             "voz": "es-CO-SalomeNeural"}
 
 
 def test_sin_modelo_se_usa_salome(azure):
     calls, _ = azure
-    assert tts.default_tts_model() == VOICE
     assert tts.synthesize_speech("Hola.") == b"ID3-MP3-AZURE"
     assert '<voice name="es-CO-SalomeNeural">' in calls[0]["body"]
-
-
-def test_sin_clave_de_azure_la_voz_por_defecto_efectiva_es_gemini(monkeypatch):
-    monkeypatch.setattr(tts, "_ALLOWED_TTS_MODEL_IDS",
-                        tts._ALLOWED_TTS_MODEL_IDS - {v["id"] for v in tts.AZURE_TTS_VOICES})
-    monkeypatch.delenv("EVALUATION_DISABLE_TTS", raising=False)
-    monkeypatch.setattr(tts, "_synthesize_gemini_tts", lambda text, model=None: f"GEMINI:{model}".encode())
-    monkeypatch.setattr(tts, "_get_gemini_client", lambda: object())
-    assert tts.default_tts_model() == tts.TTS_MODEL
-    assert tts.synthesize_speech("Hola.") == f"GEMINI:{tts.TTS_MODEL}".encode()
-    assert tts.synthesize_speech("Hola.", model=VOICE) == f"GEMINI:{tts.TTS_MODEL}".encode()
 
 
 def test_voz_de_azure_devuelve_mp3_con_ssml_y_la_clave_solo_en_la_cabecera(azure):

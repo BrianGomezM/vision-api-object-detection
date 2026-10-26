@@ -140,8 +140,8 @@ def create_app(profile: str | None = None) -> FastAPI:
     async def startup_event():
         """
         Al arrancar: carga YOLO26s con warm-up para eliminar overhead en la
-        primera petición. El cliente de Gemini TTS se inicializa de forma
-        perezosa (singleton) en su primer uso; ver app/services/tts_service.py.
+        primera petición. La síntesis de voz (Azure AI Speech) no requiere
+        inicialización; ver app/services/tts_service.py.
         """
         # production: lo desplegado debe ser EXACTAMENTE la configuración congelada
         # (app/deploy_identity.py); si difiere, el worker no arranca.
