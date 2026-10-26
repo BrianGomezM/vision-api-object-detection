@@ -1,0 +1,124 @@
+imagen,condicion,lado_mayor_px,objetos,confianza_media,deteccion_ms,clases
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,max_800,800,0,,605.0,
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,max_1280,1280,0,,718.2,
+evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png,original,,0,,642.2,
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,max_800,800,3,0.836,614.2,"bench, bicycle"
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,max_1280,1280,3,0.744,568.0,"bench, bicycle"
+evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png,original,,4,0.722,632.0,"bench, bicycle"
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,max_800,800,15,0.731,602.7,"bench, car, chair, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,max_1280,1280,13,0.792,735.7,"bench, car, chair, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png,original,,14,0.779,708.7,"bench, car, chair, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,max_800,800,27,0.602,567.1,"bottle, chair, couch, dining table, laptop, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,max_1280,1280,36,0.59,677.0,"backpack, bottle, chair, couch, dining table, laptop, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png,original,,36,0.601,717.9,"backpack, bottle, chair, couch, dining table, laptop, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,max_800,800,16,0.742,513.3,"backpack, bus, car, dog, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,max_1280,1280,16,0.797,595.5,"backpack, bus, car, dog, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png,original,,18,0.766,626.4,"backpack, bus, car, dog, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,max_800,800,25,0.658,567.7,"backpack, bench, person"
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,max_1280,1280,23,0.705,576.1,"backpack, person, potted plant"
+evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png,original,,26,0.697,580.6,"backpack, laptop, person"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,max_800,800,8,0.676,594.7,"car, truck, umbrella"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,max_1280,1280,15,0.573,499.3,"bench, car, truck, umbrella"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png,original,,13,0.588,698.1,"bench, car, truck, umbrella"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,max_800,800,1,0.796,459.4,bench
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,max_1280,1280,1,0.921,462.0,bench
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png,original,,1,0.913,592.9,bench
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,max_800,800,10,0.624,491.6,"bottle, chair, couch, potted plant"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,max_1280,1280,10,0.622,503.9,"bottle, chair, couch, potted plant"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png,original,,11,0.592,629.9,"bottle, chair, couch, potted plant"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,max_800,800,30,0.517,464.5,"chair, clock, dining table, tv"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,max_1280,1280,29,0.527,502.2,"chair, clock, dining table, tv"
+evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png,original,,31,0.513,653.2,"chair, clock, dining table, tv"
+evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png,max_800,800,0,,474.4,
+evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png,max_1280,1280,0,,452.1,
+evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png,original,,0,,561.2,
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,max_800,800,2,0.603,467.7,"potted plant, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,max_1280,1280,2,0.701,463.1,"potted plant, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png,original,,2,0.758,555.2,"potted plant, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,max_800,800,3,0.753,418.8,"chair, couch, potted plant"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,max_1280,1135,3,0.728,404.9,"chair, couch, potted plant"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png,original,,3,0.728,444.2,"chair, couch, potted plant"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,max_800,800,2,0.865,655.4,"chair, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,max_1280,1061,3,0.682,652.0,"chair, potted plant, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png,original,,3,0.682,664.7,"chair, potted plant, vase"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,max_800,799,3,0.866,532.8,couch
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,max_1280,1280,4,0.714,512.0,"chair, couch"
+evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png,original,,4,0.736,637.6,"chair, couch"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,max_800,800,28,0.632,473.4,"bottle, chair, dining table"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,max_1280,1280,32,0.622,472.7,"bottle, chair, dining table"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png,original,,38,0.628,476.5,"bottle, chair, dining table"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,max_800,800,14,0.673,466.5,"bus, chair, dining table, person"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,max_1280,1280,15,0.601,469.5,"chair, dining table, person"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png,original,,13,0.611,608.9,"chair, dining table, person"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,max_800,800,2,0.415,635.8,"bottle, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,max_1280,1025,3,0.426,590.4,"bottle, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png,original,,3,0.426,702.7,"bottle, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,max_800,800,14,0.572,497.2,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,max_1280,1280,17,0.504,498.5,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png,original,,16,0.522,518.5,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,max_800,800,9,0.453,494.8,"chair, couch, dining table, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,max_1280,1280,12,0.473,519.7,"chair, couch, dining table, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png,original,,11,0.497,519.2,"chair, couch, dining table, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,max_800,800,3,0.414,677.9,"chair, dining table, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,max_1280,1023,1,0.632,592.1,vase
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png,original,,1,0.632,660.3,vase
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,max_800,800,6,0.588,464.3,"couch, dining table, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,max_1280,1280,5,0.674,559.9,"couch, dining table, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png,original,,4,0.82,521.6,"couch, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,max_800,800,4,0.423,550.2,"car, truck"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,max_1280,1280,2,0.524,450.5,truck
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png,original,,2,0.522,477.4,truck
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,max_800,799,5,0.77,471.6,"chair, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,max_1280,1280,6,0.739,467.8,"chair, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png,original,,7,0.665,591.3,"chair, potted plant, tv"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,max_800,800,12,0.571,545.6,"chair, couch, dining table, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,max_1280,1280,14,0.547,495.6,"chair, couch, dining table, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png,original,,11,0.661,590.8,"chair, couch, potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,max_800,717,2,0.543,805.2,"potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,max_1280,717,2,0.543,796.2,"potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png,original,,2,0.543,709.6,"potted plant, vase"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,max_800,800,0,,840.1,
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,max_1280,888,0,,879.1,
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png,original,,0,,802.4,
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,max_800,800,24,0.655,451.9,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,max_1280,1280,25,0.692,534.7,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png,original,,28,0.713,587.8,"chair, dining table, potted plant"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,max_800,800,3,0.608,484.2,"couch, dining table"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,max_1280,1280,3,0.614,472.2,"couch, dining table"
+evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png,original,,3,0.648,474.2,"couch, dining table"
+test_images/01_persona_bolso.jpg,max_800,800,2,0.459,584.5,"person, suitcase"
+test_images/01_persona_bolso.jpg,max_1280,1280,2,0.72,558.2,"person, suitcase"
+test_images/01_persona_bolso.jpg,original,,2,0.704,949.1,"person, suitcase"
+test_images/02_calle_carros.jpg,max_800,799,15,0.777,786.2,"car, person, truck"
+test_images/02_calle_carros.jpg,max_1280,1280,19,0.697,567.9,"car, person, truck"
+test_images/02_calle_carros.jpg,original,,22,0.683,957.2,"car, person, truck"
+test_images/03_escritorio_objetos.jpg,max_800,800,11,0.589,660.6,"bottle, cell phone, laptop, person, tv"
+test_images/03_escritorio_objetos.jpg,max_1280,1280,11,0.587,595.5,"bottle, cell phone, laptop, person, tv"
+test_images/03_escritorio_objetos.jpg,original,,9,0.642,959.7,"bottle, cell phone, laptop, person"
+test_images/04_cocina_utensilios.jpg,max_800,800,2,0.287,550.5,dining table
+test_images/04_cocina_utensilios.jpg,max_1280,1280,1,0.394,613.7,dining table
+test_images/04_cocina_utensilios.jpg,original,,2,0.289,860.0,dining table
+test_images/05_sala_muebles.jpg,max_800,800,8,0.746,612.6,"chair, couch, potted plant, tv"
+test_images/05_sala_muebles.jpg,max_1280,1280,8,0.744,661.3,"chair, couch, potted plant, tv"
+test_images/05_sala_muebles.jpg,original,,8,0.767,931.5,"chair, couch, potted plant, tv"
+test_images/06_bicicleta_persona.jpg,max_800,800,4,0.415,802.8,"backpack, bicycle, person"
+test_images/06_bicicleta_persona.jpg,max_1280,1280,3,0.412,809.7,"backpack, person"
+test_images/06_bicicleta_persona.jpg,original,,3,0.412,925.5,"backpack, person"
+test_images/07_perro_parque.jpg,max_800,800,4,0.692,422.7,"dog, person"
+test_images/07_perro_parque.jpg,max_1280,1280,4,0.672,420.6,"dog, person"
+test_images/07_perro_parque.jpg,original,,4,0.673,413.2,"dog, person"
+test_images/08_mercado_productos.jpg,max_800,800,6,0.373,556.6,"dining table, person"
+test_images/08_mercado_productos.jpg,max_1280,1260,6,0.374,558.1,"dining table, person"
+test_images/08_mercado_productos.jpg,original,,6,0.374,518.8,"dining table, person"
+test_images/09_objetos_pequenos.jpg,max_800,800,7,0.39,658.6,"cell phone, dining table, laptop"
+test_images/09_objetos_pequenos.jpg,max_1280,1280,4,0.336,536.7,"cell phone, dining table"
+test_images/09_objetos_pequenos.jpg,original,,3,0.384,880.7,"cell phone, dining table"
+test_images/10_escena_compleja.jpg,max_800,800,13,0.719,786.8,car
+test_images/10_escena_compleja.jpg,max_1280,1280,15,0.73,787.8,car
+test_images/10_escena_compleja.jpg,original,,18,0.681,799.6,car
+test_images/11_escritorio.jpeg,max_800,800,5,0.759,562.9,"chair, couch, dining table, tv"
+test_images/11_escritorio.jpeg,max_1280,1280,5,0.789,429.3,"chair, couch, dining table, tv"
+test_images/11_escritorio.jpeg,original,,6,0.72,513.0,"chair, couch, dining table, tv"
+test_images/12_sala.jpg,max_800,640,18,0.745,470.8,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+test_images/12_sala.jpg,max_1280,640,18,0.745,468.5,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+test_images/12_sala.jpg,original,,18,0.745,492.3,"bottle, chair, couch, dining table, potted plant, tv, wine glass"

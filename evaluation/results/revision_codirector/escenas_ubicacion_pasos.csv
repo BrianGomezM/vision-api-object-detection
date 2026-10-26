@@ -1,0 +1,46 @@
+escena,lugar,objeto,x_m,distancia_suelo_m,lado_real,detectado,iou,columna_sistema,banda_sistema,pasos_sistema,categoria_sistema
+E1,Oficina,chair,1.7,3.45,derecha,True,0.99,derecha,cerca,4,obstacle
+E1,Oficina,potted plant,2.4,5.55,derecha,True,0.85,derecha,medio,5,obstacle
+E1,Oficina,clock,1.0,7.52,centro,True,0.9,centro,lejos,,small_object
+E1,Oficina,person,1.3,6.53,centro,True,0.96,centro,medio,6,obstacle
+E1,Oficina,potted plant,-2.35,5.52,izquierda,True,0.95,izquierda,medio,5,obstacle
+E1,Oficina,side table,-2.35,7.29,izquierda,False,,,,,
+E1,Oficina,bottle,-2.35,7.29,izquierda,True,0.85,izquierda,medio,,small_object
+E2,Cocina-comedor,person,-1.15,2.57,izquierda,True,0.98,izquierda,muy cerca,3,obstacle
+E2,Cocina-comedor,dining table,1.75,4.64,derecha,True,0.98,derecha,cerca,5,obstacle
+E2,Cocina-comedor,bowl,1.66,4.39,derecha,False,,,,,
+E2,Cocina-comedor,chair,0.95,4.4,centro,True,0.98,centro,cerca,5,obstacle
+E2,Cocina-comedor,chair,2.6,5.02,derecha,True,0.96,derecha,cerca,5,obstacle
+E2,Cocina-comedor,potted plant,2.45,6.48,derecha,True,0.29,derecha,medio,,obstacle
+E2,Cocina-comedor,clock,0.6,6.48,centro,True,0.95,centro,lejos,,small_object
+E2,Cocina-comedor,bench,-0.2,6.15,centro,True,0.97,centro,medio,5,obstacle
+E2,Cocina-comedor,bottle,1.84,4.89,derecha,True,0.79,derecha,medio,,small_object
+E2,Cocina-comedor,potted plant,-1.2,6.12,centro,True,0.93,centro,medio,6,obstacle
+E3,Sala v1,couch,0.0,3.11,centro,True,0.98,centro,cerca,4,obstacle
+E3,Sala v1,chair,1.6,2.97,derecha,True,0.98,derecha,muy cerca,2,obstacle
+E3,Sala v1,side table,0.0,5.55,centro,False,,,,,
+E3,Sala v1,tv,0.0,5.55,centro,True,0.86,centro,medio,,informative
+E3,Sala v1,potted plant,-2.4,5.91,izquierda,True,0.96,izquierda,medio,5,obstacle
+E3,Sala v1,potted plant,2.4,5.91,derecha,True,0.94,derecha,medio,5,obstacle
+E4,Sala v2,couch,0.0,3.11,centro,True,0.98,centro,cerca,4,obstacle
+E4,Sala v2,chair,-1.6,2.97,izquierda,True,0.97,izquierda,muy cerca,2,obstacle
+E4,Sala v2,side table,0.0,5.55,centro,False,,,,,
+E4,Sala v2,tv,0.0,5.55,centro,True,0.86,centro,medio,,informative
+E4,Sala v2,potted plant,-2.4,5.91,izquierda,True,0.96,izquierda,medio,5,obstacle
+E4,Sala v2,potted plant,2.4,5.91,derecha,True,0.95,derecha,medio,5,obstacle
+E5,Dormitorio,bed,0.0,5.35,centro,True,0.98,centro,medio,5,obstacle
+E5,Dormitorio,side table,1.15,6.16,centro,False,,,,,
+E5,Dormitorio,vase,1.15,6.16,centro,False,,,,,
+E5,Dormitorio,chair,1.75,3.65,derecha,True,0.99,derecha,cerca,4,obstacle
+E5,Dormitorio,potted plant,-2.2,5.37,izquierda,True,0.95,izquierda,medio,5,obstacle
+E5,Dormitorio,side table,-1.85,3.96,izquierda,False,,,,,
+E5,Dormitorio,tv,-1.85,3.96,izquierda,True,0.91,izquierda,medio,,informative
+E5,Dormitorio,clock,2.0,6.59,derecha,True,0.95,derecha,lejos,,small_object
+E5,Dormitorio,side table,-1.15,6.16,centro,False,,,,,
+E5,Dormitorio,vase,-1.15,6.16,centro,True,0.9,centro,medio,6,obstacle
+E6,Comedor (práctica),dining table,-1.7,4.25,izquierda,True,0.98,izquierda,cerca,5,obstacle
+E6,Comedor (práctica),chair,-2.62,4.7,izquierda,True,0.95,izquierda,cerca,5,obstacle
+E6,Comedor (práctica),potted plant,2.3,6.05,derecha,True,0.97,derecha,medio,5,obstacle
+E6,Comedor (práctica),clock,0.0,6.45,centro,True,0.95,centro,lejos,,small_object
+E6,Comedor (práctica),bowl,-1.6,4.0,izquierda,False,,,,,
+E6,Comedor (práctica),bottle,-1.8,4.5,izquierda,True,0.84,izquierda,medio,,small_object
