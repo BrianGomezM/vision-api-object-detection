@@ -1,0 +1,1014 @@
+{
+  "meta": {
+    "fecha_utc": "2026-10-25T23:01:43.583058+00:00",
+    "pesos": "yolo26s.pt",
+    "imgsz": 1280,
+    "iou": 0.45,
+    "reduccion_previa_px": 800,
+    "imagenes": [
+      "01_persona_bolso.jpg",
+      "02_calle_carros.jpg",
+      "03_escritorio_objetos.jpg",
+      "04_cocina_utensilios.jpg",
+      "05_sala_muebles.jpg",
+      "06_bicicleta_persona.jpg",
+      "07_perro_parque.jpg",
+      "08_mercado_productos.jpg",
+      "09_objetos_pequenos.jpg",
+      "10_escena_compleja.jpg",
+      "11_escritorio.jpeg",
+      "12_sala.jpg"
+    ],
+    "umbrales": [
+      0.3,
+      0.5,
+      0.7
+    ]
+  },
+  "resumen": {
+    "adaptado": {
+      "por_umbral": {
+        "0.3": {
+          "objetos_prom": 8,
+          "confianza_prom": 0.577,
+          "deteccion_ms_prom": 786.6
+        },
+        "0.5": {
+          "objetos_prom": 7.83,
+          "confianza_prom": 0.581,
+          "deteccion_ms_prom": 732.4
+        },
+        "0.7": {
+          "objetos_prom": 7.17,
+          "confianza_prom": 0.591,
+          "deteccion_ms_prom": 829.3
+        }
+      },
+      "objetos_prom_total": 7.67,
+      "variacion_0.3_0.7": 0.83
+    },
+    "sin_adaptar": {
+      "por_umbral": {
+        "0.3": {
+          "objetos_prom": 9.67,
+          "confianza_prom": 0.637,
+          "deteccion_ms_prom": 790.3
+        },
+        "0.5": {
+          "objetos_prom": 7.08,
+          "confianza_prom": 0.729,
+          "deteccion_ms_prom": 774.7
+        },
+        "0.7": {
+          "objetos_prom": 4.67,
+          "confianza_prom": 0.826,
+          "deteccion_ms_prom": 765.4
+        }
+      },
+      "objetos_prom_total": 7.14,
+      "variacion_0.3_0.7": 5.0
+    }
+  },
+  "filas": [
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 2,
+      "confianza_media": 0.459,
+      "deteccion_ms": 687.9,
+      "etiquetas": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 2,
+      "confianza_media": 0.459,
+      "deteccion_ms": 683.3,
+      "etiquetas": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 2,
+      "confianza_media": 0.459,
+      "deteccion_ms": 715.4,
+      "etiquetas": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 1,
+      "confianza_media": 0.612,
+      "deteccion_ms": 1181.6,
+      "etiquetas": [
+        "person"
+      ]
+    },
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 2,
+      "confianza_media": 0.459,
+      "deteccion_ms": 893.1,
+      "etiquetas": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "01_persona_bolso.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 734.4,
+      "etiquetas": []
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 16,
+      "confianza_media": 0.749,
+      "deteccion_ms": 716.3,
+      "etiquetas": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 16,
+      "confianza_media": 0.749,
+      "deteccion_ms": 884.7,
+      "etiquetas": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 15,
+      "confianza_media": 0.777,
+      "deteccion_ms": 629.9,
+      "etiquetas": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 14,
+      "confianza_media": 0.804,
+      "deteccion_ms": 598.8,
+      "etiquetas": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 12,
+      "confianza_media": 0.816,
+      "deteccion_ms": 825.7,
+      "etiquetas": [
+        "car",
+        "person"
+      ]
+    },
+    {
+      "imagen": "02_calle_carros.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 11,
+      "confianza_media": 0.854,
+      "deteccion_ms": 798.7,
+      "etiquetas": [
+        "car",
+        "person"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 11,
+      "confianza_media": 0.589,
+      "deteccion_ms": 586.5,
+      "etiquetas": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 16,
+      "confianza_media": 0.603,
+      "deteccion_ms": 687.5,
+      "etiquetas": [
+        "book",
+        "bottle",
+        "cell phone",
+        "cup",
+        "keyboard",
+        "laptop",
+        "mouse",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 11,
+      "confianza_media": 0.589,
+      "deteccion_ms": 654.2,
+      "etiquetas": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 12,
+      "confianza_media": 0.667,
+      "deteccion_ms": 678.2,
+      "etiquetas": [
+        "bottle",
+        "cup",
+        "keyboard",
+        "laptop",
+        "mouse",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 11,
+      "confianza_media": 0.589,
+      "deteccion_ms": 831.6,
+      "etiquetas": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "03_escritorio_objetos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 6,
+      "confianza_media": 0.788,
+      "deteccion_ms": 990.8,
+      "etiquetas": [
+        "bottle",
+        "cup",
+        "keyboard",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 2,
+      "confianza_media": 0.287,
+      "deteccion_ms": 848.6,
+      "etiquetas": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 8,
+      "confianza_media": 0.68,
+      "deteccion_ms": 676.1,
+      "etiquetas": [
+        "bowl",
+        "cup",
+        "dining table",
+        "orange",
+        "spoon"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 2,
+      "confianza_media": 0.287,
+      "deteccion_ms": 668.6,
+      "etiquetas": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 4,
+      "confianza_media": 0.901,
+      "deteccion_ms": 724.9,
+      "etiquetas": [
+        "orange",
+        "spoon"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 2,
+      "confianza_media": 0.287,
+      "deteccion_ms": 706.5,
+      "etiquetas": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "04_cocina_utensilios.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 4,
+      "confianza_media": 0.901,
+      "deteccion_ms": 790.7,
+      "etiquetas": [
+        "orange",
+        "spoon"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 8,
+      "confianza_media": 0.746,
+      "deteccion_ms": 831.0,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 10,
+      "confianza_media": 0.736,
+      "deteccion_ms": 764.6,
+      "etiquetas": [
+        "apple",
+        "bowl",
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 8,
+      "confianza_media": 0.746,
+      "deteccion_ms": 951.3,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 10,
+      "confianza_media": 0.736,
+      "deteccion_ms": 1109.4,
+      "etiquetas": [
+        "apple",
+        "bowl",
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 8,
+      "confianza_media": 0.746,
+      "deteccion_ms": 1241.1,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "05_sala_muebles.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 6,
+      "confianza_media": 0.834,
+      "deteccion_ms": 865.9,
+      "etiquetas": [
+        "bowl",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 4,
+      "confianza_media": 0.415,
+      "deteccion_ms": 1304.3,
+      "etiquetas": [
+        "backpack",
+        "bicycle",
+        "person"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 4,
+      "confianza_media": 0.415,
+      "deteccion_ms": 1197.4,
+      "etiquetas": [
+        "backpack",
+        "bicycle",
+        "person"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 3,
+      "confianza_media": 0.434,
+      "deteccion_ms": 1038.5,
+      "etiquetas": [
+        "backpack",
+        "person"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 1,
+      "confianza_media": 0.504,
+      "deteccion_ms": 1081.7,
+      "etiquetas": [
+        "backpack"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 3,
+      "confianza_media": 0.434,
+      "deteccion_ms": 833.7,
+      "etiquetas": [
+        "backpack",
+        "person"
+      ]
+    },
+    {
+      "imagen": "06_bicicleta_persona.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 892.4,
+      "etiquetas": []
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 4,
+      "confianza_media": 0.692,
+      "deteccion_ms": 520.6,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 4,
+      "confianza_media": 0.692,
+      "deteccion_ms": 630.3,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 4,
+      "confianza_media": 0.692,
+      "deteccion_ms": 557.2,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 3,
+      "confianza_media": 0.76,
+      "deteccion_ms": 412.5,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 4,
+      "confianza_media": 0.692,
+      "deteccion_ms": 411.5,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "07_perro_parque.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 3,
+      "confianza_media": 0.76,
+      "deteccion_ms": 581.9,
+      "etiquetas": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 6,
+      "confianza_media": 0.373,
+      "deteccion_ms": 772.8,
+      "etiquetas": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 15,
+      "confianza_media": 0.49,
+      "deteccion_ms": 799.9,
+      "etiquetas": [
+        "apple",
+        "cup",
+        "dining table",
+        "orange",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 6,
+      "confianza_media": 0.373,
+      "deteccion_ms": 602.7,
+      "etiquetas": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 5,
+      "confianza_media": 0.673,
+      "deteccion_ms": 658.5,
+      "etiquetas": [
+        "apple",
+        "orange",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 6,
+      "confianza_media": 0.373,
+      "deteccion_ms": 693.9,
+      "etiquetas": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "08_mercado_productos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 1,
+      "confianza_media": 0.899,
+      "deteccion_ms": 677.0,
+      "etiquetas": [
+        "apple"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 7,
+      "confianza_media": 0.39,
+      "deteccion_ms": 731.9,
+      "etiquetas": [
+        "cell phone",
+        "dining table",
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 6,
+      "confianza_media": 0.473,
+      "deteccion_ms": 633.9,
+      "etiquetas": [
+        "book",
+        "cell phone",
+        "laptop",
+        "remote"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 7,
+      "confianza_media": 0.39,
+      "deteccion_ms": 625.8,
+      "etiquetas": [
+        "cell phone",
+        "dining table",
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 2,
+      "confianza_media": 0.7,
+      "deteccion_ms": 607.4,
+      "etiquetas": [
+        "cell phone",
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 7,
+      "confianza_media": 0.39,
+      "deteccion_ms": 635.8,
+      "etiquetas": [
+        "cell phone",
+        "dining table",
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "09_objetos_pequenos.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 1,
+      "confianza_media": 0.701,
+      "deteccion_ms": 727.8,
+      "etiquetas": [
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 13,
+      "confianza_media": 0.719,
+      "deteccion_ms": 1059.0,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 13,
+      "confianza_media": 0.719,
+      "deteccion_ms": 1381.6,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 13,
+      "confianza_media": 0.719,
+      "deteccion_ms": 1188.0,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 13,
+      "confianza_media": 0.719,
+      "deteccion_ms": 1002.5,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 8,
+      "confianza_media": 0.799,
+      "deteccion_ms": 995.1,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "10_escena_compleja.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 8,
+      "confianza_media": 0.799,
+      "deteccion_ms": 876.9,
+      "etiquetas": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 5,
+      "confianza_media": 0.759,
+      "deteccion_ms": 683.8,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 4,
+      "confianza_media": 0.881,
+      "deteccion_ms": 532.2,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 5,
+      "confianza_media": 0.759,
+      "deteccion_ms": 489.7,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 4,
+      "confianza_media": 0.881,
+      "deteccion_ms": 500.5,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 5,
+      "confianza_media": 0.759,
+      "deteccion_ms": 630.2,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "11_escritorio.jpeg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 4,
+      "confianza_media": 0.881,
+      "deteccion_ms": 614.9,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.3,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 696.0,
+      "etiquetas": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.3,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 611.6,
+      "etiquetas": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.5,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 667.5,
+      "etiquetas": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.5,
+      "objetos": 16,
+      "confianza_media": 0.787,
+      "deteccion_ms": 740.7,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "adaptado",
+      "umbral": 0.7,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 1253.8,
+      "etiquetas": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "12_sala.jpg",
+      "condicion": "sin_adaptar",
+      "umbral": 0.7,
+      "objetos": 12,
+      "confianza_media": 0.843,
+      "deteccion_ms": 633.2,
+      "etiquetas": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    }
+  ]
+}

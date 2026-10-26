@@ -1,0 +1,73 @@
+imagen,condicion,umbral,objetos,confianza_media,deteccion_ms,etiquetas
+01_persona_bolso.jpg,adaptado,0.3,2,0.459,687.9,"person, suitcase"
+01_persona_bolso.jpg,sin_adaptar,0.3,2,0.459,683.3,"person, suitcase"
+01_persona_bolso.jpg,adaptado,0.5,2,0.459,715.4,"person, suitcase"
+01_persona_bolso.jpg,sin_adaptar,0.5,1,0.612,1181.6,person
+01_persona_bolso.jpg,adaptado,0.7,2,0.459,893.1,"person, suitcase"
+01_persona_bolso.jpg,sin_adaptar,0.7,0,,734.4,
+02_calle_carros.jpg,adaptado,0.3,16,0.749,716.3,"car, person, truck"
+02_calle_carros.jpg,sin_adaptar,0.3,16,0.749,884.7,"car, person, truck"
+02_calle_carros.jpg,adaptado,0.5,15,0.777,629.9,"car, person, truck"
+02_calle_carros.jpg,sin_adaptar,0.5,14,0.804,598.8,"car, person, truck"
+02_calle_carros.jpg,adaptado,0.7,12,0.816,825.7,"car, person"
+02_calle_carros.jpg,sin_adaptar,0.7,11,0.854,798.7,"car, person"
+03_escritorio_objetos.jpg,adaptado,0.3,11,0.589,586.5,"bottle, cell phone, laptop, person, tv"
+03_escritorio_objetos.jpg,sin_adaptar,0.3,16,0.603,687.5,"book, bottle, cell phone, cup, keyboard, laptop, mouse, person, tv"
+03_escritorio_objetos.jpg,adaptado,0.5,11,0.589,654.2,"bottle, cell phone, laptop, person, tv"
+03_escritorio_objetos.jpg,sin_adaptar,0.5,12,0.667,678.2,"bottle, cup, keyboard, laptop, mouse, person, tv"
+03_escritorio_objetos.jpg,adaptado,0.7,11,0.589,831.6,"bottle, cell phone, laptop, person, tv"
+03_escritorio_objetos.jpg,sin_adaptar,0.7,6,0.788,990.8,"bottle, cup, keyboard, laptop, person, tv"
+04_cocina_utensilios.jpg,adaptado,0.3,2,0.287,848.6,dining table
+04_cocina_utensilios.jpg,sin_adaptar,0.3,8,0.68,676.1,"bowl, cup, dining table, orange, spoon"
+04_cocina_utensilios.jpg,adaptado,0.5,2,0.287,668.6,dining table
+04_cocina_utensilios.jpg,sin_adaptar,0.5,4,0.901,724.9,"orange, spoon"
+04_cocina_utensilios.jpg,adaptado,0.7,2,0.287,706.5,dining table
+04_cocina_utensilios.jpg,sin_adaptar,0.7,4,0.901,790.7,"orange, spoon"
+05_sala_muebles.jpg,adaptado,0.3,8,0.746,831.0,"chair, couch, potted plant, tv"
+05_sala_muebles.jpg,sin_adaptar,0.3,10,0.736,764.6,"apple, bowl, chair, couch, potted plant, tv"
+05_sala_muebles.jpg,adaptado,0.5,8,0.746,951.3,"chair, couch, potted plant, tv"
+05_sala_muebles.jpg,sin_adaptar,0.5,10,0.736,1109.4,"apple, bowl, chair, couch, potted plant, tv"
+05_sala_muebles.jpg,adaptado,0.7,8,0.746,1241.1,"chair, couch, potted plant, tv"
+05_sala_muebles.jpg,sin_adaptar,0.7,6,0.834,865.9,"bowl, couch, potted plant, tv"
+06_bicicleta_persona.jpg,adaptado,0.3,4,0.415,1304.3,"backpack, bicycle, person"
+06_bicicleta_persona.jpg,sin_adaptar,0.3,4,0.415,1197.4,"backpack, bicycle, person"
+06_bicicleta_persona.jpg,adaptado,0.5,3,0.434,1038.5,"backpack, person"
+06_bicicleta_persona.jpg,sin_adaptar,0.5,1,0.504,1081.7,backpack
+06_bicicleta_persona.jpg,adaptado,0.7,3,0.434,833.7,"backpack, person"
+06_bicicleta_persona.jpg,sin_adaptar,0.7,0,,892.4,
+07_perro_parque.jpg,adaptado,0.3,4,0.692,520.6,"dog, person"
+07_perro_parque.jpg,sin_adaptar,0.3,4,0.692,630.3,"dog, person"
+07_perro_parque.jpg,adaptado,0.5,4,0.692,557.2,"dog, person"
+07_perro_parque.jpg,sin_adaptar,0.5,3,0.76,412.5,"dog, person"
+07_perro_parque.jpg,adaptado,0.7,4,0.692,411.5,"dog, person"
+07_perro_parque.jpg,sin_adaptar,0.7,3,0.76,581.9,"dog, person"
+08_mercado_productos.jpg,adaptado,0.3,6,0.373,772.8,"dining table, person"
+08_mercado_productos.jpg,sin_adaptar,0.3,15,0.49,799.9,"apple, cup, dining table, orange, person"
+08_mercado_productos.jpg,adaptado,0.5,6,0.373,602.7,"dining table, person"
+08_mercado_productos.jpg,sin_adaptar,0.5,5,0.673,658.5,"apple, orange, person"
+08_mercado_productos.jpg,adaptado,0.7,6,0.373,693.9,"dining table, person"
+08_mercado_productos.jpg,sin_adaptar,0.7,1,0.899,677.0,apple
+09_objetos_pequenos.jpg,adaptado,0.3,7,0.39,731.9,"cell phone, dining table, laptop"
+09_objetos_pequenos.jpg,sin_adaptar,0.3,6,0.473,633.9,"book, cell phone, laptop, remote"
+09_objetos_pequenos.jpg,adaptado,0.5,7,0.39,625.8,"cell phone, dining table, laptop"
+09_objetos_pequenos.jpg,sin_adaptar,0.5,2,0.7,607.4,"cell phone, laptop"
+09_objetos_pequenos.jpg,adaptado,0.7,7,0.39,635.8,"cell phone, dining table, laptop"
+09_objetos_pequenos.jpg,sin_adaptar,0.7,1,0.701,727.8,laptop
+10_escena_compleja.jpg,adaptado,0.3,13,0.719,1059.0,car
+10_escena_compleja.jpg,sin_adaptar,0.3,13,0.719,1381.6,car
+10_escena_compleja.jpg,adaptado,0.5,13,0.719,1188.0,car
+10_escena_compleja.jpg,sin_adaptar,0.5,13,0.719,1002.5,car
+10_escena_compleja.jpg,adaptado,0.7,8,0.799,995.1,car
+10_escena_compleja.jpg,sin_adaptar,0.7,8,0.799,876.9,car
+11_escritorio.jpeg,adaptado,0.3,5,0.759,683.8,"chair, couch, dining table, tv"
+11_escritorio.jpeg,sin_adaptar,0.3,4,0.881,532.2,"chair, couch, tv"
+11_escritorio.jpeg,adaptado,0.5,5,0.759,489.7,"chair, couch, dining table, tv"
+11_escritorio.jpeg,sin_adaptar,0.5,4,0.881,500.5,"chair, couch, tv"
+11_escritorio.jpeg,adaptado,0.7,5,0.759,630.2,"chair, couch, dining table, tv"
+11_escritorio.jpeg,sin_adaptar,0.7,4,0.881,614.9,"chair, couch, tv"
+12_sala.jpg,adaptado,0.3,18,0.745,696.0,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+12_sala.jpg,sin_adaptar,0.3,18,0.745,611.6,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+12_sala.jpg,adaptado,0.5,18,0.745,667.5,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+12_sala.jpg,sin_adaptar,0.5,16,0.787,740.7,"chair, couch, dining table, potted plant, tv, wine glass"
+12_sala.jpg,adaptado,0.7,18,0.745,1253.8,"bottle, chair, couch, dining table, potted plant, tv, wine glass"
+12_sala.jpg,sin_adaptar,0.7,12,0.843,633.2,"chair, couch, potted plant, tv, wine glass"

@@ -1,0 +1,1614 @@
+{
+  "meta": {
+    "fecha_utc": "2026-10-25T23:03:38.623963+00:00",
+    "pesos": "yolo26s.pt",
+    "imgsz": 1280,
+    "umbral": 0.35,
+    "n_imagenes": 41
+  },
+  "resumen": {
+    "max_800": {
+      "detecciones_total": 366,
+      "confianza_media": 0.619,
+      "deteccion_ms_mediana": 550.5,
+      "deteccion_ms_media": 569.4
+    },
+    "max_1280": {
+      "detecciones_total": 391,
+      "confianza_media": 0.629,
+      "deteccion_ms_mediana": 536.7,
+      "deteccion_ms_media": 564.1,
+      "imagenes_con_mas_que_800": 14,
+      "imagenes_con_menos_que_800": 9,
+      "imagenes_con_otras_clases": 10
+    },
+    "original": {
+      "detecciones_total": 406,
+      "confianza_media": 0.633,
+      "deteccion_ms_mediana": 629.9,
+      "deteccion_ms_media": 653.3,
+      "imagenes_con_mas_que_800": 18,
+      "imagenes_con_menos_que_800": 9,
+      "imagenes_con_otras_clases": 13
+    }
+  },
+  "filas": [
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 605.0,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 718.2,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-01-granja.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 642.2,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 3,
+      "confianza_media": 0.836,
+      "deteccion_ms": 614.2,
+      "clases": [
+        "bench",
+        "bicycle"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 3,
+      "confianza_media": 0.744,
+      "deteccion_ms": 568.0,
+      "clases": [
+        "bench",
+        "bicycle"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-02-parque.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 4,
+      "confianza_media": 0.722,
+      "deteccion_ms": 632.0,
+      "clases": [
+        "bench",
+        "bicycle"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 15,
+      "confianza_media": 0.731,
+      "deteccion_ms": 602.7,
+      "clases": [
+        "bench",
+        "car",
+        "chair",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 13,
+      "confianza_media": 0.792,
+      "deteccion_ms": 735.7,
+      "clases": [
+        "bench",
+        "car",
+        "chair",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-03-calle.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 14,
+      "confianza_media": 0.779,
+      "deteccion_ms": 708.7,
+      "clases": [
+        "bench",
+        "car",
+        "chair",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 27,
+      "confianza_media": 0.602,
+      "deteccion_ms": 567.1,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "laptop",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 36,
+      "confianza_media": 0.59,
+      "deteccion_ms": 677.0,
+      "clases": [
+        "backpack",
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "laptop",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-04-Biblioteca.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 36,
+      "confianza_media": 0.601,
+      "deteccion_ms": 717.9,
+      "clases": [
+        "backpack",
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "laptop",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 16,
+      "confianza_media": 0.742,
+      "deteccion_ms": 513.3,
+      "clases": [
+        "backpack",
+        "bus",
+        "car",
+        "dog",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 16,
+      "confianza_media": 0.797,
+      "deteccion_ms": 595.5,
+      "clases": [
+        "backpack",
+        "bus",
+        "car",
+        "dog",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-05-Ciudad.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 18,
+      "confianza_media": 0.766,
+      "deteccion_ms": 626.4,
+      "clases": [
+        "backpack",
+        "bus",
+        "car",
+        "dog",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 25,
+      "confianza_media": 0.658,
+      "deteccion_ms": 567.7,
+      "clases": [
+        "backpack",
+        "bench",
+        "person"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 23,
+      "confianza_media": 0.705,
+      "deteccion_ms": 576.1,
+      "clases": [
+        "backpack",
+        "person",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/generated/synthetic/W3D-G-06-Universidad.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 26,
+      "confianza_media": 0.697,
+      "deteccion_ms": 580.6,
+      "clases": [
+        "backpack",
+        "laptop",
+        "person"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 8,
+      "confianza_media": 0.676,
+      "deteccion_ms": 594.7,
+      "clases": [
+        "car",
+        "truck",
+        "umbrella"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 15,
+      "confianza_media": 0.573,
+      "deteccion_ms": 499.3,
+      "clases": [
+        "bench",
+        "car",
+        "truck",
+        "umbrella"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-01-cars.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 13,
+      "confianza_media": 0.588,
+      "deteccion_ms": 698.1,
+      "clases": [
+        "bench",
+        "car",
+        "truck",
+        "umbrella"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 1,
+      "confianza_media": 0.796,
+      "deteccion_ms": 459.4,
+      "clases": [
+        "bench"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 1,
+      "confianza_media": 0.921,
+      "deteccion_ms": 462.0,
+      "clases": [
+        "bench"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-02-megapolis.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 1,
+      "confianza_media": 0.913,
+      "deteccion_ms": 592.9,
+      "clases": [
+        "bench"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 10,
+      "confianza_media": 0.624,
+      "deteccion_ms": 491.6,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 10,
+      "confianza_media": 0.622,
+      "deteccion_ms": 503.9,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-03-salad.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 11,
+      "confianza_media": 0.592,
+      "deteccion_ms": 629.9,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 30,
+      "confianza_media": 0.517,
+      "deteccion_ms": 464.5,
+      "clases": [
+        "chair",
+        "clock",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 29,
+      "confianza_media": 0.527,
+      "deteccion_ms": 502.2,
+      "clases": [
+        "chair",
+        "clock",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/justcreate3d/W3D-I-JC3D-04-school.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 31,
+      "confianza_media": 0.513,
+      "deteccion_ms": 653.2,
+      "clases": [
+        "chair",
+        "clock",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 474.4,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 452.1,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/kaykit/W3D-I-KYK-01-restaurant.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 561.2,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 2,
+      "confianza_media": 0.603,
+      "deteccion_ms": 467.7,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 2,
+      "confianza_media": 0.701,
+      "deteccion_ms": 463.1,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-01-bathroom.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 2,
+      "confianza_media": 0.758,
+      "deteccion_ms": 555.2,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 3,
+      "confianza_media": 0.753,
+      "deteccion_ms": 418.8,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1135,
+      "objetos": 3,
+      "confianza_media": 0.728,
+      "deteccion_ms": 404.9,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-02-studio.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.728,
+      "deteccion_ms": 444.2,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 2,
+      "confianza_media": 0.865,
+      "deteccion_ms": 655.4,
+      "clases": [
+        "chair",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1061,
+      "objetos": 3,
+      "confianza_media": 0.682,
+      "deteccion_ms": 652.0,
+      "clases": [
+        "chair",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-03-studio2.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.682,
+      "deteccion_ms": 664.7,
+      "clases": [
+        "chair",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 799,
+      "objetos": 3,
+      "confianza_media": 0.866,
+      "deteccion_ms": 532.8,
+      "clases": [
+        "couch"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 4,
+      "confianza_media": 0.714,
+      "deteccion_ms": 512.0,
+      "clases": [
+        "chair",
+        "couch"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/polyhaven/W3D-I-PHV-04-sofa.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 4,
+      "confianza_media": 0.736,
+      "deteccion_ms": 637.6,
+      "clases": [
+        "chair",
+        "couch"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 28,
+      "confianza_media": 0.632,
+      "deteccion_ms": 473.4,
+      "clases": [
+        "bottle",
+        "chair",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 32,
+      "confianza_media": 0.622,
+      "deteccion_ms": 472.7,
+      "clases": [
+        "bottle",
+        "chair",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-01-british.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 38,
+      "confianza_media": 0.628,
+      "deteccion_ms": 476.5,
+      "clases": [
+        "bottle",
+        "chair",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 14,
+      "confianza_media": 0.673,
+      "deteccion_ms": 466.5,
+      "clases": [
+        "bus",
+        "chair",
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 15,
+      "confianza_media": 0.601,
+      "deteccion_ms": 469.5,
+      "clases": [
+        "chair",
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-02-cartoon-low-poly.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 13,
+      "confianza_media": 0.611,
+      "deteccion_ms": 608.9,
+      "clases": [
+        "chair",
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 2,
+      "confianza_media": 0.415,
+      "deteccion_ms": 635.8,
+      "clases": [
+        "bottle",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1025,
+      "objetos": 3,
+      "confianza_media": 0.426,
+      "deteccion_ms": 590.4,
+      "clases": [
+        "bottle",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-03-clean.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.426,
+      "deteccion_ms": 702.7,
+      "clases": [
+        "bottle",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 14,
+      "confianza_media": 0.572,
+      "deteccion_ms": 497.2,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 17,
+      "confianza_media": 0.504,
+      "deteccion_ms": 498.5,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-04-coffee.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 16,
+      "confianza_media": 0.522,
+      "deteccion_ms": 518.5,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 9,
+      "confianza_media": 0.453,
+      "deteccion_ms": 494.8,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 12,
+      "confianza_media": 0.473,
+      "deteccion_ms": 519.7,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-05-interior.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 11,
+      "confianza_media": 0.497,
+      "deteccion_ms": 519.2,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 3,
+      "confianza_media": 0.414,
+      "deteccion_ms": 677.9,
+      "clases": [
+        "chair",
+        "dining table",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1023,
+      "objetos": 1,
+      "confianza_media": 0.632,
+      "deteccion_ms": 592.1,
+      "clases": [
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-06-kitchen.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 1,
+      "confianza_media": 0.632,
+      "deteccion_ms": 660.3,
+      "clases": [
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 6,
+      "confianza_media": 0.588,
+      "deteccion_ms": 464.3,
+      "clases": [
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 5,
+      "confianza_media": 0.674,
+      "deteccion_ms": 559.9,
+      "clases": [
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-07-living-room.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 4,
+      "confianza_media": 0.82,
+      "deteccion_ms": 521.6,
+      "clases": [
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 4,
+      "confianza_media": 0.423,
+      "deteccion_ms": 550.2,
+      "clases": [
+        "car",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 2,
+      "confianza_media": 0.524,
+      "deteccion_ms": 450.5,
+      "clases": [
+        "truck"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-08-low-poly-city.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 2,
+      "confianza_media": 0.522,
+      "deteccion_ms": 477.4,
+      "clases": [
+        "truck"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 799,
+      "objetos": 5,
+      "confianza_media": 0.77,
+      "deteccion_ms": 471.6,
+      "clases": [
+        "chair",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 6,
+      "confianza_media": 0.739,
+      "deteccion_ms": 467.8,
+      "clases": [
+        "chair",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-09-office.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 7,
+      "confianza_media": 0.665,
+      "deteccion_ms": 591.3,
+      "clases": [
+        "chair",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 12,
+      "confianza_media": 0.571,
+      "deteccion_ms": 545.6,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 14,
+      "confianza_media": 0.547,
+      "deteccion_ms": 495.6,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-10-room.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 11,
+      "confianza_media": 0.661,
+      "deteccion_ms": 590.8,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 717,
+      "objetos": 2,
+      "confianza_media": 0.543,
+      "deteccion_ms": 805.2,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 717,
+      "objetos": 2,
+      "confianza_media": 0.543,
+      "deteccion_ms": 796.2,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-11-rooms.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 2,
+      "confianza_media": 0.543,
+      "deteccion_ms": 709.6,
+      "clases": [
+        "potted plant",
+        "vase"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 840.1,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 888,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 879.1,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-12-salad.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 0,
+      "confianza_media": null,
+      "deteccion_ms": 802.4,
+      "clases": []
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 24,
+      "confianza_media": 0.655,
+      "deteccion_ms": 451.9,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 25,
+      "confianza_media": 0.692,
+      "deteccion_ms": 534.7,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-13-the-grand-budapest-hotel.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 28,
+      "confianza_media": 0.713,
+      "deteccion_ms": 587.8,
+      "clases": [
+        "chair",
+        "dining table",
+        "potted plant"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 3,
+      "confianza_media": 0.608,
+      "deteccion_ms": 484.2,
+      "clases": [
+        "couch",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 3,
+      "confianza_media": 0.614,
+      "deteccion_ms": 472.2,
+      "clases": [
+        "couch",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "evaluation/images/web3d/internet/sketchfab/W3D-I-SKF-14-waiting-room.png",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.648,
+      "deteccion_ms": 474.2,
+      "clases": [
+        "couch",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/01_persona_bolso.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 2,
+      "confianza_media": 0.459,
+      "deteccion_ms": 584.5,
+      "clases": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "test_images/01_persona_bolso.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 2,
+      "confianza_media": 0.72,
+      "deteccion_ms": 558.2,
+      "clases": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "test_images/01_persona_bolso.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 2,
+      "confianza_media": 0.704,
+      "deteccion_ms": 949.1,
+      "clases": [
+        "person",
+        "suitcase"
+      ]
+    },
+    {
+      "imagen": "test_images/02_calle_carros.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 799,
+      "objetos": 15,
+      "confianza_media": 0.777,
+      "deteccion_ms": 786.2,
+      "clases": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "test_images/02_calle_carros.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 19,
+      "confianza_media": 0.697,
+      "deteccion_ms": 567.9,
+      "clases": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "test_images/02_calle_carros.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 22,
+      "confianza_media": 0.683,
+      "deteccion_ms": 957.2,
+      "clases": [
+        "car",
+        "person",
+        "truck"
+      ]
+    },
+    {
+      "imagen": "test_images/03_escritorio_objetos.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 11,
+      "confianza_media": 0.589,
+      "deteccion_ms": 660.6,
+      "clases": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/03_escritorio_objetos.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 11,
+      "confianza_media": 0.587,
+      "deteccion_ms": 595.5,
+      "clases": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/03_escritorio_objetos.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 9,
+      "confianza_media": 0.642,
+      "deteccion_ms": 959.7,
+      "clases": [
+        "bottle",
+        "cell phone",
+        "laptop",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/04_cocina_utensilios.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 2,
+      "confianza_media": 0.287,
+      "deteccion_ms": 550.5,
+      "clases": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/04_cocina_utensilios.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 1,
+      "confianza_media": 0.394,
+      "deteccion_ms": 613.7,
+      "clases": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/04_cocina_utensilios.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 2,
+      "confianza_media": 0.289,
+      "deteccion_ms": 860.0,
+      "clases": [
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/05_sala_muebles.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 8,
+      "confianza_media": 0.746,
+      "deteccion_ms": 612.6,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/05_sala_muebles.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 8,
+      "confianza_media": 0.744,
+      "deteccion_ms": 661.3,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/05_sala_muebles.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 8,
+      "confianza_media": 0.767,
+      "deteccion_ms": 931.5,
+      "clases": [
+        "chair",
+        "couch",
+        "potted plant",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/06_bicicleta_persona.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 4,
+      "confianza_media": 0.415,
+      "deteccion_ms": 802.8,
+      "clases": [
+        "backpack",
+        "bicycle",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/06_bicicleta_persona.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 3,
+      "confianza_media": 0.412,
+      "deteccion_ms": 809.7,
+      "clases": [
+        "backpack",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/06_bicicleta_persona.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.412,
+      "deteccion_ms": 925.5,
+      "clases": [
+        "backpack",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/07_perro_parque.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 4,
+      "confianza_media": 0.692,
+      "deteccion_ms": 422.7,
+      "clases": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/07_perro_parque.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 4,
+      "confianza_media": 0.672,
+      "deteccion_ms": 420.6,
+      "clases": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/07_perro_parque.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 4,
+      "confianza_media": 0.673,
+      "deteccion_ms": 413.2,
+      "clases": [
+        "dog",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/08_mercado_productos.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 6,
+      "confianza_media": 0.373,
+      "deteccion_ms": 556.6,
+      "clases": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/08_mercado_productos.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1260,
+      "objetos": 6,
+      "confianza_media": 0.374,
+      "deteccion_ms": 558.1,
+      "clases": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/08_mercado_productos.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 6,
+      "confianza_media": 0.374,
+      "deteccion_ms": 518.8,
+      "clases": [
+        "dining table",
+        "person"
+      ]
+    },
+    {
+      "imagen": "test_images/09_objetos_pequenos.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 7,
+      "confianza_media": 0.39,
+      "deteccion_ms": 658.6,
+      "clases": [
+        "cell phone",
+        "dining table",
+        "laptop"
+      ]
+    },
+    {
+      "imagen": "test_images/09_objetos_pequenos.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 4,
+      "confianza_media": 0.336,
+      "deteccion_ms": 536.7,
+      "clases": [
+        "cell phone",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/09_objetos_pequenos.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 3,
+      "confianza_media": 0.384,
+      "deteccion_ms": 880.7,
+      "clases": [
+        "cell phone",
+        "dining table"
+      ]
+    },
+    {
+      "imagen": "test_images/10_escena_compleja.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 13,
+      "confianza_media": 0.719,
+      "deteccion_ms": 786.8,
+      "clases": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "test_images/10_escena_compleja.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 15,
+      "confianza_media": 0.73,
+      "deteccion_ms": 787.8,
+      "clases": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "test_images/10_escena_compleja.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 18,
+      "confianza_media": 0.681,
+      "deteccion_ms": 799.6,
+      "clases": [
+        "car"
+      ]
+    },
+    {
+      "imagen": "test_images/11_escritorio.jpeg",
+      "condicion": "max_800",
+      "lado_mayor_px": 800,
+      "objetos": 5,
+      "confianza_media": 0.759,
+      "deteccion_ms": 562.9,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/11_escritorio.jpeg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 1280,
+      "objetos": 5,
+      "confianza_media": 0.789,
+      "deteccion_ms": 429.3,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/11_escritorio.jpeg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 6,
+      "confianza_media": 0.72,
+      "deteccion_ms": 513.0,
+      "clases": [
+        "chair",
+        "couch",
+        "dining table",
+        "tv"
+      ]
+    },
+    {
+      "imagen": "test_images/12_sala.jpg",
+      "condicion": "max_800",
+      "lado_mayor_px": 640,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 470.8,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "test_images/12_sala.jpg",
+      "condicion": "max_1280",
+      "lado_mayor_px": 640,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 468.5,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    },
+    {
+      "imagen": "test_images/12_sala.jpg",
+      "condicion": "original",
+      "lado_mayor_px": null,
+      "objetos": 18,
+      "confianza_media": 0.745,
+      "deteccion_ms": 492.3,
+      "clases": [
+        "bottle",
+        "chair",
+        "couch",
+        "dining table",
+        "potted plant",
+        "tv",
+        "wine glass"
+      ]
+    }
+  ]
+}

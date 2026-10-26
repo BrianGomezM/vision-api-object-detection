@@ -7,9 +7,10 @@
   conservan los identificadores con los que se generaron (`fcf80e9` y `302db7e`), que hoy
   corresponden a los commits `5d0072c` y `c24e00f`; el código de esos commits es el mismo.
 - **Suites:**
-  - Suite automatizada (`pytest -m "not entorno_referencia and not live_smoke"`): 442 pruebas,
-    438 aprobadas y 4 omitidas por requerir el entorno de referencia. Proveedores simulados: no
-    consume servicios externos. Se ejecuta en GitHub Actions antes de cada despliegue.
+  - Suite automatizada: 340 pruebas. Las 331 que no requieren el entorno de referencia ni servicios
+    reales (`pytest -m "not entorno_referencia and not live_smoke"`) se aprueban en GitHub Actions
+    antes de cada despliegue; usan proveedores simulados y no consumen servicios externos. Las 9
+    restantes se ejecutan a mano (entorno de referencia y servicios reales).
   - Regresión del procesamiento (`tests/regression`, entorno de referencia): 3/3 aprobadas; las
     41 imágenes de referencia producen una salida idéntica a la línea base.
   - Mediciones con los proveedores reales: `scripts/evaluation/plan_pruebas_nf.py`
