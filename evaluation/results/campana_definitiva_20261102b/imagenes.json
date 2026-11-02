@@ -1,0 +1,158 @@
+[
+ {
+  "imagen": "01_persona_bolso.jpg",
+  "sha256_original": "39d492a1267696643110974bbbf2426df6db7950aa1802385601ff2e61c5e7ff",
+  "original_px": [
+   5184,
+   3456
+  ],
+  "preparada_px": [
+   800,
+   533
+  ],
+  "sha256_preparada": "6bc132a85a890ad8792df801fcbb3ec8d18af08809deffbf6adbf3ff93c7238c"
+ },
+ {
+  "imagen": "02_calle_carros.jpg",
+  "sha256_original": "e0aaa10d255c08ed200dad740720d3249e5caafd2397d57200985f11da3ebd85",
+  "original_px": [
+   5586,
+   3712
+  ],
+  "preparada_px": [
+   799,
+   531
+  ],
+  "sha256_preparada": "912d99382266a9787f6d85e02a08efc6c8cc06e7aa32f78fdad62e8ba148ecdc"
+ },
+ {
+  "imagen": "03_escritorio_objetos.jpg",
+  "sha256_original": "f7d7bfd5ab3c02fd71bf4e8d9c57ec1c8b8a6f2c784b222e33c384a36813c591",
+  "original_px": [
+   5472,
+   3648
+  ],
+  "preparada_px": [
+   800,
+   533
+  ],
+  "sha256_preparada": "850353e253fe9cf48d764b4e8efaeeafe297b2bd7e44b6ff3e6f18745de17e26"
+ },
+ {
+  "imagen": "04_cocina_utensilios.jpg",
+  "sha256_original": "bee4e4e93b3a9c55fb14a56e9f28b3e0699b8a19064e07b2bc2e9c61944e0893",
+  "original_px": [
+   5373,
+   3582
+  ],
+  "preparada_px": [
+   800,
+   533
+  ],
+  "sha256_preparada": "6beaaa128f8621114af5306e6f4ae3bda9911a25ef9641e83dd26ea972838180"
+ },
+ {
+  "imagen": "05_sala_muebles.jpg",
+  "sha256_original": "b0c0850a68fc41c4c762b56a5b417bd608bad0d1afafeb0836db516ed692cc04",
+  "original_px": [
+   5095,
+   3743
+  ],
+  "preparada_px": [
+   800,
+   587
+  ],
+  "sha256_preparada": "8424d7a4603d71491e64c4d8c6dde5d607d09cce4b009409570d99d88bb10f35"
+ },
+ {
+  "imagen": "06_bicicleta_persona.jpg",
+  "sha256_original": "15f61db77f326fd5032cc9a28603bdf1ddc891d578261a4a4f7f79e6794eabda",
+  "original_px": [
+   3571,
+   3024
+  ],
+  "preparada_px": [
+   800,
+   677
+  ],
+  "sha256_preparada": "922f06f1179bc2853cb702c992cb20942049d6c708940783aef50c46fbc9168e"
+ },
+ {
+  "imagen": "07_perro_parque.jpg",
+  "sha256_original": "9fb346f58e7635ad30cd77971be9ba424094e048ababcd72145e51c5ca953ddb",
+  "original_px": [
+   738,
+   1600
+  ],
+  "preparada_px": [
+   369,
+   800
+  ],
+  "sha256_preparada": "c47ae963e6f3a02c87d23f788528b0892666e72cc1b5db8c5b6af11f00f5804c"
+ },
+ {
+  "imagen": "08_mercado_productos.jpg",
+  "sha256_original": "6224c85540f702016698787bab571d89e095353c0366f24bd9f8464c6acc1a6f",
+  "original_px": [
+   1260,
+   839
+  ],
+  "preparada_px": [
+   800,
+   532
+  ],
+  "sha256_preparada": "460fdd55d8577f3b9b872c46f7711095bb4688ff4fae0da7552018c51df7c78f"
+ },
+ {
+  "imagen": "09_objetos_pequenos.jpg",
+  "sha256_original": "db09ebf896bd53988d199411600ee906726868c122f57e18f39be829dd1a75e0",
+  "original_px": [
+   5983,
+   3853
+  ],
+  "preparada_px": [
+   800,
+   515
+  ],
+  "sha256_preparada": "c2f976180ec899a3d6a75900e106bc30635f23a5a941c52c070d5e4d2f3cbdc8"
+ },
+ {
+  "imagen": "10_escena_compleja.jpg",
+  "sha256_original": "e1bf81ee08ff9cbb84d82c038876fce9385d397c0fc780e53bfbe6b81c024726",
+  "original_px": [
+   1600,
+   1430
+  ],
+  "preparada_px": [
+   800,
+   715
+  ],
+  "sha256_preparada": "ec8cda3992e8e325d0165c83213a80f4f1043f1c3bb3d4c7963c2ee65f152b35"
+ },
+ {
+  "imagen": "11_escritorio.jpeg",
+  "sha256_original": "1188a51456ed7a611d3508f0d4e10489f5fdf32a4cfc12bb132a2ef807f92d6e",
+  "original_px": [
+   1823,
+   1001
+  ],
+  "preparada_px": [
+   800,
+   439
+  ],
+  "sha256_preparada": "f94db35544c8f8df486d85706ed87cdab7871915aae17a5da7b581cf76304bd4"
+ },
+ {
+  "imagen": "12_sala.jpg",
+  "sha256_original": "cb80bc2166972cf1d21bd0e7d09422890e07bedf376437481adad77209fc504c",
+  "original_px": [
+   640,
+   364
+  ],
+  "preparada_px": [
+   640,
+   364
+  ],
+  "sha256_preparada": "cb80bc2166972cf1d21bd0e7d09422890e07bedf376437481adad77209fc504c"
+ }
+]
