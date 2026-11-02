@@ -1,0 +1,275 @@
+{
+ "yolo": {
+  "0.3": {
+   "VP": 44,
+   "FP": 6,
+   "dudosos": 0,
+   "precision": 0.88,
+   "imagenes_con_FP": 5,
+   "FP_lista": [
+    "02:truck",
+    "03:book",
+    "03:laptop",
+    "04:dining table",
+    "08:dining table",
+    "09:remote"
+   ]
+  },
+  "0.5": {
+   "VP": 35,
+   "FP": 2,
+   "dudosos": 0,
+   "precision": 0.946,
+   "imagenes_con_FP": 2,
+   "FP_lista": [
+    "02:truck",
+    "03:laptop"
+   ]
+  },
+  "0.7": {
+   "VP": 26,
+   "FP": 1,
+   "dudosos": 0,
+   "precision": 0.963,
+   "imagenes_con_FP": 1,
+   "FP_lista": [
+    "03:laptop"
+   ]
+  }
+ },
+ "fasterrcnn": {
+  "0.3": {
+   "VP": 58,
+   "FP": 24,
+   "dudosos": 1,
+   "precision": 0.707,
+   "imagenes_con_FP": 8,
+   "FP_lista": [
+    "02:bird",
+    "02:truck",
+    "03:laptop",
+    "04:carrot",
+    "04:dining table",
+    "04:donut",
+    "04:fork",
+    "04:scissors",
+    "08:dining table",
+    "09:bowl",
+    "09:clock",
+    "09:dining table",
+    "09:knife",
+    "09:tv",
+    "10:bed",
+    "10:book",
+    "10:cell phone",
+    "10:clock",
+    "10:cup",
+    "10:scissors",
+    "11:mouse",
+    "12:cup",
+    "12:knife",
+    "12:vase"
+   ]
+  },
+  "0.5": {
+   "VP": 54,
+   "FP": 15,
+   "dudosos": 1,
+   "precision": 0.783,
+   "imagenes_con_FP": 6,
+   "FP_lista": [
+    "02:truck",
+    "04:carrot",
+    "04:dining table",
+    "04:fork",
+    "08:dining table",
+    "09:bowl",
+    "09:clock",
+    "09:dining table",
+    "10:bed",
+    "10:cell phone",
+    "10:clock",
+    "10:cup",
+    "10:scissors",
+    "12:knife",
+    "12:vase"
+   ]
+  },
+  "0.7": {
+   "VP": 47,
+   "FP": 10,
+   "dudosos": 0,
+   "precision": 0.825,
+   "imagenes_con_FP": 6,
+   "FP_lista": [
+    "02:truck",
+    "04:carrot",
+    "04:dining table",
+    "08:dining table",
+    "09:bowl",
+    "09:clock",
+    "09:dining table",
+    "10:clock",
+    "10:cup",
+    "12:vase"
+   ]
+  }
+ },
+ "maskrcnn": {
+  "0.3": {
+   "VP": 57,
+   "FP": 28,
+   "dudosos": 2,
+   "precision": 0.671,
+   "imagenes_con_FP": 7,
+   "FP_lista": [
+    "01:banana",
+    "01:surfboard",
+    "02:bird",
+    "02:truck",
+    "04:book",
+    "04:carrot",
+    "04:dining table",
+    "04:mouse",
+    "08:banana",
+    "08:dining table",
+    "09:bowl",
+    "09:car",
+    "09:clock",
+    "09:dining table",
+    "09:remote",
+    "10:bench",
+    "10:book",
+    "10:bottle",
+    "10:cell phone",
+    "10:clock",
+    "10:cup",
+    "10:donut",
+    "10:kite",
+    "10:orange",
+    "10:tv",
+    "10:umbrella",
+    "10:wine glass",
+    "12:vase"
+   ]
+  },
+  "0.5": {
+   "VP": 56,
+   "FP": 14,
+   "dudosos": 2,
+   "precision": 0.8,
+   "imagenes_con_FP": 7,
+   "FP_lista": [
+    "01:surfboard",
+    "02:truck",
+    "04:carrot",
+    "04:dining table",
+    "08:banana",
+    "08:dining table",
+    "09:clock",
+    "09:dining table",
+    "10:bench",
+    "10:cell phone",
+    "10:clock",
+    "10:cup",
+    "10:orange",
+    "12:vase"
+   ]
+  },
+  "0.7": {
+   "VP": 52,
+   "FP": 10,
+   "dudosos": 1,
+   "precision": 0.839,
+   "imagenes_con_FP": 7,
+   "FP_lista": [
+    "01:surfboard",
+    "02:truck",
+    "04:carrot",
+    "04:dining table",
+    "08:banana",
+    "08:dining table",
+    "09:dining table",
+    "10:clock",
+    "10:cup",
+    "12:vase"
+   ]
+  }
+ },
+ "ssd": {
+  "0.3": {
+   "VP": 55,
+   "FP": 43,
+   "dudosos": 0,
+   "precision": 0.561,
+   "imagenes_con_FP": 12,
+   "FP_lista": [
+    "01:surfboard",
+    "02:kite",
+    "02:traffic light",
+    "02:truck",
+    "03:laptop",
+    "03:tie",
+    "04:apple",
+    "04:cake",
+    "04:carrot",
+    "04:dining table",
+    "04:donut",
+    "04:fork",
+    "04:scissors",
+    "05:bed",
+    "06:skateboard",
+    "07:backpack",
+    "07:cell phone",
+    "07:skateboard",
+    "08:bottle",
+    "08:broccoli",
+    "08:carrot",
+    "08:cell phone",
+    "08:dining table",
+    "08:spoon",
+    "08:vase",
+    "09:clock",
+    "09:dining table",
+    "09:mouse",
+    "09:remote",
+    "09:tv",
+    "10:bottle",
+    "10:cake",
+    "10:person",
+    "10:umbrella",
+    "11:clock",
+    "11:toilet",
+    "12:clock",
+    "12:cup",
+    "12:oven",
+    "12:person",
+    "12:refrigerator",
+    "12:sink",
+    "12:vase"
+   ]
+  },
+  "0.5": {
+   "VP": 27,
+   "FP": 5,
+   "dudosos": 0,
+   "precision": 0.844,
+   "imagenes_con_FP": 4,
+   "FP_lista": [
+    "02:truck",
+    "04:carrot",
+    "04:dining table",
+    "08:dining table",
+    "09:mouse"
+   ]
+  },
+  "0.7": {
+   "VP": 14,
+   "FP": 0,
+   "dudosos": 0,
+   "precision": 1.0,
+   "imagenes_con_FP": 0,
+   "FP_lista": []
+  }
+ }
+}
