@@ -16,15 +16,27 @@ No forma parte del servicio desplegado.
 """
 
 import io
+import os
 
+import torch
 from PIL import Image
 
 from app.services import yolo_service as _ys
 
 
+def _fijar_hilos() -> None:
+    """Restaura los hilos de la campaña: Ultralytics llama torch.set_num_threads(cpu_count - 1)
+    al preparar el dispositivo, lo que daría a YOLO26s más hilos que a los otros modelos."""
+    hilos = int(os.environ.get("OMP_NUM_THREADS", "0"))
+    if hilos:
+        torch.set_num_threads(hilos)
+
+
 def cargar_modelo():
     """Carga (y calienta) el modelo con el cargador de producción."""
-    return _ys._get_model()
+    model = _ys._get_model()
+    _fijar_hilos()
+    return model
 
 
 def run_yolo_coco80(image_bytes: bytes, confidence_threshold: float = 0.5) -> dict:
