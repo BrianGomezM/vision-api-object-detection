@@ -1,0 +1,15 @@
+{
+ "_nota": "Huellas SHA-256 esperadas de los pesos. Las null se completan con la descarga aprobada (decisión S5) y se registran en un commit ANTES de medir; mientras haya null, campana_definitiva.py se niega a medir ese modelo. En torchvision, los 8 caracteres del nombre del archivo son el prefijo del SHA-256 publicado por PyTorch, que la descarga comprueba.",
+ "yolo": {
+  "yolo26s.pt": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b"
+ },
+ "fasterrcnn": {
+  "fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth": "dd69338a24b8d7381807e247652bdc356325bcbaf1cd3e092e00e0a1a58706bf"
+ },
+ "maskrcnn": {
+  "maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth": "73cbd0190fcbe3ba339921fbce2c3a0b6bb9126c9a133c85e43a2a8e060a109e"
+ },
+ "ssd": {
+  "https://tfhub.dev/tensorflow/ssd_mobilenet_v2/2": "f3bb8593e984c0c59e8684f8295c5fe50ef2507160537567bdf8a6e87bbe6268"
+ }
+}
