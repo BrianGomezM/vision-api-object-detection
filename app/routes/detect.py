@@ -104,7 +104,7 @@ def _threshold_explanation(result: dict, threshold: float) -> dict:
 from app.utils.groq_client import is_llm_active
 
 # Alias históricos
-build_final_narrative = build_narrative          # usado por app/experimental/batch.py
+build_final_narrative = build_narrative          # nombre anterior de build_narrative
 _run_full_pipeline = pipeline.run                 # nombre anterior del orquestador
 
 
