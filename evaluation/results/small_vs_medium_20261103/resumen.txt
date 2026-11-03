@@ -1,0 +1,40 @@
+small: media 684 ms | media de medianas 658 ms | min 479 max 997 | hilos 4 | repeticiones idénticas True | sha 646f8bc3fe0a
+medium: media 1751 ms | media de medianas 1715 ms | min 1099 max 3594 | hilos 4 | repeticiones idénticas True | sha 401cea9ab23a
+small_control: media 661 ms | media de medianas 637 ms | min 404 max 1413 | hilos 4 | repeticiones idénticas True | sha 646f8bc3fe0a
+
+== producción (clases de navegación, umbral 0,35): small 95 objetos, medium 94; imágenes con la misma lista: 2/12
+   01_persona_bolso.bin: solo small {} | solo medium {'person': 1}
+   02_calle_carros.bin: solo small {} | solo medium {'car': 3, 'person': 4}
+   03_escritorio_objetos.bin: solo small {'bottle': 1, 'laptop': 1, 'person': 1} | solo medium {}
+   05_sala_muebles.bin: solo small {'chair': 1} | solo medium {'potted plant': 1}
+   06_bicicleta_persona.bin: solo small {'backpack': 1, 'person': 1} | solo medium {'bicycle': 1}
+   07_perro_parque.bin: solo small {'person': 2} | solo medium {}
+   08_mercado_productos.bin: solo small {'dining table': 2, 'person': 1} | solo medium {}
+   09_objetos_pequenos.bin: solo small {'cell phone': 1, 'dining table': 3, 'laptop': 1} | solo medium {}
+   10_escena_compleja.bin: solo small {} | solo medium {'bicycle': 3, 'car': 1}
+   12_sala.bin: solo small {} | solo medium {'wine glass': 1}
+
+== 80 clases, umbral 0,5: small 85 objetos, medium 80; imágenes con la misma lista: 1/12
+   01_persona_bolso.bin: solo small {} | solo medium {'handbag': 1}
+   02_calle_carros.bin: solo small {'car': 1} | solo medium {'person': 1}
+   03_escritorio_objetos.bin: solo small {'bottle': 1, 'laptop': 3, 'person': 1, 'tv': 1} | solo medium {'cell phone': 1}
+   04_cocina_utensilios.bin: solo small {} | solo medium {'cup': 1, 'orange': 1}
+   05_sala_muebles.bin: solo small {'apple': 1, 'chair': 2} | solo medium {'bowl': 1}
+   06_bicicleta_persona.bin: solo small {} | solo medium {'bicycle': 1}
+   07_perro_parque.bin: solo small {'person': 1} | solo medium {}
+   08_mercado_productos.bin: solo small {} | solo medium {'apple': 2, 'cup': 1, 'orange': 1}
+   09_objetos_pequenos.bin: solo small {'cell phone': 1, 'laptop': 1} | solo medium {'cup': 1}
+   10_escena_compleja.bin: solo small {'car': 3} | solo medium {}
+   12_sala.bin: solo small {'dining table': 1} | solo medium {}
+
+== 80 clases, umbral 0,3: small 116 objetos, medium 129; imágenes con la misma lista: 2/12
+   01_persona_bolso.bin: solo small {} | solo medium {'handbag': 1, 'person': 1}
+   02_calle_carros.bin: solo small {} | solo medium {'car': 3, 'person': 4}
+   03_escritorio_objetos.bin: solo small {'bottle': 1, 'laptop': 1, 'person': 1} | solo medium {}
+   04_cocina_utensilios.bin: solo small {} | solo medium {'bowl': 1, 'cup': 2, 'dining table': 1, 'orange': 3, 'spoon': 1}
+   05_sala_muebles.bin: solo small {'chair': 1} | solo medium {'bowl': 1}
+   06_bicicleta_persona.bin: solo small {'backpack': 1, 'person': 1} | solo medium {'bicycle': 1}
+   07_perro_parque.bin: solo small {'person': 2} | solo medium {}
+   08_mercado_productos.bin: solo small {'apple': 1, 'dining table': 1, 'person': 1} | solo medium {}
+   09_objetos_pequenos.bin: solo small {'book': 1, 'cell phone': 1, 'laptop': 1} | solo medium {'cup': 1}
+   10_escena_compleja.bin: solo small {} | solo medium {'airplane': 2, 'bicycle': 3, 'car': 2}

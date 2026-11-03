@@ -1,0 +1,28 @@
+Comparación de YOLO26s (small) y YOLO26m (medium) — apartado 3.5.5 y Tabla 9
+
+Qué se midió
+  Las 12 imágenes de la campaña (campana_definitiva_20261102b/imagenes_preparadas, ya reducidas a 800 px),
+  con imgsz 1280, conf 0,15 (umbral interno del servicio), CPU con 4 hilos, 3 llamadas de calentamiento
+  y 3 repeticiones por imagen. Orden de ejecución: small, medium y small otra vez como control.
+  Fecha: 2026-11-03, 07:37 a 07:40 UTC. Equipo: Intel Core i5-8300H con el cargador conectado.
+
+Pesos
+  small:  yolo26s.pt, el mismo del servicio
+          SHA-256 646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b
+  medium: yolo26m.pt, descargado de https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt
+          SHA-256 401cea9ab23ad19246ff7744859816bc599f350e93c9dd30367b6f0a0745d0b7
+          (no se incluye en el repositorio por su tamaño, 42 MB)
+
+Resultado (resumen.txt tiene el detalle por imagen)
+  Tiempo de detección, media de las medianas por imagen: small 658 ms, medium 1715 ms (unas 2,6 veces más);
+  control de small al final: 637 ms.
+  Con las reglas del servicio (clases de navegación y umbral efectivo = mínimo entre el de la clase y 0,35):
+  small 95 objetos y medium 94; solo 2 de las 12 imágenes tienen exactamente la misma lista de objetos.
+  Las diferencias van de 1 a 7 objetos por imagen, y ninguna versión encuentra más en todas.
+  En cada versión, las tres repeticiones de cada imagen dieron las mismas detecciones.
+
+Archivos
+  medir.py          ejecuta una versión y escribe un .jsonl con el tiempo y las detecciones de cada llamada
+  analizar.py       calcula resumen.txt a partir de los .jsonl
+  small.jsonl, medium.jsonl, small_control.jsonl   mediciones crudas
+  resumen.txt       tiempos y diferencias de objetos por imagen
