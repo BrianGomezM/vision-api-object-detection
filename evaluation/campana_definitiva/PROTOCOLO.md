@@ -17,7 +17,7 @@
 
 Se miden sobre las 12 imágenes de la Tabla 4, con las 80 clases de COCO, umbral aplicado directamente y en el mismo equipo y sesión.
 
-**Qué sustituye.** Esta campaña pasa a ser la fuente de las Tablas 5–7 y de la selección. Reemplaza a la de mayo (`test_results_summary.xlsx`) y a la reevaluación del 25-oct. Esos archivos no se modifican y se conservan como registro.
+**Uso.** Esta campaña es la fuente de las Tablas 5–7 y de la selección del modelo.
 
 **Qué no es.** No es una evaluación de exactitud de detección al estilo COCO (sección 2).
 
@@ -41,7 +41,7 @@ Se miden sobre las 12 imágenes de la Tabla 4, con las 80 clases de COCO, umbral
 1. **Plantilla.** Se generó automáticamente con la lista de las 80 clases de COCO del traductor del servicio y los nombres de archivo de `test_images/`. Todas las celdas están vacías; la plantilla no contiene ninguna predicción.
 2. **Llenado.** Lo hace el autor, mirando cada imagen, con los valores de la sección 1.1. Anota en `observaciones` el criterio de cada `?`.
 3. **Sin revisión independiente.** Lo llena una sola persona y no hay segundo anotador.
-4. **No es ciego.** El autor conoce las detecciones de las campañas de mayo y del 25-oct. **La tesis no afirmará que la evaluación fue ciega** ni que el inventario es independiente de esas detecciones.
+4. **No es ciego.** El autor revisa las clases que nombraron los modelos, así que conoce sus detecciones. **La tesis no afirmará que la evaluación fue ciega** ni que la revisión es independiente de esas detecciones.
 
 ### 1.3 Versionado obligatorio antes de la campaña
 
@@ -473,7 +473,7 @@ Todo lo anterior se **registra como configuración efectiva** leída del objeto 
 **Análisis complementario de YOLO26s a 640 px.** La configuración de producción (1280 px) es la **principal y la única que puntúa**. La corrida a 640 px (`--yolo-640`, etiqueta `yolo_640`) usa el mismo commit y entorno, se valida en cuanto a commit, se guarda en `metricas.json` bajo `complementario_yolo_640_no_puntuado` y **no entra en el total, en la elegibilidad ni en la sensibilidad**. Sirve para relacionar los resultados con el mAP publicado, que se midió a 640.
 
 **Otros riesgos:**
-- **Máximos de detecciones.** En mayo los máximos por imagen fueron 70 (SSD), 65 (Mask), 47 (Faster) y 16 (YOLO con filtro). Si alguna corrida llega al máximo, queda un aviso y la tesis debe declararlo.
+- **Máximos de detecciones.** Si alguna corrida llega al máximo, queda un aviso y la tesis debe declararlo.
 - **SSD en TensorFlow.** Se compara el detector tal como se usaría, no a igualdad de código.
 - **Memoria base.** La de TensorFlow es mayor y se informa aparte.
 
